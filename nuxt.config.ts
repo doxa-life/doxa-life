@@ -78,7 +78,8 @@ export default defineNuxtConfig({
       appName: process.env.APP_TITLE || 'My App',
       nodeEnv: process.env.NODE_ENV || '',
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || '',
-      prayBaseUrl: process.env.NUXT_PUBLIC_PRAY_BASE_URL || 'https://pray.doxa.life'
+      prayBaseUrl: process.env.NUXT_PUBLIC_PRAY_BASE_URL || 'https://pray.doxa.life',
+      mapboxToken: process.env.NUXT_PUBLIC_MAPBOX_TOKEN || ''
     }
   },
 
