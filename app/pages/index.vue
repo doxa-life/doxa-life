@@ -1,11 +1,17 @@
+<script setup lang="ts">
+// Placeholder home page. Phase 3 replaces this with the full port of
+// marketing-theme/front-page.php (hero video, reel, step cards, etc.).
+const { t } = useI18n()
+</script>
+
 <template>
-  <div style="padding: 2rem; font-family: system-ui, sans-serif;">
-    <h1>Doxa</h1>
+  <section class="stack stack--md container">
+    <div>
+      <h2 class="color-brand">{{ t('Our gift to Jesus') }}:</h2>
+      <h1 class="color-brand-light">{{ t('Engage every people by 2033') }}</h1>
+    </div>
     <p>
-      Marketing-rebuild scaffold. The real homepage is ported in Phase 3.
+      {{ t('The DOXA Vision: Click image to watch the video') }}
     </p>
-    <p>
-      <a href="/admin">Admin →</a>
-    </p>
-  </div>
+  </section>
 </template>

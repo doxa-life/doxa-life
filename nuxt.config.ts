@@ -1,8 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { generateI18nLocales } from './config/languages'
+
 export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
-    '@nuxt/ui'
+    '@nuxt/ui',
+    '@nuxtjs/i18n'
+  ],
+
+  components: [
+    { path: '~/components', pathPrefix: false }
   ],
 
   devtools: {
@@ -21,14 +28,29 @@ export default defineNuxtConfig({
     }
   },
 
+  i18n: {
+    locales: generateI18nLocales(),
+    defaultLocale: 'en',
+    langDir: 'locales',
+    strategy: 'prefix_except_default',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'preferred_language',
+      redirectOn: 'root',
+      alwaysRedirect: true
+    },
+    vueI18n: './i18n.config.ts'
+  },
+
   app: {
     head: {
-      title: process.env.APP_TITLE || 'My App'
+      title: process.env.APP_TITLE || 'Doxa.Life – Global Partnership for the Unreached'
     }
   },
 
   routeRules: {
-    '/': { prerender: true }
+    '/': { prerender: true },
+    '/en/**': { redirect: '/**' }
   },
 
   runtimeConfig: {

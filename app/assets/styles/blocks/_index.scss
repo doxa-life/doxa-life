@@ -1,0 +1,17 @@
+// Blocks Layer
+// Component-level styles using composition utilities and semantic tokens
+// Structure for WordPress components (header, footer, etc.)
+
+// Blocks will be organized here as components are created
+// Example structure:
+@use 'buttons';
+@use 'cards';
+@use 'concentric_circles';
+@use 'dropdowns';
+@use 'filters';
+@use 'footer';
+@use 'form';
+@use 'header';
+@use 'polylang';
+@use 'progress-bar';
+@use 'video';

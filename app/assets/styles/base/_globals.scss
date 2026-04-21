@@ -1,0 +1,206 @@
+// Root Styles
+// Imports semantic tokens (which export CSS custom properties)
+// Sets up base typography and body styles
+
+html {
+  font-size: var(--font-size-base);
+  scrollbar-gutter: stable;
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-on-default);
+  background-color: var(--color-surface-default);
+}
+
+section {
+  padding-top: var(--spacing-4xl);
+  padding-top: clamp(var(--spacing-2xl), 6vw, var(--spacing-4xl));
+  padding-bottom: var(--spacing-4xl);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.page-content {
+  margin-top: var(--spacing-3xl);
+  margin-bottom: var(--spacing-4xl);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-family-heading);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-none);
+
+  [lang="ru-RU"] & {
+    font-family: var(--font-family-cyrillic);
+    letter-spacing: -0.02em;
+  }
+}
+
+h1, .h1 {
+  font-size: var(--font-size-5xl);
+  font-size: clamp(var(--font-size-3xl), 7vw, var(--font-size-5xl));
+}
+
+h2, .h2 {
+  font-size: clamp(var(--font-size-2xl), 6vw, var(--font-size-4xl));
+}
+
+h3, .h3 {
+  font-size: var(--font-size-3xl);
+  font-size: clamp(var(--font-size-xl), 5vw, var(--font-size-3xl));
+}
+
+h4, .h4 {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  font-size: var(--font-size-xl);
+}
+
+h5, .h5 {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-tight);
+  font-size: var(--font-size-lg);
+}
+
+.subtext {
+  font-family: var(--font-family-base);
+  font-size: clamp(var(--font-size-md), 2vw, var(--font-size-lg));
+  font-weight: var(--font-weight-medium);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--border-radius-lg);
+  object-fit: cover;
+}
+
+.bg-image {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+table {
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--table-border-color);
+  background-color: var(--color-surface-white);
+  border-collapse: collapse;
+}
+
+ul:not([role="list"]):not([role="listbox"]):not(.role-list):not(.sub-menu) {
+  list-style: none;
+  margin-inline-start: 0;
+  padding-inline-start: 1.8em;
+  line-height: var(--line-height-normal);
+}
+ul:not([role="list"]):not([role="listbox"]):not(.role-list):not(.sub-menu) li {
+  position: relative;
+}
+
+ul:not([role="list"]):not([role="listbox"]):not(.role-list):not(.sub-menu) li::before {
+  content: "";
+  background-repeat: no-repeat;
+  background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='%2392b195' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='8' cy='8' r='7' stroke='%2392b195' stroke-width='1.5'/%3E%3C/svg%3E");
+  width: 1.5em;
+  height: 1.5em;
+  position: absolute;
+  top: 0.3em;
+  line-height: 0.9;
+  margin-inline-start: -1.3em;
+  [dir="rtl"] & {
+    margin-inline-start: -2em;
+  }
+}
+
+a {
+  color: var(--color-brand-light);
+  font-weight: var(--font-weight-medium);
+  transition: color 0.3s ease;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+
+  &:hover {
+    color: var(--color-brand-lighter);
+  }
+
+  &.light-link {
+    color: var(--color-brand-secondary);
+
+    &:hover {
+      color: var(--color-brand-secondary-light);
+    }
+  }
+}
+
+
+figure[class*="wp-block-"]:has(blockquote) {
+  padding-inline: var(--spacing-lg);
+}
+blockquote {
+  padding: var(--spacing-md);
+  padding-left: 5rem;
+  padding-right: 5rem;
+  border-radius: var(--border-radius-lg);
+  line-height: var(--line-height-tight);
+  position: relative;
+}
+blockquote::before {
+  content: "“";
+  font-size: 2em;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-brand-primary);
+  margin-right: 0.25em;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+blockquote::after {
+  content: "”";
+  font-size: 2em;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-brand-primary);
+  margin-left: 0.25em;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+strong {
+  font-weight: var(--font-weight-medium);
+}
+
+.wp-block-table td,
+td {
+  border: 1px solid var(--table-border-color);
+  border-spacing: 0;
+}
+
+.wp-block-group {
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-4xl);
+}
+
+.page-body > *:not(.wp-block-table) {
+  border-radius: var(--border-radius-lg);
+}
+.page-body > * + * {
+  margin-top: var(--spacing-md);
+}
+
+.banner-title {
+  font-size: var(--font-size-5xl);
+  color: var(--color-surface-white);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+

@@ -1,0 +1,61 @@
+// Abstract Spacing Tokens
+
+@use 'sass:math';
+
+$base: 1;
+
+// modular scale
+$major-third: 1.33;
+
+$density: $major-third;
+$modular-sm: $base * $density;
+$modular-md: $modular-sm * $density;
+$modular-lg: $modular-md * $density;
+$modular-xl: $modular-lg * $density;
+$modular-2xl: $modular-xl * $density;
+$modular-3xl: $modular-2xl * $density;
+$modular-4xl: $modular-3xl * $density;
+$modular-5xl: $modular-4xl * $density;
+
+$modular-xs: math.div($modular-sm, $density);
+$modular-2xs: math.div($modular-xs, $density);
+$modular-3xs: math.div($modular-2xs, $density);
+
+
+$linear-0: 0;
+$linear-25: $base * 0.25;
+$linear-50: $base * 0.5;
+$linear-100: $base * 1;
+$linear-200: $base * 2;
+$linear-300: $base * 3;
+$linear-400: $base * 4;
+$linear-500: $base * 5;
+$linear-600: $base * 6;
+$linear-700: $base * 7;
+$linear-800: $base * 8;
+
+// Semantic Spacing Tokens
+:root {
+  --spacing-base: #{$base}rem;
+  --spacing-3xs: #{$modular-3xs}rem;
+  --spacing-2xs: #{$modular-2xs}rem;
+  --spacing-xs: #{$modular-xs}rem;
+  --spacing-sm: #{$modular-sm}rem;
+  --spacing-md: #{$modular-md}rem;
+  --spacing-lg: #{$modular-lg}rem;
+  --spacing-xl: #{$modular-xl}rem;
+  --spacing-2xl: #{$modular-2xl}rem;
+  --spacing-3xl: #{$modular-3xl}rem;
+  --spacing-4xl: #{$modular-4xl}rem;
+  --spacing-5xl: #{$modular-5xl}rem;
+
+  --spacing-0: #{$linear-0}rem;
+  --spacing-25: #{$linear-25}rem;
+  --spacing-50: #{$linear-50}rem;
+  --spacing-100: #{$linear-100}rem;
+  --spacing-200: #{$linear-200}rem;
+  --spacing-300: #{$linear-300}rem;
+  --spacing-400: #{$linear-400}rem;
+  --spacing-500: #{$linear-500}rem;
+  --spacing-600: #{$linear-600}rem;
+}

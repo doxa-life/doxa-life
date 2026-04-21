@@ -1,0 +1,24 @@
+.reel {
+    display: flex;
+    overflow: hidden;
+}
+.reel > * {
+    flex: 0 0 auto;
+    padding-inline: var(--spacing-sm);
+}
+
+.reel[data-reel-mode='auto-scroll'] {
+    opacity: 0;
+}
+.reel.in[data-reel-mode='auto-scroll'] {
+    animation: in 1s ease-in both;
+}
+
+@keyframes in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

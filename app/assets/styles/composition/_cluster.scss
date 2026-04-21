@@ -1,0 +1,7 @@
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md, 0.75rem);
+  justify-content: flex-start;
+  align-items: center;
+}
