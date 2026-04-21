@@ -74,6 +74,8 @@ export default defineNuxtConfig({
     s3BucketName: process.env.S3_BUCKET_NAME || '',
     formApiKey: process.env.FORM_API_KEY || '',
     prayBaseUrl: process.env.NUXT_PRAY_BASE_URL || 'https://pray.doxa.life',
+    deeplApiKey: process.env.DEEPL_API_KEY || '',
+    deeplApiUrl: process.env.DEEPL_API_URL || 'https://api-free.deepl.com',
     public: {
       appName: process.env.APP_TITLE || 'My App',
       nodeEnv: process.env.NODE_ENV || '',
@@ -84,6 +86,15 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2025-01-15',
+
+  vite: {
+    optimizeDeps: {
+      include: [
+        '@vue/devtools-core',
+        '@vue/devtools-kit'
+      ]
+    }
+  },
 
   eslint: {
     config: {

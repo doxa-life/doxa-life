@@ -8,7 +8,9 @@ export const PERMISSIONS = [
   'users.view',
   'users.manage',
   'roles.view',
-  'roles.manage'
+  'roles.manage',
+  'pages.view',
+  'pages.manage'
 ] as const
 
 export type Permission = typeof PERMISSIONS[number]
@@ -36,6 +38,14 @@ export const PERMISSION_META: Record<string, { title: string; description: strin
   'roles.manage': {
     title: 'Manage roles',
     description: 'Create, edit, and delete custom roles.'
+  },
+  'pages.view': {
+    title: 'View CMS pages',
+    description: 'See the CMS pages list and read existing translations.'
+  },
+  'pages.manage': {
+    title: 'Manage CMS pages',
+    description: 'Create, edit, publish, translate, and delete CMS pages.'
   }
 }
 

@@ -50,3 +50,19 @@ export function generateI18nLocales() {
     ]
   }))
 }
+
+export function getLanguage(code: string): Language | undefined {
+  return LANGUAGES.find(l => l.code === code)
+}
+
+export function getDeeplTargetCode(code: string): string {
+  return getLanguage(code)?.deeplTarget ?? code.toUpperCase()
+}
+
+export function getDeeplSourceCode(code: string): string {
+  return getLanguage(code)?.deeplSource ?? code.toUpperCase()
+}
+
+export function getGlossaryId(code: string): string | undefined {
+  return getLanguage(code)?.glossaryId
+}

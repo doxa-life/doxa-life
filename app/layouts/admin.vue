@@ -6,6 +6,9 @@ const mobileOpen = ref(false)
 
 const navItems = computed(() => [
   { to: '/admin', label: 'Dashboard', icon: 'i-lucide-layout-dashboard' },
+  ...(hasPermission('pages.view')
+    ? [{ to: '/admin/pages', label: 'Pages', icon: 'i-lucide-file-text' }]
+    : []),
   ...(hasPermission('users.view')
     ? [{ to: '/admin/users', label: 'Users', icon: 'i-lucide-users' }]
     : []),
