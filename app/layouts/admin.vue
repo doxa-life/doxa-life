@@ -25,8 +25,9 @@ watch(() => route.path, () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-(--ui-bg) text-(--ui-text)">
-    <!-- Mobile top bar -->
+  <UApp>
+    <div class="min-h-screen bg-(--ui-bg) text-(--ui-text)">
+      <!-- Mobile top bar -->
     <header class="lg:hidden bg-(--ui-bg-elevated) border-b border-(--ui-border) py-3 px-4 sticky top-0 z-40 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <UButton
@@ -126,4 +127,7 @@ watch(() => route.path, () => {
       </main>
     </div>
   </div>
+  </UApp>
 </template>
+
+<style src="~/assets/css/admin.css"></style>

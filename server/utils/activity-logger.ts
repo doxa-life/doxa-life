@@ -2,7 +2,7 @@ import { db } from './database'
 import crypto from 'crypto'
 import type { H3Event } from 'h3'
 import type { Kysely } from 'kysely'
-import type { Database } from '~/server/database/schema'
+import type { Database } from '../database/schema'
 import { getAuthUser } from './auth'
 
 interface LogEventOptions {

@@ -1,7 +1,7 @@
 import { Kysely, sql } from 'kysely'
 import { PostgresJSDialect } from 'kysely-postgres-js'
 import postgres from 'postgres'
-import type { Database } from '~/server/database/schema'
+import type { Database } from '../database/schema'
 
 let _db: Kysely<Database> | null = null
 

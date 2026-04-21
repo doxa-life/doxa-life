@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+@source "../../pages/admin";
+@source "../../components/admin";
+@source "../../layouts/admin.vue";
+
 @theme static {
   --font-sans: 'Public Sans', sans-serif;
 
