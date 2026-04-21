@@ -5,8 +5,13 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui',
-    '@nuxtjs/i18n'
+    '@nuxtjs/i18n',
+    '@nuxtjs/turnstile'
   ],
+
+  turnstile: {
+    siteKey: process.env.NUXT_TURNSTILE_SITE_KEY || ''
+  },
 
   components: [
     { path: '~/components', pathPrefix: false }
@@ -67,10 +72,13 @@ export default defineNuxtConfig({
     s3AccessKeyId: process.env.S3_ACCESS_KEY_ID || '',
     s3SecretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
     s3BucketName: process.env.S3_BUCKET_NAME || '',
+    formApiKey: process.env.FORM_API_KEY || '',
+    prayBaseUrl: process.env.NUXT_PRAY_BASE_URL || 'https://pray.doxa.life',
     public: {
       appName: process.env.APP_TITLE || 'My App',
       nodeEnv: process.env.NODE_ENV || '',
-      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || ''
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || '',
+      prayBaseUrl: process.env.NUXT_PUBLIC_PRAY_BASE_URL || 'https://pray.doxa.life'
     }
   },
 

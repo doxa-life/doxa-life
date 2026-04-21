@@ -16,7 +16,10 @@ export function applyTextHighlights(root: ParentNode = document) {
   nodes.forEach((item) => {
     if (item.dataset[PROCESSED_FLAG] === 'true') return
 
-    const words = (item.textContent ?? '').split(' ')
+    // Trim leading/trailing whitespace Vue introduces around {{ }} on
+    // multiline templates, then split on any whitespace run so word
+    // indices are accurate regardless of source formatting.
+    const words = (item.textContent ?? '').trim().split(/\s+/)
     const highlightIndex = item.dataset.highlightIndex ? parseInt(item.dataset.highlightIndex, 10) - 1 : -1
     const highlightLast = 'highlightLast' in item.dataset
     const color = item.dataset.highlightColor || 'primary'

@@ -1,34 +1,33 @@
 <script setup lang="ts">
-// Port of the video modal in marketing-theme/front-page.php + theme.js.
-// Overlay + Vimeo iframe; opens on any element bound to the exposed
-// `openVideo()`. Closes on overlay click, close button, Escape, or back
-// navigation. Uses `data-state` attributes to match the existing SCSS
-// (_video.scss).
+// Port of the video modal markup in marketing-theme/front-page.php plus
+// the open/close/escape/back behaviour from marketing-theme/js/theme.js.
+// The template mirrors the PHP structure verbatim — .video-modal-overlay
+// + .video-modal with the 41.89% padding wrapper, <iframe id="vimeo-player">,
+// and the whiteX.png close button.
 
 const props = defineProps<{
-  src: string        // Vimeo embed URL (without autoplay param)
+  src: string           // Vimeo embed URL (without autoplay param)
+  title?: string        // <iframe title>
+  closeLabel?: string   // alt text on the close icon
 }>()
 
 const state = ref<'open' | 'closed'>('closed')
 const iframeRef = ref<HTMLIFrameElement | null>(null)
-const baseSrc = computed(() => props.src)
 
 function open() {
   state.value = 'open'
   if (iframeRef.value) {
-    // Append autoplay=1 when opening
-    const sep = baseSrc.value.includes('?') ? '&' : '?'
-    iframeRef.value.src = `${baseSrc.value}${sep}autoplay=1`
+    const sep = props.src.includes('?') ? '&' : '?'
+    iframeRef.value.src = `${props.src}${sep}autoplay=1`
   }
   if (import.meta.client) history.pushState(null, '', '#playing-video')
 }
 
 function close() {
   state.value = 'closed'
-  // Reset src to stop playback
   if (iframeRef.value) {
     iframeRef.value.src = ''
-    iframeRef.value.src = baseSrc.value
+    iframeRef.value.src = props.src
   }
 }
 
@@ -53,7 +52,6 @@ onBeforeUnmount(() => {
   window.removeEventListener('popstate', onPopState)
 })
 
-// Expose open/close so parent templates can trigger from the hero button.
 defineExpose({ open, close })
 </script>
 
@@ -65,22 +63,21 @@ defineExpose({ open, close })
       @click="close"
     />
     <div class="video-modal" :data-state="state">
-      <button
-        type="button"
-        class="video-modal-close"
-        aria-label="Close video"
-        @click="close"
-      >
-        ×
+      <div style="padding:41.89% 0 0 0;position:relative;">
+        <iframe
+          id="vimeo-player"
+          ref="iframeRef"
+          :src="props.src"
+          frameborder="0"
+          allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          style="position:absolute;top:0;left:0;width:100%;height:100%;"
+          :title="title ?? 'Doxa Video'"
+        />
+      </div>
+      <button type="button" class="video-modal-close icon-button" @click="close">
+        <img src="/assets/icons/whiteX.png" :alt="closeLabel ?? 'Close video'">
       </button>
-      <iframe
-        ref="iframeRef"
-        id="vimeo-player"
-        :src="baseSrc"
-        frameborder="0"
-        allow="autoplay; fullscreen; picture-in-picture"
-        allowfullscreen
-      />
     </div>
   </div>
 </template>
