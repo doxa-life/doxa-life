@@ -35,8 +35,34 @@ export interface ActivityLogsTable {
   metadata: Generated<Record<string, any>>
 }
 
+export interface PagesTable {
+  id: Generated<string>
+  slug: string
+  parent_slug: string | null
+  menu_order: Generated<number>
+  created: ColumnType<Date, Date | string | undefined, Date | string>
+  updated: ColumnType<Date, Date | string | undefined, Date | string>
+}
+
+export interface PageTranslationsTable {
+  id: Generated<string>
+  page_id: string
+  locale: string
+  title: string
+  body_json: Generated<Record<string, any>>
+  excerpt: string | null
+  featured_image: string | null
+  meta_title: string | null
+  meta_description: string | null
+  og_image: string | null
+  status: Generated<'draft' | 'published'>
+  updated: ColumnType<Date, Date | string | undefined, Date | string>
+}
+
 export interface Database {
   users: UsersTable
   password_reset_requests: PasswordResetRequestsTable
   activity_logs: ActivityLogsTable
+  pages: PagesTable
+  page_translations: PageTranslationsTable
 }
