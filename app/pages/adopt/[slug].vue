@@ -251,16 +251,18 @@ async function onSubmit(e: Event) {
             </div>
             <div class="">
               <label for="phone">{{ t('Phone') }}</label>
-              <PhoneInput
-                :value="phone"
-                :initialCountry="initialCountry"
-                :t="{
-                  phone_error: t('Please enter a valid phone number'),
-                  phone_error_too_short: t('Phone number is too short'),
-                  phone_error_too_long: t('Phone number is too long')
-                }"
-                @phone-input="(d) => phone = d.number"
-              />
+              <ClientOnly>
+                <PhoneInput
+                  :value="phone"
+                  :initialCountry="initialCountry"
+                  :t="{
+                    phone_error: t('Please enter a valid phone number'),
+                    phone_error_too_short: t('Phone number is too short'),
+                    phone_error_too_long: t('Phone number is too long')
+                  }"
+                  @phone-input="(d) => phone = d.number"
+                />
+              </ClientOnly>
             </div>
             <div class="">
               <label for="role">{{ t('Role') }}</label>
