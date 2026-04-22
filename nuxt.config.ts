@@ -25,7 +25,7 @@ export default defineNuxtConfig({
     port: 3033
   },
 
-  ssr: false,
+  ssr: true,
 
   ui: {
     theme: {
@@ -63,7 +63,30 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/': { prerender: true },
+    '/adopt': { prerender: true },
+    '/pray': { prerender: true },
+    '/research': { prerender: true },
+    '/contact-us': { prerender: true },
+    '/login': { ssr: false },
+    '/register': { ssr: false },
+    '/reset-password': { ssr: false },
+    '/dashboard': { ssr: false },
+    '/profile': { ssr: false },
+    '/admin/**': { ssr: false },
     '/en/**': { redirect: '/**' }
+  },
+
+  nitro: {
+    prerender: {
+      crawlLinks: true,
+      routes: [
+        '/', '/es', '/fr', '/pt', '/ar', '/ru',
+        '/adopt', '/es/adopt', '/fr/adopt', '/pt/adopt', '/ar/adopt', '/ru/adopt',
+        '/pray', '/es/pray', '/fr/pray', '/pt/pray', '/ar/pray', '/ru/pray',
+        '/research', '/es/research', '/fr/research', '/pt/research', '/ar/research', '/ru/research',
+        '/contact-us', '/es/contact-us', '/fr/contact-us', '/pt/contact-us', '/ar/contact-us', '/ru/contact-us'
+      ]
+    }
   },
 
   runtimeConfig: {
