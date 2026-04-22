@@ -1,0 +1,497 @@
+{
+  "sourceUrl": "https://doxa.life/about/vision/",
+  "slug": "about/vision",
+  "locale": "en",
+  "title": "Vision",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Vision"
+          }
+        ]
+      },
+      {
+        "type": "div",
+        "attrs": {
+          "class": "wp-block-group is-style-plain has-doxa-white-color has-brand-light-background-color has-text-color has-background has-link-color wp-elements-5ce8e9891fb2bccd5f348f52aae760b7 is-layout-flow wp-block-group-is-layout-flow",
+          "style": null,
+          "data-width": null,
+          "data-width-sm": null,
+          "data-width-md": null,
+          "data-width-lg": null,
+          "data-width-xl": null,
+          "data-list-color": null,
+          "data-highlight-color": null,
+          "data-highlight-index": null,
+          "data-highlight-last": null,
+          "data-no-action": null,
+          "data-reel-mode": null,
+          "data-variant": null,
+          "data-size": null
+        },
+        "content": [
+          {
+            "type": "heading",
+            "attrs": {
+              "textAlign": null,
+              "level": 5
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "A great multitude of all nations and families and peoples and tongues standing before the Lamb. "
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "textAlign": null,
+              "level": 5
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "– Revelation 7:9"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Mission"
+          }
+        ]
+      },
+      {
+        "type": "div",
+        "attrs": {
+          "class": "wp-block-group has-doxa-white-color has-brand-light-background-color has-text-color has-background has-link-color wp-elements-eb07a762a4b1afbb1911b420d4b48937 is-layout-flow wp-block-group-is-layout-flow",
+          "style": null,
+          "data-width": null,
+          "data-width-sm": null,
+          "data-width-md": null,
+          "data-width-lg": null,
+          "data-width-xl": null,
+          "data-list-color": null,
+          "data-highlight-color": null,
+          "data-highlight-index": null,
+          "data-highlight-last": null,
+          "data-no-action": null,
+          "data-reel-mode": null,
+          "data-variant": null,
+          "data-size": null
+        },
+        "content": [
+          {
+            "type": "heading",
+            "attrs": {
+              "textAlign": null,
+              "level": 5
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "For the glory of God, to make disciples of all the nations by going, baptizing, and teaching. "
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "textAlign": null,
+              "level": 5
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "– Matthew 28:19-20"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Priority"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "To engage every Unengaged People Group by 2033"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Values"
+          }
+        ]
+      },
+      {
+        "type": "bulletList",
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Abide in Jesus (John 15:5)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Pray without ceasing (1 Thessalonians 5:17)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Deny yourself (Luke 9:23)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Engage the regions beyond (2 Corinthians 10:16)"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Goals"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Prayer"
+          }
+        ]
+      },
+      {
+        "type": "orderedList",
+        "attrs": {
+          "start": 1,
+          "type": null
+        },
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Daily prayer for each of the 2,085 UUPGs"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "At least 144 intercessors praying for each UUPG 10 minutes a day (which equals 24-hour prayer coverage)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Over 1,000 intercessors for each UUPG (2,085,000+ intercessors) "
+                  },
+                  {
+                    "type": "hardBreak"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Engagement"
+          }
+        ]
+      },
+      {
+        "type": "orderedList",
+        "attrs": {
+          "start": 1,
+          "type": null
+        },
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "By 2033 every unengaged people group is engaged"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Post 2033 every unreached people group on earth is fruitfully engaged"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "There is an indigenous church planted among every people group on earth"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "What is Engagement?"
+          }
+        ]
+      },
+      {
+        "type": "bulletList",
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "There is sustained activity* to share Christ and make disciples"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "There are efforts to establish self-sustaining churches"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "The work occurs in culturally appropriate and locally relevant ways"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "* For WAGF understanding, this means cross-cultural workers are resident…"
+          }
+        ]
+      }
+    ]
+  }
+}

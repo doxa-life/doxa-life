@@ -1,0 +1,521 @@
+{
+  "sourceUrl": "https://doxa.life/ar/about/vision/",
+  "slug": "about/vision",
+  "locale": "ar",
+  "title": "الرؤية",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "الرؤية"
+          }
+        ]
+      },
+      {
+        "type": "div",
+        "attrs": {
+          "class": "wp-block-group is-style-plain has-doxa-white-color has-brand-light-background-color has-text-color has-background has-link-color wp-elements-683a8ce7ed221259dc7d12a25e206b0d is-layout-flow wp-block-group-is-layout-flow",
+          "style": null,
+          "data-width": null,
+          "data-width-sm": null,
+          "data-width-md": null,
+          "data-width-lg": null,
+          "data-width-xl": null,
+          "data-list-color": null,
+          "data-highlight-color": null,
+          "data-highlight-index": null,
+          "data-highlight-last": null,
+          "data-no-action": null,
+          "data-reel-mode": null,
+          "data-variant": null,
+          "data-size": null
+        },
+        "content": [
+          {
+            "type": "heading",
+            "attrs": {
+              "textAlign": null,
+              "level": 5
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "جمهور عظيم من جميع الأمم والعائلات والشعوب واللغات واقفون أمام الحمل. "
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "textAlign": null,
+              "level": 2
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "سفر الرؤيا 9:7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "المهمة"
+          }
+        ]
+      },
+      {
+        "type": "div",
+        "attrs": {
+          "class": "wp-block-group has-doxa-white-color has-brand-light-background-color has-text-color has-background has-link-color wp-elements-83ec41915c0bc608ba2230dc22d816be is-layout-flow wp-block-group-is-layout-flow",
+          "style": null,
+          "data-width": null,
+          "data-width-sm": null,
+          "data-width-md": null,
+          "data-width-lg": null,
+          "data-width-xl": null,
+          "data-list-color": null,
+          "data-highlight-color": null,
+          "data-highlight-index": null,
+          "data-highlight-last": null,
+          "data-no-action": null,
+          "data-reel-mode": null,
+          "data-variant": null,
+          "data-size": null
+        },
+        "content": [
+          {
+            "type": "heading",
+            "attrs": {
+              "textAlign": null,
+              "level": 5
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "لأجل مجد الله، أن نصنع تلاميذ من كل الأمم من خلال الذهاب، وتعميدهم، وتعليمهم."
+              },
+              {
+                "type": "hardBreak"
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "textAlign": null,
+              "level": 2
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "متى ٢٨: ١٩-٢٠"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "الأولوية"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "إقامة حضور إرسالي فعّال بين كل مجموعة بشرية غير مُنخرط فيها بحلول عام 2033"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "القيم"
+          }
+        ]
+      },
+      {
+        "type": "bulletList",
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "اثبتوا في يسوع (يوحنا 15: 5)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "صلوا بلا انقطاع (1 تسالونيكي 17:5)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "أنكر نفسك (لوقا 23:9)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "الوصول إلى المناطق الأبعد غير المخدومة (2 كورنثوس 16:10)"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "الأهداف"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "الصلاة"
+          }
+        ]
+      },
+      {
+        "type": "orderedList",
+        "attrs": {
+          "start": 1,
+          "type": null
+        },
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "صلاة يومية لكل ال 2085 مجموعة الغير موصول لها"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "وجود 144متشفع على الأقل لكل شعب غير موصول له ، يصلّون 10 دقائق يوميًا لضمان تغطية صلاة مستمرة طوال اليوم."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "أكثر من 1,000 متشفع مخصَّص للصلاة من أجل كل شعب غير موصول له، بإجمالي يتجاوز 2,085,000 متشفع "
+                  },
+                  {
+                    "type": "hardBreak"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "الالتزام/ "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "الانخراط الإرسالي"
+          }
+        ]
+      },
+      {
+        "type": "orderedList",
+        "attrs": {
+          "start": 1,
+          "type": null
+        },
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "بحلول عام 2033، سيتم إشراك جميع المجموعات غير المشاركة"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "بعد عام 2033، ستكون جميع المجموعات السكانية غير المبلغة على وجه الأرض منخرطة بشكل مثمر"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "هناك كنيسة أصلية موجودة بين كل مجموعة من الشعوب على وجه الأرض."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "ما هو الانخراط؟"
+          }
+        ]
+      },
+      {
+        "type": "bulletList",
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "هناك نشاط مستمر* لمشاركة المسيح وتكوين تلاميذ"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "هناك جهود لإنشاء كنائس مستقلة ذاتياً"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "يتم العمل بطرق ملائمة ثقافياً وذات صلة بالسياق المحلي"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "* لفهم WAGF، هذا يعني أن العاملين في مجال التبادل الثقافي هم مقيمون…"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "ان كل العاملين عبر الثقافات مقيمونWAGF وفقا لـــ"
+          }
+        ]
+      }
+    ]
+  }
+}

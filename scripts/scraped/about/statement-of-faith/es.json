@@ -1,0 +1,447 @@
+{
+  "sourceUrl": "https://doxa.life/es/about/statement-of-faith/",
+  "slug": "about/statement-of-faith",
+  "locale": "es",
+  "title": "Declaración de fe",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Asambleas de Dios Mundial"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Esta Declaración de Fe tiene como único propósito servir de base para la creencia, la comunión y la cooperación entre nosotros. La fraseología empleada en esta declaración no es inspirada, pero la verdad que se expone se considera esencial para un verdadero ministerio pentecostal. No se afirma que contenga toda la verdad bíblica, sólo que cubre nuestra necesidad de estas doctrinas esenciales."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "1. INSPIRACIÓN DE LAS ESCRITURAS"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Nosotros creemos que las Escrituras, tanto el Antiguo como el Nuevo Testamento, son inspiradas verbalmente por Dios y constituyen la revelación de Dios al hombre, la norma infalible y autoritativa de fe y de conducta. La inspiración divina se extiende por igual y plenamente a todas las partes de los escritos originales, asegurando su total fiabilidad (2 Timoteo 3:15-17; 2 Pedro 1:21)."
+          }
+        ]
+      },
+      {
+        "type": "orderedList",
+        "attrs": {
+          "start": 1,
+          "type": null
+        },
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "LA DEIDAD ETERNA"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Nosotros creemos en la unidad del único Dios verdadero y vivo, que es Uno, eterno y autoexistente, y se ha revelado como un solo ser en tres personas: Padre, Hijo y Espíritu Santo (Mateo 3:16-17; 28:19)."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 4
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "a. Dios el Padre"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Creemos en Dios Padre, la primera persona de la Deidad Trina, que existe eternamente como Creador del cielo y de la tierra, Dador de la Ley, a Quien todas las cosas le estarán sujetas, para que Él sea todo en todos (Génesis 1:1; Deuteronomio 6:4; 1 Corintios 15:28)."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 4
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "b. El Señor Jesucristo"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Creemos en el Señor Jesucristo, la segunda persona de la Trinidad, Quien fue y es el Hijo eterno de Dios; que se encarnó por obra del Espíritu Santo y nació de la virgen María. Creemos en su vida sin pecado, su ministerio milagroso, su muerte expiatoria sustitutiva, su resurrección corporal, su ascensión triunfal y su intercesión constante (Isaías 7:14; Hebreos 7:25-26; 1 Pedro 2:22; Hechos 1:9; 2:22; 10:38; 1 Corintios 15:4; 2 Corintios 5:21)."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 4
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "c. El Espíritu Santo"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Creemos en el Espíritu Santo, la tercera persona de la Deidad Trina, que procede del Padre y del Hijo, y está siempre presente y activo en la obra de convencer y regenerar al pecador, santificar al creyente, guiarlo a toda verdad y capacitarlo para el ministerio (Juan 14:26; 16:8-11; 1 Pedro 1:2; Romanos 8:14-16)."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "LA CAÍDA DEL HOMBRE"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Creemos que la humanidad fue creada buena y recta. Sin embargo, la transgresión voluntaria resultó en su alejamiento de Dios, incurriendo así no solo en la muerte física, sino también en la muerte espiritual, que es la separación de Dios (Génesis 1:16-27; 2:17; 3:6; Romanos 5:12-19)."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "LA SALVACIÓN DEL HOMBRE"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Creemos en la salvación mediante la fe en Cristo, quien murió por nuestros pecados, fue sepultado y resucitó al tercer día. Por su sangre expiatoria, la salvación ha sido provista para toda la humanidad mediante el sacrificio de Cristo en la cruz. Esta experiencia, también conocida como el nuevo nacimiento, es una operación instantánea y completa del Espíritu Santo mediante la cual el pecador creyente es regenerado, justificado y adoptado en la familia de Dios, convirtiéndose en una nueva creación en Cristo Jesús y heredero de la vida eterna (Juan 3:5-6; Romanos 10:8-15; Tito 2:11, 3:4-7; 1 Juan 5:1)."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "5. LA SANIDAD DIVINA"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Creemos que la liberación de la enfermedad se proporciona en la expiación y es el privilegio de todos los creyentes (Isaías 53:4-5; Mateo 8:16-17; Santiago 5:14-16)."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "6. LA IGLESIA Y SU MISIÓN"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Creemos que la iglesia es el cuerpo de Cristo y la morada de Dios por medio del Espíritu, testigo de la presencia del reino de Dios en el mundo presente, e incluye universalmente a todos los que nacen de nuevo (Efesios 1:22-23; 2:22; Romanos 14:17-18; 1 Corintios 4:20)."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Creemos que la misión de la iglesia es (1) proclamar las buenas nuevas de salvación a toda la humanidad, (2) edificar y entrenar a los creyentes para el ministerio espiritual, (3) alabar al Señor a través de la adoración, (4) demostrar compasión cristiana a todos los que sufren, y (5) exhibir unidad como el cuerpo de Cristo (Mateo 28:19-20; 10:42; Efesios 4:11-13)."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "7. LAS ORDENANZAS DE LA IGLESIA"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Creemos que el bautismo en agua por inmersión es obligatorio para todos los que se han arrepentido y han creído. Al hacerlo, declaran al mundo que han muerto con Cristo y resucitado con él para vivir una vida nueva (Mateo 28:19; Hechos 10:47-48; Romanos 6:4)."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Creemos que la Cena del Señor es una proclamación del sufrimiento y la muerte de nuestro Señor Jesucristo, para ser compartida por todos los creyentes hasta que el Señor regrese (Lucas 22:14-20; 1 Corintios 11:20-34)."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "8. SANTIFICACIÓN"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Creemos que la santificación es un acto de separación del mal y de dedicación a Dios. En la experiencia, es instantánea y progresiva. Se produce en la vida del creyente al apropiarse del poder de la sangre y la vida resucitada de Cristo mediante la persona del Espíritu Santo. Él atrae la atención del creyente hacia Cristo, le enseña mediante la Palabra y produce el carácter de Cristo en él (Romanos 6:1-11; 8:1-2,13; 12:1-2; Gálatas 2:20; Hebreos 10:10, 14)."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "9. EL BAUTISMO EN EL ESPÍRITU SANTO"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Creemos que el bautismo en el Espíritu Santo otorga al creyente poder para vivir y servir a Cristo. Esta experiencia es distinta y posterior al nuevo nacimiento, se recibe por fe y está acompañada por la manifestación de hablar en lenguas según el Espíritu lo indique como evidencia inicial (Lucas 24:49; Hechos 1:8; 2:1-4; 8:15-19; 11:14-17; 19:1-7)."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "10. LOS DONES DEL ESPÍRITU SANTO"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Creemos en la operación actual de los nueve dones sobrenaturales del Espíritu Santo (1 Corintios 12) y los dones ministeriales de Cristo (Efesios 4:11-13) para la edificación y expansión de la iglesia."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "11. EL FIN DE LOS TIEMPOS"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Creemos en el regreso premilenial, inminente y personal de nuestro Señor Jesucristo para reunir a su pueblo. Con esta bendita esperanza y ferviente expectativa, nos purificamos, como Él es puro, para estar listos para recibirlo cuando venga (Juan 14:1-3; Tito 2:13; 1 Tesalonicenses 4:15-17; 1 Juan 3:2-3; Apocalipsis 20:1-6)."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Creemos en la resurrección corporal de toda la humanidad, en la felicidad eterna y consciente de todos los que creen verdaderamente en nuestro Señor Jesucristo, y en que el castigo eterno y consciente es el destino de todos aquellos cuyos nombres no están escritos en el Libro de la Vida (Juan 5:28-29; 1 Corintios 15:22-24; Apocalipsis 20:10-15)."
+          }
+        ]
+      }
+    ]
+  }
+}

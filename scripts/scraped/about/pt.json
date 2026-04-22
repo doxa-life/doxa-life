@@ -1,0 +1,317 @@
+{
+  "sourceUrl": "https://doxa.life/pt/about/",
+  "slug": "about",
+  "locale": "pt",
+  "title": "Sobre",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Liderança"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "A DOXA foi fundada e é administrada pela Comunhão das Assembléias de Deus Mundial (World Assemblies of God Fellowship – WAGF) e supervisionada pela Equipe de Liderança da Comissão de Missões da WAGF."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Parceiros"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Todos os departamentos de missões afiliados à World Assemblies of God Fellowship (129 secretárias de missões diferentes em 2026) são automaticamente parceiros da DOXA. Isso se deve ao fato de que a DOXA serve à World Assemblies of God Fellowship como parte da Comissão de Missões. Qualquer membro da comissão de missões da WAGF é um parceiro que a DOXA acolhe e serve."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Declaração de 2025"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "A Parceria DOXA"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "DECLARAÇÃO FINAL DA CONFERÊNCIA DE CÚPULA"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Lago Geneva, Minnesota – 25 de setembro de 2025"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Reconhecendo que Jesus nos chamou para uma parceria, comprometemo-nos com Deus e uns com os outros a trabalhar em conjunto globalmente para o maior movimento de formação de discípulos e plantação de igrejas entre os não alcançados que a World Assemblies of God Fellowship já viu. O nosso compromisso inclui o seguinte:"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que continuaremos a confiar no Espírito Santo e nas Sagradas Escrituras sempre e em tudo;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que consideraremos humildemente os outros melhores do que nós mesmos e não competiremos uns com os outros ou com outras agências, mas respeitaremos e honraremos todo o povo de Deus na Sua missão;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que formaremos uma Parceria Voluntária, Global e Receptiva, comprometida em trabalhar com as igrejas nacionais existentes e os Conselhos Gerais da Assembléia de Deus, sempre que possível;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que esta parceria não será uma secretaria de missões, nem substituirá o trabalho ou o papel das atuais secretarias de missões ou das suas igrejas nacionais;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que as secretarias de missões possam colaborar com a parceria no nível que desejarem. Elas podem optar por enviar alguns, todos ou nenhum dos seus missionários por meio da parceria;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que as secretarias de missões mantenham a autoridade final sobre os seus missionários, os apoiem e os formem antes de serem enviados para o campo;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que a parceria — a convite da secretaria enviadora — possa receber missionários, treiná-los no campo, coordenar a colocação da equipa e orientá-los estrategicamente no campo;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que a parceria priorizará o engajamento dos povos não engajados do mundo que atualmente não têm equipes de plantação de igrejas entre eles, de modo residencial, de longo prazo e frutífero, com o objetivo de plantar igrejas indígenas que levem a igrejas nacionais ou à integração em igrejas nacionais existentes. Faremos isso em harmonia com o MM33;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que a parceria também capacitará missionários para engajarem-se com povos de fronteira (menos de 1 crente em cada 1.000), com povos pouco engajados (menos de 1 crente em cada 100) e com os geralmente não alcançados (menos de 2 crentes em cada 100), de modo residencial, de longo prazo e fruitífero;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que a parceria será administrada pela Comissão de Missões da World Assemblies of God Fellowship, que nomeará e supervisionará os líderes da parceria, que poderão ser provenientes de qualquer país ou secretaria da parceria;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que a parceria será denominada “Doxa”, que é a palavra grega para “glória”, e este nome nos lembrará que Jesus é digno da glória de todas as tribos, línguas, povos e nações;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que faremos parceria com toda a igreja de Deus para levar todo o evangelho de Deus a todo o mundo de Deus;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que um dia haverá uma multidão de todos os povos ao redor do trono adorando a Deus;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que somente Jesus receberá toda a glória."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Em fé e pela graça de Deus, afirmado neste dia 25 de setembro de 2025."
+          },
+          {
+            "type": "hardBreak"
+          }
+        ]
+      }
+    ]
+  }
+}

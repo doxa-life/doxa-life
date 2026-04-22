@@ -1,0 +1,403 @@
+{
+  "sourceUrl": "https://doxa.life/pt/about/definitions/",
+  "slug": "about/definitions",
+  "locale": "pt",
+  "title": "Definições",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Igreja"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Uma "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "igreja"
+          },
+          {
+            "type": "text",
+            "text": " é composta por discípulos batizados, unidos pelo Espírito Santo, que se reúnem regularmente para doutrina, comunhão, Santa Ceia e oração (Atos 2:42). "
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Na prática, para que uma nova congregação seja considerada uma igreja, são necessários pelo menos seis discípulos batizados; no entanto, não é necessário definir um local específico, frequência de reuniões e pastor designado — embora esses aspectos normalmente se desenvolvam à medida que uma igreja indígena amadurece nos cinco «autos» (autopropagação, autogoverno, autosuficiente, autoteologização e auto-missionária)."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Um "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "movimento de plantação de igrejas"
+          },
+          {
+            "type": "text",
+            "text": " é uma multiplicação de igrejas locais que plantam outras igrejas, incluindo pelo menos quatro correntes de quatro gerações espirituais, totalizando mais de 1.000 pessoas."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Povo (Grupo Étnico)"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Um p"
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "ovo"
+          },
+          {
+            "type": "text",
+            "text": " é um grupo etnolinguístico que considera ter uma afinidade comum com base na língua, cultura, religião e cosmovisão. Do ponto de vista da evangelização, é o maior grupo possível dentro do qual o evangelho pode se espalhar como um movimento viável e indígena de plantação de igrejas, sem encontrar barreiras de compreensão ou aceitação. "
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Um "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "povo"
+          },
+          {
+            "type": "text",
+            "text": " ("
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "grupo étnico) não alcançado (PNA)"
+          },
+          {
+            "type": "text",
+            "text": " tem aproximadamente 2 discípulos ou menos em cada 100 (≤ 2%) e carece da capacidade de estabelecer igrejas indígenas sem assistência intercultural."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Dentro da categoria geral dos PNAs, encontram-se os seguintes grupos de pessoas, em ordem decrescente de envolvimento:"
+          }
+        ]
+      },
+      {
+        "type": "orderedList",
+        "attrs": {
+          "start": 1,
+          "type": null
+        },
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": "Sub-engajado."
+                  },
+                  {
+                    "type": "text",
+                    "text": " Um "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "italic"
+                      }
+                    ],
+                    "text": "povo sub-engajado"
+                  },
+                  {
+                    "type": "text",
+                    "text": " tem aproximadamente 1 discípulo ou menos em cada 100 (≤ 1%). São necessárias mais equipes de plantação de igrejas para aumentar o engajamento frutífero."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": "De Fronteira."
+                  },
+                  {
+                    "type": "text",
+                    "text": " Um "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "italic"
+                      }
+                    ],
+                    "text": "povo de fronteira"
+                  },
+                  {
+                    "type": "text",
+                    "text": " tem aproximadamente 1 discípulo ou menos em cada 1.000 pessoas (≤ 0"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": ","
+                  },
+                  {
+                    "type": "text",
+                    "text": "1%), sem movimento confirmado e sustentado em direção a Jesus. Esses grupos estão frequentemente isolados geograficamente, com pouco ou nenhum acesso ao evangelho; portanto, o trabalho pioneiro geralmente deve começar com os não crentes."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": "Não engajado"
+                  },
+                  {
+                    "type": "text",
+                    "text": ". Um "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "italic"
+                      }
+                    ],
+                    "text": "povo não engajado"
+                  },
+                  {
+                    "type": "text",
+                    "text": " não possui crentes conhecidos ou possui um número muito pequeno (efetivamente 0%) e carece dos quatro níveis primários de engajamento efetivo:"
+                  }
+                ]
+              },
+              {
+                "type": "bulletList",
+                "content": [
+                  {
+                    "type": "listItem",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Esforço apostólico (pioneiro) como residente"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "listItem",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Compromisso de trabalhar na cultura local e na língua do coração do povo"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "listItem",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Compromisso com o ministério de longo prazo"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "listItem",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Semeando o evangelho de maneira consistente com o objetivo de ver surgir um movimento de plantação de igrejas"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Um engajamento mais amplo inclui componentes importantes que podem ser realizados por parceiros não residentes, incluindo oração intercessória, tradução da Bíblia, ministério de compaixão/ajuda em desastres, alcance através dos meios de comunicação, esforços de mobilização, formação de líderes e trabalho entre a diáspora."
+          }
+        ]
+      }
+    ]
+  }
+}

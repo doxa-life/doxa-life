@@ -1,0 +1,501 @@
+{
+  "sourceUrl": "https://doxa.life/fr/about/vision/",
+  "slug": "about/vision",
+  "locale": "fr",
+  "title": "Vision",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "La Vision"
+          }
+        ]
+      },
+      {
+        "type": "div",
+        "attrs": {
+          "class": "wp-block-group is-style-plain has-doxa-white-color has-brand-light-background-color has-text-color has-background has-link-color wp-elements-bbf7b2500ce7e23b47396ced19e96100 is-layout-flow wp-block-group-is-layout-flow",
+          "style": null,
+          "data-width": null,
+          "data-width-sm": null,
+          "data-width-md": null,
+          "data-width-lg": null,
+          "data-width-xl": null,
+          "data-list-color": null,
+          "data-highlight-color": null,
+          "data-highlight-index": null,
+          "data-highlight-last": null,
+          "data-no-action": null,
+          "data-reel-mode": null,
+          "data-variant": null,
+          "data-size": null
+        },
+        "content": [
+          {
+            "type": "heading",
+            "attrs": {
+              "textAlign": null,
+              "level": 5
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Une grande multitude de toutes les nations, familles, peuples et langues se tenait devant l’Agneau. "
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "textAlign": null,
+              "level": 5
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "– Apocalypse 7:9"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "La Mission"
+          }
+        ]
+      },
+      {
+        "type": "div",
+        "attrs": {
+          "class": "wp-block-group has-doxa-white-color has-brand-light-background-color has-text-color has-background has-link-color wp-elements-35dff377cea816f37aee529feb8cea8e is-layout-flow wp-block-group-is-layout-flow",
+          "style": null,
+          "data-width": null,
+          "data-width-sm": null,
+          "data-width-md": null,
+          "data-width-lg": null,
+          "data-width-xl": null,
+          "data-list-color": null,
+          "data-highlight-color": null,
+          "data-highlight-index": null,
+          "data-highlight-last": null,
+          "data-no-action": null,
+          "data-reel-mode": null,
+          "data-variant": null,
+          "data-size": null
+        },
+        "content": [
+          {
+            "type": "heading",
+            "attrs": {
+              "textAlign": null,
+              "level": 5
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Pour la gloire de Dieu, afin de faire des disciples de toutes les nations en allant, en baptisant et en enseignant. "
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "attrs": {
+              "textAlign": null,
+              "level": 5
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "– Matthieu 28:19-20"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "La Priorité"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Engager tous les groupes ethniques non ciblés d’ici 2033"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Nos Valeurs"
+          }
+        ]
+      },
+      {
+        "type": "bulletList",
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Demeurons en Jésus (Jean 15:5)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Prions sans cesse (1 Thessaloniciens 5:17)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Renonçons à vous-même (Luc 9:23)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Engageons-nous dans les régions au-delà (2 Corinthiens 10:16)"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Nos Objectifs"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "La Prière"
+          }
+        ]
+      },
+      {
+        "type": "orderedList",
+        "attrs": {
+          "start": 1,
+          "type": null
+        },
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Chaque Groupe Ethnique non ciblé adoptée par une église locale (2 085)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "1 000 intercesseurs pour chaque Groupe Ethnique non ciblé (2 085 000)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Prière continue 24 heures sur 24 pour chaque groupe ethnique non évangélisé, par tranches de 10 minutes."
+                  },
+                  {
+                    "type": "hardBreak"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "L’Engagement"
+          }
+        ]
+      },
+      {
+        "type": "orderedList",
+        "attrs": {
+          "start": 1,
+          "type": null
+        },
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "D’ici 2033, tous les groupes ethniques non ciblés seront ciblés."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Après 2033, chaque groupe ethnique non atteint sur terre sera engagé de manière fructueuse."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Il existe une église indigène implantée parmi chaque groupe ethnique sur terre."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Qu’est-ce que l’engagement ?"
+          }
+        ]
+      },
+      {
+        "type": "bulletList",
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Il existe une activité soutenue* visant à partager le message du Christ et à former des disciples."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Des efforts sont déployés pour établir des églises autonomes."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Le travail est effectué de manière culturellement appropriée et adaptée au contexte local."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "* "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "Pour la compréhension de la Fraternité Mondiale des Assemblées de Dieu, cela signifie que les travailleurs interculturels sont résidents…"
+          }
+        ]
+      }
+    ]
+  }
+}

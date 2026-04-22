@@ -1,0 +1,73 @@
+{
+  "sourceUrl": "https://doxa.life/events-page/",
+  "slug": "events-page",
+  "locale": "en",
+  "title": "Events page",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": "body {\n  background-color: var(--color-brand-light);\n  color: white;\n}",
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Choose a people group"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Select one of these six highlighted unengaged people groups, or search for more."
+          }
+        ]
+      },
+      {
+        "type": "uupgsList",
+        "attrs": {
+          "languageCode": "en",
+          "selectUrl": "https://pray.doxa.life",
+          "researchUrl": "https://doxa.life/research/",
+          "initialSearchTerm": "",
+          "t": {
+            "select": "Select",
+            "full_profile": "Full Profile",
+            "prayer_coverage": "Intercessors",
+            "loading": "Loading results...",
+            "load_more": "Load More",
+            "total": "Total",
+            "search": "Search names, country/continent, religions...",
+            "see_all": "See All"
+          },
+          "perPage": 6,
+          "morePerPage": 12,
+          "useSelectCard": true,
+          "useHighlightedUUPGs": false,
+          "hideSeeAllLink": true,
+          "dontShowListOnLoad": false,
+          "randomizeList": true
+        }
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        }
+      }
+    ]
+  }
+}

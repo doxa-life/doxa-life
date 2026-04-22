@@ -1,0 +1,629 @@
+{
+  "sourceUrl": "https://doxa.life/pt/resources/email-templates/",
+  "slug": "resources/email-templates",
+  "locale": "pt",
+  "title": "Modelos de e-mail",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "E-mail de apresentação"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Olá, [Nome],"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Gostaria de partilhar algo com que me comprometi recentemente e convidá-lo a refletir sobre isso comigo."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Tenho vindo a aprender sobre os grupos étnicos não alcançados e não evangelizados — 202 milhões de pessoas em 2.085 comunidades em todo o mundo, sem missionários, sem igrejas e, muitas vezes, sem crentes conhecidos entre elas. Não ouviram o evangelho não porque o tenham rejeitado, mas porque ainda ninguém lá foi. Mateus 28:19–20 é um mandamento para todos nós que seguimos Jesus, não apenas para alguns. E Mateus 9:38 deixa claro por onde se começa: «Rogai ao Senhor da colheita que envie trabalhadores para o seu campo de colheita.» Antes de enviar alguém, Jesus diz-nos para pedirmos."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Comprometi-me a fazer exatamente isso — mobilizar a oração diária pelo [nome do grupo étnico], um grupo étnico que ainda não teve contacto com o Evangelho. Através da campanha de oração DOXA, reservei um intervalo de 10 minutos por dia para orar por eles, e estou a contactá-lo porque penso que poderá sentir o mesmo apelo que eu senti."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Participar é simples: inscreva-se num horário através do link ou do código QR abaixo e receberá um lembrete diário, juntamente com conteúdos de oração centrados nas Escrituras, para o ajudar a orar com discernimento e fé."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Poderia orar para saber se Deus o está a convidar para participar nisto? Se tiver alguma dúvida, terei todo o prazer em dar-lhe mais informações, ou pode visitar doxa.life para conhecer a visão global."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "As nossas orações podem abrir portas para o Evangelho onde Jesus ainda não é conhecido. Isso não é pouca coisa."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "[Código QR ou link de inscrição]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Agradeço-lhe,"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "[O seu nome]"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Convite para um pequeno grupo"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Olá, [Nome],"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Gostaria de o convidar pessoalmente para uma noite que acredito que será importante para si."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Estamos a reunir um pequeno grupo para percorrer as Escrituras, debater o coração de Deus para com as nações e orar especificamente por grupos étnicos ainda não alcançados — 202 milhões de pessoas distribuídas por 2.085 comunidades sem missionários, sem igrejas e, muitas vezes, sem crentes conhecidos. Não porque tenham rejeitado o evangelho, mas porque ainda ninguém lá foi."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "A noite incluirá um debate orientado, oração intencional e uma oportunidade para responder ao que Deus nos estiver a inspirar. Venham com um coração aberto, confiando que o Espírito se encontrará connosco nesse momento."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Data: "
+          },
+          {
+            "type": "text",
+            "text": "[Insira a data]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Hora: "
+          },
+          {
+            "type": "text",
+            "text": "[Insira a hora]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Localização: "
+          },
+          {
+            "type": "text",
+            "text": "[Insira a localização]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Adoraria contar com a sua presença. Se tiver alguma dúvida, não hesite em contactar-me."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Grato por estarmos a seguir o coração de Deus juntos,"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "[O seu nome]"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "E-mail de acompanhamento"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Olá, [Nome],"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Obrigado por terem estado connosco no nosso evento dedicado ao coração de Deus para com as nações. Tenho refletido sobre aquilo por que orámos juntos e queria certificar-me de que dispõem de tudo o que precisam para dar o próximo passo."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Se Deus despertou algo em si nessa noite, eis como pode responder: inscreva-se num horário diário de 10 minutos de oração pelo [nome do grupo étnico] utilizando o link ou o código QR abaixo. Receberá diariamente conteúdo de oração centrado nas Escrituras para o ajudar a orar com discernimento e fé. Juntos, o objetivo é que 144 pessoas orem 10 minutos por dia — o suficiente para cobrir este grupo étnico em oração durante 24 horas seguidas. O seu horário é a peça que falta num desses 144."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "[Código QR ou link de inscrição]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Tem alguma dúvida? Terei todo o prazer em entrar em contacto consigo."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Para a Sua glória,"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "[O seu nome]"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Seguimento da apresentação"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Olá, [Nome],"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Foi um privilégio partilhar convosco, recentemente, a visão da DOXA. Somos convidados a colaborar com o que Deus já está a fazer entre as nações."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Já ouviram os números: 2 085 grupos étnicos sem evangelização. 202 milhões de pessoas sem missionários, sem igrejas, sem crentes conhecidos entre elas. Não porque tenham rejeitado o Evangelho — mas porque ainda ninguém foi até lá. Jesus disse para orarmos. É aí que tudo começa, e é isso que vos pedimos que tenham em consideração."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "É muito simples começar. Inscreva-se num horário diário de 10 minutos de oração pelo [nome do grupo étnico] e receba conteúdos de oração centrados nas Escrituras para o orientar. Quando 144 pessoas dedicarem 10 minutos por dia, o nosso grupo étnico estará coberto pela oração durante 24 horas. O seu horário é o que permite que isso aconteça. O que você oferece nesses 10 minutos é uma semente lançada para uma colheita que talvez não venha a ver, mas na qual confiamos que Deus cuidará fielmente."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Existem três formas de aprofundar o assunto a partir daqui:"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Reze: "
+          },
+          {
+            "type": "text",
+            "text": "Inscreva-se para um intervalo de oração diário de 10 minutos através do link abaixo."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Adoção: "
+          },
+          {
+            "type": "text",
+            "text": "Se lidera uma igreja, um pequeno grupo ou uma rede, considere adotar o seu próprio grupo étnico. Trata-se de um compromisso de orar, contribuir financeiramente e enviar missionários em nome deles."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Saiba mais: "
+          },
+          {
+            "type": "text",
+            "text": "Visite https://doxa.life para conhecer a visão completa, os grupos étnicos e os recursos à sua disposição."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Se algo o tocou ao ouvir esta visão, não deixe passar esta oportunidade. Inscreva-se hoje mesmo para aceitar o convite."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Tem alguma dúvida? Terei todo o prazer em falar consigo pessoalmente."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "[Código QR ou link de inscrição]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Para a Sua glória,"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "[O seu nome]"
+          }
+        ]
+      }
+    ]
+  }
+}

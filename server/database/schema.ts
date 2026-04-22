@@ -40,6 +40,7 @@ export interface PagesTable {
   slug: string
   parent_slug: string | null
   menu_order: Generated<number>
+  custom_css: string | null
   created: ColumnType<Date, Date | string | undefined, Date | string>
   updated: ColumnType<Date, Date | string | undefined, Date | string>
 }

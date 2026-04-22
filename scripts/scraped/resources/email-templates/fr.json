@@ -1,0 +1,629 @@
+{
+  "sourceUrl": "https://doxa.life/fr/resources/email-templates/",
+  "slug": "resources/email-templates",
+  "locale": "fr",
+  "title": "Modèles d'e-mails",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Introduction – Courriel"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Bonjour [Nom],"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Je voudrais vous faire part d’un engagement que j’ai pris récemment et vous inviter à y réfléchir avec moi."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Je me suis renseigné sur les groupes ethniques non atteints et non engagés — 202 millions de personnes réparties dans 2 085 communautés à travers le monde, sans missionnaires, sans églises et souvent sans aucun croyant connu parmi elles. Elles n’ont pas entendu l’Évangile, non pas parce qu’elles l’ont rejeté, mais parce que personne ne s’est encore rendu auprès d’elles. Matthieu 28:19-20 est un commandement qui s’adresse à nous tous qui suivons Jésus, et non pas seulement à quelques-uns. Et Matthieu 9:38 indique clairement par où commencer : « Priez le Seigneur de la moisson d’envoyer des ouvriers dans sa moisson. » Avant d’envoyer qui que ce soit, Jésus nous dit de demander."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Je me suis engagé à faire exactement cela : mobiliser la prière quotidienne en faveur du [nom du groupe ethnique], un groupe ethnique qui n’a toujours pas été touché par l’Évangile. Dans le cadre de la campagne de prière DOXA, j’ai réservé un créneau de prière quotidien de 10 minutes pour eux, et je vous écris car je pense que vous pourriez ressentir le même appel que moi."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Pour participer, rien de plus simple : inscrivez-vous à un créneau horaire en cliquant sur le lien ou en scannant le code QR ci-dessous, et vous recevrez chaque jour un rappel accompagné d’un contenu de prière axé sur les Écritures, qui vous aidera à prier avec perspicacité et foi."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Pourriez-vous prier pour savoir si Dieu vous invite à vous engager dans cette aventure ? Si vous avez des questions, je me ferai un plaisir de vous en dire plus ; vous pouvez également vous rendre sur doxa.life pour en savoir plus sur notre vision globale."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Nos prières peuvent ouvrir la voie à l’Évangile là où Jésus n’est pas encore connu. Ce n’est pas une mince affaire."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "[Code QR ou lien d’inscription]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Je vous suis reconnaissant,"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "[Votre nom]"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Invitation à un petit groupe"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Bonjour [Nom],"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Je tiens à vous inviter personnellement à une soirée qui, j’en suis sûr, vous intéressera."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Nous réunissons un petit groupe pour parcourir les Écritures, discuter de l’amour de Dieu pour les nations et prier tout particulièrement pour les peuples non évangélisés — 202 millions de personnes réparties dans 2 085 communautés où il n’y a ni missionnaires, ni églises, et souvent aucun croyant connu. Non pas parce qu’ils ont rejeté l’Évangile, mais parce que personne ne s’y est encore rendu."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Au programme de cette soirée : une discussion guidée, un temps de prière ciblée et l’occasion de répondre à ce que Dieu pourrait bien être en train de susciter en nous. Venez le cœur ouvert, dans l’attente que l’Esprit vienne à notre rencontre."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Date : "
+          },
+          {
+            "type": "text",
+            "text": "[Insérer la date]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Heure : "
+          },
+          {
+            "type": "text",
+            "text": "[Insérer l’heure]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Lieu : "
+          },
+          {
+            "type": "text",
+            "text": "[Insérer le lieu]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "J’aimerais beaucoup que vous soyez des nôtres. N’hésitez pas à me faire savoir si vous avez des questions."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Nous sommes reconnaissants de pouvoir, ensemble, suivre la volonté de Dieu,"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "[Votre nom]"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "E-mail de suivi"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Bonjour [Nom],"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Merci d’avoir été parmi nous lors de notre rencontre consacrée au cœur de Dieu pour les nations. J’ai réfléchi à ce pour quoi nous avons prié ensemble et je tenais à m’assurer que vous disposiez de tout ce dont vous avez besoin pour passer à l’étape suivante."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Si Dieu a touché votre cœur ce soir-là, voici comment vous pouvez réagir : inscrivez-vous pour un créneau de prière quotidien de 10 minutes en faveur du [nom du groupe ethnique] en utilisant le lien ou le code QR ci-dessous. Vous recevrez chaque jour un contenu de prière centré sur les Écritures pour vous aider à prier avec perspicacité et foi. Ensemble, notre objectif est de réunir 144 personnes priant 10 minutes par jour — suffisamment pour couvrir ce groupe ethnique de prières pendant 24 heures d’affilée. Votre créneau est la pièce manquante de l’un de ces 144."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "[Code QR ou lien d’inscription]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Des questions ? Je me ferai un plaisir de vous répondre."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Pour sa gloire,"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "[Votre nom]"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Suivi de la présentation"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Bonjour [Nom],"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Ce fut un privilège de vous faire part récemment de la vision de DOXA. Nous sommes invités à nous associer à ce que Dieu accomplit déjà parmi les nations."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Vous avez entendu les chiffres : 2 085 groupes ethniques non évangélisés. 202 millions de personnes sans missionnaires, sans églises, sans aucun croyant connu parmi elles. Non pas parce qu’elles ont rejeté l’Évangile, mais parce que personne ne s’y est encore rendu. Jésus nous a demandé de prier. C’est là que tout commence, et c’est ce que nous vous invitons à prendre en considération."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "C’est très simple. Inscrivez-vous pour un créneau de prière quotidien de 10 minutes en faveur du [nom du groupe ethnique], et recevez des textes de prière inspirés des Écritures pour vous guider. Lorsque 144 personnes consacrent chacune 10 minutes par jour, notre groupe ethnique est couvert par la prière 24 heures sur 24. Votre créneau permet de rendre cela possible. Ce que vous offrez pendant ces 10 minutes est une graine semée pour une moisson que vous ne verrez peut-être pas de votre vivant, mais dont nous sommes convaincus que Dieu prendra fidèlement soin."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Il existe trois façons d’approfondir le sujet à partir de là :"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Priez : "
+          },
+          {
+            "type": "text",
+            "text": "inscrivez-vous pour un créneau de prière quotidien de 10 minutes en cliquant sur le lien ci-dessous."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Adopter : "
+          },
+          {
+            "type": "text",
+            "text": "Si vous dirigez une église, un petit groupe ou un réseau, envisagez d’adopter votre propre groupe ethnique. Il s’agit d’un engagement à prier, à faire des dons et à envoyer des missionnaires en leur faveur."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Pour en savoir plus : "
+          },
+          {
+            "type": "text",
+            "text": "rendez-vous sur https://doxa.life pour découvrir notre vision dans son intégralité, les groupes ethniques concernés et les ressources mises à votre disposition."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Si cette vision a éveillé quelque chose en vous, ne laissez pas passer cette occasion. Inscrivez-vous dès aujourd’hui pour accepter cette invitation."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Vous avez des questions ? Je me ferai un plaisir de vous répondre personnellement."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "[Code QR ou lien d’inscription]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Pour sa gloire,"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "[Votre nom]"
+          }
+        ]
+      }
+    ]
+  }
+}

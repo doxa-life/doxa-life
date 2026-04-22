@@ -1,0 +1,139 @@
+{
+  "sourceUrl": "https://doxa.life/agwm-uupg-signup/",
+  "slug": "agwm-uupg-signup",
+  "locale": "en",
+  "title": "AGWM UUPG Sign-Up",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": "body {\n    background-color: #4C584F; /* green */\ncolor: #ffffff; /* white */\n\n.aligncenter img {\n    display: block;\n    margin: auto;\n}",
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "image",
+        "attrs": {
+          "src": "https://doxa.life/wp-content/uploads/2026/03/AGWM-GAGA-Banner-1024x290.jpg",
+          "alt": "",
+          "title": null,
+          "width": 1024,
+          "height": 290
+        }
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "AG World Missions is so thrilled to partner with the worldwide AG family and the body of Christ in praying for unengaged, unreached people groups (UUPGs). In our vision of “Gospel Access for All,” we believe the first step is prayer."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "The first prayer goal is that we would have 144 people praying 10 minutes a day for one of the UUPGs. If so, we would have 24 hours of covering prayer. The second prayer goal is to have 1,000 intercessors for every one of the UUPGs. Prayer is not just preparation for battle, it is the battle. And it is how the battle will be won."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "You can sign up below. You can search for a specific UUPG by country or religion."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Thank you for praying with us and with the global family."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Dr. John Easter"
+          },
+          {
+            "type": "hardBreak"
+          },
+          {
+            "type": "text",
+            "text": "Executive Director of AG World Missions"
+          }
+        ]
+      },
+      {
+        "type": "div",
+        "attrs": {
+          "class": "wp-block-spacer",
+          "style": "height:25px",
+          "data-width": null,
+          "data-width-sm": null,
+          "data-width-md": null,
+          "data-width-lg": null,
+          "data-width-xl": null,
+          "data-list-color": null,
+          "data-highlight-color": null,
+          "data-highlight-index": null,
+          "data-highlight-last": null,
+          "data-no-action": null,
+          "data-reel-mode": null,
+          "data-variant": null,
+          "data-size": null
+        }
+      },
+      {
+        "type": "uupgsList",
+        "attrs": {
+          "languageCode": "en",
+          "selectUrl": "https://pray.doxa.life",
+          "researchUrl": "https://doxa.life/research/",
+          "initialSearchTerm": "",
+          "t": {
+            "select": "Select",
+            "full_profile": "Full Profile",
+            "prayer_coverage": "Intercessors",
+            "loading": "Loading results...",
+            "load_more": "Load More",
+            "total": "Total",
+            "search": "Search names, country/continent, religions...",
+            "see_all": "See All"
+          },
+          "perPage": 6,
+          "morePerPage": 12,
+          "useSelectCard": true,
+          "useHighlightedUUPGs": false,
+          "hideSeeAllLink": true,
+          "dontShowListOnLoad": false,
+          "randomizeList": true
+        }
+      }
+    ]
+  }
+}

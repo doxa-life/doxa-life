@@ -1,0 +1,127 @@
+{
+  "sourceUrl": "https://doxa.life/pwf26/",
+  "slug": "pwf26",
+  "locale": "en",
+  "title": "World Pentecostal Fellowship Meeting",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": "body {\n    background-color: #4C584F; /* green */\ncolor: #ffffff; /* white */\n}",
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "image",
+        "attrs": {
+          "src": "https://doxa.life/wp-content/uploads/2026/03/Logo-WMC-of-Pentecostal-World-Fellowship-scaled.jpg",
+          "alt": "",
+          "title": null,
+          "width": 2560,
+          "height": 725
+        }
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Welcome to our Pentecostal World Fellowship Friends!"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "The DOXA partnership would be delighted to labor together in prayer with you and the churches you serve through prayer."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Would you consider signing up to pray for one of these Unengaged, Unreached People Groups (UUPGs) below?"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Our goal is that every UUPG will have at least 144 people from around the world praying for them 10 minutes a day. This will give us 24-hour prayer coverage for every one of these UUPGs."
+          }
+        ]
+      },
+      {
+        "type": "div",
+        "attrs": {
+          "class": "wp-block-spacer",
+          "style": "height:30px",
+          "data-width": null,
+          "data-width-sm": null,
+          "data-width-md": null,
+          "data-width-lg": null,
+          "data-width-xl": null,
+          "data-list-color": null,
+          "data-highlight-color": null,
+          "data-highlight-index": null,
+          "data-highlight-last": null,
+          "data-no-action": null,
+          "data-reel-mode": null,
+          "data-variant": null,
+          "data-size": null
+        }
+      },
+      {
+        "type": "uupgsList",
+        "attrs": {
+          "languageCode": "en",
+          "selectUrl": "https://pray.doxa.life",
+          "researchUrl": "https://doxa.life/research/",
+          "initialSearchTerm": "",
+          "t": {
+            "select": "Select",
+            "full_profile": "Full Profile",
+            "prayer_coverage": "Intercessors",
+            "loading": "Loading results...",
+            "load_more": "Load More",
+            "total": "Total",
+            "search": "Search names, country/continent, religions...",
+            "see_all": "See All"
+          },
+          "perPage": 6,
+          "morePerPage": 12,
+          "useSelectCard": true,
+          "useHighlightedUUPGs": false,
+          "hideSeeAllLink": true,
+          "dontShowListOnLoad": false,
+          "randomizeList": true
+        }
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        }
+      }
+    ]
+  }
+}

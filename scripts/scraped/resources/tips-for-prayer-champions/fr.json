@@ -1,0 +1,571 @@
+{
+  "sourceUrl": "https://doxa.life/fr/resources/tips-for-prayer-champions/",
+  "slug": "resources/tips-for-prayer-champions",
+  "locale": "fr",
+  "title": "Conseils pour les champions de la prière",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "1. Alignez-vous d’abord sur la direction de l’Église"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Avant d’inviter d’autres personnes, faites part de votre vision à votre pasteur ou au responsable de votre ministère. Expliquez-leur pourquoi ce groupe ethnique vous tient à cœur : "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "votre témoignage est plus convaincant que n’importe quel support promotionnel."
+          },
+          {
+            "type": "text",
+            "text": " Demandez-leur leur bénédiction. La "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://player.vimeo.com/video/1174779547?h=8c00c1c764&badge=0&autopause=0&player_id=0&app_id=58479",
+                  "target": "_blank",
+                  "rel": "noopener noreferrer nofollow",
+                  "class": null,
+                  "title": null
+                }
+              }
+            ],
+            "text": "vidéo promotionnelle de DOXA"
+          },
+          {
+            "type": "text",
+            "text": " constitue un excellent point de départ s’ils ne connaissent pas encore la campagne."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "2. S’adapter aux rythmes de la paroisse"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Vous n’avez pas besoin de créer quelque chose de nouveau. "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Intégrez cette vision à ce qui existe déjà"
+          },
+          {
+            "type": "text",
+            "text": " : petits groupes, soirées de prière, rassemblements missionnaires, moments du dimanche. Le « "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "/resources/small-group-discussion-guide/",
+                  "target": "_blank",
+                  "rel": "noopener noreferrer nofollow",
+                  "class": null,
+                  "title": null
+                }
+              }
+            ],
+            "text": "Guide de discussion et de prière en groupe »,"
+          },
+          {
+            "type": "text",
+            "text": " disponible dans notre section Ressources, propose des suggestions détaillées pour intégrer efficacement cette démarche au sein d’un petit groupe."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "3. Définir une vision"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Aidez les gens à comprendre le cœur de Dieu pour les peuples non évangélisés et à saisir toute la gravité du fait qu’un peuple entier n’ait jamais entendu parler de l’Évangile. "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "/resources/talking-points/",
+                  "target": "_blank",
+                  "rel": "noopener noreferrer nofollow",
+                  "class": null,
+                  "title": null
+                }
+              }
+            ],
+            "text": "La rubrique « Arguments clés pour les intervenants »"
+          },
+          {
+            "type": "text",
+            "text": " de notre section de ressources contient des suggestions pour vous aider. "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Une motivation durable naît lorsque les gens s’approprient eux-mêmes cette vision."
+          },
+          {
+            "type": "text",
+            "text": " Comptez sur l’Esprit pour accomplir ce que vous ne pouvez pas faire. "
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "4. Commencez par les influenceurs clés"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Commencez par les responsables de groupes, les membres de l’Église fidèles sur le plan spirituel, ainsi que vos proches et vos amis qui partagent le cœur de Dieu pour les nations. "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Les invitations personnelles ont un poids que les annonces ne pourront jamais avoir."
+          },
+          {
+            "type": "text",
+            "text": " Vous pourriez envisager "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://zume.training/fr/relational-stewardship-list-of-100/",
+                  "target": "_blank",
+                  "rel": "noopener noreferrer nofollow",
+                  "class": null,
+                  "title": null
+                }
+              }
+            ],
+            "text": "cette activité d’« intendance relationnelle »"
+          },
+          {
+            "type": "text",
+            "text": " pour vous aider à identifier les personnes que vous connaissez déjà. Lorsque les bonnes personnes acceptent, d’autres suivent. Lorsque ces personnes commencent à inviter à leurs côtés, le mouvement prend une ampleur bien supérieure à ce que vous auriez pu construire seul. "
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "5. Veillez à ce que le parcours d’intégration soit clair et simple"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Une invitation trop compliquée suscite des hésitations, et non un engagement. Facilitez la tâche à ceux qui souhaitent accepter : "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "expliquez clairement en quoi consiste la participation et veillez à ce que le code QR ou le lien d’inscription soit bien visible sur les diapositives, dans les e-mails et sur les prospectus."
+          },
+          {
+            "type": "text",
+            "text": " "
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "6. Priez lorsque vous invitez quelqu’un"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Chaque fois que vous le pouvez, "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "concluez votre invitation par une prière"
+          },
+          {
+            "type": "text",
+            "text": ". Il ne s’agit pas d’une technique, mais de la reconnaissance que ce n’est pas vous qui devez convaincre. Cela transforme ce moment de simple recrutement en un partenariat spirituel et invite le Saint-Esprit à accomplir ce que Lui seul peut faire : adoucir les cœurs envers un peuple qu’Il aime déjà."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "7. Servir l’Église"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Présentez cette campagne comme un approfondissement des valeurs déjà chères à votre église"
+          },
+          {
+            "type": "text",
+            "text": " : la prière, les missions, l’obéissance. La participation à cette campagne s’inscrit dans le cadre d’un parcours de disciple transformateur !"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "8. Partagez des histoires qui touchent"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Les témoignages de prière, d’obéissance et d’impact mondial stimulent la foi d’une manière que les données ne peuvent égaler. "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Soyez attentifs aux mises à jour régulières et aux récits de DOXA"
+          },
+          {
+            "type": "text",
+            "text": ", "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "et partagez-les avec votre communauté"
+          },
+          {
+            "type": "text",
+            "text": ". Un récit de ce que Dieu accomplit suscite l’enthousiasme et l’attente.  "
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "9. Assurez le suivi sur le plan relationnel, et non sur le plan administratif"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Les e-mails et les modèles sont utiles — "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "/resources/email-templates/",
+                  "target": "_blank",
+                  "rel": "noopener noreferrer nofollow",
+                  "class": null,
+                  "title": null
+                }
+              }
+            ],
+            "text": "des versions personnalisables"
+          },
+          {
+            "type": "text",
+            "text": " sont à votre disposition pour vous aider — mais ils ne constituent qu’un minimum, pas un maximum. "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Un contact personnel, une prière partagée, un bref témoignage ont un impact qu’un simple rappel ne peut avoir."
+          },
+          {
+            "type": "text",
+            "text": " Les gens s’investissent dans ce à quoi ils se sentent personnellement liés, et non pas simplement dans ce à quoi ils sont abonnés en ligne."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "10. Mesurez la fidélité, pas seulement les chiffres"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Les inscriptions sont encourageantes, mais elles ne constituent pas le fruit. Célébrez l’obéissance, la constance et la croissance spirituelle. La croissance peut être régulière et discrète plutôt qu’immédiate et visible. Telle est la nature de la prière. "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Ayez confiance : Dieu agit en profondeur à travers ce qui lui est offert avec fidélité,"
+          },
+          {
+            "type": "text",
+            "text": " même lorsque les résultats ne sont pas encore visibles à vos yeux."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              },
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "Entretenez vos relations avec soin, gardez à l’esprit de votre communauté le cœur que Dieu porte pour les nations, et faites confiance au Saint-Esprit pour accomplir ce que vous ne pouvez pas faire."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        }
+      }
+    ]
+  }
+}

@@ -21,6 +21,8 @@ import Typography from '@tiptap/extension-typography'
 import Subscript from '@tiptap/extension-subscript'
 import Superscript from '@tiptap/extension-superscript'
 import Youtube from '@tiptap/extension-youtube'
+import { Div } from '~/utils/tiptapDiv'
+import { UupgsListNode } from '~/utils/tiptapUupgsList'
 import { uploadImage } from '~/composables/useImageUpload'
 
 const props = withDefaults(defineProps<{
@@ -49,7 +51,9 @@ const editor = useEditor({
     Typography,
     Subscript,
     Superscript,
-    Youtube
+    Youtube,
+    Div,
+    UupgsListNode
   ],
   onUpdate({ editor: e }) {
     emit('update:modelValue', e.getJSON())

@@ -1,0 +1,629 @@
+{
+  "sourceUrl": "https://doxa.life/resources/email-templates/",
+  "slug": "resources/email-templates",
+  "locale": "en",
+  "title": "Email Templates",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Introduction Email"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Hi [Name],"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "I want to share something I’ve recently committed to, and invite you to consider it with me."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "I’ve been learning about unreached and unengaged people groups — 202 million people across 2,085 communities worldwide with no missionaries, no churches, and often no known believers among them. They haven’t heard the gospel not because they rejected it, but because no one has yet gone. Matthew 28:19–20 is a commandment for all of us who follow Jesus, not just a few. And Matthew 9:38 makes clear where it begins: “Pray the Lord of the harvest to send out laborers into His harvest field.” Before He sends anyone, Jesus tells us to ask."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "I’ve committed to doing exactly that — mobilizing daily prayer for the [name of people group], a people group who remains unengaged with the gospel. Through the DOXA prayer campaign, I’ve taken a 10-minute daily prayer slot for them, and I’m reaching out because I think you might feel the same pull I did."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Participation is simple: sign up for a time slot using the link or QR code below, and you’ll receive a daily reminder along with Scripture-centered prayer content to help you pray with insight and faith."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Will you pray about whether God is inviting you into this? If you have questions, I’m happy to share more or you can visit doxa.life to learn about the larger vision."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Our prayers can open doors for the gospel where Jesus is not yet known. That is not a small thing."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "[QR Code or Sign-Up Link]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Grateful for you,"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "[Your Name]"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Invitation to Small group"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Hi [Name],"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "I want to personally invite you to an evening that I think will matter to you."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "We’re gathering a small group to walk through Scripture, discuss God’s heart for the nations, and pray specifically for unengaged people groups — 202 million people across 2,085 communities with no missionaries, no churches, and often no known believers. Not because they rejected the gospel, but because no one has yet gone."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "The evening will include guided discussion, intentional prayer, and an opportunity to respond to what God may be stirring. Come with a willing heart expecting the Spirit to meet us there."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Date:  "
+          },
+          {
+            "type": "text",
+            "text": "[Insert Date]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Time:  "
+          },
+          {
+            "type": "text",
+            "text": "[Insert Time]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Location:  "
+          },
+          {
+            "type": "text",
+            "text": "[Insert Location]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "I’d love to have you there. Let me know if you have any questions."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Grateful to be pursuing God’s heart together,"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "[Your Name]"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Follow up email"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Hi [Name],"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Thank you for being with us at our event focused on God’s heart for the nations. I’ve been thinking about what we prayed together and wanted to make sure you had everything you need to take the next step."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "If God stirred something in you that evening, this is how you respond: sign up for a 10-minute daily prayer slot for the [name of people group] using the link or QR code below. You’ll receive Scripture-centered prayer content each day to help you pray with insight and faith. Together, the goal is 144 people praying 10 minutes a day — enough to cover this people group in prayer for 24 hours straight. Your slot is a missing piece of one of those 144."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "[QR Code or Sign-Up Link]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Questions? I’m happy to connect."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "For His glory,"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "[Your Name]"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Follow up to Presentation"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Hi [Name],"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "It was a privilege to share the DOXA vision with you recently. We are invited to partner with what God is already doing among the nations."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "You heard the numbers: 2,085 unengaged people groups. 202 million people with no missionaries, no churches, no known believers among them. Not because they rejected the gospel — but because no one has yet gone. Jesus said to pray. That is where this begins, and that is what we are asking you to consider."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "The on-ramp is simple. Sign up for a 10-minute daily prayer slot for the [people group name], and receive Scripture-centered prayer content to guide you. When 144 people each give 10 minutes a day, our people group is covered in prayer for 24 hours. Your slot is one that allows this to happen. What you give in those 10 minutes is a seed sown into a harvest you may not live to see, but one that we trust God to tend faithfully."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "There are three ways to go deeper from here:"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "•  "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Pray: "
+          },
+          {
+            "type": "text",
+            "text": "Sign up for a daily 10-minute prayer slot at the link below."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "•  "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Adopt: "
+          },
+          {
+            "type": "text",
+            "text": "If you lead a church, small group, or network, consider adopting your own people group. This is a commitment to pray, give, and send on their behalf."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "•  "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Learn more: "
+          },
+          {
+            "type": "text",
+            "text": "Visit https://doxa.life to explore the full vision, the people groups, and the resources available to you."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "If something stirred in you when you heard the vision, don’t let the moment pass. Sign up today to accept the invitation."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Questions? I’m happy to connect personally."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "[QR Code or Sign-Up Link]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "For His glory,"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "[Your Name]"
+          }
+        ]
+      }
+    ]
+  }
+}

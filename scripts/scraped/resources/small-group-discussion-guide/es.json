@@ -1,0 +1,800 @@
+{
+  "sourceUrl": "https://doxa.life/es/resources/small-group-discussion-guide/",
+  "slug": "resources/small-group-discussion-guide",
+  "locale": "es",
+  "title": "Guía para el debate y la oración en grupos reducidos",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "El corazón de Dios por los que aún no han sido alcanzados"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Diseñado para grupos pequeños de la iglesia · Duración total: 60 minutos (flexible)"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Nota para los líderes"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Esta guía está diseñada para ayudar a su grupo a descubrir el corazón de Dios por las naciones a través de las Escrituras y la oración. No están aquí para persuadir a nadie; están aquí para crear un espacio en el que el Espíritu Santo pueda despertar lo que solo Él puede despertar: la conciencia, la compasión y la obediencia."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "No es necesario que sea un experto en misiones. Dirija la conversación, lea las Escrituras e invite a participar. Después, confíe en que Dios se encargará del resto. Cuente con que lo hará."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Duración recomendada"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Las Escrituras y el establecimiento de los cimientos"
+          },
+          {
+            "type": "text",
+            "text": " 15 minutos"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Debate:"
+          },
+          {
+            "type": "text",
+            "text": " 15 minutos"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Oración guiada"
+          },
+          {
+            "type": "text",
+            "text": " 20 minutos"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Bienvenida y clausura"
+          },
+          {
+            "type": "text",
+            "text": " 15 minutos"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Lectura inicial y reflexión · 15 minutos"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Lectura en voz alta: "
+          },
+          {
+            "type": "text",
+            "text": "Elija uno de los siguientes pasajes: Mateo 9:35-38, Romanos 10:10-17, Lucas 10:1-9"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              },
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "Pregunta inicial:"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "¿Qué es lo que más le llama la atención de este pasaje?"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Reflexión del líder (leer o resumir):"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Jesús no parte de una estrategia, sino de la compasión. Antes de decirles a sus discípulos que vayan, les dice que pidan. La oración no es un simple calentamiento para el trabajo real. Es la forma en que Dios invita a su pueblo a unirse a su corazón por aquellos que nunca han oído hablar de Él. Lo que usted ofrece en la oración no se pierde: se siembra en una cosecha que quizá no llegue a ver. Confíe en que Dios cuidará de lo que usted le ofrece."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Comprender a los que aún no han sido alcanzados "
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Un grupo étnico no alcanzado es un pueblo que tiene poco o ningún acceso al Evangelio; a menudo carece de iglesia local, de creyentes y de cualquier tipo de testimonio entre sus miembros. Existen 2.085 grupos étnicos sin contacto —202 millones de personas— que carecen de misioneros, de iglesias y, a menudo, de creyentes conocidos entre ellos."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "La oración no es algo que hacemos hasta que alguien se marcha. La oración es la forma en que Dios prepara los corazones, abre puertas y envía obreros. No estamos esperando al margen: se nos invita a participar en el centro de lo que Él está haciendo."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Debate en grupo · 15 minutos"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Plantee una o dos preguntas, según el tiempo disponible. Deje margen para respuestas sinceras: no hay respuestas incorrectas."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "• "
+          },
+          {
+            "type": "text",
+            "text": "¿Por qué cree que Jesús hace hincapié en la oración cuando habla de la cosecha?"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "• "
+          },
+          {
+            "type": "text",
+            "text": "¿Cómo influye en su forma de ver la oración el hecho de saber que millones de personas nunca han escuchado el Evangelio?"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "• "
+          },
+          {
+            "type": "text",
+            "text": "¿De qué maneras podría estar invitando Dios a su Iglesia —y no solo a los misioneros— a participar en su misión global?"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Transición a la oración · Lectura en voz alta por parte del líder"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "Esta noche tenemos la oportunidad de contribuir al cumplimiento de la Gran Comisión. Nuestra iglesia o grupo ha acordado colaborar con una iniciativa llamada DOXA. Nuestra visión es llegar a los 2.085 grupos étnicos sin evangelizar para el año 2033. Simplemente estamos respondiendo a una invitación. Dios ya está obrando entre los pueblos no alcanzados; nos pide que nos unamos a Él a través de la oración. Él utilizará lo que ofrezcamos esta noche. Oren confiando en que así será."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Oración guiada por los pueblos no alcanzados · 20 minutos"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Recomendación:"
+          },
+          {
+            "type": "text",
+            "text": " utilice el contenido de oración de hoy de la campaña. Pida al grupo que escanee el código QR o acceda a la URL desde sus dispositivos, o bien muestre el contenido en pantalla. Oren siguiendo el contenido utilizando una de las opciones de formato de oración que se indican a continuación. De este modo, se presenta a los participantes el grupo étnico y la iniciativa de oración en curso."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Si no dispone del texto de oración de la campaña de oración, puede utilizar las sugerencias de oración que se indican a continuación."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Sugerencias para la oración escrita:"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• Pida al Señor de la mies que envíe misioneros a todo el mundo para predicar en lugares donde aún no se ha anunciado el Evangelio."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• Interceda para que los trabajadores internacionales tengan la oportunidad de acercarse a estas comunidades y ser acogidos en ellas."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• Oremos para que la fe se despierte entre los pueblos no evangelizados al descubrir el amor y la verdad de Dios al escuchar la Palabra de Dios."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• Oremos para que las personas y las iglesias cumplan fielmente con su parte de orar, dar y enviar, no solo durante una temporada, sino a largo plazo."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Opciones de formato de oración:"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• Oración en silencio seguida de oraciones en voz alta"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• Una persona lee una guía mientras los demás rezan en voz alta"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• Oración «Popcorn»: oraciones breves de muchas voces"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Invitación a la oración continua · 5 minutos"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Lo que hemos rezado esta noche forma parte de una iniciativa mundial destinada a garantizar una cobertura de oración continua, las 24 horas del día, para los grupos étnicos no evangelizados. Participar es sencillo y flexible: un turno de 10 minutos que 144 personas mantengan fielmente significa que el [nombre del grupo étnico] estará cubierto por la oración durante las 24 horas. Se trata de un acto significativo de corresponsabilidad."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Si Dios ha despertado algo en usted esta noche, hay un siguiente paso que puede dar. "
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Siguiente paso: "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "(Moderador: comparta el enlace o el código QR, o invite a los participantes a ponerse en contacto con usted después de la sesión.)"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Texto bíblico de clausura y bendición · 5 minutos"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Lea en voz alta: Salmo 67:1-2"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "Que Dios tenga misericordia de nosotros, nos bendiga y haga resplandecer su rostro sobre nosotros, para que se conozcan tus caminos en la tierra y tu salvación entre todas las naciones."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "Bendición final"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "La oración no es una preparación para la misión. La oración es la misión. Lo que se ofrezca fielmente a Dios en esta sala no volverá vacío."
+          },
+          {
+            "type": "hardBreak"
+          },
+          {
+            "type": "text",
+            "text": "El formato de esta guía sigue el método SOAPS de estudio bíblico. Obtenga más información sobre el método SOAPS en "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://zume.training/soaps-bible-reading",
+                  "target": "_blank",
+                  "rel": "noopener noreferrer nofollow",
+                  "class": null,
+                  "title": null
+                }
+              }
+            ],
+            "text": "https://zume.training/soaps-bible-reading"
+          },
+          {
+            "type": "text",
+            "text": ". Zume Training es un plan de estudios gratuito en línea que ofrece 30 herramientas y formación para convertirse en un discípulo que forma discípulos. Está disponible en 50 idiomas."
+          }
+        ]
+      }
+    ]
+  }
+}

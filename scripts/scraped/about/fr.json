@@ -1,0 +1,317 @@
+{
+  "sourceUrl": "https://doxa.life/fr/about/",
+  "slug": "about",
+  "locale": "fr",
+  "title": "À propos de",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Leadership"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "DOXA a été fondée et est gérée par la World Assemblies of God Fellowship (WAGF) et supervisée par l’équipe dirigeante de la Commission des missions de la WAGF."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Partenaires"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Chaque département missionnaire affilié à la World Assemblies of God Fellowship (129 agences d’envoi différentes en 2026) est automatiquement partenaire de DOXA. Ceci en vertu du fait que DOXA sert la World Assemblies of God Fellowship dans le cadre de la Commission des missions. Tout membre de la commission des missions de la WAGF est un partenaire que DOXA accueille et sert."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Déclaration de 2025"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Le partenariat DOXA"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "DÉCLARATION FINALE DU SOMMET"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Lac Léman, Minnesota – 25 septembre 2025"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Reconnaissant que Jésus nous a appelés à être ses partenaires, nous nous engageons devant Dieu et les uns envers les autres à collaborer à l’échelle mondiale pour mener à bien le plus grand mouvement de formation de disciples et d’implantation d’Églises parmi les peuples non atteints que la World Assemblies of God Fellowship ait jamais connu. Notre engagement comprend les éléments suivants :"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que nous continuerons à dépendre du Saint-Esprit et des Saintes Écritures en toutes circonstances et pour tout ;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que nous considérerons humblement les autres comme supérieurs à nous-mêmes et que nous ne nous mettrons pas en concurrence les uns avec les autres ou avec d’autres agences, mais que nous respecterons et honorerons tous les enfants de Dieu dans Sa mission ;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que nous formerons un partenariat volontaire, mondial et réceptif, engagé à collaborer avec les églises nationales existantes et les conseils généraux des Assemblées de Dieu, dans la mesure du possible ;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que ce partenariat ne sera pas une agence d’envoi et ne remplacera pas le travail ou le rôle des agences d’envoi actuelles ou de leurs Églises nationales ;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Les agences d’envoi peuvent collaborer avec le partenariat au niveau qu’elles souhaitent. Elles peuvent choisir d’envoyer tout ou partie de leurs missionnaires, ou aucun, par l’intermédiaire du partenariat."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que les agences d’envoi conserveront l’autorité finale sur leurs missionnaires, les soutiendront et les formeront avant leur départ sur le terrain ;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que le partenariat, à l’invitation de l’agence d’envoi, puisse accueillir des missionnaires, les former sur le terrain, coordonner leur placement au sein d’équipes et les encadrer de manière stratégique sur le terrain ;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que le partenariat accordera la priorité à un engagement fructueux et à long terme auprès des peuples non ciblés dans le monde qui ne disposent actuellement d’aucune équipe d’implantation d’églises parmi eux, avec pour objectif à long terme l’implantation d’églises indigènes qui mèneront à la création d’églises nationales ou à l’intégration dans des églises nationales existantes. Nous accomplirons cela en harmonie avec MM33 ;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que ce partenariat permettra également aux missionnaires de s’engager de manière fructueuse et durable auprès des peuples pionniers (moins d’un croyant pour 1 000 habitants), des peuples peu engagés (moins d’un croyant pour 100 habitants) et des peuples généralement non évangélisés (moins de deux croyants pour 100 habitants) ;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que le partenariat sera supervisé par la Commission des missions de la World Assemblies of God Fellowship, qui nommera et supervisera les responsables du partenariat, lesquels pourront provenir de n’importe quel pays ou organisme participant au partenariat ;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que le partenariat sera nommé « Doxa », qui signifie « gloire » en grec, et que ce nom nous rappellera que Jésus est digne de la gloire de chaque tribu, langue, peuple et nation ;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que nous collaborerons avec l’ensemble de l’Église de Dieu afin de transmettre l’Évangile de Dieu à l’ensemble du monde de Dieu ;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Qu’un jour, une multitude de personnes de tous les peuples se tiendra autour du trône pour adorer Dieu ;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que Jésus seul recevra toute la gloire."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "En foi de quoi, par la grâce de Dieu, le présent document a été approuvé le 25 septembre 2025."
+          },
+          {
+            "type": "hardBreak"
+          }
+        ]
+      }
+    ]
+  }
+}

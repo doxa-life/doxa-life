@@ -1,0 +1,390 @@
+{
+  "sourceUrl": "https://doxa.life/about/definitions/",
+  "slug": "about/definitions",
+  "locale": "en",
+  "title": "Definitions",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Church"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "A "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "church"
+          },
+          {
+            "type": "text",
+            "text": " is comprised of baptized disciples joined together by the Holy Spirit who regularly meet together for doctrine, fellowship, communion, and prayer (Acts 2:42). "
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Practically speaking, for a new gathering to be called a church, at least six baptized disciples are required; however, specific location, meeting frequency, and designated pastor are not—though those normally develop as an indigenous church matures in the five “selfs” (self-propagating, self-governing, self-supporting, self-theologizing, self-missionizing)."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "A "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "church-planting movement"
+          },
+          {
+            "type": "text",
+            "text": " is a multiplication of indigenous churches planting churches that includes at least four streams of four spiritual generations together totaling more than 1,000 persons."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "People Group"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "A "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "people group"
+          },
+          {
+            "type": "text",
+            "text": " is an ethnolinguistic group who perceive themselves to have a common affinity for one another based on language, culture, religion, and worldview. From the viewpoint of evangelization, it is the largest possible group within which the gospel can spread as a viable, indigenous church-planting movement without encountering barriers of understanding or acceptance. "
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "An "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "unreached people group (UPG)"
+          },
+          {
+            "type": "text",
+            "text": " has approximately 2 disciples or fewer out of 100 (≤ 2%) and lacks the capacity to establish indigenous churches without cross-cultural assistance."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Within the overarching UPG category are the following people groups in descending levels of engagement:"
+          }
+        ]
+      },
+      {
+        "type": "orderedList",
+        "attrs": {
+          "start": 1,
+          "type": null
+        },
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": "Under-Engaged."
+                  },
+                  {
+                    "type": "text",
+                    "text": " An "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "italic"
+                      }
+                    ],
+                    "text": "under-engaged people group"
+                  },
+                  {
+                    "type": "text",
+                    "text": " has approximately 1 disciple or fewer out of 100 (≤ 1%). More church planting teams are needed to increase fruitful engagement."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": "Frontier."
+                  },
+                  {
+                    "type": "text",
+                    "text": " A "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "italic"
+                      }
+                    ],
+                    "text": "frontier people group "
+                  },
+                  {
+                    "type": "text",
+                    "text": "has approximately 1 disciple or fewer out of 1,000 (≤ 0"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": "."
+                  },
+                  {
+                    "type": "text",
+                    "text": "1%) with no confirmed, sustained movement to Jesus. These groups are often geographically isolated with little to no access to the gospel; thus, pioneer work generally must begin with nonbelievers."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": "Unengaged"
+                  },
+                  {
+                    "type": "text",
+                    "text": ". An "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "italic"
+                      }
+                    ],
+                    "text": "unengaged UPG (UUPG)"
+                  },
+                  {
+                    "type": "text",
+                    "text": " has no known believers or a tiny few (effectively 0%) and lacks the four primary levels of effective engagement:"
+                  }
+                ]
+              },
+              {
+                "type": "bulletList",
+                "content": [
+                  {
+                    "type": "listItem",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Apostolic (pioneering) effort in residence"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "listItem",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Commitment to work in the local culture and heart language"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "listItem",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Commitment to long-term ministry"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "listItem",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Sowing the gospel in a manner consistent with the goal of seeing a church-planting movement emerge"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Broader engagement includes important contributing components that can be done by nonresident partners, including intercessory prayer, Bible translation, compassion/disaster ministry outreaches, media reach, mobilization efforts, leadership training, and work among diaspora."
+          }
+        ]
+      }
+    ]
+  }
+}

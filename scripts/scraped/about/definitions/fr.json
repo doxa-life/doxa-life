@@ -1,0 +1,396 @@
+{
+  "sourceUrl": "https://doxa.life/fr/about/definitions/",
+  "slug": "about/definitions",
+  "locale": "fr",
+  "title": "Définitions",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Église"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Une "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "église"
+          },
+          {
+            "type": "text",
+            "text": " est composée de disciples baptisés, unis par le Saint-Esprit, qui se réunissent régulièrement pour étudier la doctrine, partager la communion fraternelle, célébrer la Cène et prier (Actes 2:42). "
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Concrètement, pour qu’un nouveau rassemblement puisse être qualifié d’église, il faut au moins six disciples baptisés ; cependant, il n’est pas nécessaire de disposer d’un lieu spécifique, de fixer la fréquence des réunions ou de désigner un pasteur, même si ces éléments se mettent généralement en place à mesure qu’une église locale mûrit dans les cinq « autonomies » (autonomie de propagation, autonomie d’administration, autonomie financière, autonomie théologique, autonomie missionnaire)."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Un "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "mouvement d’implantation d’églises"
+          },
+          {
+            "type": "text",
+            "text": " est une multiplication d’églises locales qui implantent à leur tour d’autres églises, et qui comprend au moins quatre courants de quatre générations spirituelles totalisant plus de 1 000 personnes."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Groupe de personnes"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Un "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "groupe ethnique"
+          },
+          {
+            "type": "text",
+            "text": " est un groupe ethnolinguistique dont les membres se considèrent comme ayant une affinité commune fondée sur la langue, la culture, la religion et la vision du monde. Du point de vue de l’évangélisation, il s’agit du plus grand groupe possible au sein duquel l’Évangile peut se répandre sous la forme d’un mouvement viable et indigène d’implantation d’Églises sans rencontrer d’obstacles de compréhension ou d’acceptation. "
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Un "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "groupe ethnique non atteint (UPG)"
+          },
+          {
+            "type": "text",
+            "text": " compte environ deux disciples ou moins sur 100 (≤ 2 %) et n’a pas la capacité de créer des églises autochtones sans aide interculturelle."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Au sein de la catégorie générale UPG, on trouve les groupes de personnes suivants, classés par ordre décroissant d’engagement :"
+          }
+        ]
+      },
+      {
+        "type": "orderedList",
+        "attrs": {
+          "start": 1,
+          "type": null
+        },
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": "Sous-engagé."
+                  },
+                  {
+                    "type": "text",
+                    "text": " Un "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "italic"
+                      }
+                    ],
+                    "text": "groupe ethnique sous-engagé"
+                  },
+                  {
+                    "type": "text",
+                    "text": " compte environ 1 disciple ou moins pour 100 personnes (≤ 1 %). Il est nécessaire d’augmenter le nombre d’équipes d’implantation d’églises afin d’accroître l’engagement fructueux."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": "Frontière."
+                  },
+                  {
+                    "type": "text",
+                    "text": " Un "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "italic"
+                      }
+                    ],
+                    "text": "groupe ethnique frontalier"
+                  },
+                  {
+                    "type": "text",
+                    "text": " compte environ 1 disciple ou moins pour 1 000 personnes (≤ 0"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": ","
+                  },
+                  {
+                    "type": "text",
+                    "text": "1 %) sans mouvement confirmé et durable vers Jésus. Ces groupes sont souvent isolés géographiquement et ont peu ou aucun accès à l’Évangile ; par conséquent, le travail pionnier doit généralement commencer avec des non-croyants."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": "Non engagé"
+                  },
+                  {
+                    "type": "text",
+                    "text": ". Un "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "italic"
+                      }
+                    ],
+                    "text": "groupe non engagé (UUPG)"
+                  },
+                  {
+                    "type": "text",
+                    "text": " ne compte aucun croyant connu ou seulement un nombre très restreint (pratiquement 0 %) et ne répond pas aux quatre niveaux principaux d’engagement efficace :"
+                  }
+                ]
+              },
+              {
+                "type": "bulletList",
+                "content": [
+                  {
+                    "type": "listItem",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Effort apostolique (pionnier) en résidence"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "listItem",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Engagement à travailler dans la culture locale et la langue maternelle"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "listItem",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Engagement envers un ministère à long terme"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "listItem",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Semer l’Évangile de manière manière cohérente avec l’objectif de voir émerger un mouvement d’implantation d’Églises."
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Un engagement plus large comprend des éléments importants auxquels peuvent contribuer des partenaires non résidents, notamment la prière d’intercession, la traduction de la Bible, les actions humanitaires et les secours en cas de catastrophe, la diffusion dans les médias, les efforts de mobilisation, la formation au leadership et le travail auprès de la diaspora."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        }
+      }
+    ]
+  }
+}

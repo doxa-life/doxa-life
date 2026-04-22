@@ -1,0 +1,800 @@
+{
+  "sourceUrl": "https://doxa.life/ar/resources/small-group-discussion-guide/",
+  "slug": "resources/small-group-discussion-guide",
+  "locale": "ar",
+  "title": "دليل المناقشة والصلاة للمجموعات الصغيرة",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "قلب الله تجاه غير المُبشَّرين"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "مصمم للمجموعات الصغيرة التابعة للكنائس · المدة الإجمالية: 60 دقيقة (قابلة للتعديل)"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "ملاحظة للقادة"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "صُمم هذا الدليل لمساعدة مجموعتكم على اكتشاف محبة الله للأمم من خلال الكتاب المقدس والصلاة. فأنتم لستم هنا لإقناع أحد — بل لتهيئة المجال للروح القدس ليحرك ما لا يستطيع سواه تحريكه: الوعي، والرحمة، والطاعة."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "لا داعي لأن تكون خبيرًا في مجال الإرساليات. قم بتوجيه الحوار، واقرأ الكتاب المقدس، ودعُ المشاركين إلى المشاركة. ثم ثق بأن الله سيتكفل بالباقي. وتوقع منه ذلك."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "الجدول الزمني المقترح"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "الكتاب المقدس وإرساء الأساس"
+          },
+          {
+            "type": "text",
+            "text": " 15 دقيقة"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "مناقشة"
+          },
+          {
+            "type": "text",
+            "text": " 15 دقيقة"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "صلاة موجهة"
+          },
+          {
+            "type": "text",
+            "text": " 20 دقيقة"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "الافتتاح والختام"
+          },
+          {
+            "type": "text",
+            "text": " 15 دقيقة"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "آية افتتاحية وتأمل · 15 دقيقة"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "اقرأ بصوت عالٍ: "
+          },
+          {
+            "type": "text",
+            "text": "اختر واحدة من الآيات التالية: متى 9:35–38، رومية 10:10-17، لوقا 10:1-9"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              },
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "السؤال الافتتاحي:"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "ما الذي يلفت انتباهك في هذه الفقرة؟"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "تأملات القائد (اقرأ أو لخص):"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "لا يبدأ يسوع بالاستراتيجية — بل يبدأ بالرحمة. وقبل أن يأمر تلاميذه بالذهاب، يطلب منهم أن يطلبوا. فالصلاة ليست مجرد تمهيداً للعمل الحقيقي. بل هي الطريقة التي يدعو بها الله شعبه ليشاركوا قلبه في الاهتمام بأولئك الذين لم يسمعوا بالإنجيل قط. وما تقدمه في الصلاة لا يضيع — بل يُزرع ليؤتي حصاداً قد لا تعيش لترى ثماره. توقع أن يعتني الله بما تقدمه له."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "فهم الفئات التي لم يتم الوصول إليها "
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "المجموعة العرقية غير المُتواصل معها هي مجموعة لا تتوفر لها سوى فرص ضئيلة أو معدومة للوصول إلى الإنجيل — وغالبًا ما تفتقر إلى كنيسة محلية، أو مؤمنين، أو أي شكل من أشكال الشهادة بين أفرادها. وهناك 2,085 مجموعة عرقية غير مُتواصل معها — يبلغ عدد سكانها 202 مليون نسمة — لا يوجد فيها مبشرون، ولا كنائس، وغالبًا ما تفتقر إلى مؤمنين معروفين بين أفرادها."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "الصلاة ليست مجرد شيء نقوم به حتى يذهب أحدهم. بل الصلاة هي الطريقة التي يُعد بها الله القلوب، ويفتح الأبواب، ويرسل العمال. نحن لا ننتظر على الهامش — بل نحن مدعوون إلى قلب ما يقوم به."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "مناقشة جماعية · 15 دقيقة"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "اطرح سؤالاً واحداً أو اثنين حسب الوقت المتاح. اترك مجالاً للإجابات الصادقة — فلا توجد إجابات خاطئة."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "• "
+          },
+          {
+            "type": "text",
+            "text": "لماذا برأيك يؤكد يسوع على الصلاة عندما يتحدث عن الحصاد؟"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "• "
+          },
+          {
+            "type": "text",
+            "text": "كيف يؤثر علمك بأن الملايين لم يسمعوا بالإنجيل قط على طريقة تفكيرك في الصلاة؟"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "• "
+          },
+          {
+            "type": "text",
+            "text": "بأي طرق قد يدعو الله كنيسته — وليس فقط المبشرين — للمشاركة في رسالته العالمية؟"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "الانتقال إلى الصلاة · القراءة بصوت عالٍ من قبل القائد"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "تتاح لنا الليلة فرصة المشاركة في تحقيق «المهمة العظمى». وقد وافقت كنيستنا/مجموعتنا على التعاون مع مبادرة تُدعى «DOXA». وتتمثل رؤيتنا في الوصول إلى جميع المجموعات العرقية غير المخاطبة، البالغ عددها 2,085 مجموعة، بحلول عام 2033. إننا ببساطة نستجيب لدعوة. فالله يعمل بالفعل بين غير المخاطبين — وهو يدعونا للانضمام إليه من خلال الصلاة. وما نقدمه الليلة، سيستخدمه الله. فصلوا متوقعين أن يتحقق ذلك."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "صلاة موجهة من أجل غير المُبلغ إليهم · 20 دقيقة"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "يفضل:"
+          },
+          {
+            "type": "text",
+            "text": " استخدم محتوى الصلاة الخاص بيومنا هذا من الحملة. اطلب من المجموعة مسح رمز الاستجابة السريعة (QR) أو الانتقال إلى الرابط على أجهزتهم، أو اعرض المحتوى على الشاشة. صلوا معًا باستخدام المحتوى وفقًا لأحد خيارات صيغ الصلاة المذكورة أدناه. وهذا يساعد في تعريف المشاركين بالمجموعة العرقية ومبادرة الصلاة الجارية."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "إذا لم يكن محتوى الصلاة الخاص بحملة الصلاة متاحًا، فيمكنك استخدام العبارات المقترحة للصلاة الواردة أدناه."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "موضوعات للصلاة المكتوبة:"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• اطلب من رب الحصاد أن يرسل عمالاً إلى جميع أنحاء العالم للتبشير في الأماكن التي لا يوجد فيها شهود للإنجيل."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• الصلاة من أجل أن تتاح فرص للعاملين في المجال الدولي للتواصل مع هذه المجتمعات والاندماج فيها."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• صلوا من أجل أن ينمو الإيمان بين الشعوب التي لم تصلها البشارة بعد، عندما يلتقون بمحبة الله وحقيقته من خلال سماع كلمة الله."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• صلوا من أجل الأفراد والكنائس لكي يؤدوا دورهم بأمانة في الصلاة والتبرع وإرسال المبعوثين — ليس لفترة محدودة، بل على المدى الطويل."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "خيارات صيغ الصلاة:"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• صلاة صامتة تليها صلوات منطوقة"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• يقرأ أحدهم نصًا محددًا بينما يصلي الآخرون بصوت عالٍ"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• صلاة البوبكورن — صلوات قصيرة بأصوات متعددة"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "دعوة للصلاة المستمرة · 5 دقائق"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "ما صلينا من أجله الليلة هو جزء من مبادرة عالمية تهدف إلى توفير تغطية صلاة مستمرة على مدار 24 ساعة للمجموعات السكانية التي لم تصلها البشارة بعد. المشاركة بسيطة ومرنة — ففترة صلاة مدتها 10 دقائق يلتزم بها 144 شخصًا بانتظام تعني أن [اسم المجموعة السكانية] محمية بصلاة على مدار 24 ساعة. وهذا عمل هادف في خدمة الرب."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "إذا كان الله قد حرك شيئًا في قلبك الليلة، فهناك خطوة تالية يمكنك اتخاذها. "
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "الخطوة التالية: "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "(القائد: شارك الرابط أو رمز الاستجابة السريعة، أو ادعُ المشاركين للتواصل معك بعد انتهاء الجلسة.)"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "آية ختامية وبركة · 5 دقائق"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "اقرأ بصوت عالٍ: مزمور 67: 1-2"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "ليكن الله رحيمًا بنا ويباركنا ويُشرق وجهه علينا — لكي تُعرف طرقك على الأرض، وخلاصك بين جميع الأمم."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "البركة الختامية"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "الصلاة ليست مجرد تحضيرًا للرسالة. بل الصلاة هي الرسالة بحد ذاتها. وما يُقدَّم بإخلاص إلى الله في هذه القاعة لن يعود خالي الوفاض."
+          },
+          {
+            "type": "hardBreak"
+          },
+          {
+            "type": "text",
+            "text": "ويتبع هذا الدليل منهجية SOAPS في دراسة الكتاب المقدس. تعرف على المزيد عن طريقة SOAPS على "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://zume.training/soaps-bible-reading",
+                  "target": "_blank",
+                  "rel": "noopener noreferrer nofollow",
+                  "class": null,
+                  "title": null
+                }
+              }
+            ],
+            "text": "https://zume.training/soaps-bible-reading"
+          },
+          {
+            "type": "text",
+            "text": ". Zume Training هو منهج مجاني عبر الإنترنت يقدم 30 أداة وتدريبًا لتصبح تلميذًا يصنع تلاميذ. وهو متاح بـ 50 لغة."
+          }
+        ]
+      }
+    ]
+  }
+}

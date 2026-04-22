@@ -22,6 +22,7 @@ interface PageResponse {
   slug: string
   parent_slug: string | null
   menu_order: number
+  custom_css: string | null
   requested_locale: string
   resolved_locale: string
   title: string
@@ -35,6 +36,10 @@ interface PageResponse {
   menu_parent: { slug: string; title: string }
   children: ChildPage[]
 }
+
+import { h, render, getCurrentInstance } from 'vue'
+import { UUPGS_LIST_PLACEHOLDER_CLASS } from '~/utils/tiptapUupgsList'
+import UupgsList from '~/components/public/UupgsList.vue'
 
 const route = useRoute()
 const { locale } = useI18n()
@@ -75,7 +80,12 @@ useHead(() => {
     meta: [
       ...(data.value.meta_description ? [{ name: 'description', content: data.value.meta_description }] : []),
       ...(data.value.og_image ? [{ property: 'og:image', content: data.value.og_image }] : [])
-    ]
+    ],
+    // Port of WP's per-page `_page_custom_css` meta — see
+    // `output_page_custom_css` in marketing-theme/functions.php.
+    style: data.value.custom_css
+      ? [{ key: `page-custom-css-${data.value.slug}`, innerHTML: data.value.custom_css }]
+      : []
   }
 })
 
@@ -87,6 +97,60 @@ const showChildGrid = computed(() =>
 )
 
 useTextHighlight()
+
+// The body_html is rendered via v-html, so the embedded
+// <div class="doxa-uupgs-list-slot" data-uupgs-list-props="…"></div>
+// placeholders come through as plain DOM. After each render, mount
+// the real Vue <UupgsList> component into each slot. Using h() + render()
+// with the host app's context so the mounted component still resolves
+// useI18n / useRuntimeConfig.
+const instance = getCurrentInstance()
+const mountedSlots = new Set<HTMLElement>()
+
+function hydrateUupgsListSlots() {
+  if (!import.meta.client) return
+  const slots = document.querySelectorAll<HTMLElement>(`.${UUPGS_LIST_PLACEHOLDER_CLASS}`)
+  for (const slot of slots) {
+    if (mountedSlots.has(slot)) continue
+    const raw = slot.getAttribute('data-uupgs-list-props') || '{}'
+    let props: Record<string, any> = {}
+    try {
+      props = JSON.parse(raw)
+    } catch (e) {
+      console.error('[UupgsList slot] failed to parse props', e, raw)
+      continue
+    }
+    const vnode = h(UupgsList, props)
+    if (instance?.appContext) vnode.appContext = instance.appContext
+    try {
+      render(vnode, slot)
+      mountedSlots.add(slot)
+    } catch (e) {
+      console.error('[UupgsList slot] failed to mount', e)
+    }
+  }
+}
+
+function unmountUupgsListSlots() {
+  for (const slot of mountedSlots) {
+    try { render(null, slot) } catch { /* ignore */ }
+  }
+  mountedSlots.clear()
+}
+
+// Hydrate once on mount (the watch above fires before the DOM is in
+// place so `querySelectorAll` would be empty).
+onMounted(() => {
+  nextTick(hydrateUupgsListSlots)
+})
+
+// Re-hydrate on client-side navigation when body_html changes.
+watch(() => data.value?.body_html, () => {
+  unmountUupgsListSlots()
+  nextTick(hydrateUupgsListSlots)
+})
+
+onBeforeUnmount(unmountUupgsListSlots)
 </script>
 
 <template>
@@ -119,12 +183,14 @@ useTextHighlight()
       </aside>
 
       <article :id="`page-${data.slug}`" class="page">
+        <!-- WP page.php emits `page-featured-image` only when a
+             post_thumbnail is explicitly set. Matches live behavior. -->
         <div v-if="data.featured_image" class="page-featured-image">
           <img :src="data.featured_image" :alt="data.title">
         </div>
 
-        <h1 v-if="!showChildGrid">{{ data.title }}</h1>
-
+        <!-- No <h1> — page.php doesn't render the title inside the
+             article; the document <title> is set via useHead() above. -->
         <div v-if="!showChildGrid" class="page-body" v-html="data.body_html" />
 
         <div v-if="showChildGrid" class="grid">

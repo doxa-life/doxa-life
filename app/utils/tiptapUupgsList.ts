@@ -1,0 +1,92 @@
+// Custom Tiptap node that preserves the <uupgs-list> Lit custom element
+// across the HTML→JSON→HTML round-trip. WP's [uupg_list] shortcode
+// renders this tag directly into page content; without a Tiptap node
+// for it, ProseMirror's DOM parser drops the element and its attrs.
+//
+// When `generateHTML` serializes the node back to HTML, we emit a
+// neutral placeholder div with a serialized props payload. The
+// catch-all page ([...slug].vue) scans for that placeholder after
+// v-html mounts and renders the real Vue <UupgsList> component into it
+// (preserving the host app's i18n / runtime-config context via `h()`
+// + `render()`).
+//
+// Keep this file shared between editor (app/components/admin/RichTextEditor.vue),
+// server renderer (server/utils/renderTiptap.ts), and scraper
+// (scripts/lib/htmlToTiptap.ts).
+
+import { Node } from '@tiptap/core'
+
+const BOOLEAN_ATTRS = ['useSelectCard', 'useHighlightedUUPGs', 'hideSeeAllLink', 'dontShowListOnLoad', 'randomizeList']
+const STRING_ATTRS = ['languageCode', 'selectUrl', 'researchUrl', 'initialSearchTerm', 't']
+const NUMBER_ATTRS = ['perPage', 'morePerPage']
+
+export const UUPGS_LIST_PLACEHOLDER_CLASS = 'doxa-uupgs-list-slot'
+
+export const UupgsListNode = Node.create({
+  name: 'uupgsList',
+  group: 'block',
+  atom: true,
+  selectable: true,
+  draggable: false,
+
+  addAttributes() {
+    const attrs: Record<string, any> = {}
+    for (const k of STRING_ATTRS) {
+      if (k === 't') {
+        // `t` on the live shortcode is a JSON object serialized into
+        // the attribute. Parse it back to an object so the Vue
+        // component gets real props, not a JSON string.
+        attrs[k] = {
+          default: null,
+          parseHTML: (el: Element) => {
+            const v = el.getAttribute('t')
+            if (!v) return null
+            try { return JSON.parse(v) } catch { return null }
+          }
+        }
+      } else {
+        attrs[k] = {
+          default: null,
+          parseHTML: (el: Element) => el.getAttribute(k)
+        }
+      }
+    }
+    for (const k of NUMBER_ATTRS) {
+      attrs[k] = {
+        default: null,
+        parseHTML: (el: Element) => {
+          const v = el.getAttribute(k)
+          return v ? Number(v) : null
+        }
+      }
+    }
+    for (const k of BOOLEAN_ATTRS) {
+      // Lit reflects `?attr=${bool}` as a bare attribute when true and
+      // absent when false. Presence — even with empty value — is true.
+      attrs[k] = {
+        default: false,
+        parseHTML: (el: Element) => el.hasAttribute(k)
+      }
+    }
+    return attrs
+  },
+
+  parseHTML() {
+    return [{ tag: 'uupgs-list' }]
+  },
+
+  renderHTML({ node }) {
+    // Serialize all props into a single data attribute so the client
+    // can JSON.parse and spread them onto the Vue component.
+    const props: Record<string, any> = {}
+    for (const k of [...STRING_ATTRS, ...NUMBER_ATTRS, ...BOOLEAN_ATTRS]) {
+      const v = node.attrs[k]
+      if (v === null || v === '' || v === false) continue
+      props[k] = v
+    }
+    return ['div', {
+      class: UUPGS_LIST_PLACEHOLDER_CLASS,
+      'data-uupgs-list-props': JSON.stringify(props)
+    }]
+  }
+})

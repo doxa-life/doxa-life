@@ -1,0 +1,338 @@
+{
+  "sourceUrl": "https://doxa.life/es/about/definitions/",
+  "slug": "about/definitions",
+  "locale": "es",
+  "title": "Definiciones",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Iglesia"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Una iglesia está compuesta de discípulos bautizados unidos por el Espíritu Santo y que se reúnen regularmente para la doctrina, la comunión, el compañerismo y la oración (Hechos 2:42)."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "En términos prácticos, para que una nueva reunión se llame iglesia, se requieren al menos seis discípulos bautizados; sin embargo, no se requiere una ubicación específica, una frecuencia de reunión ni un pastor designado, aunque estos requisitos normalmente se desarrollan a medida que una iglesia autóctona madura en los cinco «auto» (autopropagación, autogobierno, autosostenimiento, autoteologización y automisión)."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Un "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "movimiento de plantación"
+          },
+          {
+            "type": "text",
+            "text": " de iglesias es una multiplicación de iglesias autóctonas que plantan otras iglesias que, al menos, incluyan cuatro corrientes de cuatro generaciones espirituales que juntas suman más de 1.000 personas."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Pueblo étnico"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Un "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "pueblo étnico"
+          },
+          {
+            "type": "text",
+            "text": " es un grupo etnolingüístico que se percibe como un grupo con afinidades comunes basadas en el idioma, la cultura, la religión y la cosmovisión. Desde el punto de vista de la evangelización, es el grupo más grande posible dentro del cual el evangelio puede difundirse como un movimiento viable y autóctono de plantación de iglesias, sin encontrar barreras de comprensión o aceptación."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Un "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "pueblo étnico no alcanzado"
+          },
+          {
+            "type": "text",
+            "text": " (PNA) tiene aprox. 2 discípulos o menos por cada 100 personas (≤ 2%) y carece la capacidad de establecer iglesias autóctonas sin asistencia transcultural."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Dentro de la categoría general de PNA se encuentran los siguientes grupos de personas en niveles descendentes de participación:"
+          }
+        ]
+      },
+      {
+        "type": "orderedList",
+        "attrs": {
+          "start": 1,
+          "type": null
+        },
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": "Poco comprometido"
+                  },
+                  {
+                    "type": "text",
+                    "text": ". Un "
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "italic"
+                      }
+                    ],
+                    "text": "grupo de personas poco comprometido"
+                  },
+                  {
+                    "type": "text",
+                    "text": " tiene aprox. 1 discípulo o menos por cada 100 personas (≤ 1%). Se necesitan más equipos de plantación de iglesias para aumentar la participación fructífera."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": "Fronterizo"
+                  },
+                  {
+                    "type": "text",
+                    "text": ". Un grupo étnico fronterizo tiene aprox. un discípulo o menos por cada 1.000 personas (≤ 0,1 %) sin un movimiento confirmado y sostenido hacia Jesús. Estos grupos suelen estar geográficamente aislados y tienen poco o ningún acceso al evangelio; por lo tanto, la obra pionera generalmente debe comenzar con los no creyentes."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": "Sin compromiso"
+                  },
+                  {
+                    "type": "text",
+                    "text": ". Un grupo desvinculado (PNANC) no tiene seguidores conocidos o solo unos pocos (prácticamente el 0%) y carece de los cuatro niveles principales de compromiso efectivo:"
+                  }
+                ]
+              },
+              {
+                "type": "bulletList",
+                "content": [
+                  {
+                    "type": "listItem",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Esfuerzo apostólico (pionero) en el lugar de residencia."
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "listItem",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Compromiso de trabajar en la cultura local y el idioma del corazón."
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "listItem",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Compromiso con el ministerio a largo plazo."
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "listItem",
+                    "content": [
+                      {
+                        "type": "paragraph",
+                        "attrs": {
+                          "textAlign": null
+                        },
+                        "content": [
+                          {
+                            "type": "text",
+                            "text": "Sembrar el evangelio de una manera coherente con el objetivo de ver surgir un movimiento de plantación de iglesias.urgir un movimiento de plantación de iglesias."
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Una participación más amplia incluye importantes componentes de contribución que pueden realizar los socios no residentes, entre ellos la oración intercesora, la traducción de la Biblia, el ministerio de compasión y ayuda en catástrofes, el alcance de los medios de comunicación, los esfuerzos de movilización, la capacitación de líderes y el trabajo entre la diáspora."
+          }
+        ]
+      }
+    ]
+  }
+}

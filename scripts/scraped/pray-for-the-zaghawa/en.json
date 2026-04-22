@@ -1,0 +1,185 @@
+{
+  "sourceUrl": "https://doxa.life/pray-for-the-zaghawa/",
+  "slug": "pray-for-the-zaghawa",
+  "locale": "en",
+  "title": "Pray for the Zaghawa",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": "body {\n    background-color: #4C584F; /* green */\ncolor: #ffffff; /* white */\n\n.aligncenter img {\n    display: block;\n    margin: auto;\n}",
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "image",
+        "attrs": {
+          "src": "https://doxa.life/wp-content/uploads/2026/03/Zaghawa.jpg",
+          "alt": "",
+          "title": null,
+          "width": 400,
+          "height": 602
+        }
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Thank you for praying for us for all these years. We are coordinating the DOXA partnership which has the goal of engaging every UUPG on earth with the gospel. The first step is prayer."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "We have personally adopted the Zaghawa of Libya, and our goal is to (step 1) have 144 intercessors sign up to pray. If 144 intercessors pray 10 minutes a day, that will be 24-hour prayer coverage. Our step 2 goal is 1,000 intercessors for the Zaghawa."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Would you consider joining us in prayer for the Zaghawa? You can sign up below for 5 or 10-minute slots or the time you feel able to commit to each day."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "We would love to see you reach our goal of 24 hours of prayer a day for the beloved Zaghawa people. If you sign up, you will receive prayer data every day by email to help remind you and fuel your prayers."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "– Dick and Jennifer Brogden"
+          }
+        ]
+      },
+      {
+        "type": "div",
+        "attrs": {
+          "class": "wp-block-spacer",
+          "style": "height:15px",
+          "data-width": null,
+          "data-width-sm": null,
+          "data-width-md": null,
+          "data-width-lg": null,
+          "data-width-xl": null,
+          "data-list-color": null,
+          "data-highlight-color": null,
+          "data-highlight-index": null,
+          "data-highlight-last": null,
+          "data-no-action": null,
+          "data-reel-mode": null,
+          "data-variant": null,
+          "data-size": null
+        }
+      },
+      {
+        "type": "div",
+        "attrs": {
+          "class": "wp-block-buttons is-content-justification-center is-layout-flex wp-container-core-buttons-is-layout-16018d1d wp-block-buttons-is-layout-flex",
+          "style": null,
+          "data-width": null,
+          "data-width-sm": null,
+          "data-width-md": null,
+          "data-width-lg": null,
+          "data-width-xl": null,
+          "data-list-color": null,
+          "data-highlight-color": null,
+          "data-highlight-index": null,
+          "data-highlight-last": null,
+          "data-no-action": null,
+          "data-reel-mode": null,
+          "data-variant": null,
+          "data-size": null
+        },
+        "content": [
+          {
+            "type": "div",
+            "attrs": {
+              "class": "wp-block-button is-style-fill",
+              "style": null,
+              "data-width": null,
+              "data-width-sm": null,
+              "data-width-md": null,
+              "data-width-lg": null,
+              "data-width-xl": null,
+              "data-list-color": null,
+              "data-highlight-color": null,
+              "data-highlight-index": null,
+              "data-highlight-last": null,
+              "data-no-action": null,
+              "data-reel-mode": null,
+              "data-variant": null,
+              "data-size": null
+            },
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://pray.doxa.life/zaghawa",
+                          "target": "_blank",
+                          "rel": "noopener noreferrer nofollow",
+                          "class": "wp-block-button__link has-text-align-center wp-element-button",
+                          "title": null
+                        }
+                      }
+                    ],
+                    "text": "SIGN UP TO PRAY"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        }
+      }
+    ]
+  }
+}

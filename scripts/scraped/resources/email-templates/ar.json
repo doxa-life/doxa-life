@@ -1,0 +1,629 @@
+{
+  "sourceUrl": "https://doxa.life/ar/resources/email-templates/",
+  "slug": "resources/email-templates",
+  "locale": "ar",
+  "title": "قوالب البريد الإلكتروني",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "مقدمة البريد الإلكتروني"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "مرحبًا [الاسم]،"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "أود أن أشارككم شيئًا التزمت به مؤخرًا، وأدعوكم للتفكير فيه معي."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "لقد كنت أتعرف على المجموعات السكانية التي لم يتم الوصول إليها أو التواصل معها — أي 202 مليون شخص في 2,085 مجتمعًا حول العالم، لا يوجد بينهم مبشرون ولا كنائس، وغالبًا ما لا يوجد بينهم مؤمنون معروفون. لم يسمعوا بالإنجيل ليس لأنهم رفضوه، بل لأن أحدًا لم يذهب إليهم بعد. إن متى 28: 19-20 هو أمر موجه إلينا جميعًا نحن أتباع يسوع، وليس لعدد قليل فقط. ويوضح متى 9:38 من أين يبدأ الأمر: «اطلبوا من رب الحصاد أن يرسل عمالاً إلى حقل حصاده». قبل أن يرسل أي شخص، يطلب منا يسوع أن نطلب."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "لقد التزمت بالقيام بذلك بالضبط — أي حشد الصلوات اليومية من أجل [اسم المجموعة العرقية]، وهي مجموعة عرقية لم تصلها بعد رسالة الإنجيل. ومن خلال حملة الصلاة «DOXA»، خصصتُ 10 دقائق يوميًا للصلاة من أجلهم، وأتواصل معكم لأنني أعتقد أنكم قد تشعرون بنفس الدافع الذي شعرتُ به."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "المشاركة سهلة: قم بالتسجيل في موعد محدد عبر الرابط أو رمز الاستجابة السريعة أدناه، وستتلقى تذكيرًا يوميًا مصحوبًا بمحتوى صلاة مستمد من الكتاب المقدس لمساعدتك على الصلاة بفهم وإيمان."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "هل يمكنك أن تصلي لتتأكد مما إذا كان الله يدعوك للانضمام إلى هذا المشروع؟ إذا كانت لديك أي أسئلة، يسعدني أن أزودك بمزيد من المعلومات، أو يمكنك زيارة موقع doxa.life للتعرف على الرؤية الأوسع نطاقاً."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "صلاواتنا قادرة على فتح أبواب للإنجيل في الأماكن التي لم يُعرف فيها يسوع بعد. وهذا ليس بالأمر الهين."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "[رمز الاستجابة السريعة أو رابط التسجيل]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "أنا ممتن لك،"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "[اسمك]"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "دعوة إلى مجموعة صغيرة"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "مرحبًا [الاسم]،"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "أود أن أدعوك شخصياً إلى أمسية أعتقد أنها ستكون مهمة بالنسبة لك."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "نحن نجمع مجموعة صغيرة للتعمق في الكتاب المقدس، ومناقشة مشاعر الله تجاه الأمم، والصلاة بشكل خاص من أجل المجموعات السكانية غير المخدومة — أي 202 مليون شخص في 2,085 مجتمعًا لا يوجد فيها مبشرون ولا كنائس، وغالبًا ما لا يوجد فيها مؤمنون معروفون. ليس لأنهم رفضوا الإنجيل، بل لأن أحدًا لم يذهب إليهم بعد."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "سيتضمن هذا المساء حوارًا موجهًا، وصلاة مركزة، وفرصة للاستجابة لما قد يوحينا به الله. تعالوا بقلب متفتح، متوقعين أن يلتقي بنا الروح القدس هناك."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "التاريخ: "
+          },
+          {
+            "type": "text",
+            "text": "[أدخل التاريخ]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "الوقت: "
+          },
+          {
+            "type": "text",
+            "text": "[أدخل الوقت]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "الموقع: "
+          },
+          {
+            "type": "text",
+            "text": "[أدخل الموقع]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "أتمنى أن تحضر. أخبرني إذا كان لديك أي أسئلة."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "نحن ممتنون لأننا نسعى معًا إلى تحقيق مشيئة الله،"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "[اسمك]"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "رسالة بريد إلكتروني للمتابعة"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "مرحبًا [الاسم]،"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "شكراً لكم على مشاركتكم في فعاليتنا التي ركزت على محبة الله للأمم. لقد كنت أفكر فيما صلينا من أجله معاً، وأردت أن أتأكد من أنكم تمتلكون كل ما تحتاجونه لاتخاذ الخطوة التالية."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "إذا كان الله قد حرك شيئًا في قلبك ذلك المساء، فهذه هي الطريقة التي يمكنك بها الاستجابة: اشترك في فترة صلاة يومية مدتها 10 دقائق من أجل [اسم المجموعة العرقية] باستخدام الرابط أو رمز الاستجابة السريعة أدناه. ستتلقى كل يوم محتوى صلاة مستمد من الكتاب المقدس لمساعدتك على الصلاة بفهم وإيمان. هدفنا معًا هو أن يصلي 144 شخصًا لمدة 10 دقائق يوميًا — وهو ما يكفي لتغطية هذه المجموعة من الناس بالصلاة لمدة 24 ساعة متواصلة. فترتك هي القطعة المفقودة من بين تلك الـ144."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "[رمز الاستجابة السريعة أو رابط التسجيل]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "هل لديك أي أسئلة؟ يسعدني التواصل معك."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "من أجل مجده،"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "[اسمك]"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "متابعة العرض التقديمي"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "مرحبًا [الاسم]،"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "لقد كان شرفًا لي أن أطلعكم مؤخرًا على رؤية «دوكسا». نحن مدعوون للمشاركة في العمل الذي يقوم به الله بالفعل بين الأمم."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "لقد سمعتم الأرقام: 2,085 مجموعة عرقية غير مخدومة. 202 مليون شخص لا يوجد بينهم مبشرون ولا كنائس ولا مؤمنون معروفون. ليس لأنهم رفضوا الإنجيل — بل لأن أحداً لم يذهب إليهم بعد. قال يسوع: «صلوا». من هنا يبدأ الأمر، وهذا ما نطلب منكم أن تفكروا فيه."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "الانضمام سهل للغاية. اشترك في فترة صلاة يومية مدتها 10 دقائق من أجل [اسم المجموعة العرقية]، وستتلقى محتوى صلاة مستمد من الكتاب المقدس لإرشادك. عندما يخصص 144 شخصًا 10 دقائق يوميًا، تصبح مجموعتنا العرقية محاطة بالصلاة على مدار 24 ساعة. وفترة الصلاة التي تخصصها هي التي تجعل ذلك ممكنًا. ما تقدمه في تلك الدقائق العشر هو بذرة تُزرع في حصاد قد لا تعيش لترى ثماره، لكننا نثق في أن الله سيعتني بها بأمانة."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "هناك ثلاث طرق للتعمق أكثر في هذا الموضوع:"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "الصلاة: "
+          },
+          {
+            "type": "text",
+            "text": "سجل في موعد صلاة يومي مدته 10 دقائق عبر الرابط أدناه."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "تبنّي: "
+          },
+          {
+            "type": "text",
+            "text": "إذا كنت تقود كنيسة أو مجموعة صغيرة أو شبكة، ففكّر في تبنّي مجموعة من الناس. وهذا التزام بالصلاة والتبرع والإرسال من أجلهم."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "• "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "لمزيد من المعلومات: "
+          },
+          {
+            "type": "text",
+            "text": "تفضل بزيارة الموقع https://doxa.life للتعرف على الرؤية الكاملة والمجموعات البشرية والموارد المتاحة لك."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "إذا كان هذا الرؤية قد أثارت شيئًا في داخلك، فلا تدع هذه الفرصة تفوتك. سجل اليوم لتقبل الدعوة."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "هل لديك أي أسئلة؟ يسعدني التواصل معك شخصياً."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "italic"
+              }
+            ],
+            "text": "[رمز الاستجابة السريعة أو رابط التسجيل]"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "من أجل مجده،"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "[اسمك]"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,317 @@
+{
+  "sourceUrl": "https://doxa.life/es/about/",
+  "slug": "about",
+  "locale": "es",
+  "title": "Acerca de",
+  "excerpt": null,
+  "meta_description": null,
+  "og_image": null,
+  "featured_image": null,
+  "custom_css": null,
+  "body_json": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Liderazgo"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "DOXA fue fundada y está dirigida por la Fraternidad Mundial de las Asambleas de Dios (WAGF) y supervisada por el equipo directivo de la Comisión de isiones de las FMAD."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Socios"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Todos los departamentos misioneros afiliados a la Fraternidad Mundial de las Asambleas de Dios (129 agencias misioneras diferentes en 2026) son automáticamente socios de DOXA. Esto se debe a que DOXA presta servicios a la Fraternidad Mundial de las Asambleas de Dios como parte de la Comisión Misionera. Cualquier miembro de la comisión misionera de la WAGF es un socio que DOXA acoge y al que presta servicios."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Declaración de 2025"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "La asociación DOXA"
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "ENVÍO DE LA DECLARACIÓN DE LA CUMBRE"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Lago Geneva, Minnesota – 25 de septiembre de 2025"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Reconociendo que Jesús nos ha llamado a la colaboración, nos comprometemos ante Dios y ante ustedes a colaborar juntos a nivel mundial para lograr el mayor movimiento de formación de discípulos y plantación de iglesias entre los no alcanzados que la Fraternidad Mundial de las Asambleas de Dios haya visto jamás. Nuestro compromiso incluye lo siguiente:"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que seguiremos confiando en el Espíritu Santo y en las Sagradas Escrituras siempre y para todo;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que consideraremos humildemente a los demás mejores que nosotros mismos y no competiremos entre ustedes ni con otras agencias, sino que respetaremos y honraremos a todo el pueblo de Dios en Su misión;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que formaremos una Asociación Voluntaria, Global y Receptiva comprometida a trabajar con las iglesias nacionales existentes y los Concilios Generales de las Asambleas de Dios siempre que sea posible;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que esta asociación no será una agencia de envío, ni sustituirá el trabajo o la función de las agencias de envío actuales o de sus iglesias nacionales;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que las agencias de envío puedan colaborar con la asociación en la medida que deseen. Pueden optar por enviar a algunos, a todos o a ninguno de sus misioneros a través de la asociación."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que las agencias enviadoras mantendrán la autoridad final sobre sus misioneros, los apoyarán y los capacitarán antes de enviarlos al campo;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que la asociación, por invitación de la agencia enviadora, pueda recibir misioneros, formarlos sobre el terreno, coordinar la asignación de equipos y asesorarlos estratégicamente sobre el terreno."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que la asociación dará prioridad al compromiso fructífero y a largo plazo con los pueblos no evangelizados del mundo que actualmente no cuentan con equipos de plantación de iglesias entre ustedes, con el objetivo a largo plazo de plantar iglesias autóctonas que den lugar a iglesias nacionales o a la integración en iglesias nacionales ya existentes. Lo haremos en armonía con MM33;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que la asociación también capacitará a los misioneros para que se comprometan de manera fructífera y a largo plazo con los pueblos fronterizos (menos de 1 creyente por cada 1000 habitantes), los pueblos poco comprometidos (menos de 1 creyente por cada 100) y los pueblos generalmente no alcanzados (menos de 2 creyentes por cada 100)."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que la asociación será dirigida por la Comisión de Misiones de la Fraternidad Mundial de las Asambleas de Dios, la cual nombrará y supervisará a los líderes de la asociación, que podrán provenir de cualquier país u organismo miembro de la misma."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que la asociación se llamará «Doxa», que es la palabra griega para «gloria», y este nombre les recordará que Jesús es digno de la gloria de cada tribu, lengua, pueblo y nación;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que nos asociaremos con toda la iglesia de Dios para llevar todo el evangelio de Dios a todo el mundo de Dios;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que algún día habrá una multitud de personas de todos los pueblos alrededor del trono adorando a Dios;"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "Que solo Jesús recibirá toda la gloria."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "En la fe y por la gracia de Dios, confirmado este día 25 de septiembre de 2025."
+          },
+          {
+            "type": "hardBreak"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -17,6 +17,8 @@ import Typography from '@tiptap/extension-typography'
 import Subscript from '@tiptap/extension-subscript'
 import Superscript from '@tiptap/extension-superscript'
 import Youtube from '@tiptap/extension-youtube'
+import { Div } from '~~/app/utils/tiptapDiv'
+import { UupgsListNode } from '~~/app/utils/tiptapUupgsList'
 
 const EXTENSIONS = [
   StarterKit.configure({ link: { openOnClick: false, autolink: true } }),
@@ -28,7 +30,9 @@ const EXTENSIONS = [
   Typography,
   Subscript,
   Superscript,
-  Youtube
+  Youtube,
+  Div,
+  UupgsListNode
 ]
 
 function isEmptyDoc(doc: unknown): boolean {
