@@ -49,7 +49,15 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: process.env.APP_TITLE || 'Doxa.Life – Global Partnership for the Unreached'
+      title: process.env.APP_TITLE || 'Doxa.Life – Global Partnership for the Unreached',
+      link: [
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon/cropped-Favicon-light-doxa-01-32x32.png' },
+        { rel: 'icon', type: 'image/png', sizes: '192x192', href: '/favicon/cropped-Favicon-light-doxa-01-192x192.png' },
+        { rel: 'apple-touch-icon', href: '/favicon/cropped-Favicon-light-doxa-01-180x180.png' }
+      ],
+      meta: [
+        { name: 'msapplication-TileImage', content: '/favicon/cropped-Favicon-light-doxa-01-270x270.png' }
+      ]
     }
   },
 
