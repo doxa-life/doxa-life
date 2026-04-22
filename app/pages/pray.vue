@@ -177,10 +177,12 @@ useTextHighlight()
     <section>
       <div class="container stack stack--lg">
         <h2>{{ t('Prayer Progress') }}</h2>
-        <PrayerMap
-          :research-url="localePath('/research') + '/'"
-          :language-code="locale"
-        />
+        <ClientOnly>
+          <PrayerMap
+            :research-url="localePath('/research') + '/'"
+            :language-code="locale"
+          />
+        </ClientOnly>
       </div>
     </section>
 
