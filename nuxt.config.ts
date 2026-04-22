@@ -70,12 +70,12 @@ export default defineNuxtConfig({
     '/pray': { prerender: true },
     '/research': { prerender: true },
     '/contact-us': { prerender: true },
-    '/login': { ssr: false },
-    '/register': { ssr: false },
-    '/reset-password': { ssr: false },
-    '/dashboard': { ssr: false },
-    '/profile': { ssr: false },
-    '/admin/**': { ssr: false },
+    '/login': { ssr: false, prerender: false },
+    '/register': { ssr: false, prerender: false },
+    '/reset-password': { ssr: false, prerender: false },
+    '/dashboard': { ssr: false, prerender: false },
+    '/profile': { ssr: false, prerender: false },
+    '/admin/**': { ssr: false, prerender: false },
     '/en/**': { redirect: '/**' }
   },
 
