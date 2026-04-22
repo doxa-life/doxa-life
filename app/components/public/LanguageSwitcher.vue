@@ -32,7 +32,12 @@ watch(() => route.fullPath, close)
 </script>
 
 <template>
-  <li ref="rootRef" class="pll-parent-menu-item menu-item menu-item-has-children">
+  <li
+    ref="rootRef"
+    class="pll-parent-menu-item menu-item menu-item-has-children"
+    @mouseenter="isOpen = true"
+    @mouseleave="isOpen = false"
+  >
     <a
       href="#"
       role="button"
