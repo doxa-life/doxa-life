@@ -76,6 +76,15 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    // Dev-only: use in-memory cache for the payload mount. The default fs
+    // driver can't represent both a leaf route ("/fr") and children of that
+    // route ("/fr/adopt") simultaneously — the first visit writes a file at
+    // `.nuxt/cache/nuxt/payload/fr`, the next hits ENOTDIR trying to create
+    // `fr/adopt` underneath it. Production prerender uses a different path
+    // scheme (`.output/public/fr/_payload.json`) so it's not affected.
+    devStorage: {
+      cache: { driver: 'memory' }
+    },
     prerender: {
       crawlLinks: true,
       routes: [
