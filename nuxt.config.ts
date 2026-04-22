@@ -95,12 +95,25 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2025-01-15',
 
+  vue: {
+    compilerOptions: {
+      isCustomElement: (tag: string) => ['doxa-map', 'feedback-widget'].includes(tag)
+    }
+  },
+
   vite: {
     optimizeDeps: {
       include: [
         '@vue/devtools-core',
         '@vue/devtools-kit'
       ]
+    },
+    vue: {
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag: string) => ['doxa-map', 'feedback-widget'].includes(tag)
+        }
+      }
     }
   },
 

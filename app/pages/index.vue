@@ -9,6 +9,7 @@ import { getVideoUrl } from '~/utils/videoUrls'
 
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
+const config = useRuntimeConfig()
 
 const videoModalRef = ref<{ open: () => void; close: () => void } | null>(null)
 const videoUrl = computed(() => getVideoUrl(locale.value))
@@ -16,6 +17,25 @@ const videoUrl = computed(() => getVideoUrl(locale.value))
 function openVideo() {
   videoModalRef.value?.open()
 }
+
+const mapboxToken = config.public.mapboxToken as string
+
+const homeMapConfig = JSON.stringify({
+  profile: 'doxa-simple-map',
+  dataSource: 'pray-tools',
+  tk: mapboxToken,
+  tabs: [{ id: 'engagement', colorStrategy: 'engagement', legend: 'engagement', popup: 'engagement' }]
+})
+
+const homeFeedbackConfig = JSON.stringify({
+  profile: 'chat-bubble',
+  apiBase: 'https://support.gospelambition.org',
+  enabled: true,
+  instanceId: 'fb-home-map',
+  projectId: '7bb8f5ba-eb45-4933-89de-bc93fcda09b2'
+})
+
+useDoxaMap()
 
 useTextHighlight()
 </script>
@@ -45,6 +65,24 @@ useTextHighlight()
       <p class="text-center color-primary uppercase font-button font-weight-medium">
         {{ t('The DOXA Vision: Click image to watch the video') }}
       </p>
+    </section>
+
+    <section class="stack stack--md container">
+      <div>
+        <h2 class="color-brand">{{ t('Where are they?') }}</h2>
+        <h1
+          class="color-brand-light highlight"
+          data-highlight-index="1"
+          data-highlight-last
+          data-highlight-color="primary"
+        >{{ t('Unengaged peoples around the world') }}</h1>
+      </div>
+      <div class="doxa-map-slot rounded-xlg">
+        <doxa-map id="home-map" :profile-config="homeMapConfig" />
+        <div class="feedback-widget-slot feedback-widget-slot--home">
+          <feedback-widget :profile-config="homeFeedbackConfig" />
+        </div>
+      </div>
     </section>
 
     <section class="stack stack--md | surface-brand-light">

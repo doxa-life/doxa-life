@@ -18,6 +18,25 @@ const { stats, prayerCoveragePercent } = usePrayerStatistics()
 const { reload } = usePrayerStatistics()
 onMounted(() => reload())
 
+const mapboxToken = config.public.mapboxToken as string
+
+const prayMapConfig = JSON.stringify({
+  profile: 'doxa-simple-map',
+  dataSource: 'pray-tools',
+  tk: mapboxToken,
+  tabs: [{ id: 'prayer', colorStrategy: 'prayer', legend: 'prayer', popup: 'prayer' }]
+})
+
+const prayFeedbackConfig = JSON.stringify({
+  profile: 'chat-bubble',
+  apiBase: 'https://support.gospelambition.org',
+  enabled: true,
+  instanceId: 'fb-pray-map',
+  projectId: '809ee16b-46e2-4bcd-a93d-b7ea0879d93d'
+})
+
+useDoxaMap()
+
 useTextHighlight()
 </script>
 
@@ -177,10 +196,12 @@ useTextHighlight()
     <section>
       <div class="container stack stack--lg">
         <h2>{{ t('Prayer Progress') }}</h2>
-        <PrayerMap
-          :research-url="localePath('/research') + '/'"
-          :language-code="locale"
-        />
+        <div class="doxa-map-slot rounded-md">
+          <doxa-map id="pray-map" :profile-config="prayMapConfig" />
+          <div class="feedback-widget-slot feedback-widget-slot--pray">
+            <feedback-widget :profile-config="prayFeedbackConfig" />
+          </div>
+        </div>
       </div>
     </section>
 
