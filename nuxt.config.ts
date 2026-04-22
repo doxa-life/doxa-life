@@ -52,7 +52,11 @@ export default defineNuxtConfig({
       link: [
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon/cropped-Favicon-light-doxa-01-32x32.png' },
         { rel: 'icon', type: 'image/png', sizes: '192x192', href: '/favicon/cropped-Favicon-light-doxa-01-192x192.png' },
-        { rel: 'apple-touch-icon', href: '/favicon/cropped-Favicon-light-doxa-01-180x180.png' }
+        { rel: 'apple-touch-icon', href: '/favicon/cropped-Favicon-light-doxa-01-180x180.png' },
+        { rel: 'stylesheet', href: '/assets/feedback-widget/feedback-widget-slot.css' }
+      ],
+      script: [
+        { src: '/assets/feedback-widget/feedback-widget.iife.js', defer: true }
       ],
       meta: [
         { name: 'msapplication-TileImage', content: '/favicon/cropped-Favicon-light-doxa-01-270x270.png' }
@@ -120,11 +124,19 @@ export default defineNuxtConfig({
       nodeEnv: process.env.NODE_ENV || '',
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || '',
       prayBaseUrl: process.env.NUXT_PUBLIC_PRAY_BASE_URL || 'https://pray.doxa.life',
-      mapboxToken: process.env.NUXT_PUBLIC_MAPBOX_TOKEN || ''
+      mapboxToken: process.env.NUXT_PUBLIC_MAPBOX_TOKEN || '',
+      feedbackApiBase: process.env.NUXT_PUBLIC_FEEDBACK_API_BASE || 'https://support.gospelambition.org',
+      feedbackProjectId: process.env.NUXT_PUBLIC_FEEDBACK_PROJECT_ID || ''
     }
   },
 
   compatibilityDate: '2025-01-15',
+
+  vue: {
+    compilerOptions: {
+      isCustomElement: (tag: string) => ['feedback-widget'].includes(tag)
+    }
+  },
 
   vite: {
     optimizeDeps: {
