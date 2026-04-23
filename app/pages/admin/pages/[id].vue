@@ -321,7 +321,7 @@ const enabledLanguages = ENABLED_LANGUAGES
         <h1 class="text-xl font-semibold">Edit page</h1>
       </div>
       <div class="flex items-center gap-2">
-        <UButton variant="outline" color="primary" icon="i-lucide-languages" @click="openTranslateModal">Translate from English</UButton>
+        <UButton variant="outline" color="primary" icon="i-lucide-languages" disabled title="Workflow not yet tested" @click="openTranslateModal">Translate from English</UButton>
         <UButton variant="outline" color="error" icon="i-lucide-trash-2" @click="deleteModalOpen = true">Delete page</UButton>
       </div>
     </div>
