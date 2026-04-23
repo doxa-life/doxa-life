@@ -17,6 +17,7 @@ import Superscript from '@tiptap/extension-superscript'
 import Youtube from '@tiptap/extension-youtube'
 import { Div } from './tiptapDiv'
 import { UupgsListNode } from './tiptapUupgsList'
+import { GeneralResourcesNode } from './tiptapGeneralResources'
 import { Verse } from './tiptapVerse'
 
 export function buildTiptapExtensions() {
@@ -33,6 +34,7 @@ export function buildTiptapExtensions() {
     Youtube,
     Div,
     UupgsListNode,
+    GeneralResourcesNode,
     Verse
   ]
 }
