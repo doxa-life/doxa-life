@@ -42,7 +42,9 @@ interface PageResponse {
 
 import { h, render, getCurrentInstance } from 'vue'
 import { UUPGS_LIST_PLACEHOLDER_CLASS } from '~/utils/tiptapUupgsList'
+import { GENERAL_RESOURCES_PLACEHOLDER_CLASS } from '~/utils/tiptapGeneralResources'
 import UupgsList from '~/components/public/UupgsList.vue'
+import GeneralResources from '~/components/public/GeneralResources.vue'
 
 const route = useRoute()
 const { locale } = useI18n()
@@ -114,40 +116,46 @@ const showChildGrid = computed(() =>
 
 useTextHighlight()
 
-// The body_html is rendered via v-html, so the embedded
-// <div class="doxa-uupgs-list-slot" data-uupgs-list-props="…"></div>
-// placeholders come through as plain DOM. After each render, mount
-// the real Vue <UupgsList> component into each slot. Using h() + render()
-// with the host app's context so the mounted component still resolves
-// useI18n / useRuntimeConfig.
+// The body_html is rendered via v-html, so custom-node placeholder divs
+// (doxa-uupgs-list-slot, doxa-general-resources-slot, …) come through
+// as plain DOM. After each render, mount the real Vue component into
+// each slot. Using h() + render() with the host app's context so the
+// mounted component still resolves useI18n / useRuntimeConfig.
 const instance = getCurrentInstance()
 const mountedSlots = new Set<HTMLElement>()
 
-function hydrateUupgsListSlots() {
+const SLOT_COMPONENTS: Array<{ className: string; dataAttr: string; component: any }> = [
+  { className: UUPGS_LIST_PLACEHOLDER_CLASS, dataAttr: 'data-uupgs-list-props', component: UupgsList },
+  { className: GENERAL_RESOURCES_PLACEHOLDER_CLASS, dataAttr: 'data-general-resources-props', component: GeneralResources }
+]
+
+function hydrateSlots() {
   if (!import.meta.client) return
-  const slots = document.querySelectorAll<HTMLElement>(`.${UUPGS_LIST_PLACEHOLDER_CLASS}`)
-  for (const slot of slots) {
-    if (mountedSlots.has(slot)) continue
-    const raw = slot.getAttribute('data-uupgs-list-props') || '{}'
-    let props: Record<string, any> = {}
-    try {
-      props = JSON.parse(raw)
-    } catch (e) {
-      console.error('[UupgsList slot] failed to parse props', e, raw)
-      continue
-    }
-    const vnode = h(UupgsList, props)
-    if (instance?.appContext) vnode.appContext = instance.appContext
-    try {
-      render(vnode, slot)
-      mountedSlots.add(slot)
-    } catch (e) {
-      console.error('[UupgsList slot] failed to mount', e)
+  for (const { className, dataAttr, component } of SLOT_COMPONENTS) {
+    const slots = document.querySelectorAll<HTMLElement>(`.${className}`)
+    for (const slot of slots) {
+      if (mountedSlots.has(slot)) continue
+      const raw = slot.getAttribute(dataAttr) || '{}'
+      let props: Record<string, any> = {}
+      try {
+        props = JSON.parse(raw)
+      } catch (e) {
+        console.error(`[${className}] failed to parse props`, e, raw)
+        continue
+      }
+      const vnode = h(component, props)
+      if (instance?.appContext) vnode.appContext = instance.appContext
+      try {
+        render(vnode, slot)
+        mountedSlots.add(slot)
+      } catch (e) {
+        console.error(`[${className}] failed to mount`, e)
+      }
     }
   }
 }
 
-function unmountUupgsListSlots() {
+function unmountSlots() {
   for (const slot of mountedSlots) {
     try { render(null, slot) } catch { /* ignore */ }
   }
@@ -157,16 +165,16 @@ function unmountUupgsListSlots() {
 // Hydrate once on mount (the watch above fires before the DOM is in
 // place so `querySelectorAll` would be empty).
 onMounted(() => {
-  nextTick(hydrateUupgsListSlots)
+  nextTick(hydrateSlots)
 })
 
 // Re-hydrate on client-side navigation when body_html changes.
 watch(() => data.value?.body_html, () => {
-  unmountUupgsListSlots()
-  nextTick(hydrateUupgsListSlots)
+  unmountSlots()
+  nextTick(hydrateSlots)
 })
 
-onBeforeUnmount(unmountUupgsListSlots)
+onBeforeUnmount(unmountSlots)
 </script>
 
 <template>
