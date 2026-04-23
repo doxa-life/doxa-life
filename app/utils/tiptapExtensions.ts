@@ -6,8 +6,8 @@
 // server renderer will drag the Vue runtime into the Nitro bundle.
 
 import StarterKit from '@tiptap/starter-kit'
-import Image from '@tiptap/extension-image'
 import TextAlign from '@tiptap/extension-text-align'
+import { CmsImage } from './tiptapImage'
 import { TextStyle } from '@tiptap/extension-text-style'
 import Color from '@tiptap/extension-color'
 import Highlight from '@tiptap/extension-highlight'
@@ -21,7 +21,7 @@ import { UupgsListNode } from './tiptapUupgsList'
 export function buildTiptapExtensions() {
   return [
     StarterKit.configure({ link: { openOnClick: false, autolink: true } }),
-    Image,
+    CmsImage,
     TextAlign.configure({ types: ['heading', 'paragraph'] }),
     TextStyle,
     Color,

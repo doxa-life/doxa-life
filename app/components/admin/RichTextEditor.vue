@@ -59,8 +59,23 @@ function isActive(name: string, attrs?: Record<string, any>): boolean {
   return editor.value?.isActive(name, attrs) ?? false
 }
 
-function isActiveAttrs(attrs: Record<string, any>): boolean {
-  return editor.value?.isActive(attrs) ?? false
+function setAlign(align: 'left' | 'center' | 'right') {
+  const e = editor.value
+  if (!e) return
+  if (e.isActive('image')) {
+    e.chain().focus().updateAttributes('image', { align }).run()
+  } else {
+    e.chain().focus().setTextAlign(align).run()
+  }
+}
+
+function isAlignActive(align: 'left' | 'center' | 'right'): boolean {
+  const e = editor.value
+  if (!e) return false
+  if (e.isActive('image')) {
+    return e.getAttributes('image').align === align
+  }
+  return e.isActive({ textAlign: align })
 }
 
 function promptForLink() {
@@ -133,9 +148,9 @@ function onBodyClick(e: MouseEvent) {
       <UButton size="xs" variant="ghost" :color="isActive('blockquote') ? 'primary' : 'neutral'" icon="i-lucide-quote" aria-label="Blockquote" @click="cmd(e => e.chain().focus().toggleBlockquote().run())" />
       <UButton size="xs" variant="ghost" :color="isActive('codeBlock') ? 'primary' : 'neutral'" icon="i-lucide-code" aria-label="Code block" @click="cmd(e => e.chain().focus().toggleCodeBlock().run())" />
       <div class="w-px bg-(--ui-border) mx-1" />
-      <UButton size="xs" variant="ghost" :color="isActiveAttrs({ textAlign: 'left' }) ? 'primary' : 'neutral'" icon="i-lucide-align-left" aria-label="Align left" @click="cmd(e => e.chain().focus().setTextAlign('left').run())" />
-      <UButton size="xs" variant="ghost" :color="isActiveAttrs({ textAlign: 'center' }) ? 'primary' : 'neutral'" icon="i-lucide-align-center" aria-label="Align center" @click="cmd(e => e.chain().focus().setTextAlign('center').run())" />
-      <UButton size="xs" variant="ghost" :color="isActiveAttrs({ textAlign: 'right' }) ? 'primary' : 'neutral'" icon="i-lucide-align-right" aria-label="Align right" @click="cmd(e => e.chain().focus().setTextAlign('right').run())" />
+      <UButton size="xs" variant="ghost" :color="isAlignActive('left') ? 'primary' : 'neutral'" icon="i-lucide-align-left" aria-label="Align left" @click="setAlign('left')" />
+      <UButton size="xs" variant="ghost" :color="isAlignActive('center') ? 'primary' : 'neutral'" icon="i-lucide-align-center" aria-label="Align center" @click="setAlign('center')" />
+      <UButton size="xs" variant="ghost" :color="isAlignActive('right') ? 'primary' : 'neutral'" icon="i-lucide-align-right" aria-label="Align right" @click="setAlign('right')" />
       <div class="w-px bg-(--ui-border) mx-1" />
       <UButton size="xs" variant="ghost" :color="isActive('link') ? 'primary' : 'neutral'" icon="i-lucide-link" aria-label="Link" @click="promptForLink" />
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-image" aria-label="Image" :loading="uploading" @click="insertImage" />
