@@ -12,11 +12,15 @@ definePageMeta({
 import { ENABLED_LANGUAGES } from '~~/config/languages'
 import { uploadImage } from '~/composables/useImageUpload'
 
+type PageTheme = 'default' | 'green'
+
 interface Page {
   id: string
   slug: string
   parent_slug: string | null
   menu_order: number
+  theme: PageTheme
+  custom_css: string | null
   created: string
   updated: string
 }
@@ -55,13 +59,22 @@ const { data, pending, refresh } = await useFetch<PageDetail>(() => `/api/admin/
 const slug = ref('')
 const parentSlug = ref<string>('')
 const menuOrder = ref(0)
+const theme = ref<PageTheme>('default')
+const customCss = ref('')
 watchEffect(() => {
   if (data.value) {
     slug.value = data.value.page.slug
     parentSlug.value = data.value.page.parent_slug ?? ''
     menuOrder.value = data.value.page.menu_order
+    theme.value = data.value.page.theme ?? 'default'
+    customCss.value = data.value.page.custom_css ?? ''
   }
 })
+
+const THEME_OPTIONS: Array<{ label: string; value: PageTheme }> = [
+  { label: 'Default', value: 'default' },
+  { label: 'Green background', value: 'green' }
+]
 
 // Tabs state — one tab per enabled language
 const activeLocale = ref<string>('en')
@@ -148,7 +161,9 @@ async function saveMetadata() {
       body: {
         slug: slug.value,
         parent_slug: parentSlug.value || null,
-        menu_order: menuOrder.value
+        menu_order: menuOrder.value,
+        theme: theme.value,
+        custom_css: customCss.value.trim() ? customCss.value : null
       }
     })
     toast.add({ title: 'Page metadata saved', color: 'success' })
@@ -346,6 +361,19 @@ const enabledLanguages = ENABLED_LANGUAGES
           </UFormField>
           <UFormField label="Menu order">
             <UInput v-model.number="menuOrder" type="number" />
+          </UFormField>
+        </div>
+        <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <UFormField label="Page theme" description="Applied to <body>.">
+            <USelect v-model="theme" :items="THEME_OPTIONS" />
+          </UFormField>
+          <UFormField label="Custom CSS" description="Raw CSS injected at end of <body>. Wins over app styles." class="sm:col-span-2">
+            <UTextarea
+              v-model="customCss"
+              :rows="4"
+              placeholder="body { … }"
+              class="font-mono text-xs w-full"
+            />
           </UFormField>
         </div>
         <div class="mt-4 flex justify-end">

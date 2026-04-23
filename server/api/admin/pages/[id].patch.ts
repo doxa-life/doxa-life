@@ -10,7 +10,13 @@ export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
   if (!id) throw createError({ statusCode: 400, statusMessage: 'id is required' })
 
-  const body = await readBody<{ slug?: string; parent_slug?: string | null; menu_order?: number }>(event)
+  const body = await readBody<{
+    slug?: string
+    parent_slug?: string | null
+    menu_order?: number
+    theme?: string
+    custom_css?: string | null
+  }>(event)
 
   const set: Record<string, unknown> = {}
   if (body?.slug != null) {
@@ -25,6 +31,17 @@ export default defineEventHandler(async (event) => {
   }
   if (body?.menu_order !== undefined) {
     set.menu_order = Number(body.menu_order) || 0
+  }
+  if (body?.theme !== undefined) {
+    const theme = String(body.theme)
+    if (!['default', 'green'].includes(theme)) {
+      throw createError({ statusCode: 400, statusMessage: 'theme must be one of: default, green' })
+    }
+    set.theme = theme
+  }
+  if (body?.custom_css !== undefined) {
+    const raw = body.custom_css == null ? null : String(body.custom_css)
+    set.custom_css = raw && raw.trim() ? raw : null
   }
   set.updated = new Date()
 

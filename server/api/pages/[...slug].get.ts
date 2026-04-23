@@ -62,6 +62,7 @@ export default defineEventHandler(async (event) => {
     slug: page.slug,
     parent_slug: page.parent_slug,
     menu_order: page.menu_order,
+    theme: page.theme,
     custom_css: page.custom_css,
     requested_locale: requestedLocale,
     resolved_locale: resolvedLocale,
