@@ -1,0 +1,45 @@
+// Public rendering for custom Tiptap block nodes. The editor emits
+// these tags/classes via renderHTML (see app/utils/tiptapVerse.ts,
+// tiptapUupgsList.ts). On the public page the serialized HTML is
+// dropped in via v-html, so these styles need to match the element
+// shape generated server-side — the node views in the editor are a
+// separate story (see app/components/admin/RichTextEditor.vue).
+
+// _globals.scss sets `.wp-block-group { padding: var(--spacing-4xl); }`
+// for the layout groups scraped in from WordPress. Scraped pages often
+// wrap or nest verses inside these groups, compounding the group's
+// padding with the verse's own. Neutralize the group padding both when
+// it wraps a verse and when it's nested inside one — the verse handles
+// its own spacing.
+.wp-block-group:has(> .doxa-verse),
+.doxa-verse .wp-block-group {
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+}
+
+// Verse block
+.doxa-verse {
+  background-color: var(--color-surface-brand);
+  color: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
+
+  p, h1, h2, h3, h4, h5, h6 {
+    text-align: center;
+    color: var(--color-white);
+    margin: 0.5rem 0;
+  }
+  > :first-child { margin-top: 0; }
+  > :last-child { margin-bottom: 0; }
+
+  &[data-reference]::after {
+    content: attr(data-reference);
+    display: block;
+    text-align: right;
+    color: rgba(255, 255, 255, 0.85);
+    font-style: italic;
+    margin-top: 0.5rem;
+  }
+}
