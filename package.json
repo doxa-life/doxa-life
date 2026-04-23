@@ -43,7 +43,8 @@
     "nodemailer-mailgun-transport": "^2.1.5",
     "nuxt": "^4.4.2",
     "postgres": "^3.4.7",
-    "tailwindcss": "^4.2.2"
+    "tailwindcss": "^4.2.2",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.15.2",

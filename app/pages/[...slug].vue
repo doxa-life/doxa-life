@@ -22,7 +22,8 @@ type PageTheme = 'default' | 'green'
 
 interface PageResponse {
   slug: string
-  parent_slug: string | null
+  category_id: string | null
+  category_slug: string | null
   menu_order: number
   theme: PageTheme
   custom_css: string | null
@@ -36,7 +37,7 @@ interface PageResponse {
   og_image: string | null
   body_html: string
   body_is_empty: boolean
-  menu_parent: { slug: string; title: string }
+  menu_parent: { slug: string; title: string } | null
   children: ChildPage[]
 }
 
@@ -108,10 +109,19 @@ useHead(() => {
 })
 
 const hasSidebar = computed(() => (data.value?.children.length ?? 0) > 0)
-const isParentSelf = computed(() => data.value?.menu_parent.slug === data.value?.slug)
+// A page renders its children as cards (instead of sidebar + body) when
+// it's the category's default landing AND its own body is empty. Useful
+// for pure index pages like /resources.
+const isCategoryDefault = computed(() =>
+  Boolean(data.value && data.value.category_slug && data.value.menu_order === 0)
+)
 const showChildGrid = computed(() =>
-  // Parent page with no body content → render children as cards
-  Boolean(data.value && isParentSelf.value && data.value.body_is_empty && data.value.children.length > 0)
+  Boolean(
+    data.value
+      && isCategoryDefault.value
+      && data.value.body_is_empty
+      && data.value.children.length > 0
+  )
 )
 
 useTextHighlight()
@@ -184,14 +194,10 @@ onBeforeUnmount(unmountSlots)
         <nav class="stack" aria-label="Child pages navigation">
           <div>
             <ul class="stack | max-width-xs" role="list">
-              <li>
-                <NuxtLink
-                  class="font-size-lg"
-                  :class="{ 'current-link': data.slug === data.menu_parent.slug }"
-                  :to="localePath(`/${data.menu_parent.slug}`)"
-                >
+              <li v-if="data.menu_parent">
+                <span class="font-size-lg category-heading">
                   {{ data.menu_parent.title }}
-                </NuxtLink>
+                </span>
               </li>
               <li v-for="child in data.children" :key="child.slug">
                 <NuxtLink

@@ -40,11 +40,27 @@ export type PageTheme = 'default' | 'green'
 export interface PagesTable {
   id: Generated<string>
   slug: string
-  parent_slug: string | null
+  category_id: string | null
   menu_order: Generated<number>
   custom_css: string | null
   theme: Generated<PageTheme>
   created: ColumnType<Date, Date | string | undefined, Date | string>
+  updated: ColumnType<Date, Date | string | undefined, Date | string>
+}
+
+export interface CategoriesTable {
+  id: Generated<string>
+  slug: string
+  menu_order: Generated<number>
+  created: ColumnType<Date, Date | string | undefined, Date | string>
+  updated: ColumnType<Date, Date | string | undefined, Date | string>
+}
+
+export interface CategoryTranslationsTable {
+  id: Generated<string>
+  category_id: string
+  locale: string
+  name: string
   updated: ColumnType<Date, Date | string | undefined, Date | string>
 }
 
@@ -69,4 +85,6 @@ export interface Database {
   activity_logs: ActivityLogsTable
   pages: PagesTable
   page_translations: PageTranslationsTable
+  categories: CategoriesTable
+  category_translations: CategoryTranslationsTable
 }

@@ -17,12 +17,20 @@ type PageTheme = 'default' | 'green'
 interface Page {
   id: string
   slug: string
-  parent_slug: string | null
+  category_id: string | null
   menu_order: number
   theme: PageTheme
   custom_css: string | null
   created: string
   updated: string
+}
+
+interface CategoryRow {
+  id: string
+  slug: string
+  menu_order: number
+  translations: Array<{ locale: string; name: string }>
+  page_count: number
 }
 
 interface Translation {
@@ -66,22 +74,48 @@ const publicUrl = computed(() => {
 const EMPTY_DOC = { type: 'doc', content: [{ type: 'paragraph' }] }
 
 const { data, pending, refresh } = await useFetch<PageDetail>(() => `/api/admin/pages/${pageId.value}`)
+const { data: categoriesData } = await useFetch<{ rows: CategoryRow[] }>(
+  '/api/admin/categories',
+  { default: () => ({ rows: [] }) }
+)
+
+const categories = computed(() => categoriesData.value?.rows ?? [])
+
+function categoryLabel(cat: CategoryRow): string {
+  const en = cat.translations.find(t => t.locale === 'en')?.name
+  return en ?? cat.slug
+}
+
+const categoryItems = computed(() => [
+  { label: '— Uncategorized —', value: null as string | null },
+  ...categories.value.map(c => ({ label: categoryLabel(c), value: c.id as string | null }))
+])
 
 // Metadata editable in the top bar
 const slug = ref('')
-const parentSlug = ref<string>('')
+const categoryId = ref<string | null>(null)
 const menuOrder = ref(0)
 const theme = ref<PageTheme>('default')
 const customCss = ref('')
+// Original category id at load time — used to detect moves that also
+// trigger an automatic slug-prefix rewrite on the server.
+const originalCategoryId = ref<string | null>(null)
 watchEffect(() => {
   if (data.value) {
     slug.value = data.value.page.slug
-    parentSlug.value = data.value.page.parent_slug ?? ''
+    categoryId.value = data.value.page.category_id
+    originalCategoryId.value = data.value.page.category_id
     menuOrder.value = data.value.page.menu_order
     theme.value = data.value.page.theme ?? 'default'
     customCss.value = data.value.page.custom_css ?? ''
   }
 })
+
+const selectedCategory = computed(() =>
+  categoryId.value ? categories.value.find(c => c.id === categoryId.value) : undefined
+)
+
+const isCategoryChanged = computed(() => categoryId.value !== originalCategoryId.value)
 
 const THEME_OPTIONS: Array<{ label: string; value: PageTheme }> = [
   { label: 'Default', value: 'default' },
@@ -182,7 +216,7 @@ async function saveAll(statusOverride?: 'draft' | 'published') {
       method: 'PATCH',
       body: {
         slug: slug.value,
-        parent_slug: parentSlug.value || null,
+        category_id: categoryId.value,
         menu_order: menuOrder.value,
         theme: theme.value,
         custom_css: customCss.value.trim() ? customCss.value : null
@@ -457,13 +491,24 @@ const enabledLanguages = ENABLED_LANGUAGES
             </template>
 
             <div class="space-y-4">
-              <UFormField label="Slug" description="URL path (e.g. about/vision)">
+              <UFormField
+                label="Category"
+                :description="isCategoryChanged ? 'Changing the category rewrites the slug prefix — the old URL will 404.' : 'Group this page under a category.'"
+              >
+                <USelect
+                  v-model="categoryId"
+                  :items="categoryItems"
+                  value-key="value"
+                  class="w-full"
+                />
+              </UFormField>
+              <UFormField
+                label="Slug"
+                :description="selectedCategory ? `Full URL: /${slug}. Must start with ${selectedCategory.slug}/` : 'URL path (e.g. privacy)'"
+              >
                 <UInput v-model="slug" />
               </UFormField>
-              <UFormField label="Parent slug" description="Leave blank for top-level.">
-                <UInput v-model="parentSlug" />
-              </UFormField>
-              <UFormField label="Menu order">
+              <UFormField label="Menu order" description="Position within the category sidebar.">
                 <UInput v-model.number="menuOrder" type="number" />
               </UFormField>
               <UFormField label="Page theme" description="Applied to <body>.">

@@ -4,14 +4,24 @@
 // - 404s if neither are published
 //
 // Returns the translation (title, excerpt, featured_image, meta_*,
-// status) plus pre-rendered HTML body (so the public bundle doesn't
-// have to ship the Tiptap renderer) and the list of published child
-// pages for sidebar navigation.
+// status) plus pre-rendered HTML body and the set of sibling pages
+// that live in the same category (used for the sidebar nav).
+//
+// When the slug matches a category's slug exactly (e.g. `/about`),
+// the endpoint transparently resolves to the category's first page
+// (lowest menu_order with a published translation).
 
 // defineCachedEventHandler + getCookie are Nitro globals (auto-imported);
 // no h3 import needed for them.
 import { getRouterParam, getQuery, createError } from 'h3'
-import { getPageBySlug, getChildTranslations } from '../../database/pages'
+import { getPageBySlug } from '../../database/pages'
+import {
+  getCategoryBySlug,
+  getCategoryDefaultPage,
+  getCategoryName,
+  getCategoryPageTranslations
+} from '../../database/categories'
+import { db } from '../../utils/database'
 import { renderTiptap } from '../../utils/renderTiptap'
 import { ENABLED_LANGUAGE_CODES } from '../../../config/languages'
 
@@ -29,7 +39,27 @@ export default defineCachedEventHandler(async (event) => {
   const requested = typeof query.locale === 'string' ? query.locale : 'en'
   const locale = ENABLED_LOCALES.has(requested) ? requested : 'en'
 
-  const result = await getPageBySlug(slug, locale, { fallback: 'en' })
+  // Try the slug as a page first. If no page row matches, see if the
+  // slug identifies a category, and render its default page.
+  let result = await getPageBySlug(slug, locale, { fallback: 'en' })
+  let bareCategorySlug: string | null = null
+
+  if (!result) {
+    const category = await getCategoryBySlug(slug)
+    if (category) {
+      const defaultPage = await getCategoryDefaultPage(category.id, locale, 'en')
+      if (defaultPage) {
+        result = {
+          page: defaultPage.page,
+          translation: defaultPage.translation,
+          resolvedLocale: defaultPage.translation.locale,
+          requestedLocale: locale
+        }
+        bareCategorySlug = category.slug
+      }
+    }
+  }
+
   if (!result) {
     throw createError({ statusCode: 404, statusMessage: 'Page not found' })
   }
@@ -37,32 +67,44 @@ export default defineCachedEventHandler(async (event) => {
   const { page, translation, resolvedLocale, requestedLocale } = result
   const bodyHtml = renderTiptap(translation.body_json)
 
-  // Menu parent = parent page if this is a child, or self if this is a
-  // top-level page. Sidebar items = children of that menu parent.
-  // Mirrors the WP page.php logic using `wp_get_post_parent_id()` and
-  // `get_pages(['child_of' => $menu_parent_id])`.
-  let menuParentSlug: string
-  let menuParentTitle: string
-  if (page.parent_slug) {
-    const parent = await getPageBySlug(page.parent_slug, resolvedLocale, { fallback: 'en' })
-    if (parent) {
-      menuParentSlug = parent.page.slug
-      menuParentTitle = parent.translation.title
-    } else {
-      // Parent row exists but isn't published — fall back to self
-      menuParentSlug = page.slug
-      menuParentTitle = translation.title
-    }
-  } else {
-    menuParentSlug = page.slug
-    menuParentTitle = translation.title
-  }
+  let menuParent: { slug: string; title: string } | null = null
+  let categorySlug: string | null = bareCategorySlug
+  let children: Array<{
+    slug: string
+    title: string
+    excerpt: string | null
+    featured_image: string | null
+    menu_order: number
+  }> = []
 
-  const siblings = await getChildTranslations(menuParentSlug, resolvedLocale, 'en')
+  if (page.category_id) {
+    const [categoryRow, categoryName, siblingRows] = await Promise.all([
+      db
+        .selectFrom('categories')
+        .select('slug')
+        .where('id', '=', page.category_id)
+        .executeTakeFirst(),
+      getCategoryName(page.category_id, resolvedLocale, 'en'),
+      getCategoryPageTranslations(page.category_id, resolvedLocale, 'en')
+    ])
+
+    if (categoryRow) categorySlug = categoryRow.slug
+    if (categorySlug && categoryName) {
+      menuParent = { slug: categorySlug, title: categoryName }
+    }
+    children = siblingRows.map(({ page: c, translation: t }) => ({
+      slug: c.slug,
+      title: t.title,
+      excerpt: t.excerpt,
+      featured_image: t.featured_image,
+      menu_order: c.menu_order
+    }))
+  }
 
   return {
     slug: page.slug,
-    parent_slug: page.parent_slug,
+    category_id: page.category_id,
+    category_slug: categorySlug,
     menu_order: page.menu_order,
     theme: page.theme,
     custom_css: page.custom_css,
@@ -76,17 +118,8 @@ export default defineCachedEventHandler(async (event) => {
     og_image: translation.og_image,
     body_html: bodyHtml,
     body_is_empty: bodyHtml.trim() === '',
-    menu_parent: {
-      slug: menuParentSlug,
-      title: menuParentTitle
-    },
-    children: siblings.map(({ page: c, translation: t }) => ({
-      slug: c.slug,
-      title: t.title,
-      excerpt: t.excerpt,
-      featured_image: t.featured_image,
-      menu_order: c.menu_order
-    }))
+    menu_parent: menuParent,
+    children
   }
 }, {
   // Keyed by (locale, slug). Purged from mutation endpoints via
