@@ -5,7 +5,7 @@ import { requirePermission } from '../../../utils/rbac'
 import { deletePage } from '../../../database/pages'
 import { db } from '../../../utils/database'
 import { logDelete } from '../../../utils/activity-logger'
-import { purgeCmsPage } from '../../../utils/cmsCache'
+import { purgeCmsPage, purgeCmsCategory } from '../../../utils/cmsCache'
 
 export default defineEventHandler(async (event) => {
   await requirePermission(event, 'pages.manage')
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
   const existing = await db
     .selectFrom('pages')
-    .select(['id', 'slug'])
+    .select(['id', 'slug', 'category_id'])
     .where('id', '=', id)
     .executeTakeFirst()
   if (!existing) throw createError({ statusCode: 404, statusMessage: 'Page not found' })
@@ -22,5 +22,9 @@ export default defineEventHandler(async (event) => {
   await deletePage(id)
   logDelete('pages', id, event, { slug: existing.slug })
   await purgeCmsPage(existing.slug)
+  // Removed entry leaves stale `children[]` on every surviving sibling.
+  if (existing.category_id) {
+    await purgeCmsCategory(existing.category_id, existing.slug)
+  }
   return { ok: true }
 })

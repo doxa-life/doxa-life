@@ -8,6 +8,7 @@
 // feature will formalize the tree and give us cleaner invalidation.
 
 import { ENABLED_LANGUAGE_CODES } from '~~/config/languages'
+import { db } from './database'
 
 // Key format matches what defineCachedEventHandler writes in
 // server/api/pages/[...slug].get.ts. Nitro composes
@@ -26,4 +27,33 @@ export async function purgeCmsPage(slug: string, locales?: string[]) {
   await Promise.all(
     targets.map(locale => storage.removeItem(storageKey(slug, locale)))
   )
+}
+
+// Purge every page in a category across all locales. Needed whenever a
+// field that leaks into a sibling's cached response changes — titles,
+// excerpts, featured images (all embedded in `children[]`) and
+// menu_order (alters sibling sort order). `excludeSlug` lets the caller
+// skip the page whose own entry was already purged independently.
+export async function purgeCmsCategory(
+  categoryId: string,
+  excludeSlug?: string
+): Promise<void> {
+  const rows = await db
+    .selectFrom('pages')
+    .select('slug')
+    .where('category_id', '=', categoryId)
+    .execute()
+  const slugs = rows.map(r => r.slug).filter(s => s !== excludeSlug)
+  await Promise.all(slugs.map(s => purgeCmsPage(s)))
+}
+
+// Wipe every cached CMS page response. Used by the admin "Flush Cache"
+// action when targeted per-slug purges aren't enough (e.g. after a
+// direct DB seed or when the editor wants a hard reset). Returns the
+// number of keys removed so the UI can show a confirmation.
+export async function purgeAllCmsCache(): Promise<number> {
+  const storage = useStorage('cache')
+  const keys = await storage.getKeys(KEY_PREFIX)
+  await Promise.all(keys.map(k => storage.removeItem(k)))
+  return keys.length
 }

@@ -6,6 +6,7 @@ import { requirePermission } from '../../../utils/rbac'
 import { createPage } from '../../../database/pages'
 import { db } from '../../../utils/database'
 import { logCreate } from '../../../utils/activity-logger'
+import { purgeCmsCategory } from '../../../utils/cmsCache'
 
 export default defineEventHandler(async (event) => {
   await requirePermission(event, 'pages.manage')
@@ -58,6 +59,11 @@ export default defineEventHandler(async (event) => {
   try {
     const page = await createPage({ slug, category_id, menu_order })
     logCreate('pages', page.id, event, { slug, category_id, menu_order })
+    // New member appears in every sibling's `children[]` — bust their
+    // cached responses so the sidebar picks it up on next visit.
+    if (category_id) {
+      await purgeCmsCategory(category_id, slug)
+    }
     return page
   } catch (e: any) {
     if (e?.code === '23505') {

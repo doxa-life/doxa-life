@@ -113,6 +113,28 @@ export default defineEventHandler(async (event) => {
     }
 
     slugsToPurge.add(updated.slug)
+
+    // Fields that bleed into a sibling's `children[]` array (slug +
+    // menu_order) or shift category membership need every member page
+    // in the affected categories re-rendered. Collect the union of
+    // old + new category ids, then pull their slug rosters in one go.
+    const categoriesToPurge = new Set<string>()
+    const slugChanged = updated.slug !== existing.slug
+    const orderChanged = updated.menu_order !== existing.menu_order
+    const movedCategory = updated.category_id !== existing.category_id
+    if (slugChanged || orderChanged || movedCategory) {
+      if (existing.category_id) categoriesToPurge.add(existing.category_id)
+      if (updated.category_id) categoriesToPurge.add(updated.category_id)
+    }
+    if (categoriesToPurge.size > 0) {
+      const siblings = await db
+        .selectFrom('pages')
+        .select('slug')
+        .where('category_id', 'in', Array.from(categoriesToPurge))
+        .execute()
+      for (const { slug } of siblings) slugsToPurge.add(slug)
+    }
+
     logUpdate('pages', id, event, { changes: { ...set, category_id: updated.category_id } })
     await Promise.all(Array.from(slugsToPurge).map(s => purgeCmsPage(s)))
     return updated

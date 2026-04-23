@@ -8,7 +8,7 @@ import { upsertTranslation } from '../../../../../database/pages'
 import { ENABLED_LANGUAGE_CODES } from '../../../../../../config/languages'
 import { logUpdate } from '../../../../../utils/activity-logger'
 import { db } from '../../../../../utils/database'
-import { purgeCmsPage } from '../../../../../utils/cmsCache'
+import { purgeCmsPage, purgeCmsCategory } from '../../../../../utils/cmsCache'
 
 interface Body {
   title?: string
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
 
   const page = await db
     .selectFrom('pages')
-    .select(['id', 'slug'])
+    .select(['id', 'slug', 'category_id'])
     .where('id', '=', id)
     .executeTakeFirst()
   if (!page) throw createError({ statusCode: 404, statusMessage: 'Page not found' })
@@ -67,6 +67,12 @@ export default defineEventHandler(async (event) => {
   })
 
   await purgeCmsPage(page.slug, [locale])
+  // Title/excerpt/featured_image show up in every sibling's `children[]`
+  // array (used for the sidebar nav). Without a category there are no
+  // siblings to bust, so skip the query for standalone pages.
+  if (page.category_id) {
+    await purgeCmsCategory(page.category_id, page.slug)
+  }
 
   return translation
 })
