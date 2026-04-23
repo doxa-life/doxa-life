@@ -289,11 +289,12 @@ export async function updateCategory(
     }
 
     if (input.translations) {
+      let translationsChanged = false
       for (const t of input.translations) {
         const name = t.name.trim()
         const priorRow = await trx
           .selectFrom('category_translations')
-          .select('id')
+          .select(['id', 'name'])
           .where('category_id', '=', id)
           .where('locale', '=', t.locale)
           .executeTakeFirst()
@@ -304,21 +305,40 @@ export async function updateCategory(
               .deleteFrom('category_translations')
               .where('id', '=', priorRow.id)
               .execute()
+            translationsChanged = true
           }
           continue
         }
 
         if (priorRow) {
-          await trx
-            .updateTable('category_translations')
-            .set({ name, updated: sql`now()` })
-            .where('id', '=', priorRow.id)
-            .execute()
+          if (priorRow.name !== name) {
+            await trx
+              .updateTable('category_translations')
+              .set({ name, updated: sql`now()` })
+              .where('id', '=', priorRow.id)
+              .execute()
+            translationsChanged = true
+          }
         } else {
           await trx
             .insertInto('category_translations')
             .values({ category_id: id, locale: t.locale, name })
             .execute()
+          translationsChanged = true
+        }
+      }
+
+      // Every member page's cached response embeds the category's name
+      // as its `menu_parent.title`. When the category name changes in
+      // any locale, purge every member so readers see the new label.
+      if (translationsChanged) {
+        const memberSlugs = await trx
+          .selectFrom('pages')
+          .select('slug')
+          .where('category_id', '=', id)
+          .execute()
+        for (const { slug } of memberSlugs) {
+          slugsToPurge.push(slug)
         }
       }
     }
