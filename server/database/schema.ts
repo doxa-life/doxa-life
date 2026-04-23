@@ -35,12 +35,15 @@ export interface ActivityLogsTable {
   metadata: Generated<Record<string, any>>
 }
 
+export type PageTheme = 'default' | 'green'
+
 export interface PagesTable {
   id: Generated<string>
   slug: string
   parent_slug: string | null
   menu_order: Generated<number>
   custom_css: string | null
+  theme: Generated<PageTheme>
   created: ColumnType<Date, Date | string | undefined, Date | string>
   updated: ColumnType<Date, Date | string | undefined, Date | string>
 }

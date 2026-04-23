@@ -18,10 +18,13 @@ interface ChildPage {
   menu_order: number
 }
 
+type PageTheme = 'default' | 'green'
+
 interface PageResponse {
   slug: string
   parent_slug: string | null
   menu_order: number
+  theme: PageTheme
   custom_css: string | null
   requested_locale: string
   resolved_locale: string
@@ -81,10 +84,24 @@ useHead(() => {
       ...(data.value.meta_description ? [{ name: 'description', content: data.value.meta_description }] : []),
       ...(data.value.og_image ? [{ property: 'og:image', content: data.value.og_image }] : [])
     ],
+    // Tagging the <body> with a theme class lets _themes.scss paint the
+    // page in brand colors (e.g. green) without the author writing CSS.
+    bodyAttrs: {
+      class: data.value.theme && data.value.theme !== 'default'
+        ? `page-theme-${data.value.theme}`
+        : undefined
+    },
     // Port of WP's per-page `_page_custom_css` meta — see
     // `output_page_custom_css` in marketing-theme/functions.php.
+    // Rendered at `bodyClose` so it lands after Vite's injected app CSS
+    // in dev and after `<link rel=stylesheet>` tags in prod, winning the
+    // cascade regardless of where main.scss ends up in <head>.
     style: data.value.custom_css
-      ? [{ key: `page-custom-css-${data.value.slug}`, innerHTML: data.value.custom_css }]
+      ? [{
+          key: `page-custom-css-${data.value.slug}`,
+          tagPosition: 'bodyClose' as const,
+          innerHTML: data.value.custom_css
+        }]
       : []
   }
 })

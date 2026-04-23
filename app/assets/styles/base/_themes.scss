@@ -1,0 +1,13 @@
+// Per-page themes. The public page renderer adds `page-theme-<name>` to
+// <body> when a page opts into a non-default theme (see [...slug].vue).
+// Rules are scoped to the body class so they win over the default body
+// styles in _globals.scss on specificity alone (0,0,1,1 > 0,0,0,1), no
+// matter which stylesheet the bundler emits first.
+
+body.page-theme-green {
+  background-color: var(--color-surface-brand-light);
+  color: var(--color-white);
+
+  a { color: var(--color-brand-secondary-light); }
+  a:hover { color: var(--color-brand-secondary); }
+}
