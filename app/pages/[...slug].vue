@@ -46,10 +46,12 @@ import { UUPGS_LIST_PLACEHOLDER_CLASS } from '~/utils/tiptapUupgsList'
 import { GENERAL_RESOURCES_PLACEHOLDER_CLASS } from '~/utils/tiptapGeneralResources'
 import UupgsList from '~/components/public/UupgsList.vue'
 import GeneralResources from '~/components/public/GeneralResources.vue'
+import { buildUupgListTranslations } from '~/utils/uupgListTranslations'
 
 const route = useRoute()
-const { locale } = useI18n()
+const { t, locale } = useI18n()
 const localePath = useLocalePath()
+const runtimeConfig = useRuntimeConfig()
 
 const slug = computed(() => {
   const raw = route.params.slug
@@ -134,25 +136,58 @@ useTextHighlight()
 const instance = getCurrentInstance()
 const mountedSlots = new Set<HTMLElement>()
 
-const SLOT_COMPONENTS: Array<{ className: string; dataAttr: string; component: any }> = [
-  { className: UUPGS_LIST_PLACEHOLDER_CLASS, dataAttr: 'data-uupgs-list-props', component: UupgsList },
+// Default props for CMS-embedded UUPG lists. Tiptap stores the node
+// attributes raw, so a plain `<uupgs-list>` dropped into the editor
+// comes through with every prop null. Mirror the /pray call site
+// (6 highlighted select-cards, collapsed-on-load) so embeds feel the
+// same anywhere, then let the attribute-serialized props override
+// where the editor explicitly set something.
+function defaultUupgsListProps(): Record<string, any> {
+  const prayBaseUrl = runtimeConfig.public.prayBaseUrl as string
+  const selectUrl = locale.value !== 'en' ? `${prayBaseUrl}/${locale.value}/` : `${prayBaseUrl}/`
+  return {
+    languageCode: locale.value,
+    selectUrl,
+    researchUrl: localePath('/research') + '/',
+    t: buildUupgListTranslations(t),
+    perPage: 6,
+    morePerPage: 12,
+    dontShowListOnLoad: true,
+    useSelectCard: true,
+    useHighlightedUUPGs: true
+  }
+}
+
+const SLOT_COMPONENTS: Array<{
+  className: string
+  dataAttr: string
+  component: any
+  defaults?: () => Record<string, any>
+}> = [
+  {
+    className: UUPGS_LIST_PLACEHOLDER_CLASS,
+    dataAttr: 'data-uupgs-list-props',
+    component: UupgsList,
+    defaults: defaultUupgsListProps
+  },
   { className: GENERAL_RESOURCES_PLACEHOLDER_CLASS, dataAttr: 'data-general-resources-props', component: GeneralResources }
 ]
 
 function hydrateSlots() {
   if (!import.meta.client) return
-  for (const { className, dataAttr, component } of SLOT_COMPONENTS) {
+  for (const { className, dataAttr, component, defaults } of SLOT_COMPONENTS) {
     const slots = document.querySelectorAll<HTMLElement>(`.${className}`)
     for (const slot of slots) {
       if (mountedSlots.has(slot)) continue
       const raw = slot.getAttribute(dataAttr) || '{}'
-      let props: Record<string, any> = {}
+      let parsed: Record<string, any> = {}
       try {
-        props = JSON.parse(raw)
+        parsed = JSON.parse(raw)
       } catch (e) {
         console.error(`[${className}] failed to parse props`, e, raw)
         continue
       }
+      const props = defaults ? { ...defaults(), ...parsed } : parsed
       const vnode = h(component, props)
       if (instance?.appContext) vnode.appContext = instance.appContext
       try {
