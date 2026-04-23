@@ -8,6 +8,7 @@ import { upsertTranslation } from '../../../../../database/pages'
 import { ENABLED_LANGUAGE_CODES } from '../../../../../../config/languages'
 import { logUpdate } from '../../../../../utils/activity-logger'
 import { db } from '../../../../../utils/database'
+import { purgeCmsPage } from '../../../../../utils/cmsCache'
 
 interface Body {
   title?: string
@@ -31,7 +32,7 @@ export default defineEventHandler(async (event) => {
 
   const page = await db
     .selectFrom('pages')
-    .select('id')
+    .select(['id', 'slug'])
     .where('id', '=', id)
     .executeTakeFirst()
   if (!page) throw createError({ statusCode: 404, statusMessage: 'Page not found' })
@@ -64,6 +65,8 @@ export default defineEventHandler(async (event) => {
     locale,
     status: translation.status
   })
+
+  await purgeCmsPage(page.slug, [locale])
 
   return translation
 })

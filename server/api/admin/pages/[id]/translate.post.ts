@@ -7,10 +7,11 @@
 import { defineEventHandler, getRouterParam, readBody, createError } from 'h3'
 import { requirePermission } from '../../../../utils/rbac'
 import { db } from '../../../../utils/database'
-import { upsertTranslation } from '../../../../database/pages'
+import { upsertTranslation, getPageSlug } from '../../../../database/pages'
 import { translateTexts, translateTiptapContent, isDeepLConfigured } from '../../../../utils/deepl'
 import { ENABLED_LANGUAGE_CODES } from '../../../../../config/languages'
 import { logUpdate } from '../../../../utils/activity-logger'
+import { purgeCmsPage } from '../../../../utils/cmsCache'
 
 interface Body {
   sourceLocale?: string
@@ -97,6 +98,14 @@ export default defineEventHandler(async (event) => {
     target_locales: targetLocales,
     results
   })
+
+  // Only purge locales whose translations actually got written (skipped
+  // ones didn't change; errored ones didn't commit).
+  const purgedLocales = results.filter(r => !r.skipped && !r.error).map(r => r.locale)
+  if (purgedLocales.length > 0) {
+    const slug = await getPageSlug(id)
+    if (slug) await purgeCmsPage(slug, purgedLocales)
+  }
 
   return { results }
 })

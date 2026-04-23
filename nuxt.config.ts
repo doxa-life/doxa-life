@@ -89,8 +89,18 @@ export default defineNuxtConfig({
     devStorage: {
       cache: { driver: 'memory' }
     },
+    // Production: persist the `cache` mount to disk so defineCachedEventHandler
+    // entries survive process restarts and redeploys. Purges (see
+    // server/utils/cmsCache.ts) remain fast; disk I/O here is a single fs
+    // write per cache entry. `.cache/` is gitignored.
+    storage: {
+      cache: { driver: 'fs', base: './.cache' }
+    },
     prerender: {
-      crawlLinks: true,
+      // CMS pages (catch-all [...slug]) are rendered live per request so
+      // edits show up immediately. Only hand-coded Vue pages in the seed
+      // list below are prerendered — they don't hit the DB.
+      crawlLinks: false,
       routes: [
         '/', '/es', '/fr', '/pt', '/ar', '/ru',
         '/adopt', '/es/adopt', '/fr/adopt', '/pt/adopt', '/ar/adopt', '/ru/adopt',

@@ -8,14 +8,16 @@
 // have to ship the Tiptap renderer) and the list of published child
 // pages for sidebar navigation.
 
-import { defineEventHandler, getRouterParam, getQuery, createError } from 'h3'
+// defineCachedEventHandler + getCookie are Nitro globals (auto-imported);
+// no h3 import needed for them.
+import { getRouterParam, getQuery, createError } from 'h3'
 import { getPageBySlug, getChildTranslations } from '../../database/pages'
 import { renderTiptap } from '../../utils/renderTiptap'
 import { ENABLED_LANGUAGE_CODES } from '../../../config/languages'
 
 const ENABLED_LOCALES = new Set(ENABLED_LANGUAGE_CODES)
 
-export default defineEventHandler(async (event) => {
+export default defineCachedEventHandler(async (event) => {
   const raw = getRouterParam(event, 'slug')
   const slugParam = Array.isArray(raw) ? raw.join('/') : (raw ?? '')
   const slug = slugParam.replace(/^\/+|\/+$/g, '')
@@ -86,4 +88,24 @@ export default defineEventHandler(async (event) => {
       menu_order: c.menu_order
     }))
   }
+}, {
+  // Keyed by (locale, slug). Purged from mutation endpoints via
+  // purgeCmsPage() in server/utils/cmsCache.ts. The slug is hex-encoded
+  // because Nitro's internal escapeKey() strips non-word chars (`:`,
+  // `/`, `-`), which would otherwise collide nested slugs like
+  // `about/team` with `about-team`.
+  name: 'cms',
+  getKey: (event) => {
+    const raw = getRouterParam(event, 'slug')
+    const slugParam = Array.isArray(raw) ? raw.join('/') : (raw ?? '')
+    const slug = slugParam.replace(/^\/+|\/+$/g, '')
+    const q = getQuery(event)
+    const requested = typeof q.locale === 'string' ? q.locale : 'en'
+    const locale = ENABLED_LOCALES.has(requested) ? requested : 'en'
+    return `${locale}_${Buffer.from(slug).toString('hex')}`
+  },
+  maxAge: 60 * 60,
+  swr: true,
+  // Admins editing content must never see — or poison — cached output.
+  shouldBypassCache: event => !!getCookie(event, 'auth-token')
 })
