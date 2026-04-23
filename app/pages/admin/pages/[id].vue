@@ -51,6 +51,18 @@ const toast = useToast()
 
 const pageId = computed(() => String(route.params.id))
 
+// Live public URL for the "View page" link in the Publish card. Uses the
+// committed slug (data) not the in-flight slug ref, so the link always
+// points to an existing route even if the author is editing the slug.
+// English is the default locale, so `prefix_except_default` means no prefix.
+const publicUrl = computed(() => {
+  const committedSlug = data.value?.page.slug
+  if (!committedSlug) return null
+  return activeLocale.value === 'en'
+    ? `/${committedSlug}`
+    : `/${activeLocale.value}/${committedSlug}`
+})
+
 const EMPTY_DOC = { type: 'doc', content: [{ type: 'paragraph' }] }
 
 const { data, pending, refresh } = await useFetch<PageDetail>(() => `/api/admin/pages/${pageId.value}`)
@@ -152,9 +164,19 @@ for (const l of ENABLED_LANGUAGES) {
   watch(() => forms[l.code]?.body_json, () => markDirty(l.code), { deep: true })
 }
 
-const savingMeta = ref(false)
-async function saveMetadata() {
-  savingMeta.value = true
+// Single save action: page-level metadata (PATCH /pages/:id) + the
+// active locale's translation (PUT /translations/:locale) in one click.
+// Passing a statusOverride also flips published/draft on the translation.
+const saving = ref(false)
+async function saveAll(statusOverride?: 'draft' | 'published') {
+  const locale = activeLocale.value
+  const f = forms[locale]
+  if (!f) return
+  if (!f.title.trim()) {
+    toast.add({ title: 'Title is required', color: 'error' })
+    return
+  }
+  saving.value = true
   try {
     await $fetch(`/api/admin/pages/${pageId.value}`, {
       method: 'PATCH',
@@ -166,29 +188,7 @@ async function saveMetadata() {
         custom_css: customCss.value.trim() ? customCss.value : null
       }
     })
-    toast.add({ title: 'Page metadata saved', color: 'success' })
-    await refresh()
-  } catch (e: any) {
-    toast.add({
-      title: 'Could not save metadata',
-      description: e?.data?.statusMessage || e?.message,
-      color: 'error'
-    })
-  } finally {
-    savingMeta.value = false
-  }
-}
 
-const savingTranslation = ref(false)
-async function saveTranslation(locale: string, statusOverride?: 'draft' | 'published') {
-  const f = forms[locale]
-  if (!f) return
-  if (!f.title.trim()) {
-    toast.add({ title: 'Title is required', color: 'error' })
-    return
-  }
-  savingTranslation.value = true
-  try {
     const body: Record<string, unknown> = {
       title: f.title,
       body_json: f.body_json,
@@ -207,7 +207,13 @@ async function saveTranslation(locale: string, statusOverride?: 'draft' | 'publi
     if (statusOverride) f.status = statusOverride
     f.loaded = true
     f.dirty = false
-    toast.add({ title: `Saved ${locale}`, color: 'success' })
+
+    const verb = statusOverride === 'published'
+      ? 'Published'
+      : statusOverride === 'draft'
+        ? 'Unpublished'
+        : 'Saved'
+    toast.add({ title: `${verb} ${locale}`, color: 'success' })
     await refresh()
   } catch (e: any) {
     toast.add({
@@ -216,33 +222,7 @@ async function saveTranslation(locale: string, statusOverride?: 'draft' | 'publi
       color: 'error'
     })
   } finally {
-    savingTranslation.value = false
-  }
-}
-
-async function setStatus(locale: string, status: 'draft' | 'published') {
-  const f = forms[locale]
-  if (!f) return
-  if (f.dirty) {
-    // Save current content along with the publish action so published
-    // state never diverges from the draft the editor is looking at
-    await saveTranslation(locale, status)
-    return
-  }
-  try {
-    await $fetch(`/api/admin/pages/${pageId.value}/publish`, {
-      method: 'POST',
-      body: { locale, status }
-    })
-    f.status = status
-    toast.add({ title: status === 'published' ? 'Published' : 'Unpublished', color: 'success' })
-    await refresh()
-  } catch (e: any) {
-    toast.add({
-      title: 'Status change failed',
-      description: e?.data?.statusMessage || e?.message,
-      color: 'error'
-    })
+    saving.value = false
   }
 }
 
@@ -351,38 +331,9 @@ const enabledLanguages = ENABLED_LANGUAGES
     </UCard>
 
     <template v-else-if="data">
-      <UCard>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <UFormField label="Slug" description="URL path (e.g. about/vision)">
-            <UInput v-model="slug" />
-          </UFormField>
-          <UFormField label="Parent slug" description="Leave blank for top-level.">
-            <UInput v-model="parentSlug" />
-          </UFormField>
-          <UFormField label="Menu order">
-            <UInput v-model.number="menuOrder" type="number" />
-          </UFormField>
-        </div>
-        <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <UFormField label="Page theme" description="Applied to <body>.">
-            <USelect v-model="theme" :items="THEME_OPTIONS" />
-          </UFormField>
-          <UFormField label="Custom CSS" description="Raw CSS injected at end of <body>. Wins over app styles." class="sm:col-span-2">
-            <UTextarea
-              v-model="customCss"
-              :rows="4"
-              placeholder="body { … }"
-              class="font-mono text-xs w-full"
-            />
-          </UFormField>
-        </div>
-        <div class="mt-4 flex justify-end">
-          <UButton size="sm" color="primary" :loading="savingMeta" @click="saveMetadata">Save metadata</UButton>
-        </div>
-      </UCard>
-
-      <!-- Locale tabs -->
-      <div class="border border-(--ui-border) rounded-lg">
+      <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6 items-start">
+        <!-- Main column: locale tabs -->
+        <div class="border border-(--ui-border) rounded-lg min-w-0">
         <div class="flex flex-wrap gap-1 p-2 border-b border-(--ui-border) bg-(--ui-bg-elevated)">
           <UButton
             v-for="l in enabledLanguages"
@@ -427,108 +378,179 @@ const enabledLanguages = ENABLED_LANGUAGES
             />
           </UFormField>
 
-          <details class="group border border-(--ui-border) rounded-md">
-            <summary class="cursor-pointer select-none flex items-center justify-between px-3 py-2 text-sm font-medium hover:bg-(--ui-bg-elevated)">
-              <span>SEO &amp; extras</span>
+          <div class="pt-2 border-t border-(--ui-border) text-sm text-(--ui-text-muted)">
+            <template v-if="forms[l.code]?.dirty">Unsaved changes</template>
+            <template v-else-if="forms[l.code]?.loaded">Saved</template>
+            <template v-else>Not translated yet</template>
+          </div>
+        </div>
+        </div>
+
+        <!-- Sidebar: page-level metadata (WordPress-style) -->
+        <aside class="lg:sticky lg:top-4 space-y-4">
+          <UCard>
+            <template #header>
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold">Publish</span>
+                <UBadge
+                  size="xs"
+                  :color="forms[activeLocale]?.status === 'published' ? 'success' : 'neutral'"
+                  variant="subtle"
+                >
+                  {{ forms[activeLocale]?.status ?? 'draft' }} · {{ activeLocale }}
+                </UBadge>
+              </div>
+            </template>
+
+            <div class="flex flex-col gap-2">
+              <template v-if="forms[activeLocale]?.status === 'published'">
+                <UButton
+                  block
+                  color="primary"
+                  icon="i-lucide-globe"
+                  :loading="saving"
+                  @click="saveAll('published')"
+                >Update</UButton>
+                <UButton
+                  block
+                  variant="ghost"
+                  color="warning"
+                  icon="i-lucide-eye-off"
+                  :loading="saving"
+                  @click="saveAll('draft')"
+                >Move to draft</UButton>
+              </template>
+              <template v-else>
+                <UButton
+                  block
+                  color="primary"
+                  icon="i-lucide-globe"
+                  :loading="saving"
+                  @click="saveAll('published')"
+                >Publish</UButton>
+                <UButton
+                  block
+                  variant="outline"
+                  color="neutral"
+                  :loading="saving"
+                  @click="saveAll()"
+                >Save draft</UButton>
+              </template>
+
+              <div v-if="publicUrl" class="pt-2 mt-1 border-t border-(--ui-border)">
+                <a
+                  :href="publicUrl"
+                  target="_blank"
+                  rel="noopener"
+                  class="text-sm text-(--ui-primary) hover:underline inline-flex items-center gap-1"
+                >
+                  <UIcon name="i-lucide-external-link" class="size-3.5" />
+                  {{ publicUrl }}
+                </a>
+              </div>
+            </div>
+          </UCard>
+
+          <UCard>
+            <template #header>
+              <span class="text-sm font-semibold">Page settings</span>
+            </template>
+
+            <div class="space-y-4">
+              <UFormField label="Slug" description="URL path (e.g. about/vision)">
+                <UInput v-model="slug" />
+              </UFormField>
+              <UFormField label="Parent slug" description="Leave blank for top-level.">
+                <UInput v-model="parentSlug" />
+              </UFormField>
+              <UFormField label="Menu order">
+                <UInput v-model.number="menuOrder" type="number" />
+              </UFormField>
+              <UFormField label="Page theme" description="Applied to <body>.">
+                <USelect v-model="theme" :items="THEME_OPTIONS" class="w-full" />
+              </UFormField>
+              <UFormField label="Custom CSS" description="Raw CSS injected at end of <body>. Wins over app & theme styles.">
+                <UTextarea
+                  v-model="customCss"
+                  :rows="6"
+                  placeholder="body { … }"
+                  class="font-mono text-xs w-full"
+                />
+              </UFormField>
+            </div>
+          </UCard>
+
+          <!-- Per-locale SEO & extras for the active locale. Native <details>
+               keeps the collapsed-by-default behavior without extra state. -->
+          <details class="group rounded-(--ui-radius) bg-(--ui-bg) ring ring-(--ui-border) shadow-sm">
+            <summary class="cursor-pointer select-none flex items-center justify-between px-4 py-3 text-sm font-semibold">
+              <span>SEO &amp; extras <span class="text-(--ui-text-muted) font-normal">· {{ activeLocale }}</span></span>
               <UIcon name="i-lucide-chevron-down" class="size-4 transition-transform group-open:rotate-180" />
             </summary>
-            <div class="p-4 space-y-4 border-t border-(--ui-border)">
+            <div class="px-4 py-3 space-y-4 border-t border-(--ui-border)">
               <UFormField label="Excerpt" description="Shown in child-page cards when a parent page has no body.">
                 <UTextarea
-                  :model-value="forms[l.code]?.excerpt ?? ''"
+                  :model-value="forms[activeLocale]?.excerpt ?? ''"
                   :rows="2"
-                  @update:model-value="v => setField(l.code, 'excerpt', String(v))"
+                  @update:model-value="v => setField(activeLocale, 'excerpt', String(v))"
                 />
               </UFormField>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <UFormField label="Featured image">
-                  <div class="flex items-center gap-2">
-                    <UInput
-                      :model-value="forms[l.code]?.featured_image ?? ''"
-                      placeholder="https://…"
-                      class="flex-1"
-                      @update:model-value="v => setField(l.code, 'featured_image', String(v))"
-                    />
-                    <label class="shrink-0">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        class="hidden"
-                        @change="e => { const f = (e.target as HTMLInputElement).files?.[0]; if (f) uploadField('featured_image', l.code, f); (e.target as HTMLInputElement).value = '' }"
-                      >
-                      <UButton variant="outline" color="neutral" size="sm" icon="i-lucide-upload" as="span">Upload</UButton>
-                    </label>
-                  </div>
-                </UFormField>
-                <UFormField label="OG image">
-                  <div class="flex items-center gap-2">
-                    <UInput
-                      :model-value="forms[l.code]?.og_image ?? ''"
-                      placeholder="https://…"
-                      class="flex-1"
-                      @update:model-value="v => setField(l.code, 'og_image', String(v))"
-                    />
-                    <label class="shrink-0">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        class="hidden"
-                        @change="e => { const f = (e.target as HTMLInputElement).files?.[0]; if (f) uploadField('og_image', l.code, f); (e.target as HTMLInputElement).value = '' }"
-                      >
-                      <UButton variant="outline" color="neutral" size="sm" icon="i-lucide-upload" as="span">Upload</UButton>
-                    </label>
-                  </div>
-                </UFormField>
-              </div>
+              <UFormField label="Featured image">
+                <div class="flex items-center gap-2">
+                  <UInput
+                    :model-value="forms[activeLocale]?.featured_image ?? ''"
+                    placeholder="https://…"
+                    class="flex-1"
+                    @update:model-value="v => setField(activeLocale, 'featured_image', String(v))"
+                  />
+                  <label class="shrink-0">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      class="hidden"
+                      @change="e => { const f = (e.target as HTMLInputElement).files?.[0]; if (f) uploadField('featured_image', activeLocale, f); (e.target as HTMLInputElement).value = '' }"
+                    >
+                    <UButton variant="outline" color="neutral" size="sm" icon="i-lucide-upload" as="span">Upload</UButton>
+                  </label>
+                </div>
+              </UFormField>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <UFormField label="Meta title" description="Overrides the page title in <title>.">
+              <UFormField label="OG image">
+                <div class="flex items-center gap-2">
                   <UInput
-                    :model-value="forms[l.code]?.meta_title ?? ''"
-                    @update:model-value="v => setField(l.code, 'meta_title', String(v))"
+                    :model-value="forms[activeLocale]?.og_image ?? ''"
+                    placeholder="https://…"
+                    class="flex-1"
+                    @update:model-value="v => setField(activeLocale, 'og_image', String(v))"
                   />
-                </UFormField>
-                <UFormField label="Meta description">
-                  <UInput
-                    :model-value="forms[l.code]?.meta_description ?? ''"
-                    @update:model-value="v => setField(l.code, 'meta_description', String(v))"
-                  />
-                </UFormField>
-              </div>
+                  <label class="shrink-0">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      class="hidden"
+                      @change="e => { const f = (e.target as HTMLInputElement).files?.[0]; if (f) uploadField('og_image', activeLocale, f); (e.target as HTMLInputElement).value = '' }"
+                    >
+                    <UButton variant="outline" color="neutral" size="sm" icon="i-lucide-upload" as="span">Upload</UButton>
+                  </label>
+                </div>
+              </UFormField>
+
+              <UFormField label="Meta title" description="Overrides the page title in <title>.">
+                <UInput
+                  :model-value="forms[activeLocale]?.meta_title ?? ''"
+                  @update:model-value="v => setField(activeLocale, 'meta_title', String(v))"
+                />
+              </UFormField>
+              <UFormField label="Meta description">
+                <UInput
+                  :model-value="forms[activeLocale]?.meta_description ?? ''"
+                  @update:model-value="v => setField(activeLocale, 'meta_description', String(v))"
+                />
+              </UFormField>
             </div>
           </details>
-
-          <div class="flex justify-between items-center pt-2 border-t border-(--ui-border)">
-            <div class="text-sm text-(--ui-text-muted)">
-              <template v-if="forms[l.code]?.dirty">Unsaved changes</template>
-              <template v-else-if="forms[l.code]?.loaded">Saved</template>
-              <template v-else>Not translated yet</template>
-            </div>
-            <div class="flex gap-2">
-              <UButton
-                v-if="forms[l.code]?.status === 'published'"
-                variant="outline"
-                color="warning"
-                icon="i-lucide-eye-off"
-                :loading="savingTranslation"
-                @click="setStatus(l.code, 'draft')"
-              >Unpublish</UButton>
-              <UButton
-                variant="outline"
-                color="neutral"
-                :loading="savingTranslation"
-                @click="saveTranslation(l.code)"
-              >Save draft</UButton>
-              <UButton
-                color="primary"
-                icon="i-lucide-globe"
-                :loading="savingTranslation"
-                @click="setStatus(l.code, 'published')"
-              >Publish</UButton>
-            </div>
-          </div>
-        </div>
+        </aside>
       </div>
     </template>
 
