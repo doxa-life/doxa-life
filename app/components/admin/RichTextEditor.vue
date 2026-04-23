@@ -119,6 +119,13 @@ function insertUupgsList() {
   editor.value?.chain().focus().insertContent({ type: 'uupgsList' }).run()
 }
 
+function insertVerse() {
+  editor.value?.chain().focus().insertContent({
+    type: 'verse',
+    content: [{ type: 'paragraph' }]
+  }).run()
+}
+
 // Clicks on the padding area around the ProseMirror content don't move
 // the cursor by default. Forward those clicks to the editor and focus
 // at end-of-doc so the click anywhere inside the body area starts editing.
@@ -156,6 +163,7 @@ function onBodyClick(e: MouseEvent) {
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-image" aria-label="Image" :loading="uploading" @click="insertImage" />
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-youtube" aria-label="YouTube" @click="insertYoutube" />
       <UButton size="xs" variant="ghost" :color="isActive('uupgsList') ? 'primary' : 'neutral'" icon="i-lucide-globe" label="UUPG list" aria-label="Insert UUPG list" @click="insertUupgsList" />
+      <UButton size="xs" variant="ghost" :color="isActive('verse') ? 'primary' : 'neutral'" icon="i-lucide-book-open" label="Verse" aria-label="Insert verse" @click="insertVerse" />
       <div class="w-px bg-(--ui-border) mx-1" />
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-undo-2" aria-label="Undo" @click="cmd(e => e.chain().focus().undo().run())" />
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-redo-2" aria-label="Redo" @click="cmd(e => e.chain().focus().redo().run())" />
@@ -219,5 +227,52 @@ function onBodyClick(e: MouseEvent) {
   font-size: 0.75rem;
   color: var(--ui-text-muted);
   font-family: var(--ui-font-mono, ui-monospace, monospace);
+}
+
+.tiptap-body :deep(.doxa-verse--editor) {
+  background-color: var(--color-surface-brand, var(--ui-primary));
+  color: #fff;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+.tiptap-body :deep(.doxa-verse__ref-bar) {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+.tiptap-body :deep(.doxa-verse__ref-input) {
+  flex: 1;
+  max-width: 280px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.625rem;
+  font: inherit;
+  outline: none;
+}
+.tiptap-body :deep(.doxa-verse__ref-input::placeholder) {
+  color: rgba(255, 255, 255, 0.6);
+}
+.tiptap-body :deep(.doxa-verse__ref-input:focus) {
+  border-color: rgba(255, 255, 255, 0.6);
+}
+.tiptap-body :deep(.doxa-verse__content p) {
+  text-align: center;
+  color: #fff;
+  margin: 0.5rem 0;
+}
+.tiptap-body :deep(.doxa-verse__content p:first-child) { margin-top: 0; }
+.tiptap-body :deep(.doxa-verse__content p:last-child) { margin-bottom: 0; }
+.tiptap-body :deep(.doxa-verse__citation) {
+  text-align: right;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8rem;
+  font-style: italic;
+  margin-top: 0.5rem;
 }
 </style>
