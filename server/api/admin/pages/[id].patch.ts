@@ -4,6 +4,7 @@ import { defineEventHandler, getRouterParam, readBody, createError } from 'h3'
 import { requirePermission } from '../../../utils/rbac'
 import { db } from '../../../utils/database'
 import { logUpdate } from '../../../utils/activity-logger'
+import { purgeCmsPage } from '../../../utils/cmsCache'
 
 export default defineEventHandler(async (event) => {
   await requirePermission(event, 'pages.manage')
@@ -53,6 +54,7 @@ export default defineEventHandler(async (event) => {
       .returningAll()
       .executeTakeFirstOrThrow()
     logUpdate('pages', id, event, { changes: set })
+    await purgeCmsPage(updated.slug)
     return updated
   } catch (e: any) {
     if (e?.code === '23505') {

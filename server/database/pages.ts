@@ -19,6 +19,15 @@ export interface LocalizedPage {
   requestedLocale: string
 }
 
+export async function getPageSlug(id: string): Promise<string | null> {
+  const row = await db
+    .selectFrom('pages')
+    .select('slug')
+    .where('id', '=', id)
+    .executeTakeFirst()
+  return row?.slug ?? null
+}
+
 export async function listPages(): Promise<Page[]> {
   return db
     .selectFrom('pages')

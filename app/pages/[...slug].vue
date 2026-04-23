@@ -66,8 +66,7 @@ const { data, error } = await useAsyncData<PageResponse | null>(
       if (e?.statusCode === 404) return null
       throw e
     }
-  },
-  { watch: [() => slug.value, () => locale.value] }
+  }
 )
 
 if (!data.value && !error.value) {

@@ -5,6 +5,7 @@ import { requirePermission } from '../../../utils/rbac'
 import { deletePage } from '../../../database/pages'
 import { db } from '../../../utils/database'
 import { logDelete } from '../../../utils/activity-logger'
+import { purgeCmsPage } from '../../../utils/cmsCache'
 
 export default defineEventHandler(async (event) => {
   await requirePermission(event, 'pages.manage')
@@ -20,5 +21,6 @@ export default defineEventHandler(async (event) => {
 
   await deletePage(id)
   logDelete('pages', id, event, { slug: existing.slug })
+  await purgeCmsPage(existing.slug)
   return { ok: true }
 })

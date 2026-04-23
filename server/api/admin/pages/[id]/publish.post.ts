@@ -2,9 +2,10 @@
 
 import { defineEventHandler, getRouterParam, readBody, createError } from 'h3'
 import { requirePermission } from '../../../../utils/rbac'
-import { setTranslationStatus } from '../../../../database/pages'
+import { setTranslationStatus, getPageSlug } from '../../../../database/pages'
 import { ENABLED_LANGUAGE_CODES } from '../../../../../config/languages'
 import { logUpdate } from '../../../../utils/activity-logger'
+import { purgeCmsPage } from '../../../../utils/cmsCache'
 
 interface Body {
   locale?: string
@@ -31,5 +32,7 @@ export default defineEventHandler(async (event) => {
     event: status === 'published' ? 'PUBLISH' : 'UNPUBLISH',
     locale
   })
+  const slug = await getPageSlug(id)
+  if (slug) await purgeCmsPage(slug, [locale])
   return { ok: true }
 })
