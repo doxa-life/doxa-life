@@ -18,6 +18,9 @@ logs
 .fleet
 .idea
 
+# Plugin-local CLAUDE.md files are kept on disk for Claude context but not tracked
+public/plugins/**/CLAUDE.md
+
 # Local env files
 .env
 .env.*

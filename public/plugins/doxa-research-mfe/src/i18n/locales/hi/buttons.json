@@ -1,0 +1,24 @@
+{
+  "prayForThem": "उनके लिए प्रार्थना करें",
+  "adoptThem": "उन्हें गोद लें",
+  "moreInfo": "अधिक जानकारी",
+  "zoomIn": "ज़ूम इन",
+  "zoomOut": "ज़ूम आउट",
+  "switchToLightMode": "लाइट मोड पर जाएं",
+  "switchToDarkMode": "डार्क मोड पर जाएं",
+  "resetView": "दृश्य रीसेट करें",
+  "toggleFullscreen": "फ़ुलस्क्रीन टॉगल करें",
+  "aboutThisMap": "इस मानचित्र के बारे में",
+  "closeMenu": "मेनू बंद करें",
+  "reloadMap": "मानचित्र पुनः लोड करें",
+  "showClusters": "क्लस्टर दिखाएं",
+  "clusterSettings": "क्लस्टर सेटिंग्स",
+  "startAutoFly": "ऑटो फ्लाई शुरू करें",
+  "stopFlight": "उड़ान रोकें",
+  "speedLabel": "गति:",
+  "speedOption": {
+    "slow": "धीमी",
+    "normal": "सामान्य",
+    "fast": "तेज़"
+  }
+}

@@ -35,8 +35,6 @@ const prayFeedbackConfig = JSON.stringify({
   projectId: '809ee16b-46e2-4bcd-a93d-b7ea0879d93d'
 })
 
-useDoxaMap()
-
 useTextHighlight()
 </script>
 
@@ -196,12 +194,11 @@ useTextHighlight()
     <section>
       <div class="container stack stack--lg">
         <h2>{{ t('Prayer Progress') }}</h2>
-        <div class="doxa-map-slot rounded-md">
-          <doxa-map id="pray-map" :profile-config="prayMapConfig" />
+        <DoxaMapSlot map-id="pray-map" :profile-config="prayMapConfig" class="rounded-md">
           <div class="feedback-widget-slot feedback-widget-slot--pray">
             <feedback-widget :profile-config="prayFeedbackConfig" />
           </div>
-        </div>
+        </DoxaMapSlot>
       </div>
     </section>
 

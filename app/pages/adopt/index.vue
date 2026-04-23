@@ -37,8 +37,6 @@ const adoptFeedbackConfig = JSON.stringify({
   projectId: 'dd1d9144-3da9-4a3b-87e8-7c17d9e94af0'
 })
 
-useDoxaMap()
-
 useTextHighlight()
 </script>
 
@@ -90,12 +88,11 @@ useTextHighlight()
           data-highlight-color="primary"
         >{{ t('Adoption Progress') }}</h1>
       </div>
-      <div class="doxa-map-slot rounded-md">
-        <doxa-map id="adopt-map" :profile-config="adoptMapConfig" />
+      <DoxaMapSlot map-id="adopt-map" :profile-config="adoptMapConfig" class="rounded-md">
         <div class="feedback-widget-slot feedback-widget-slot--adopt">
           <feedback-widget :profile-config="adoptFeedbackConfig" />
         </div>
-      </div>
+      </DoxaMapSlot>
     </section>
 
     <section class="surface-brand-light">

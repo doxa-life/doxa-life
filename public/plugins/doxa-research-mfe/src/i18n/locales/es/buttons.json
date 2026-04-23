@@ -1,0 +1,24 @@
+{
+  "prayForThem": "Ora por ellos",
+  "adoptThem": "Adóptalos",
+  "moreInfo": "Más información",
+  "zoomIn": "Acercar",
+  "zoomOut": "Alejar",
+  "switchToLightMode": "Cambiar a modo claro",
+  "switchToDarkMode": "Cambiar a modo oscuro",
+  "resetView": "Restablecer vista",
+  "toggleFullscreen": "Alternar pantalla completa",
+  "aboutThisMap": "Acerca de este mapa",
+  "closeMenu": "Cerrar menú",
+  "reloadMap": "Recargar mapa",
+  "showClusters": "Mostrar clústeres",
+  "clusterSettings": "Ajustes de clústeres",
+  "startAutoFly": "Iniciar vuelo automático",
+  "stopFlight": "Detener vuelo",
+  "speedLabel": "Velocidad:",
+  "speedOption": {
+    "slow": "Lenta",
+    "normal": "Normal",
+    "fast": "Rápida"
+  }
+}
