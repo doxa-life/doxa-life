@@ -4,10 +4,24 @@ const { hasPermission } = usePermissions()
 const route = useRoute()
 const mobileOpen = ref(false)
 
-const navItems = computed(() => [
+interface NavItem {
+  to: string
+  label: string
+  icon: string
+  children?: Array<{ to: string; label: string }>
+}
+
+const navItems = computed<NavItem[]>(() => [
   { to: '/admin', label: 'Dashboard', icon: 'i-lucide-layout-dashboard' },
   ...(hasPermission('pages.view')
-    ? [{ to: '/admin/pages', label: 'Pages', icon: 'i-lucide-file-text' }]
+    ? [{
+        to: '/admin/pages',
+        label: 'Pages',
+        icon: 'i-lucide-file-text',
+        children: [
+          { to: '/admin/pages/categories', label: 'Categories' }
+        ]
+      }]
     : []),
   ...(hasPermission('users.view')
     ? [{ to: '/admin/users', label: 'Users', icon: 'i-lucide-users' }]
@@ -21,6 +35,15 @@ const isActive = (to: string) => {
   if (to === '/admin') return route.path === '/admin'
   return route.path === to || route.path.startsWith(to + '/')
 }
+
+// A parent row is "expanded" when the user is somewhere inside its
+// section — keeps the submenu visible on the category pages.
+const isExpanded = (item: NavItem) => {
+  if (!item.children?.length) return false
+  return isActive(item.to)
+}
+
+const isExactActive = (to: string) => route.path === to || route.path.startsWith(to + '/')
 
 watch(() => route.path, () => {
   mobileOpen.value = false
@@ -54,18 +77,31 @@ watch(() => route.path, () => {
           <h1 class="text-xl font-semibold">Admin</h1>
         </div>
         <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          <NuxtLink
-            v-for="item in navItems"
-            :key="item.to"
-            :to="item.to"
-            class="flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors"
-            :class="isActive(item.to)
-              ? 'bg-(--ui-bg-accented) text-(--ui-text) font-medium'
-              : 'text-(--ui-text-muted) hover:bg-(--ui-bg-accented) hover:text-(--ui-text)'"
-          >
-            <UIcon :name="item.icon" class="size-5 shrink-0" />
-            <span>{{ item.label }}</span>
-          </NuxtLink>
+          <template v-for="item in navItems" :key="item.to">
+            <NuxtLink
+              :to="item.to"
+              class="flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors"
+              :class="isActive(item.to)
+                ? 'bg-(--ui-bg-accented) text-(--ui-text) font-medium'
+                : 'text-(--ui-text-muted) hover:bg-(--ui-bg-accented) hover:text-(--ui-text)'"
+            >
+              <UIcon :name="item.icon" class="size-5 shrink-0" />
+              <span>{{ item.label }}</span>
+            </NuxtLink>
+            <div v-if="isExpanded(item)" class="ml-8 mt-1 space-y-1">
+              <NuxtLink
+                v-for="child in item.children"
+                :key="child.to"
+                :to="child.to"
+                class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors"
+                :class="isExactActive(child.to)
+                  ? 'bg-(--ui-bg-accented) text-(--ui-text) font-medium'
+                  : 'text-(--ui-text-muted) hover:bg-(--ui-bg-accented) hover:text-(--ui-text)'"
+              >
+                <span>{{ child.label }}</span>
+              </NuxtLink>
+            </div>
+          </template>
         </nav>
         <div class="border-t border-(--ui-border) px-4 py-4 space-y-2">
           <div class="text-sm text-(--ui-text-muted) truncate">
@@ -96,18 +132,31 @@ watch(() => route.path, () => {
               />
             </div>
             <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-              <NuxtLink
-                v-for="item in navItems"
-                :key="item.to"
-                :to="item.to"
-                class="flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors"
-                :class="isActive(item.to)
-                  ? 'bg-(--ui-bg-accented) text-(--ui-text) font-medium'
-                  : 'text-(--ui-text-muted) hover:bg-(--ui-bg-accented) hover:text-(--ui-text)'"
-              >
-                <UIcon :name="item.icon" class="size-5 shrink-0" />
-                <span>{{ item.label }}</span>
-              </NuxtLink>
+              <template v-for="item in navItems" :key="item.to">
+                <NuxtLink
+                  :to="item.to"
+                  class="flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors"
+                  :class="isActive(item.to)
+                    ? 'bg-(--ui-bg-accented) text-(--ui-text) font-medium'
+                    : 'text-(--ui-text-muted) hover:bg-(--ui-bg-accented) hover:text-(--ui-text)'"
+                >
+                  <UIcon :name="item.icon" class="size-5 shrink-0" />
+                  <span>{{ item.label }}</span>
+                </NuxtLink>
+                <div v-if="isExpanded(item)" class="ml-8 mt-1 space-y-1">
+                  <NuxtLink
+                    v-for="child in item.children"
+                    :key="child.to"
+                    :to="child.to"
+                    class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors"
+                    :class="isExactActive(child.to)
+                      ? 'bg-(--ui-bg-accented) text-(--ui-text) font-medium'
+                      : 'text-(--ui-text-muted) hover:bg-(--ui-bg-accented) hover:text-(--ui-text)'"
+                  >
+                    <span>{{ child.label }}</span>
+                  </NuxtLink>
+                </div>
+              </template>
             </nav>
             <div class="border-t border-(--ui-border) px-4 py-4 space-y-2">
               <div class="text-sm text-(--ui-text-muted) truncate">
