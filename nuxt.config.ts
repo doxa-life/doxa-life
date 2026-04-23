@@ -89,12 +89,17 @@ export default defineNuxtConfig({
     devStorage: {
       cache: { driver: 'memory' }
     },
-    // Production: persist the `cache` mount to disk so defineCachedEventHandler
-    // entries survive process restarts and redeploys. Purges (see
-    // server/utils/cmsCache.ts) remain fast; disk I/O here is a single fs
-    // write per cache entry. `.cache/` is gitignored.
+    // Production: in-process memory driver. Railway runs a single
+    // container and doesn't guarantee `./.cache/` persistence in a way
+    // Nitro's fs driver can rely on — it behaves like a serverless fs
+    // (writes succeed locally but reads silently miss), making
+    // defineCachedEventHandler a no-op in prod. Memory is the simplest
+    // correct driver for single-replica hosts: cache lives for the life
+    // of the process, gets cleared on deploy (fine — content re-warms
+    // on first visit). Swap to a shared driver (e.g. Redis on Railway)
+    // if the service ever scales to >1 replica.
     storage: {
-      cache: { driver: 'fs', base: './.cache' }
+      cache: { driver: 'memory' }
     },
     prerender: {
       // CMS pages (catch-all [...slug]) are rendered live per request so
