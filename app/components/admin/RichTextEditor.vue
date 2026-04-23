@@ -11,18 +11,7 @@
 
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import type { Editor } from '@tiptap/core'
-import StarterKit from '@tiptap/starter-kit'
-import Image from '@tiptap/extension-image'
-import TextAlign from '@tiptap/extension-text-align'
-import { TextStyle } from '@tiptap/extension-text-style'
-import Color from '@tiptap/extension-color'
-import Highlight from '@tiptap/extension-highlight'
-import Typography from '@tiptap/extension-typography'
-import Subscript from '@tiptap/extension-subscript'
-import Superscript from '@tiptap/extension-superscript'
-import Youtube from '@tiptap/extension-youtube'
-import { Div } from '~/utils/tiptapDiv'
-import { UupgsListNode } from '~/utils/tiptapUupgsList'
+import { buildTiptapExtensions } from '~/utils/tiptapExtensions'
 import { uploadImage } from '~/composables/useImageUpload'
 
 const props = withDefaults(defineProps<{
@@ -41,20 +30,7 @@ const uploading = ref(false)
 
 const editor = useEditor({
   content: props.modelValue,
-  extensions: [
-    StarterKit.configure({ link: { openOnClick: false, autolink: true } }),
-    Image,
-    TextAlign.configure({ types: ['heading', 'paragraph'] }),
-    TextStyle,
-    Color,
-    Highlight,
-    Typography,
-    Subscript,
-    Superscript,
-    Youtube,
-    Div,
-    UupgsListNode
-  ],
+  extensions: buildTiptapExtensions(),
   onUpdate({ editor: e }) {
     emit('update:modelValue', e.getJSON())
   }

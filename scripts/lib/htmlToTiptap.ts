@@ -11,33 +11,9 @@ import { JSDOM } from 'jsdom'
 // same logic @tiptap/html runs, just with a DOM we control.
 import { getSchema } from '@tiptap/core'
 import { DOMParser as ProseMirrorDOMParser } from 'prosemirror-model'
-import StarterKit from '@tiptap/starter-kit'
-import Image from '@tiptap/extension-image'
-import TextAlign from '@tiptap/extension-text-align'
-import { TextStyle } from '@tiptap/extension-text-style'
-import Color from '@tiptap/extension-color'
-import Highlight from '@tiptap/extension-highlight'
-import Typography from '@tiptap/extension-typography'
-import Subscript from '@tiptap/extension-subscript'
-import Superscript from '@tiptap/extension-superscript'
-import Youtube from '@tiptap/extension-youtube'
-import { Div } from '../../app/utils/tiptapDiv'
-import { UupgsListNode } from '../../app/utils/tiptapUupgsList'
+import { buildTiptapExtensions } from '../../app/utils/tiptapExtensions'
 
-const EXTENSIONS = [
-  StarterKit.configure({ link: { openOnClick: false, autolink: true } }),
-  Image,
-  TextAlign.configure({ types: ['heading', 'paragraph'] }),
-  TextStyle,
-  Color,
-  Highlight,
-  Typography,
-  Subscript,
-  Superscript,
-  Youtube,
-  Div,
-  UupgsListNode
-]
+const EXTENSIONS = buildTiptapExtensions()
 
 // @tiptap/html ultimately calls prosemirror-model's DOMParser which
 // expects a global `window`/`document`. In Bun/Node we provide one via
