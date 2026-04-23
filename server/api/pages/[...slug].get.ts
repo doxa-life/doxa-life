@@ -11,8 +11,9 @@
 import { defineEventHandler, getRouterParam, getQuery, createError } from 'h3'
 import { getPageBySlug, getChildTranslations } from '../../database/pages'
 import { renderTiptap } from '../../utils/renderTiptap'
+import { ENABLED_LANGUAGE_CODES } from '../../../config/languages'
 
-const ENABLED_LOCALES = new Set(['en', 'es', 'fr', 'pt', 'ar', 'ru'])
+const ENABLED_LOCALES = new Set(ENABLED_LANGUAGE_CODES)
 
 export default defineEventHandler(async (event) => {
   const raw = getRouterParam(event, 'slug')
