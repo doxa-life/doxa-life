@@ -100,6 +100,10 @@ function insertYoutube() {
   editor.value?.commands.setYoutubeVideo({ src: url })
 }
 
+function insertUupgsList() {
+  editor.value?.chain().focus().insertContent({ type: 'uupgsList' }).run()
+}
+
 // Clicks on the padding area around the ProseMirror content don't move
 // the cursor by default. Forward those clicks to the editor and focus
 // at end-of-doc so the click anywhere inside the body area starts editing.
@@ -136,6 +140,7 @@ function onBodyClick(e: MouseEvent) {
       <UButton size="xs" variant="ghost" :color="isActive('link') ? 'primary' : 'neutral'" icon="i-lucide-link" aria-label="Link" @click="promptForLink" />
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-image" aria-label="Image" :loading="uploading" @click="insertImage" />
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-youtube" aria-label="YouTube" @click="insertYoutube" />
+      <UButton size="xs" variant="ghost" :color="isActive('uupgsList') ? 'primary' : 'neutral'" icon="i-lucide-globe" label="UUPG list" aria-label="Insert UUPG list" @click="insertUupgsList" />
       <div class="w-px bg-(--ui-border) mx-1" />
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-undo-2" aria-label="Undo" @click="cmd(e => e.chain().focus().undo().run())" />
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-redo-2" aria-label="Redo" @click="cmd(e => e.chain().focus().redo().run())" />
@@ -170,4 +175,34 @@ function onBodyClick(e: MouseEvent) {
 .tiptap-body :deep(img) { max-width: 100%; height: auto; border-radius: 0.375rem; }
 .tiptap-body :deep(iframe) { max-width: 100%; }
 .tiptap-body :deep(.ProseMirror:focus) { outline: none; }
+
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip) {
+  display: block;
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px dashed var(--ui-border-accented, var(--ui-border));
+  border-radius: 0.5rem;
+  background: var(--ui-bg-elevated);
+  color: var(--ui-text);
+  user-select: none;
+  cursor: grab;
+}
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip.is-selected) {
+  outline: 2px solid var(--ui-primary);
+  outline-offset: 1px;
+}
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip__header) {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip__icon) { font-size: 1rem; }
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip__detail) {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--ui-text-muted);
+  font-family: var(--ui-font-mono, ui-monospace, monospace);
+}
 </style>
