@@ -35,8 +35,6 @@ const homeFeedbackConfig = JSON.stringify({
   projectId: '7bb8f5ba-eb45-4933-89de-bc93fcda09b2'
 })
 
-useDoxaMap()
-
 useTextHighlight()
 </script>
 
@@ -77,12 +75,11 @@ useTextHighlight()
           data-highlight-color="primary"
         >{{ t('Unengaged peoples around the world') }}</h1>
       </div>
-      <div class="doxa-map-slot rounded-xlg">
-        <doxa-map id="home-map" :profile-config="homeMapConfig" />
+      <DoxaMapSlot map-id="home-map" :profile-config="homeMapConfig" class="rounded-xlg">
         <div class="feedback-widget-slot feedback-widget-slot--home">
           <feedback-widget :profile-config="homeFeedbackConfig" />
         </div>
-      </div>
+      </DoxaMapSlot>
     </section>
 
     <section class="stack stack--md | surface-brand-light">

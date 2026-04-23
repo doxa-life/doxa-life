@@ -1,0 +1,35 @@
+{
+  "title": {
+    "prayer": "प्रार्थना प्रगति",
+    "engagement": "सहभागिता प्रगति",
+    "adoption": "गोद लेने की प्रगति",
+    "languageFamilies": "भाषा परिवार",
+    "doxaRegions": "Doxa क्षेत्र",
+    "affinityBlocs": "समानता समूह",
+    "gospelResources": "सुसमाचार संसाधन"
+  },
+  "header": {
+    "collapsed": "किंवदंती",
+    "peopleGroupFallback": "जनजाति समूह"
+  },
+  "prayer": {
+    "needsPrayer": "प्रार्थना चाहिए",
+    "hasPrayer": "प्रार्थना है",
+    "fullPrayerCoverage": "पूर्ण प्रार्थना कवरेज"
+  },
+  "engagement": {
+    "needsEngagement": "सहभागिता चाहिए",
+    "hasEngagement": "सहभागिता है"
+  },
+  "adoption": {
+    "needsAdoption": "गोद लेना चाहिए",
+    "hasAdoption": "गोद लिया गया"
+  },
+  "columns": {
+    "upgs": "UPGs",
+    "population": "जनसंख्या"
+  },
+  "footer": {
+    "total": "कुल"
+  }
+}

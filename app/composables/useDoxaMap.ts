@@ -7,7 +7,8 @@
 
 const MAPBOX_JS = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js'
 const MAPBOX_GEOCODER_JS = 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js'
-const MAP_APP_JS = '/assets/map-app/map-app.iife.js'
+const MAP_APP_JS = '/plugins/doxa-simple-map-mfe/app/map-app.iife.js'
+const MAP_APP_CSS = '/plugins/doxa-simple-map-mfe/app/map-app.css'
 const FEEDBACK_WIDGET_JS = '/assets/feedback-widget/feedback-widget.iife.js'
 
 function loadScript(src: string): Promise<void> {
@@ -33,8 +34,7 @@ export function useDoxaMap() {
     link: [
       { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css' },
       { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css' },
-      { rel: 'stylesheet', href: '/assets/map-app/map-app.css' },
-      { rel: 'stylesheet', href: '/assets/map-app/map-app-slot.css' },
+      { rel: 'stylesheet', href: MAP_APP_CSS },
       { rel: 'stylesheet', href: '/assets/feedback-widget/feedback-widget-slot.css' },
       { rel: 'stylesheet', href: '/assets/feedback-widget/feedback-widget-map.css' }
     ]

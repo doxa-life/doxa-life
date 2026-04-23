@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>doxa-research-mfe — dev preview</title>
+  <link rel="icon" href="data:,">
+
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #0f1216;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #e7ebf0;
+    }
+
+    .page {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100vh;
+    }
+
+    .toolbar {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: #171b21;
+      border-bottom: 1px solid #1f2937;
+      font-size: 13px;
+    }
+
+    .toolbar label { color: #94a3b8; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; font-size: 11px; }
+    .toolbar select {
+      background: #1e293b;
+      color: #e7ebf0;
+      border: 1px solid #334155;
+      border-radius: 4px;
+      padding: 6px 10px;
+      font-family: inherit;
+      font-size: 13px;
+      min-width: 220px;
+    }
+    .toolbar .spacer { flex: 1; }
+    .toolbar .hint { color: #64748b; font-size: 11px; }
+
+    .embed-slot {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    doxa-map {
+      display: block;
+      position: absolute;
+      inset: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="toolbar">
+      <label for="profile-select">Profile</label>
+      <select id="profile-select"></select>
+      <span class="spacer"></span>
+      <span class="hint">Each change remounts &lt;doxa-map&gt; with a fresh shadow DOM + Pinia instance.</span>
+    </div>
+    <div class="embed-slot" id="slot"></div>
+  </div>
+
+  <script>
+    // Pulled from .env at dev-server start. Vite replaces %VITE_MAPBOX_TOKEN%
+    // with the value at request time; the .env file is gitignored.
+    const TK = '%VITE_MAPBOX_TOKEN%';
+
+    const PROFILES = {
+      'research-map': { profile: 'research-map', tk: TK, dataSource: 'pray-tools', instanceId: 'research-map-dev' },
+      'ten-tab-map':  { profile: 'ten-tab-map',  tk: TK }
+    };
+
+    const select = document.getElementById('profile-select');
+    const slot = document.getElementById('slot');
+
+    for (const key of Object.keys(PROFILES)) {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = key;
+      select.appendChild(opt);
+    }
+
+    function mount(profileKey) {
+      slot.innerHTML = '';
+      const el = document.createElement('doxa-map');
+      el.setAttribute('profile-config', JSON.stringify(PROFILES[profileKey]));
+      slot.appendChild(el);
+    }
+
+    const LAST_KEY = 'doxa-research-mfe:last-profile';
+    const initial = localStorage.getItem(LAST_KEY) || 'research-map';
+    select.value = PROFILES[initial] ? initial : 'research-map';
+
+    select.addEventListener('change', () => {
+      localStorage.setItem(LAST_KEY, select.value);
+      mount(select.value);
+    });
+
+    mount(select.value);
+  </script>
+
+  <script>
+    window.MAP_APP_API_URL = 'https://pray.doxa.life';
+    window.MAP_APP_BASE_URL = '/';
+  </script>
+  <script type="module" src="/src/entry.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "prayForThem": "Priez pour eux",
+  "adoptThem": "Adoptez-les",
+  "moreInfo": "Plus d'infos",
+  "zoomIn": "Zoom avant",
+  "zoomOut": "Zoom arrière",
+  "switchToLightMode": "Passer au mode clair",
+  "switchToDarkMode": "Passer au mode sombre",
+  "resetView": "Réinitialiser la vue",
+  "toggleFullscreen": "Basculer en plein écran",
+  "aboutThisMap": "À propos de cette carte",
+  "closeMenu": "Fermer le menu",
+  "reloadMap": "Recharger la carte",
+  "showClusters": "Afficher les clusters",
+  "clusterSettings": "Paramètres des clusters",
+  "startAutoFly": "Démarrer le vol auto",
+  "stopFlight": "Arrêter le vol",
+  "speedLabel": "Vitesse :",
+  "speedOption": {
+    "slow": "Lente",
+    "normal": "Normale",
+    "fast": "Rapide"
+  }
+}

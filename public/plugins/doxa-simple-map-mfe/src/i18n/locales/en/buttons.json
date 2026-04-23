@@ -1,0 +1,24 @@
+{
+  "prayForThem": "Pray for them",
+  "adoptThem": "Adopt",
+  "moreInfo": "More info",
+  "zoomIn": "Zoom in",
+  "zoomOut": "Zoom out",
+  "switchToLightMode": "Switch to light mode",
+  "switchToDarkMode": "Switch to dark mode",
+  "resetView": "Reset view",
+  "toggleFullscreen": "Toggle fullscreen",
+  "aboutThisMap": "About this map",
+  "closeMenu": "Close menu",
+  "reloadMap": "Reload Map",
+  "showClusters": "Show Clusters",
+  "clusterSettings": "Cluster Settings",
+  "startAutoFly": "Start Auto Fly",
+  "stopFlight": "Stop Flight",
+  "speedLabel": "Speed:",
+  "speedOption": {
+    "slow": "Slow",
+    "normal": "Normal",
+    "fast": "Fast"
+  }
+}
