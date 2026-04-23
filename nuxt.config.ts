@@ -115,6 +115,7 @@ export default defineNuxtConfig({
     s3AccessKeyId: process.env.S3_ACCESS_KEY_ID || '',
     s3SecretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
     s3BucketName: process.env.S3_BUCKET_NAME || '',
+    s3PublicBaseUrl: process.env.S3_PUBLIC_BASE_URL || '',
     formApiKey: process.env.FORM_API_KEY || '',
     prayBaseUrl: process.env.NUXT_PRAY_BASE_URL || 'https://pray.doxa.life',
     deeplApiKey: process.env.DEEPL_API_KEY || '',

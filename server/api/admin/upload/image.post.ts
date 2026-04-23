@@ -28,6 +28,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const filename = file.filename || 'upload'
-  const result = await uploadToS3(file.data, filename, contentType)
+  const result = await uploadToS3(file.data, filename, contentType, 'public')
   return { url: result.url, key: result.key, filename: result.filename }
 })
