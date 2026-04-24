@@ -35,6 +35,7 @@ watch(() => route.fullPath, close)
   <li
     ref="rootRef"
     class="pll-parent-menu-item menu-item menu-item-has-children"
+    :class="{ 'is-open': isOpen }"
     @mouseenter="isOpen = true"
     @mouseleave="isOpen = false"
   >
