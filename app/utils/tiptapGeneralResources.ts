@@ -1,3 +1,5 @@
+/// <reference lib="dom" />
+
 // Custom Tiptap node for the <general-resources> shortcode/placeholder.
 // Mirrors the UupgsListNode pattern: the editor treats it as an atom
 // block; generateHTML serializes to a neutral placeholder div; the

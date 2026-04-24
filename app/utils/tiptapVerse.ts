@@ -1,3 +1,5 @@
+/// <reference lib="dom" />
+
 // Verse block — styled container for a scripture quotation with an
 // editable reference ("e.g. John 3:16") shown at the top of the block
 // in the editor and rendered as a citation below the text on the
@@ -9,11 +11,11 @@
 // framework-agnostic and `generateHTML` on the server stays Vue-free.
 // The view never runs during `generateHTML`; only the editor mounts it.
 
-import { Node, mergeAttributes } from '@tiptap/core'
+import { Node as TiptapNode, mergeAttributes } from '@tiptap/core'
 
 export const VERSE_CLASS = 'doxa-verse'
 
-export const Verse = Node.create({
+export const Verse = TiptapNode.create({
   name: 'verse',
   group: 'block',
   content: 'block+',
@@ -103,7 +105,7 @@ export const Verse = Node.create({
       }
 
       refInput.addEventListener('blur', commitReference)
-      refInput.addEventListener('keydown', (e) => {
+      refInput.addEventListener('keydown', (e: KeyboardEvent) => {
         if (e.key === 'Enter') {
           e.preventDefault()
           refInput.blur()
@@ -117,7 +119,7 @@ export const Verse = Node.create({
       // the input keeps clipboard + key events local to the input.
       const LOCAL_EVENTS = ['paste', 'copy', 'cut', 'drop', 'dragstart', 'beforeinput', 'input', 'keydown', 'keypress', 'keyup', 'mousedown', 'click'] as const
       for (const ev of LOCAL_EVENTS) {
-        refInput.addEventListener(ev, (e) => e.stopPropagation())
+        refInput.addEventListener(ev, (e: Event) => e.stopPropagation())
       }
 
       return {
