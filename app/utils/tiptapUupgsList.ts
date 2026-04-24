@@ -1,3 +1,5 @@
+/// <reference lib="dom" />
+
 // Custom Tiptap node that preserves the <uupgs-list> Lit custom element
 // across the HTML→JSON→HTML round-trip. WP's [uupg_list] shortcode
 // renders this tag directly into page content; without a Tiptap node

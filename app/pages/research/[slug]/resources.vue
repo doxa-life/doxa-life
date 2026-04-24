@@ -8,7 +8,7 @@
 
 import type { Uupg, ValueLabel } from '~/types/uupg'
 
-interface UupgDetail extends Uupg {
+interface UupgDetail extends Omit<Uupg, 'country_code' | 'rop1'> {
   country_code?: ValueLabel
   rop1?: ValueLabel
   error?: string

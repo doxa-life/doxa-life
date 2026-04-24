@@ -7,7 +7,6 @@
 //      "Edit" button/link don't get hijacked into a drag.
 
 import { ENABLED_LANGUAGES } from '~~/config/languages'
-// @ts-expect-error — vuedraggable ships without type declarations.
 import draggable from 'vuedraggable'
 
 definePageMeta({

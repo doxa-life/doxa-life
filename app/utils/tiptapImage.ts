@@ -1,3 +1,5 @@
+/// <reference lib="dom" />
+
 // Extends @tiptap/extension-image with an `align` attribute so authors
 // can left/center/right-align block images from the editor toolbar. The
 // align value renders as an inline style on the <img> element (instead
