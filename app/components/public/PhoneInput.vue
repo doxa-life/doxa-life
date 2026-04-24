@@ -56,18 +56,7 @@ onMounted(() => {
   if (!inputRef.value) return
   iti = intlTelInput(inputRef.value, {
     initialCountry: (props.initialCountry || undefined) as any,
-    loadUtils: () => new Promise((resolve) => {
-      const w = window as any
-      if (w.intlTelInputUtils) {
-        resolve({ default: w.intlTelInputUtils })
-      } else {
-        const script = document.createElement('script')
-        script.type = 'module'
-        script.src = '/assets/js/intl-tel-input-utils-bundle.js'
-        script.onload = () => resolve({ default: w.intlTelInputUtils })
-        document.body.appendChild(script)
-      }
-    })
+    loadUtils: () => import('intl-tel-input/utils')
   })
   number.value = props.value
 })
