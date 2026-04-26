@@ -89,9 +89,7 @@ useTextHighlight()
         >{{ t('Adoption Progress') }}</h1>
       </div>
       <DoxaMapSlot map-id="adopt-map" :profile-config="adoptMapConfig" class="rounded-md">
-        <div class="feedback-widget-slot feedback-widget-slot--adopt">
-          <feedback-widget :profile-config="adoptFeedbackConfig" />
-        </div>
+        <FeedbackWidgetSlot :profile-config="adoptFeedbackConfig" />
       </DoxaMapSlot>
     </section>
 

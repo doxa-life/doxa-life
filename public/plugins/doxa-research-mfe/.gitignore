@@ -1,7 +1,0 @@
-node_modules/
-dist/
-.env
-*.local
-
-# vite.config.js holds private deploy paths per LL-025; commit vite.config.example.js instead.
-vite.config.js

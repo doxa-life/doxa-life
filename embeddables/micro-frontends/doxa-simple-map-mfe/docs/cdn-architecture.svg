@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 640" width="1100" height="640" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0d1117;border-radius:14px;">
+
+  <!-- Title -->
+  <text x="550" y="38" fill="#e6edf3" font-size="20" font-weight="700" text-anchor="middle">DOXA Maps CDN — Architecture</text>
+  <text x="550" y="58" fill="#8b949e" font-size="12" text-anchor="middle">Map experience extracted into one bundle · Served from doxa.life/js/ · Partners embed maps anywhere with a single &lt;script&gt; tag</text>
+
+  <!-- ══ COLUMN 1: Past Map Apps ══ -->
+  <text x="95" y="90" fill="#8b949e" font-size="13" font-weight="600" text-anchor="middle">Past Map Apps</text>
+  <text x="95" y="106" fill="#555d6b" font-size="10" text-anchor="middle">Vue · Vanilla JS · experience</text>
+
+  <rect x="18" y="116" width="154" height="36" rx="8" fill="#1c2333" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="95" y="139" fill="#c9d1d9" font-size="12" text-anchor="middle">prayer map app</text>
+
+  <rect x="18" y="160" width="154" height="36" rx="8" fill="#1c2333" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="95" y="183" fill="#c9d1d9" font-size="12" text-anchor="middle">adoption map app</text>
+
+  <rect x="18" y="204" width="154" height="36" rx="8" fill="#1c2333" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="95" y="227" fill="#c9d1d9" font-size="12" text-anchor="middle">region map app</text>
+
+  <rect x="18" y="248" width="154" height="36" rx="8" fill="#1c2333" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="95" y="271" fill="#8b949e" font-size="12" text-anchor="middle">+ more…</text>
+
+  <!-- Map Framework informs Template -->
+  <rect x="18" y="300" width="154" height="58" rx="8" fill="#1a0d2e" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="95" y="320" fill="#a78bfa" font-size="11" font-weight="700" text-anchor="middle">Map Framework</text>
+  <text x="95" y="335" fill="#8b949e" font-size="10" text-anchor="middle">patterns &amp; learnings</text>
+  <text x="95" y="350" fill="#555d6b" font-size="10" text-anchor="middle">informs the template ↗</text>
+
+  <!-- Funnel arrows to template -->
+  <line x1="172" y1="134" x2="270" y2="218" stroke="#4a5568" stroke-width="1.5" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.5s" repeatCount="indefinite"/></line>
+  <line x1="172" y1="178" x2="270" y2="230" stroke="#4a5568" stroke-width="1.5" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.5s" repeatCount="indefinite"/></line>
+  <line x1="172" y1="222" x2="270" y2="242" stroke="#4a5568" stroke-width="1.5" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.5s" repeatCount="indefinite"/></line>
+  <line x1="172" y1="266" x2="270" y2="254" stroke="#4a5568" stroke-width="1.5" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.5s" repeatCount="indefinite"/></line>
+  <!-- Map Framework → Template arrow (purple) -->
+  <line x1="172" y1="325" x2="270" y2="200" stroke="#a78bfa" stroke-width="1.8" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.8s" repeatCount="indefinite"/></line>
+  <polygon points="266,193 278,202 264,208" fill="#a78bfa"/>
+
+  <!-- ══ COLUMN 2: Template ══ -->
+  <text x="355" y="90" fill="#8b949e" font-size="13" font-weight="600" text-anchor="middle">Template</text>
+  <text x="355" y="106" fill="#555d6b" font-size="10" text-anchor="middle">distillation of all map apps</text>
+  <rect x="270" y="104" width="170" height="230" rx="12" fill="#161b27" stroke="#58a6ff" stroke-width="2"/>
+  <rect x="270" y="104" width="170" height="230" rx="12" fill="none" stroke="#58a6ff" stroke-width="3" opacity="0">
+    <animate attributeName="opacity" values="0;0.5;0" dur="2.5s" repeatCount="indefinite"/>
+  </rect>
+  <text x="355" y="130" fill="#58a6ff" font-size="13" font-weight="700" text-anchor="middle">map-app-template/</text>
+
+  <rect x="284" y="140" width="142" height="26" rx="5" fill="#1c2333" stroke="#30363d" stroke-width="1"/>
+  <text x="294" y="158" fill="#7dd3fc" font-size="12" font-weight="600">entry.js</text>
+
+  <rect x="284" y="174" width="142" height="26" rx="5" fill="#1c2333" stroke="#30363d" stroke-width="1"/>
+  <text x="294" y="192" fill="#7dd3fc" font-size="12" font-weight="600">ProfileLoader.vue</text>
+  <text x="294" y="207" fill="#555d6b" font-size="10">→ chooses map via prop</text>
+
+  <rect x="284" y="214" width="142" height="26" rx="5" fill="#1c2333" stroke="#30363d" stroke-width="1"/>
+  <text x="294" y="232" fill="#d2a8ff" font-size="12" font-weight="600">app-profiles/</text>
+  <text x="294" y="247" fill="#555d6b" font-size="10">prayer · adopt · region…</text>
+
+  <rect x="284" y="254" width="142" height="26" rx="5" fill="#1c2333" stroke="#30363d" stroke-width="1"/>
+  <text x="294" y="272" fill="#7ee787" font-size="12" font-weight="600">Pinia stores/</text>
+
+  <text x="355" y="320" fill="#58a6ff" font-size="11" text-anchor="middle">npm run build</text>
+
+  <!-- ══ COLUMN 3: Vite Build ══ -->
+  <text x="530" y="90" fill="#8b949e" font-size="13" font-weight="600" text-anchor="middle">Build</text>
+  <line x1="440" y1="240" x2="490" y2="240" stroke="#f59e0b" stroke-width="2.5"/>
+  <polygon points="486,233 502,240 486,247" fill="#f59e0b"/>
+  <rect x="502" y="206" width="56" height="68" rx="10" fill="#1a1505" stroke="#f59e0b" stroke-width="2"/>
+  <text x="530" y="238" fill="#f59e0b" font-size="22" text-anchor="middle" font-weight="700">⚡</text>
+  <text x="530" y="258" fill="#fbbf24" font-size="11" text-anchor="middle" font-weight="700">Vite IIFE</text>
+  <line x1="558" y1="240" x2="608" y2="240" stroke="#f59e0b" stroke-width="2.5"/>
+  <polygon points="604,233 620,240 604,247" fill="#f59e0b"/>
+
+  <circle r="5" fill="#fbbf24"><animateMotion path="M 440,240 L 620,240" dur="1.6s" repeatCount="indefinite" begin="0s"/><animate attributeName="opacity" values="0;1;1;0" dur="1.6s" repeatCount="indefinite"/></circle>
+  <circle r="5" fill="#fbbf24"><animateMotion path="M 440,240 L 620,240" dur="1.6s" repeatCount="indefinite" begin="0.53s"/><animate attributeName="opacity" values="0;1;1;0" dur="1.6s" repeatCount="indefinite" begin="0.53s"/></circle>
+  <circle r="5" fill="#fbbf24"><animateMotion path="M 440,240 L 620,240" dur="1.6s" repeatCount="indefinite" begin="1.06s"/><animate attributeName="opacity" values="0;1;1;0" dur="1.6s" repeatCount="indefinite" begin="1.06s"/></circle>
+
+  <!-- ══ COLUMN 4: JS Bundle ══ -->
+  <text x="700" y="90" fill="#8b949e" font-size="13" font-weight="600" text-anchor="middle">CDN Output</text>
+
+  <rect x="620" y="104" width="160" height="160" rx="12" fill="#0f1a0a" stroke="#4ade80" stroke-width="2"/>
+  <rect x="620" y="104" width="160" height="160" rx="12" fill="none" stroke="#4ade80" stroke-width="3" opacity="0">
+    <animate attributeName="opacity" values="0;0.4;0" dur="2s" begin="0.8s" repeatCount="indefinite"/>
+  </rect>
+
+  <text x="700" y="128" fill="#4ade80" font-size="12" font-weight="700" text-anchor="middle">.js only</text>
+
+  <rect x="634" y="135" width="132" height="24" rx="5" fill="#1c2333" stroke="#4ade80" stroke-width="1"/>
+  <text x="700" y="152" fill="#4ade80" font-size="11" font-weight="700" text-anchor="middle">map-app.iife.js</text>
+
+  <text x="700" y="176" fill="#8b949e" font-size="10" text-anchor="middle">CSS bundled inline into JS</text>
+  <text x="700" y="190" fill="#8b949e" font-size="10" text-anchor="middle">No separate stylesheet</text>
+  <text x="700" y="206" fill="#555d6b" font-size="10" text-anchor="middle">Shadow DOM isolates styles</text>
+  <text x="700" y="222" fill="#555d6b" font-size="10" text-anchor="middle">~220 KB gzipped</text>
+  <text x="700" y="252" fill="#fbbf24" font-size="10" font-weight="700" text-anchor="middle">▲ copied to Nuxt</text>
+  <text x="700" y="266" fill="#fbbf24" font-size="10" text-anchor="middle">public/js/ on each build</text>
+
+  <!-- Nuxt public/js hosting box -->
+  <rect x="620" y="278" width="160" height="72" rx="10" fill="#1a1505" stroke="#f59e0b" stroke-width="1.8"/>
+  <text x="700" y="298" fill="#fbbf24" font-size="11" font-weight="700" text-anchor="middle">doxa.life Nuxt Repo</text>
+  <text x="700" y="313" fill="#8b949e" font-size="10" text-anchor="middle">public/js/map-app.iife.js</text>
+  <text x="700" y="328" fill="#4ade80" font-size="10" font-weight="600" text-anchor="middle">→ doxa.life/js/map-app.iife.js</text>
+  <text x="700" y="343" fill="#555d6b" font-size="10" text-anchor="middle">Nuxt serves it as static CDN</text>
+
+  <!-- Application profiles note -->
+  <rect x="620" y="364" width="160" height="76" rx="10" fill="#0d1a2e" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="700" y="383" fill="#a78bfa" font-size="11" font-weight="700" text-anchor="middle">Application Profiles</text>
+  <text x="700" y="398" fill="#8b949e" font-size="10" text-anchor="middle">One bundle · many map types</text>
+  <text x="700" y="413" fill="#8b949e" font-size="10" text-anchor="middle">Each profile = its own</text>
+  <text x="700" y="427" fill="#8b949e" font-size="10" text-anchor="middle">"main class" chosen via prop</text>
+
+  <!-- Fan-out lines to deploy -->
+  <line x1="780" y1="140" x2="858" y2="120" stroke="#4ade80" stroke-width="1.8" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-20" dur="1.2s" repeatCount="indefinite"/></line>
+  <line x1="780" y1="155" x2="858" y2="240" stroke="#4ade80" stroke-width="1.8" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-20" dur="1.2s" begin="0.2s" repeatCount="indefinite"/></line>
+  <line x1="780" y1="170" x2="858" y2="360" stroke="#4ade80" stroke-width="1.8" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-20" dur="1.2s" begin="0.4s" repeatCount="indefinite"/></line>
+  <line x1="780" y1="185" x2="858" y2="480" stroke="#4ade80" stroke-width="1.8" stroke-dasharray="6 4"><animate attributeName="stroke-dashoffset" from="0" to="-20" dur="1.2s" begin="0.6s" repeatCount="indefinite"/></line>
+
+  <circle r="4" fill="#4ade80"><animateMotion path="M 780,140 L 858,120" dur="1s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;0" dur="1s" repeatCount="indefinite"/></circle>
+  <circle r="4" fill="#4ade80"><animateMotion path="M 780,155 L 858,240" dur="1s" repeatCount="indefinite" begin="0.25s"/><animate attributeName="opacity" values="0;1;0" dur="1s" repeatCount="indefinite" begin="0.25s"/></circle>
+  <circle r="4" fill="#4ade80"><animateMotion path="M 780,170 L 858,360" dur="1s" repeatCount="indefinite" begin="0.5s"/><animate attributeName="opacity" values="0;1;0" dur="1s" repeatCount="indefinite" begin="0.5s"/></circle>
+  <circle r="4" fill="#4ade80"><animateMotion path="M 780,185 L 858,480" dur="1s" repeatCount="indefinite" begin="0.75s"/><animate attributeName="opacity" values="0;1;0" dur="1s" repeatCount="indefinite" begin="0.75s"/></circle>
+
+  <!-- ══ COLUMN 5: Deploy ══ -->
+  <text x="940" y="90" fill="#8b949e" font-size="13" font-weight="600" text-anchor="middle">Deploy Anywhere</text>
+  <text x="940" y="106" fill="#555d6b" font-size="10" text-anchor="middle">doxa.life/js/ enables DOXA Maps CDN</text>
+
+  <!-- Card 1 -->
+  <rect x="858" y="84" width="164" height="92" rx="10" fill="#0d1a30" stroke="#3b82f6" stroke-width="2"/>
+  <text x="940" y="112" fill="#60a5fa" font-size="11" font-weight="700" text-anchor="middle">profile: "prayer"</text>
+  <text x="940" y="130" fill="#e6edf3" font-size="13" font-weight="600" text-anchor="middle">Pray Page</text>
+  <text x="940" y="148" fill="#8b949e" font-size="10" text-anchor="middle">prayer coverage map</text>
+  <text x="940" y="165" fill="#555d6b" font-size="10" text-anchor="middle">doxa.life/pray</text>
+
+  <!-- Card 2 -->
+  <rect x="858" y="200" width="164" height="92" rx="10" fill="#0d1f1a" stroke="#10b981" stroke-width="2"/>
+  <text x="940" y="228" fill="#34d399" font-size="11" font-weight="700" text-anchor="middle">profile: "adoption"</text>
+  <text x="940" y="246" fill="#e6edf3" font-size="13" font-weight="600" text-anchor="middle">Adopt Page</text>
+  <text x="940" y="264" fill="#8b949e" font-size="10" text-anchor="middle">adoption progress map</text>
+  <text x="940" y="281" fill="#555d6b" font-size="10" text-anchor="middle">doxa.life/adopt</text>
+
+  <!-- Card 3 -->
+  <rect x="858" y="320" width="164" height="92" rx="10" fill="#1a0d2e" stroke="#a78bfa" stroke-width="2"/>
+  <text x="940" y="348" fill="#c4b5fd" font-size="11" font-weight="700" text-anchor="middle">profile: "engagement"</text>
+  <text x="940" y="366" fill="#e6edf3" font-size="13" font-weight="600" text-anchor="middle">Home Page</text>
+  <text x="940" y="384" fill="#8b949e" font-size="10" text-anchor="middle">engagement overview</text>
+  <text x="940" y="401" fill="#555d6b" font-size="10" text-anchor="middle">doxa.life</text>
+
+  <!-- Card 4 -->
+  <rect x="858" y="440" width="164" height="92" rx="10" fill="#1a1505" stroke="#f59e0b" stroke-width="2"/>
+  <text x="940" y="466" fill="#fbbf24" font-size="11" font-weight="700" text-anchor="middle">profile: "custom"</text>
+  <text x="940" y="484" fill="#e6edf3" font-size="13" font-weight="600" text-anchor="middle">DOXA Partners</text>
+  <text x="940" y="502" fill="#8b949e" font-size="10" text-anchor="middle">embed on any partner site</text>
+  <text x="940" y="519" fill="#555d6b" font-size="10" text-anchor="middle">multiplying map instances</text>
+
+  <!-- Bottom embed snippet banner -->
+  <rect x="18" y="580" width="1064" height="50" rx="10" fill="#0f1a0f" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="550" y="599" fill="#4ade80" font-size="13" font-weight="700" text-anchor="middle">&lt;script src="https://doxa.life/js/map-app.iife.js"&gt;&lt;/script&gt;</text>
+  <text x="550" y="618" fill="#c9d1d9" font-size="11" text-anchor="middle">&lt;doxa-map profile-config='{"profile":"prayer","tk":"…"}' /&gt;  ·  CSS inline in JS · Nuxt public/js/ folder serves the CDN  ·  Update once → all partner maps update</text>
+
+</svg>
