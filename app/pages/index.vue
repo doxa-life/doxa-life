@@ -76,9 +76,7 @@ useTextHighlight()
         >{{ t('Unengaged peoples around the world') }}</h1>
       </div>
       <DoxaMapSlot map-id="home-map" :profile-config="homeMapConfig" class="rounded-xlg">
-        <div class="feedback-widget-slot feedback-widget-slot--home">
-          <feedback-widget :profile-config="homeFeedbackConfig" />
-        </div>
+        <FeedbackWidgetSlot :profile-config="homeFeedbackConfig" />
       </DoxaMapSlot>
     </section>
 

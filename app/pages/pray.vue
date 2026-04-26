@@ -195,9 +195,7 @@ useTextHighlight()
       <div class="container stack stack--lg">
         <h2>{{ t('Prayer Progress') }}</h2>
         <DoxaMapSlot map-id="pray-map" :profile-config="prayMapConfig" class="rounded-md">
-          <div class="feedback-widget-slot feedback-widget-slot--pray">
-            <feedback-widget :profile-config="prayFeedbackConfig" />
-          </div>
+          <FeedbackWidgetSlot :profile-config="prayFeedbackConfig" />
         </DoxaMapSlot>
       </div>
     </section>

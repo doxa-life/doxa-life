@@ -2,6 +2,10 @@
 import { generateI18nLocales } from './config/languages'
 
 export default defineNuxtConfig({
+  // Embeddables (micro-frontends + web-components) have their own Vite builds —
+  // Nuxt must not watch or scan their source trees.
+  ignore: ['embeddables/**'],
+
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui',
@@ -52,11 +56,10 @@ export default defineNuxtConfig({
       link: [
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon/cropped-Favicon-light-doxa-01-32x32.png' },
         { rel: 'icon', type: 'image/png', sizes: '192x192', href: '/favicon/cropped-Favicon-light-doxa-01-192x192.png' },
-        { rel: 'apple-touch-icon', href: '/favicon/cropped-Favicon-light-doxa-01-180x180.png' },
-        { rel: 'stylesheet', href: '/assets/feedback-widget/feedback-widget-slot.css' }
+        { rel: 'apple-touch-icon', href: '/favicon/cropped-Favicon-light-doxa-01-180x180.png' }
       ],
       script: [
-        { src: '/assets/feedback-widget/feedback-widget.iife.js', defer: true }
+        { src: 'https://support.gospelambition.org/js/feedback-web-component.iife.js' }
       ],
       meta: [
         { name: 'msapplication-TileImage', content: '/favicon/cropped-Favicon-light-doxa-01-270x270.png' }
@@ -134,7 +137,7 @@ export default defineNuxtConfig({
 
   vue: {
     compilerOptions: {
-      isCustomElement: (tag: string) => ['doxa-map', 'feedback-widget'].includes(tag)
+      isCustomElement: (tag: string) => ['doxa-map', 'feedback-web-component'].includes(tag)
     }
   },
 
@@ -148,7 +151,7 @@ export default defineNuxtConfig({
     vue: {
       template: {
         compilerOptions: {
-          isCustomElement: (tag: string) => ['doxa-map', 'feedback-widget'].includes(tag)
+          isCustomElement: (tag: string) => ['doxa-map', 'feedback-web-component'].includes(tag)
         }
       }
     }

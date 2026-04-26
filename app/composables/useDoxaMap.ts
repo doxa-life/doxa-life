@@ -1,15 +1,14 @@
-// Loads the <doxa-map> + <feedback-widget> web-component bundles for any page
-// that embeds them. CSS is injected via useHead (order doesn't matter). JS is
-// chained through onMounted so that mapbox-gl + geocoder are guaranteed to
-// define window.mapboxgl / window.MapboxGeocoder BEFORE map-app.iife.js runs
+// Loads the <doxa-map> web-component bundle for any page that embeds it. CSS
+// is injected via useHead (order doesn't matter). JS is chained through
+// onMounted so that mapbox-gl + geocoder are guaranteed to define
+// window.mapboxgl / window.MapboxGeocoder BEFORE map-app.iife.js runs
 // customElements.define('doxa-map', …) — otherwise the custom-element upgrade's
 // connectedCallback calls `new mapboxgl.Map(…)` before the global exists.
+// The <feedback-widget> bundle is loaded globally via nuxt.config.ts.
 
 const MAPBOX_JS = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js'
 const MAPBOX_GEOCODER_JS = 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js'
-const MAP_APP_JS = '/plugins/doxa-simple-map-mfe/app/map-app.iife.js'
-const MAP_APP_CSS = '/plugins/doxa-simple-map-mfe/app/map-app.css'
-const FEEDBACK_WIDGET_JS = '/assets/feedback-widget/feedback-widget.iife.js'
+const MAP_APP_JS = '/js/doxa-simple-map.iife.js'
 
 function loadScript(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -33,10 +32,7 @@ export function useDoxaMap() {
   useHead({
     link: [
       { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css' },
-      { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css' },
-      { rel: 'stylesheet', href: MAP_APP_CSS },
-      { rel: 'stylesheet', href: '/assets/feedback-widget/feedback-widget-slot.css' },
-      { rel: 'stylesheet', href: '/assets/feedback-widget/feedback-widget-map.css' }
+      { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css' }
     ]
   })
 
@@ -45,7 +41,6 @@ export function useDoxaMap() {
       await loadScript(MAPBOX_JS)
       await loadScript(MAPBOX_GEOCODER_JS)
       await loadScript(MAP_APP_JS)
-      loadScript(FEEDBACK_WIDGET_JS)
     } catch (err) {
       console.error('[useDoxaMap] script load failed', err)
     }
