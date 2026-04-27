@@ -138,7 +138,7 @@ export default defineNuxtConfig({
     formApiKey: process.env.FORM_API_KEY || '',
     prayBaseUrl: process.env.NUXT_PRAY_BASE_URL || 'https://pray.doxa.life',
     deeplApiKey: process.env.DEEPL_API_KEY || '',
-    deeplApiUrl: process.env.DEEPL_API_URL || 'https://api-free.deepl.com',
+    deeplApiUrl: process.env.DEEPL_API_URL || 'https://api.deepl.com',
     public: {
       appName: process.env.APP_TITLE || 'My App',
       nodeEnv: process.env.NODE_ENV || '',
