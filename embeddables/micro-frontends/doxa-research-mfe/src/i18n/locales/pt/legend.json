@@ -1,0 +1,35 @@
+{
+  "title": {
+    "prayer": "Progresso da oração",
+    "engagement": "Progresso do envolvimento",
+    "adoption": "Progresso da adoção",
+    "languageFamilies": "Famílias linguísticas",
+    "doxaRegions": "Regiões Doxa",
+    "affinityBlocs": "Blocos de afinidade",
+    "gospelResources": "Recursos do Evangelho"
+  },
+  "header": {
+    "collapsed": "Legenda",
+    "peopleGroupFallback": "Grupo de pessoas"
+  },
+  "prayer": {
+    "needsPrayer": "Precisa de oração",
+    "hasPrayer": "Tem oração",
+    "fullPrayerCoverage": "Cobertura de oração completa"
+  },
+  "engagement": {
+    "needsEngagement": "Precisa de envolvimento",
+    "hasEngagement": "Tem envolvimento"
+  },
+  "adoption": {
+    "needsAdoption": "Precisa de adoção",
+    "hasAdoption": "Tem adoção"
+  },
+  "columns": {
+    "upgs": "UPGs",
+    "population": "População"
+  },
+  "footer": {
+    "total": "Total"
+  }
+}
