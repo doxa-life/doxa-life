@@ -64,8 +64,10 @@ export default defineConfig({
     vue({
       template: {
         compilerOptions: {
-          // <doxa-map> is a native custom element, not a Vue component
-          isCustomElement: tag => tag === 'doxa-map'
+          // <doxa-research-map> is a native custom element, not a Vue component.
+          // Tag differs from simple-map's <doxa-map> so the two IIFEs can
+          // coexist on the same SPA without colliding in customElements.define.
+          isCustomElement: tag => tag === 'doxa-research-map'
         }
       }
     }),
@@ -105,8 +107,14 @@ export default defineConfig({
         globals: { 'mapbox-gl': 'mapboxgl' },
         inlineDynamicImports: true,
         assetFileNames: (assetInfo) => {
-          if (assetInfo.name === 'style.css') return 'research-map.css'
-          return assetInfo.name
+          // The CSS asset Vite emits for a lib build is conventionally
+          // named "style.css" — rename it to match our bundle's basename
+          // so the inline-css plugin can pair them up. (Vite 5+ exposes
+          // assetInfo.names as an array; the deprecated singular .name is
+          // intentionally avoided.)
+          const name = assetInfo.names?.[0]
+          if (name === 'style.css') return 'research-map.css'
+          return name ?? '[name][extname]'
         }
       }
     },

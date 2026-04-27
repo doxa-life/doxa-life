@@ -132,8 +132,8 @@
     .gem-index { margin-left: auto; font: 10px/1 ui-monospace, monospace; color: #64748b; letter-spacing: .1em; }
     .gem-slot { position: relative; width: 100%; aspect-ratio: 16 / 9; }
     @media (max-width: 768px) { .gem-slot { aspect-ratio: 3 / 4; } }
-    doxa-map { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
-    doxa-map:fullscreen, doxa-map:-webkit-full-screen { position: fixed; inset: 0; width: 100vw; height: 100vh; }
+    doxa-research-map { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
+    doxa-research-map:fullscreen, doxa-research-map:-webkit-full-screen { position: fixed; inset: 0; width: 100vw; height: 100vh; }
 
     /* ── Overview mode: grid every slot + square aspect to see all at once ── */
     body.zoom-out-all #showcase {
@@ -151,7 +151,7 @@
 <!-- ═══════════════════════════════════════════════════════════════════
      ⚡ EDIT HERE — one flat array. Add / remove / reorder slots freely.
      ─────────────────────────────────────────────────────────────────
-     Each entry becomes one gem-framed <doxa-map>. The profile-tabs bar
+     Each entry becomes one gem-framed <doxa-research-map>. The profile-tabs bar
      at the top auto-groups by the `profile` field — add a new profile
      just by using a new value.
 
@@ -159,7 +159,7 @@
        label    header title shown on the gem-frame
        gem      amethyst | sapphire | aquamarine | emerald |
                 topaz | citrine | tourmaline. Omit to auto-cycle.
-       config   profile-config JSON passed to <doxa-map>. Optional.
+       config   profile-config JSON passed to <doxa-research-map>. Optional.
                 `profile` + `tk` auto-injected, you don't need them here.
      ═══════════════════════════════════════════════════════════════════ -->
 <script>
@@ -194,7 +194,7 @@
     </svg>
     <img src="https://vitejs.dev/logo.svg" alt="Vite" />
   </div>
-  <div class="caption">one <strong>Vite bundle</strong> → many <strong>&lt;doxa-map&gt;</strong> instances</div>
+  <div class="caption">one <strong>Vite bundle</strong> → many <strong>&lt;doxa-research-map&gt;</strong> instances</div>
   <div class="vite-beams">
     <svg viewBox="0 0 520 60" preserveAspectRatio="none">
       <defs>
@@ -279,7 +279,7 @@
 
   // ── Render the slots for the active profile ──
   function renderActive() {
-    showcase.innerHTML = '';   // tears down previous <doxa-map> elements → shadow DOMs + Pinia + GL contexts released
+    showcase.innerHTML = '';   // tears down previous <doxa-research-map> elements → shadow DOMs + Pinia + GL contexts released
     const slotsForProfile = SLOTS.filter(s => s.profile === activeProfile);
     slotsForProfile.forEach((slot, i) => {
       const gem    = slot.gem ? gemByName(slot.gem) : gemForIndex(i);
@@ -302,7 +302,7 @@
             <span class="gem-index">#${i + 1}</span>
           </div>
           <div class="gem-slot">
-            <doxa-map profile-config='${JSON.stringify(config)}'></doxa-map>
+            <doxa-research-map profile-config='${JSON.stringify(config)}'></doxa-research-map>
           </div>
         </div>`;
       showcase.appendChild(el);
