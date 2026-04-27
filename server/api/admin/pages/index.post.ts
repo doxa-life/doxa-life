@@ -9,7 +9,7 @@ import { logCreate } from '../../../utils/activity-logger'
 import { purgeCmsCategory } from '../../../utils/cmsCache'
 
 export default defineEventHandler(async (event) => {
-  await requirePermission(event, 'pages.manage')
+  await requirePermission(event, 'pages.write')
   const body = await readBody<{ slug?: string; category_id?: string | null; menu_order?: number }>(event)
 
   const slug = (body?.slug ?? '').trim().replace(/^\/+|\/+$/g, '')

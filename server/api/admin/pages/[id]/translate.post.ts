@@ -20,7 +20,7 @@ interface Body {
 }
 
 export default defineEventHandler(async (event) => {
-  await requirePermission(event, 'pages.manage')
+  await requirePermission(event, 'pages.write')
   if (!isDeepLConfigured()) {
     throw createError({ statusCode: 500, statusMessage: 'DEEPL_API_KEY is not configured' })
   }

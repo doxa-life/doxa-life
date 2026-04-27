@@ -13,7 +13,7 @@ interface Body {
 }
 
 export default defineEventHandler(async (event) => {
-  await requirePermission(event, 'pages.manage')
+  await requirePermission(event, 'pages.publish')
   const id = getRouterParam(event, 'id')
   if (!id) throw createError({ statusCode: 400, statusMessage: 'id is required' })
 

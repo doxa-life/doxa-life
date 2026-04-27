@@ -35,7 +35,7 @@ async function flushCache() {
   <div>
     <h1 class="text-3xl font-bold mb-6">Dashboard</h1>
 
-    <section v-if="hasPermission('pages.manage')" class="border border-(--ui-border) rounded-md p-4 max-w-xl">
+    <section v-if="hasPermission('pages.write')" class="border border-(--ui-border) rounded-md p-4 max-w-xl">
       <h2 class="text-lg font-semibold mb-1">CMS cache</h2>
       <p class="text-sm text-(--ui-text-muted) mb-3">
         Every edit auto-purges the pages it touches. Use this when you've

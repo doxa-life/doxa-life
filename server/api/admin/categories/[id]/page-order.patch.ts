@@ -10,7 +10,7 @@ import { reorderCategoryPages, getCategoryPages, purgeSlugs } from '../../../../
 import { logUpdate } from '../../../../utils/activity-logger'
 
 export default defineEventHandler(async (event) => {
-  await requirePermission(event, 'pages.manage')
+  await requirePermission(event, 'pages.write')
   const id = getRouterParam(event, 'id')
   if (!id) throw createError({ statusCode: 400, statusMessage: 'id is required' })
 

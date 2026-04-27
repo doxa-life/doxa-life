@@ -11,7 +11,7 @@ import { logEvent } from '../../../utils/activity-logger'
 import { getAuthUser } from '../../../utils/auth'
 
 export default defineEventHandler(async (event) => {
-  await requirePermission(event, 'pages.manage')
+  await requirePermission(event, 'pages.write')
   const user = await getAuthUser(event)
   const count = await purgeAllCmsCache()
   logEvent({
