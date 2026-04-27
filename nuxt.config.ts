@@ -137,7 +137,7 @@ export default defineNuxtConfig({
 
   vue: {
     compilerOptions: {
-      isCustomElement: (tag: string) => ['doxa-map', 'feedback-web-component'].includes(tag)
+      isCustomElement: (tag: string) => ['doxa-map', 'doxa-research-map', 'feedback-web-component'].includes(tag)
     }
   },
 
@@ -151,7 +151,7 @@ export default defineNuxtConfig({
     vue: {
       template: {
         compilerOptions: {
-          isCustomElement: (tag: string) => ['doxa-map', 'feedback-web-component'].includes(tag)
+          isCustomElement: (tag: string) => ['doxa-map', 'doxa-research-map', 'feedback-web-component'].includes(tag)
         }
       }
     }

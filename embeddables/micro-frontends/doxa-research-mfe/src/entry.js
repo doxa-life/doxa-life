@@ -28,6 +28,11 @@ const DoxaMapElement = defineCustomElement(ProfileLoader, {
   }
 })
 
-customElements.define('doxa-map', DoxaMapElement)
+// Custom element name MUST differ from doxa-simple-map-mfe's `<doxa-map>`.
+// Both bundles can be loaded by the same Nuxt host (different pages), and
+// customElements.define() is one-shot — whichever IIFE wins the race is
+// the only registry the host can reach. Using a distinct tag here lets the
+// two bundles coexist on the same SPA.
+customElements.define('doxa-research-map', DoxaMapElement)
 
 export default DoxaMapElement
