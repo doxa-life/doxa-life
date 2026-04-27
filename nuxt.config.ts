@@ -2,7 +2,12 @@
 import { generateI18nLocales } from './config/languages'
 
 export default defineNuxtConfig({
+  extends: [
+    process.env.OAUTH_LAYER_PATH
+  ].filter(Boolean) as string[],
+
   modules: [
+    './modules/migrations',
     '@nuxt/eslint',
     '@nuxt/ui',
     '@nuxtjs/i18n',
