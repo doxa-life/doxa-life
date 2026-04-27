@@ -1,0 +1,12 @@
+{
+  "labels": {
+    "country": "الدولة:",
+    "population": "السكان:",
+    "language": "اللغة:",
+    "religion": "الديانة:",
+    "languageFamily": "العائلة اللغوية:"
+  },
+  "messages": {
+    "noDescription": "لا يوجد وصف متاح."
+  }
+}

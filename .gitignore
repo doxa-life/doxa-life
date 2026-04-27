@@ -39,9 +39,6 @@ embeddables/**/.env.*
 embeddables/**/CLAUDE.md
 embeddables/micro-frontends/_template/
 
-# Research map MFE — excluded from tracking for now
-embeddables/micro-frontends/doxa-research-mfe/
-
 # Local env files
 .env
 .env.*

@@ -2,11 +2,15 @@
 interface Props {
   mapId: string
   profileConfig: string
+  /** Which IIFE bundle to load. Defaults to 'simple-map' to preserve
+   *  existing call-sites (home, pray, adopt). Pass 'research-map' on the
+   *  research page to load the 5-tab research-mfe bundle instead. */
+  bundle?: 'simple-map' | 'research-map'
 }
 
-defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), { bundle: 'simple-map' })
 
-useDoxaMap()
+useDoxaMap(props.bundle)
 </script>
 
 <template>

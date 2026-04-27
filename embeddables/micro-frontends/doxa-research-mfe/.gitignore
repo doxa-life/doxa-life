@@ -1,0 +1,14 @@
+node_modules/
+.env
+*.local
+
+# QA scratch notes — per-developer, not for the shared history
+qa-*.md
+
+# Dev artifact text dumps
+tree.txt
+allfiles.txt
+CLAUDE.md
+
+# Local data files (large / generated, not for source control)
+assets/

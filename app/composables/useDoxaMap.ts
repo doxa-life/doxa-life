@@ -8,7 +8,14 @@
 
 const MAPBOX_JS = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js'
 const MAPBOX_GEOCODER_JS = 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js'
-const MAP_APP_JS = '/js/doxa-simple-map.iife.js'
+
+// Map of bundle keys → /public/js URLs. The IIFE bundles all register the
+// same `<doxa-map>` custom element, so only one bundle should load per page.
+const BUNDLES = {
+  'simple-map':   '/js/doxa-simple-map.iife.js',
+  'research-map': '/js/research-map.iife.js'
+} as const
+type BundleKey = keyof typeof BUNDLES
 
 function loadScript(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -28,13 +35,23 @@ function loadScript(src: string): Promise<void> {
   })
 }
 
-export function useDoxaMap() {
+/**
+ * Load the Mapbox stack + a doxa-map IIFE bundle.
+ *
+ * @param bundle - Which IIFE to load. Defaults to 'simple-map' so existing
+ *                 callers (home, pray, adopt, contact-us) don't break. The
+ *                 research/index.vue page passes 'research-map' to load the
+ *                 5-tab research bundle.
+ */
+export function useDoxaMap(bundle: BundleKey = 'simple-map') {
   useHead({
     link: [
       { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css' },
       { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css' }
     ]
   })
+
+  const MAP_APP_JS = BUNDLES[bundle]
 
   onMounted(async () => {
     try {
