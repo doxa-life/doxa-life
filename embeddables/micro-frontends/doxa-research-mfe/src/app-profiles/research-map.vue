@@ -34,6 +34,7 @@ import { useMapInstance }  from '@/composables/useMapInstance.js'
 import { useMapLayers }    from '../composables/useMapLayers.js'
 import { useMapEvents }    from '../composables/useMapEvents.js'
 import { useMapFly }       from '../composables/useMapFly.js'
+import { useSelectedPin }  from '../composables/useSelectedPin.js'
 import { useShadowStyles } from '@/composables/useShadowStyles.js'
 import { FULL_PRAYER_THRESHOLD } from '@/config/prayerColors.js'
 
@@ -349,6 +350,13 @@ const mapFly = useMapFly({
   defaultCenter: profileConfig?.value?.center ?? [20, 10],
   defaultZoom:   profileConfig?.value?.zoom   ?? 1.8
 })
+
+// ─── Selected-pin composable (animated GO marker on selection) ───────────────
+// Watches uiStore.selectedPeopleGroup; when set, swaps the dot to neon orange
+// AND floats an animated GO pin above it. Highlight layer attaches itself to
+// the `language-families` source created by useMapLayers, so initialize()
+// must be called AFTER that source has been added (i.e. inside onMapReady).
+const selectedPin = useSelectedPin({ getMap: () => map.value })
 
 // ─── Clustering composable (lazy) ────────────────────────────────────────────
 // Modes: 'mapbox' (native circle clustering) | 'mst' | 'network' | 'off'.
@@ -886,6 +894,9 @@ async function onMapReady(normalizedPeopleGroups) {
     clustering.setData?.(normalizedPeopleGroups)
     // Build the initial legend
     legend.build?.(normalizedPeopleGroups)
+    // Selected-pin highlight + GO marker — must come after the language-families
+    // source exists (added by addLanguageFamilyLayer above).
+    selectedPin.initialize()
   }
 
   // PERF: doxa-regions GeoJSON is 6.4 MB decoded. If the user lands on the
@@ -968,6 +979,7 @@ onBeforeUnmount(() => {
   if (_containerObserver) { _containerObserver.disconnect(); _containerObserver = null }
   poster.value?.cleanup?.()
   clustering.cleanup?.()
+  selectedPin.cleanup?.()
   mapStore.unregisterMap(mapId)
   destroy()
 })
