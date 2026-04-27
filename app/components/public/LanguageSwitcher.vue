@@ -14,10 +14,30 @@ const current = computed(() => LANGUAGES.find(l => l.code === locale.value) ?? L
 const others = computed(() => ENABLED_LANGUAGES.filter(l => l.code !== locale.value))
 
 const isOpen = ref(false)
+const isPinned = ref(false)
 const rootRef = ref<HTMLElement | null>(null)
 
 function close() {
   isOpen.value = false
+  isPinned.value = false
+}
+
+function onTriggerClick() {
+  if (isPinned.value) {
+    close()
+  }
+  else {
+    isOpen.value = true
+    isPinned.value = true
+  }
+}
+
+function onMouseEnter() {
+  if (!isPinned.value) isOpen.value = true
+}
+
+function onMouseLeave() {
+  if (!isPinned.value) isOpen.value = false
 }
 
 function handleClickOutside(event: MouseEvent) {
@@ -36,15 +56,15 @@ watch(() => route.fullPath, close)
     ref="rootRef"
     class="pll-parent-menu-item menu-item menu-item-has-children"
     :class="{ 'is-open': isOpen }"
-    @mouseenter="isOpen = true"
-    @mouseleave="isOpen = false"
+    @mouseenter="onMouseEnter"
+    @mouseleave="onMouseLeave"
   >
     <a
       href="#"
       role="button"
       :aria-expanded="isOpen"
       :aria-label="current?.name"
-      @click.prevent="isOpen = !isOpen"
+      @click.prevent="onTriggerClick"
     >
       <span class="language-flag" :aria-hidden="true">{{ current?.flag }}</span>
       <span>{{ current?.nativeName }}</span>
