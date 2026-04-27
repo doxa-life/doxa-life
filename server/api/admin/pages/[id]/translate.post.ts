@@ -1,8 +1,9 @@
 // Admin: one-click translate an EN (or other source) translation of a
 // CMS page into one or more target locales. Uses DeepL for title,
 // excerpt, meta_title, meta_description, and body_json. Each target
-// translation is upserted as a draft (overwrite controllable via
-// `overwrite` flag); the editor reviews + publishes manually.
+// translation is upserted with the caller-chosen `status` (draft or
+// published, default draft). `overwrite` controls whether to replace
+// translations that already exist for a given locale.
 
 import { defineEventHandler, getRouterParam, readBody, createError } from 'h3'
 import { requirePermission } from '../../../../utils/rbac'
@@ -17,6 +18,7 @@ interface Body {
   sourceLocale?: string
   targetLocales?: string[]
   overwrite?: boolean
+  status?: 'draft' | 'published'
 }
 
 export default defineEventHandler(async (event) => {
@@ -34,6 +36,7 @@ export default defineEventHandler(async (event) => {
   if (targetLocales.length === 0) {
     throw createError({ statusCode: 400, statusMessage: 'targetLocales is empty' })
   }
+  const status: 'draft' | 'published' = body?.status === 'published' ? 'published' : 'draft'
 
   const source = await db
     .selectFrom('page_translations')
@@ -83,7 +86,7 @@ export default defineEventHandler(async (event) => {
         meta_title: translatedMetaTitle || null,
         meta_description: translatedMetaDescription || null,
         og_image: source.og_image,
-        status: 'draft'
+        status
       })
       results.push({ locale: target })
     } catch (e: any) {

@@ -202,13 +202,13 @@ for (const l of ENABLED_LANGUAGES) {
 // active locale's translation (PUT /translations/:locale) in one click.
 // Passing a statusOverride also flips published/draft on the translation.
 const saving = ref(false)
-async function saveAll(statusOverride?: 'draft' | 'published') {
-  const locale = activeLocale.value
+async function saveAll(statusOverride?: 'draft' | 'published', localeOverride?: string): Promise<boolean> {
+  const locale = localeOverride ?? activeLocale.value
   const f = forms[locale]
-  if (!f) return
+  if (!f) return false
   if (!f.title.trim()) {
     toast.add({ title: 'Title is required', color: 'error' })
-    return
+    return false
   }
   saving.value = true
   try {
@@ -249,12 +249,14 @@ async function saveAll(statusOverride?: 'draft' | 'published') {
         : 'Saved'
     toast.add({ title: `${verb} ${locale}`, color: 'success' })
     await refresh()
+    return true
   } catch (e: any) {
     toast.add({
       title: 'Save failed',
       description: e?.data?.statusMessage || e?.message,
       color: 'error'
     })
+    return false
   } finally {
     saving.value = false
   }
@@ -300,16 +302,25 @@ const translateModalOpen = ref(false)
 const translateSource = ref('en')
 const translateTargets = ref<string[]>([])
 const translateOverwrite = ref(false)
+const translateStatus = ref<'draft' | 'published'>('draft')
 const translating = ref(false)
 
 function openTranslateModal() {
   translateSource.value = 'en'
   translateTargets.value = ENABLED_LANGUAGES.map(l => l.code).filter(c => c !== 'en')
   translateOverwrite.value = false
+  translateStatus.value = 'draft'
   translateModalOpen.value = true
 }
 
 async function runTranslate() {
+  // Persist any unsaved edits in the source-locale tab first — the
+  // translate endpoint reads from the DB, not from the in-memory form.
+  const sourceForm = forms[translateSource.value]
+  if (sourceForm && (sourceForm.dirty || !sourceForm.loaded)) {
+    const ok = await saveAll(undefined, translateSource.value)
+    if (!ok) return
+  }
   translating.value = true
   try {
     const res = await $fetch<{ results: Array<{ locale: string; skipped?: boolean; error?: string }> }>(
@@ -319,7 +330,8 @@ async function runTranslate() {
         body: {
           sourceLocale: translateSource.value,
           targetLocales: translateTargets.value,
-          overwrite: translateOverwrite.value
+          overwrite: translateOverwrite.value,
+          status: translateStatus.value
         }
       }
     )
@@ -355,7 +367,7 @@ const enabledLanguages = ENABLED_LANGUAGES
         <h1 class="text-xl font-semibold">Edit page</h1>
       </div>
       <div class="flex items-center gap-2">
-        <UButton variant="outline" color="primary" icon="i-lucide-languages" disabled title="Workflow not yet tested" @click="openTranslateModal">Translate from English</UButton>
+        <UButton variant="outline" color="primary" icon="i-lucide-languages" @click="openTranslateModal">Translate from English</UButton>
         <UButton variant="outline" color="error" icon="i-lucide-trash-2" @click="deleteModalOpen = true">Delete page</UButton>
       </div>
     </div>
@@ -623,7 +635,8 @@ const enabledLanguages = ENABLED_LANGUAGES
               :items="enabledLanguages.map(l => ({ label: l.nativeName, value: l.code }))"
             />
           </UFormField>
-          <UFormField label="Target locales">
+          <div>
+            <p class="text-sm font-medium text-(--ui-text) mb-1">Target locales</p>
             <div class="flex flex-wrap gap-2">
               <UCheckbox
                 v-for="l in enabledLanguages.filter(x => x.code !== translateSource)"
@@ -633,6 +646,15 @@ const enabledLanguages = ENABLED_LANGUAGES
                 @update:model-value="checked => { if (checked) { translateTargets = Array.from(new Set([...translateTargets, l.code])) } else { translateTargets = translateTargets.filter(c => c !== l.code) } }"
               />
             </div>
+          </div>
+          <UFormField label="Save translations as">
+            <USelect
+              v-model="translateStatus"
+              :items="[
+                { label: 'Draft', value: 'draft' },
+                { label: 'Published', value: 'published' }
+              ]"
+            />
           </UFormField>
           <UCheckbox
             v-model="translateOverwrite"
