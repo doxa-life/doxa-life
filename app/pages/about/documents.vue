@@ -40,10 +40,9 @@ useHead(() => ({ title: t('Documents') }))
           <div>
             <ul class="stack | max-width-xs" role="list">
               <li v-if="about">
-                <NuxtLink
-                  class="font-size-lg"
-                  :to="localePath(`/${about.menu_parent.slug}`)"
-                >{{ about.menu_parent.title }}</NuxtLink>
+                <span class="font-size-lg category-heading">
+                  {{ about.menu_parent.title }}
+                </span>
               </li>
               <li v-for="child in about?.children ?? []" :key="child.slug">
                 <NuxtLink
