@@ -57,11 +57,10 @@ export default defineNuxtConfig({
       link: [
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon/cropped-Favicon-light-doxa-01-32x32.png' },
         { rel: 'icon', type: 'image/png', sizes: '192x192', href: '/favicon/cropped-Favicon-light-doxa-01-192x192.png' },
-        { rel: 'apple-touch-icon', href: '/favicon/cropped-Favicon-light-doxa-01-180x180.png' },
-        { rel: 'stylesheet', href: '/assets/feedback-widget/feedback-widget-slot.css' }
+        { rel: 'apple-touch-icon', href: '/favicon/cropped-Favicon-light-doxa-01-180x180.png' }
       ],
       script: [
-        { src: '/assets/feedback-widget/feedback-widget.iife.js', defer: true }
+        { src: 'https://support.gospelambition.org/js/feedback-web-component.iife.js', defer: true }
       ],
       meta: [
         { name: 'msapplication-TileImage', content: '/favicon/cropped-Favicon-light-doxa-01-270x270.png' }
@@ -155,7 +154,7 @@ export default defineNuxtConfig({
 
   vue: {
     compilerOptions: {
-      isCustomElement: (tag: string) => ['feedback-widget'].includes(tag)
+      isCustomElement: (tag: string) => ['feedback-web-component'].includes(tag)
     }
   },
 
