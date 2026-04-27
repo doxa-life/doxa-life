@@ -355,7 +355,7 @@ function filterUUPGs() {
 }
 
 async function getUUPGs() {
-  const url = `${prayBaseUrl}/api/people-groups/list?fields=name,slug,wagf_region,wagf_block,country_code,rop1,religion,has_photo,image_url,adopted_by_churches,imb_alternate_name,engagement_status&lang=${props.languageCode}`
+  const url = `${prayBaseUrl}/api/people-groups/list?fields=name,slug,wagf_region,wagf_block,country_code,rop1,religion,has_photo,image_url,adopted_by_churches,imb_alternate_name,engagement_status,people_committed&lang=${props.languageCode}`
   loading.value = true
   try {
     const response = await fetch(url)
