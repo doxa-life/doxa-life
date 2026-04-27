@@ -11,7 +11,7 @@ import { uploadToS3, validateImageType, validateFileSize } from '../../../utils/
 const MAX_IMAGE_MB = 10
 
 export default defineEventHandler(async (event) => {
-  await requirePermission(event, 'pages.manage')
+  await requirePermission(event, 'pages.write')
 
   const form = await readMultipartFormData(event)
   const file = form?.find(p => p.name === 'file')

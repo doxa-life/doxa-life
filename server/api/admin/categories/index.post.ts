@@ -37,7 +37,7 @@ function normalizeTranslations(
 }
 
 export default defineEventHandler(async (event) => {
-  await requirePermission(event, 'pages.manage')
+  await requirePermission(event, 'pages.write')
   const body = await readBody<Body>(event)
 
   const slug = (body?.slug ?? '').trim().replace(/^\/+|\/+$/g, '')
