@@ -49,7 +49,14 @@ export default defineNitroPlugin(async () => {
 
   const migrator = new Migrator({
     db: getDb(),
-    provider: new MultiFolderMigrationProvider(folders)
+    provider: new MultiFolderMigrationProvider(folders),
+    // Layer-supplied migrations (e.g. `oauth_001_*`) sort alphabetically AFTER
+    // the consumer's numeric-prefixed migrations, so any consumer migration
+    // added after a layer migration was applied looks "out of order" to the
+    // strict default checker. Allowing unordered execution is the correct
+    // posture for this multi-folder setup — migrations are still run exactly
+    // once each and must remain idempotent regardless of relative order.
+    allowUnorderedMigrations: true
   })
 
   // Identify pending migrations so we can announce them before execution
