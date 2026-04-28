@@ -5,7 +5,6 @@ import { readBody, getHeader, setCookie } from 'h3'
 import { useRuntimeConfig } from '#imports'
 import { db } from '../../utils/database'
 import { logEvent, logLogin } from '../../utils/activity-logger'
-import { getUserPermissions } from '../../utils/rbac'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -27,7 +26,7 @@ export default defineEventHandler(async (event) => {
 
   const user = await db
     .selectFrom('users')
-    .selectAll()
+    .select(['id', 'email', 'verified', 'password', 'token_expires_at'])
     .where('token_key', '=', token)
     .executeTakeFirst()
 
@@ -43,7 +42,9 @@ export default defineEventHandler(async (event) => {
   const hashedPassword = await bcrypt.hash(password, 12)
   const newTokenKey = randomUUID()
 
-  await db
+  // Idempotency / TOCTOU guard: only mutate while the row is still pending.
+  // A second concurrent POST loses the race and gets a clean 410.
+  const result = await db
     .updateTable('users')
     .set({
       password: hashedPassword,
@@ -54,7 +55,12 @@ export default defineEventHandler(async (event) => {
       updated: new Date().toISOString(),
     })
     .where('id', '=', user.id)
-    .execute()
+    .where('password', 'is', null)
+    .executeTakeFirst()
+
+  if (Number(result.numUpdatedRows ?? 0) === 0) {
+    throw createError({ statusCode: 410, statusMessage: 'Invitation has already been accepted' })
+  }
 
   const jwtToken = jwt.sign(
     { userId: user.id, email: user.email, display_name },
@@ -82,18 +88,5 @@ export default defineEventHandler(async (event) => {
 
   logLogin(user.id, userAgent, { via: 'invite_accept' })
 
-  const permissions = await getUserPermissions(user.id)
-
-  return {
-    success: true,
-    user: {
-      id: user.id,
-      email: user.email,
-      display_name,
-      avatar: user.avatar,
-      verified: true,
-      roles: user.roles,
-      permissions: [...permissions]
-    }
-  }
+  return { success: true }
 })

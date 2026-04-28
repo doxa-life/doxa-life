@@ -77,7 +77,7 @@ const { user: currentUser } = useAuth()
 const page = ref(1)
 const pageSize = ref(50)
 const search = ref('')
-const sortField = ref<'display_name' | 'email' | 'verified' | 'created' | 'last_login'>('created')
+const sortField = ref<'display_name' | 'email' | 'status' | 'created' | 'last_login'>('created')
 const sortDir = ref<'asc' | 'desc'>('desc')
 
 const searchDebounced = ref('')
@@ -98,7 +98,7 @@ const queryKey = computed(() => ({
   dir: sortDir.value
 }))
 
-const { data, pending, error } = await useFetch<UsersResponse>('/api/admin/users', {
+const { data, pending, error, refresh } = await useFetch<UsersResponse>('/api/admin/users', {
   query: queryKey,
   watch: [queryKey],
   default: () => ({ rows: [], total: 0, page: 1, pageSize: 50 })
@@ -193,8 +193,8 @@ const columns: TableColumn<AdminUserRow>[] = [
     header: sortableHeader('Email', 'email')
   },
   {
-    accessorKey: 'verified',
-    header: sortableHeader('Status', 'verified'),
+    accessorKey: 'status',
+    header: sortableHeader('Status', 'status'),
     cell: ({ row }) => {
       const meta = STATUS_META[row.original.status] ?? STATUS_META.active
       return h(UBadge, { color: meta.color, variant: 'subtle', size: 'sm' }, () => [
@@ -428,7 +428,7 @@ const handleInvite = async () => {
   inviteError.value = ''
   inviting.value = true
   try {
-    const response = await $fetch<{ user: AdminUserRow }>('/api/admin/users', {
+    const response = await $fetch<{ user: { email: string } }>('/api/admin/users', {
       method: 'POST',
       body: {
         email: inviteForm.email.trim().toLowerCase(),
@@ -437,16 +437,9 @@ const handleInvite = async () => {
       }
     })
 
-    if (data.value) {
-      data.value = {
-        ...data.value,
-        rows: [response.user, ...data.value.rows].slice(0, data.value.pageSize),
-        total: data.value.total + 1
-      }
-    }
-
     toast.add({ title: 'Invite sent', description: response.user.email, color: 'success' })
     inviteModalOpen.value = false
+    await refresh()
   } catch (err: any) {
     inviteError.value = err?.data?.statusMessage || err?.message || 'Failed to send invite'
   } finally {

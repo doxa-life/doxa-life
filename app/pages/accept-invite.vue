@@ -58,8 +58,9 @@ async function handleAccept() {
     error.value = 'Password must be at least 8 characters'
     return
   }
+  // Mismatch is surfaced inline under the confirm field; submit button is also
+  // disabled in that state. Bail without surfacing a duplicate top-level alert.
   if (state.password !== state.confirmPassword) {
-    error.value = 'Passwords do not match'
     return
   }
 
