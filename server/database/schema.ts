@@ -7,10 +7,11 @@ export interface UsersTable {
   email: string
   display_name: string
   avatar: Generated<string>
-  password: Generated<string>
+  password: ColumnType<string | null, string | null | undefined, string | null>
   verified: Generated<boolean>
   roles: Generated<string[]>
   token_key: Generated<string>
+  token_expires_at: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>
   pending_email: string | null
   email_change_token: string | null
 }

@@ -1,4 +1,22 @@
 <script setup lang="ts">
+import '~/assets/css/admin.css'
+
+// Dev-only: Vite's dev server pins main.scss (and its @use partials) into
+// the module graph as soon as you visit the public site, then injects link
+// tags for them on every subsequent page in the session — even admin pages
+// that don't import them. Strip them on mount so the admin shell isn't
+// styled by the public-site SCSS. Production code-splits per-route, so this
+// branch is dead-code-eliminated and has no effect on the prod bundle.
+if (import.meta.dev) {
+  onMounted(() => {
+    document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
+      if ((link as HTMLLinkElement).href.includes('/assets/styles/')) {
+        link.remove()
+      }
+    })
+  })
+}
+
 const { user } = useAuth()
 const { hasPermission } = usePermissions()
 const route = useRoute()
@@ -181,5 +199,3 @@ watch(() => route.path, () => {
   </div>
   </UApp>
 </template>
-
-<style src="~/assets/css/admin.css"></style>
