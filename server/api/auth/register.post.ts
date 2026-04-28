@@ -5,6 +5,7 @@ import { db, sql } from '../../utils/database'
 import { logRegisterAttempt, logEvent } from '../../utils/activity-logger'
 import { sendTemplateEmail } from '../../utils/email'
 import { checkRateLimit, logRateLimitExceeded } from '../../utils/rate-limit'
+import { getSetting } from '../../utils/site-settings'
 import { readBody, getHeader, setResponseHeader, getRequestURL, setCookie } from 'h3'
 import { useRuntimeConfig, createError } from '#imports'
 import { ROLES } from '~~/app/utils/role-definitions'
@@ -22,6 +23,15 @@ export default defineEventHandler(async (event) => {
 
   if (display_name.length < 2) {
     throw createError({ statusCode: 400, statusMessage: 'Display name must be at least 2 characters long' })
+  }
+
+  // Reject before rate-limiting so disabled-registration attempts don't burn
+  // the IP bucket. First-user bootstrap is unaffected — a brand-new install
+  // never has the toggle off (default true) and admins typically only flip it
+  // off after at least one admin exists.
+  const registrationEnabled = await getSetting('auth.public_registration_enabled')
+  if (!registrationEnabled) {
+    throw createError({ statusCode: 403, statusMessage: 'Public registration is disabled' })
   }
 
   // Check rate limit by IP

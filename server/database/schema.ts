@@ -16,6 +16,12 @@ export interface UsersTable {
   email_change_token: string | null
 }
 
+export interface SiteSettingsTable {
+  key: string
+  value: ColumnType<unknown, unknown, unknown>
+  updated: ColumnType<Date, string | undefined, string>
+}
+
 export interface PasswordResetRequestsTable {
   id: Generated<string>
   created: ColumnType<Date, Date | string | undefined, Date | string>
@@ -82,6 +88,7 @@ export interface PageTranslationsTable {
 
 export interface Database {
   users: UsersTable
+  site_settings: SiteSettingsTable
   password_reset_requests: PasswordResetRequestsTable
   activity_logs: ActivityLogsTable
   pages: PagesTable

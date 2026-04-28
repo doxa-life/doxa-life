@@ -46,6 +46,9 @@ const navItems = computed<NavItem[]>(() => [
     : []),
   ...(hasPermission('roles.view')
     ? [{ to: '/admin/roles', label: 'Roles', icon: 'i-lucide-shield' }]
+    : []),
+  ...(hasPermission('settings.view')
+    ? [{ to: '/admin/settings', label: 'Settings', icon: 'i-lucide-settings' }]
     : [])
 ])
 

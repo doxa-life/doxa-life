@@ -31,8 +31,22 @@ onMounted(() => {
     successMessage.value = 'Email verified successfully! You can now sign in.'
   } else if (verified === 'already') {
     successMessage.value = 'Your email is already verified. Please sign in.'
+  } else if (verified === 'expired') {
+    successMessage.value = 'That verification link has expired. Ask an administrator to send a new one.'
+  } else if (verified === 'invalid') {
+    successMessage.value = 'That verification link is invalid.'
   }
 })
+
+// Public site settings — used to hide the "Create Account" CTA when an admin
+// has disabled public registration.
+const { data: publicSettings } = await useFetch<{ 'auth.public_registration_enabled'?: boolean }>(
+  '/api/settings/public',
+  { default: () => ({ 'auth.public_registration_enabled': true }) }
+)
+const registrationEnabled = computed(() =>
+  publicSettings.value?.['auth.public_registration_enabled'] !== false
+)
 
 async function handleLogin() {
   error.value = ''
@@ -187,7 +201,7 @@ function switchToReset() {
           </UButton>
 
           <!-- Divider -->
-          <div class="relative">
+          <div v-if="registrationEnabled" class="relative">
             <div class="absolute inset-0 flex items-center">
               <div class="w-full border-t border-(--ui-border)"></div>
             </div>
@@ -198,6 +212,7 @@ function switchToReset() {
 
           <!-- Register Link -->
           <UButton
+            v-if="registrationEnabled"
             color="neutral"
             variant="outline"
             size="lg"
