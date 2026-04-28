@@ -15,6 +15,7 @@
     "@aws-sdk/s3-request-presigner": "^3.914.0",
     "@iconify-json/lucide": "^1.2.102",
     "@iconify-json/simple-icons": "^1.2.78",
+    "@modelcontextprotocol/sdk": "^1.20.0",
     "@nuxt/ui": "^4.6.1",
     "@nuxtjs/i18n": "^10.2.4",
     "@nuxtjs/turnstile": "^1.1.2",
@@ -44,7 +45,9 @@
     "nuxt": "^4.4.2",
     "postgres": "^3.4.7",
     "tailwindcss": "^4.2.2",
-    "vuedraggable": "^4.1.0"
+    "vuedraggable": "^4.1.0",
+    "zod": "^3.23",
+    "zod-to-json-schema": "^3.23"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.15.2",
