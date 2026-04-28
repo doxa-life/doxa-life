@@ -3,7 +3,8 @@ import { generateI18nLocales } from './config/languages'
 
 export default defineNuxtConfig({
   extends: [
-    process.env.OAUTH_LAYER_PATH
+    process.env.OAUTH_LAYER_PATH,
+    process.env.MCP_LAYER_PATH
   ].filter(Boolean) as string[],
 
   modules: [
