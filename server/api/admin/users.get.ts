@@ -56,6 +56,8 @@ export default defineEventHandler(async (event) => {
       'users.verified',
       'users.created',
       'users.roles',
+      'users.password',
+      'users.token_expires_at',
       eb => eb
         .selectFrom('activity_logs')
         .select(eb2 => eb2.fn.max('activity_logs.timestamp').as('last_login'))
@@ -72,8 +74,22 @@ export default defineEventHandler(async (event) => {
     .offset((page - 1) * pageSize)
     .execute()
 
+  const now = Date.now()
+  const decorated = rows.map(({ password, token_expires_at, ...rest }) => {
+    let status: 'active' | 'not_verified' | 'pending_invite' | 'expired_invite'
+    if (rest.verified) {
+      status = 'active'
+    } else if (password !== null) {
+      status = 'not_verified'
+    } else {
+      const expiresMs = token_expires_at ? new Date(token_expires_at).getTime() : 0
+      status = expiresMs > now ? 'pending_invite' : 'expired_invite'
+    }
+    return { ...rest, status }
+  })
+
   return {
-    rows,
+    rows: decorated,
     total,
     page,
     pageSize
