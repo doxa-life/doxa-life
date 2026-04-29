@@ -13,6 +13,18 @@ const localeString = z.string().min(2).max(20)
 const titleString = z.string().min(1).max(500)
 const idString = z.string().min(1).max(64)
 
+// body_json serialized-size cap. Matches the body_markdown 1 MB cap so the
+// two input shapes have parity, and stays well under the MCP transport's
+// 2 MB body ceiling. Pathological structure (deeply nested or huge node
+// count) is caught further in by tiptapValidate's depth/node limits.
+const MAX_BODY_JSON_BYTES = 1024 * 1024
+const bodyJsonInput = z
+  .record(z.unknown())
+  .refine(
+    v => JSON.stringify(v).length <= MAX_BODY_JSON_BYTES,
+    { message: `body_json serialized exceeds ${MAX_BODY_JSON_BYTES} bytes (1 MB)` }
+  )
+
 // ── List pages ──────────────────────────────────────────────────────
 
 export const listPagesInput = z
@@ -58,7 +70,7 @@ const inlineTranslationInput = z
     locale: localeString,
     title: titleString,
     body_markdown: z.string().max(1024 * 1024).optional(),
-    body_json: z.record(z.unknown()).optional(),
+    body_json: bodyJsonInput.optional(),
     excerpt: z.string().max(2048).nullish(),
     featured_image: z.string().max(2048).nullish(),
     meta_title: z.string().max(255).nullish(),
@@ -114,7 +126,7 @@ export const upsertPageTranslationInput = z
     locale: localeString,
     title: titleString,
     body_markdown: z.string().max(1024 * 1024).optional(),
-    body_json: z.record(z.unknown()).optional(),
+    body_json: bodyJsonInput.optional(),
     excerpt: z.string().max(2048).nullish(),
     featured_image: z.string().max(2048).nullish(),
     meta_title: z.string().max(255).nullish(),
