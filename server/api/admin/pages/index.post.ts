@@ -1,73 +1,64 @@
 // Admin: create a new CMS page (no translations). Returns the row.
 // Translation is added separately via PUT /api/admin/pages/[id]/translations/[locale].
+//
+// Validation, slug rules, transactional audit, and cache invalidation
+// are owned by the cmsPages service. The admin route stays thin: parse
+// + auth + dispatch + project the response shape Vue expects.
 
-import { defineEventHandler, readBody, createError } from 'h3'
+import { defineEventHandler, readBody, createError, getHeader } from 'h3'
+import type { Kysely } from 'kysely'
 import { requirePermission } from '../../../utils/rbac'
-import { createPage } from '../../../database/pages'
-import { db } from '../../../utils/database'
-import { logCreate } from '../../../utils/activity-logger'
-import { purgeCmsCategory } from '../../../utils/cmsCache'
+import {
+  createCmsPage,
+  applyPageInvalidations
+} from '../../../services/cmsPages'
+import { logEvent } from '../../../utils/activity-logger'
+import type { Database } from '../../../database/schema'
 
 export default defineEventHandler(async (event) => {
-  await requirePermission(event, 'pages.write')
+  const authUser = await requirePermission(event, 'pages.write')
   const body = await readBody<{ slug?: string; category_id?: string | null; menu_order?: number }>(event)
-
-  const slug = (body?.slug ?? '').trim().replace(/^\/+|\/+$/g, '')
-  if (!slug) {
+  if (!body?.slug || !String(body.slug).trim()) {
     throw createError({ statusCode: 400, statusMessage: 'slug is required' })
-  }
-  if (!/^[a-z0-9][a-z0-9/-]*$/.test(slug)) {
-    throw createError({ statusCode: 400, statusMessage: 'slug must be lowercase letters, digits, dashes, and slashes' })
   }
 
   const category_id = body?.category_id ? String(body.category_id) : null
   const menu_order = Number.isFinite(body?.menu_order) ? Number(body.menu_order) : 0
 
-  // When a category is picked, the slug must live under its prefix so
-  // public URL resolution stays consistent. Uncategorized pages can
-  // have any slug shape, but they can't collide with a category slug —
-  // that would make `/contact` ambiguous.
-  if (category_id) {
-    const category = await db
-      .selectFrom('categories')
-      .select(['slug'])
-      .where('id', '=', category_id)
-      .executeTakeFirst()
-    if (!category) {
-      throw createError({ statusCode: 400, statusMessage: 'Category not found' })
-    }
-    if (!slug.startsWith(`${category.slug}/`)) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: `Slug must start with "${category.slug}/"`
-      })
-    }
-  } else {
-    const collidingCategory = await db
-      .selectFrom('categories')
-      .select('id')
-      .where('slug', '=', slug)
-      .executeTakeFirst()
-    if (collidingCategory) {
-      throw createError({
-        statusCode: 409,
-        statusMessage: `"${slug}" is already used by a category.`
-      })
-    }
-  }
-
   try {
-    const page = await createPage({ slug, category_id, menu_order })
-    logCreate('pages', page.id, event, { slug, category_id, menu_order })
-    // New member appears in every sibling's `children[]` — bust their
-    // cached responses so the sidebar picks it up on next visit.
-    if (category_id) {
-      await purgeCmsCategory(category_id, slug)
-    }
-    return page
+    const result = await createCmsPage(
+      // Service normalizes the slug (trim + strip leading/trailing
+      // slashes); pass the raw body value through.
+      { slug: body?.slug ?? '', category_id, menu_order },
+      async ({ pageId }, executor) => {
+        // Admin route never passes an inline translation, so
+        // translationId is always null here — page audit only.
+        await logEvent(
+          {
+            eventType: 'CREATE',
+            tableName: 'pages',
+            recordId: pageId,
+            userId: authUser.userId,
+            userAgent: getHeader(event, 'user-agent') || undefined,
+            metadata: { slug: body.slug, category_id, menu_order, source: 'admin-ui' }
+          },
+          executor as Kysely<Database>,
+          { throwOnError: true }
+        )
+      }
+    )
+    await applyPageInvalidations(result.slugsToPurge, result.categoriesToPurge)
+    return result.page
   } catch (e: any) {
+    // Translate H3-shaped service errors back to the admin route's
+    // legacy createError contract. The service's `err()` helper already
+    // attaches statusCode/statusMessage so most cases pass through;
+    // we just need the unique-violation special case.
     if (e?.code === '23505') {
       throw createError({ statusCode: 409, statusMessage: 'A page with that slug already exists' })
+    }
+    if (e?.statusCode) {
+      throw createError({ statusCode: e.statusCode, statusMessage: e.statusMessage || e.message })
     }
     throw e
   }

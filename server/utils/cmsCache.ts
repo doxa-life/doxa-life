@@ -32,18 +32,26 @@ export async function purgeCmsPage(slug: string, locales?: string[]) {
 // Purge every page in a category across all locales. Needed whenever a
 // field that leaks into a sibling's cached response changes — titles,
 // excerpts, featured images (all embedded in `children[]`) and
-// menu_order (alters sibling sort order). `excludeSlug` lets the caller
-// skip the page whose own entry was already purged independently.
+// menu_order (alters sibling sort order). `excludeSlugs` lets the
+// caller skip pages whose entries were already purged independently
+// (avoids duplicate removeItem calls + lets `applyPageInvalidations`
+// pass the page-being-modified's slug — and its old slug, on a
+// category move — through).
 export async function purgeCmsCategory(
   categoryId: string,
-  excludeSlug?: string
+  excludeSlugs?: string | ReadonlyArray<string>
 ): Promise<void> {
+  const skip = new Set<string>(
+    excludeSlugs === undefined
+      ? []
+      : (typeof excludeSlugs === 'string' ? [excludeSlugs] : excludeSlugs)
+  )
   const rows = await db
     .selectFrom('pages')
     .select('slug')
     .where('category_id', '=', categoryId)
     .execute()
-  const slugs = rows.map(r => r.slug).filter(s => s !== excludeSlug)
+  const slugs = rows.map(r => r.slug).filter(s => !skip.has(s))
   await Promise.all(slugs.map(s => purgeCmsPage(s)))
 }
 

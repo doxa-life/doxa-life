@@ -2,16 +2,20 @@
 // theme, custom_css). Changing `category_id` auto-rewrites the slug
 // prefix to stay under the new category (old URL 404s), and both the
 // old and new cached URLs are purged.
+//
+// All slug-rewrite, validation, and cache fan-out logic lives in the
+// cmsPages service; the route stays thin.
 
-import { defineEventHandler, getRouterParam, readBody, createError } from 'h3'
+import { defineEventHandler, getRouterParam, readBody, createError, getHeader } from 'h3'
 import { requirePermission } from '../../../utils/rbac'
-import { db } from '../../../utils/database'
-import { setPageCategory } from '../../../database/pages'
-import { logUpdate } from '../../../utils/activity-logger'
-import { purgeCmsPage } from '../../../utils/cmsCache'
+import {
+  updateCmsPage,
+  applyPageInvalidations
+} from '../../../services/cmsPages'
+import { logEvent } from '../../../utils/activity-logger'
 
 export default defineEventHandler(async (event) => {
-  await requirePermission(event, 'pages.write')
+  const authUser = await requirePermission(event, 'pages.write')
   const id = getRouterParam(event, 'id')
   if (!id) throw createError({ statusCode: 400, statusMessage: 'id is required' })
 
@@ -23,124 +27,55 @@ export default defineEventHandler(async (event) => {
     custom_css?: string | null
   }>(event)
 
-  const existing = await db
-    .selectFrom('pages')
-    .selectAll()
-    .where('id', '=', id)
-    .executeTakeFirst()
-  if (!existing) throw createError({ statusCode: 404, statusMessage: 'Page not found' })
-
-  const slugsToPurge = new Set<string>([existing.slug])
-  let currentCategoryId = existing.category_id
-
-  // Category moves are handled via setPageCategory so the slug prefix
-  // is rewritten in the same transaction. Skip if unchanged.
-  if (body?.category_id !== undefined) {
-    const nextCategoryId = body.category_id ? String(body.category_id) : null
-    if (nextCategoryId !== existing.category_id) {
-      const { page: moved, slugsToPurge: moveSlugs } = await setPageCategory(id, nextCategoryId)
-      moveSlugs.forEach(s => slugsToPurge.add(s))
-      currentCategoryId = moved.category_id
-    }
+  if (body?.theme !== undefined && !['default', 'green'].includes(body.theme)) {
+    throw createError({ statusCode: 400, statusMessage: 'theme must be one of: default, green' })
   }
 
-  const set: Record<string, unknown> = {}
-  if (body?.slug != null) {
-    const slug = String(body.slug).trim().replace(/^\/+|\/+$/g, '')
-    if (!slug || !/^[a-z0-9][a-z0-9/-]*$/.test(slug)) {
-      throw createError({ statusCode: 400, statusMessage: 'slug must be lowercase letters, digits, dashes, and slashes' })
-    }
-
-    if (currentCategoryId) {
-      const category = await db
-        .selectFrom('categories')
-        .select('slug')
-        .where('id', '=', currentCategoryId)
-        .executeTakeFirst()
-      if (category && !slug.startsWith(`${category.slug}/`)) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: `Slug must start with "${category.slug}/"`
-        })
-      }
-    } else {
-      const collidingCategory = await db
-        .selectFrom('categories')
-        .select('id')
-        .where('slug', '=', slug)
-        .executeTakeFirst()
-      if (collidingCategory) {
-        throw createError({
-          statusCode: 409,
-          statusMessage: `"${slug}" is already used by a category.`
-        })
-      }
-    }
-
-    set.slug = slug
-  }
-  if (body?.menu_order !== undefined) {
-    set.menu_order = Number(body.menu_order) || 0
-  }
-  if (body?.theme !== undefined) {
-    const theme = String(body.theme)
-    if (!['default', 'green'].includes(theme)) {
-      throw createError({ statusCode: 400, statusMessage: 'theme must be one of: default, green' })
-    }
-    set.theme = theme
-  }
-  if (body?.custom_css !== undefined) {
-    const raw = body.custom_css == null ? null : String(body.custom_css)
-    set.custom_css = raw && raw.trim() ? raw : null
+  // Service normalizes the slug; admin just forwards. Empty/whitespace
+  // custom_css folds to null at this boundary (matches legacy admin
+  // behavior); a non-empty custom_css keeps its original form,
+  // including any leading/trailing whitespace the author wrote.
+  const slugIn = body?.slug != null ? String(body.slug) : undefined
+  let customCssIn: string | null | undefined
+  if (body?.custom_css === undefined) {
+    customCssIn = undefined
+  } else if (body.custom_css == null) {
+    customCssIn = null
+  } else {
+    const raw = String(body.custom_css)
+    customCssIn = raw && raw.trim() ? raw : null
   }
 
   try {
-    let updated = existing
-    if (Object.keys(set).length > 0) {
-      set.updated = new Date()
-      updated = await db
-        .updateTable('pages')
-        .set(set as any)
-        .where('id', '=', id)
-        .returningAll()
-        .executeTakeFirstOrThrow()
-    } else {
-      updated = await db
-        .selectFrom('pages')
-        .selectAll()
-        .where('id', '=', id)
-        .executeTakeFirstOrThrow()
-    }
+    const result = await updateCmsPage({
+      id,
+      slug: slugIn,
+      category_id: body?.category_id === undefined ? undefined : (body.category_id ? String(body.category_id) : null),
+      menu_order: body?.menu_order !== undefined ? (Number(body.menu_order) || 0) : undefined,
+      theme: body?.theme as 'default' | 'green' | undefined,
+      custom_css: customCssIn
+    })
 
-    slugsToPurge.add(updated.slug)
-
-    // Fields that bleed into a sibling's `children[]` array (slug +
-    // menu_order) or shift category membership need every member page
-    // in the affected categories re-rendered. Collect the union of
-    // old + new category ids, then pull their slug rosters in one go.
-    const categoriesToPurge = new Set<string>()
-    const slugChanged = updated.slug !== existing.slug
-    const orderChanged = updated.menu_order !== existing.menu_order
-    const movedCategory = updated.category_id !== existing.category_id
-    if (slugChanged || orderChanged || movedCategory) {
-      if (existing.category_id) categoriesToPurge.add(existing.category_id)
-      if (updated.category_id) categoriesToPurge.add(updated.category_id)
+    if (Object.keys(result.changes).length > 0) {
+      // Fire-and-forget audit (matches legacy admin behavior; the audit
+      // runs after the data write commits).
+      logEvent({
+        eventType: 'UPDATE',
+        tableName: 'pages',
+        recordId: id,
+        userId: authUser.userId,
+        userAgent: getHeader(event, 'user-agent') || undefined,
+        metadata: { changes: result.changes, source: 'admin-ui' }
+      })
     }
-    if (categoriesToPurge.size > 0) {
-      const siblings = await db
-        .selectFrom('pages')
-        .select('slug')
-        .where('category_id', 'in', Array.from(categoriesToPurge))
-        .execute()
-      for (const { slug } of siblings) slugsToPurge.add(slug)
-    }
-
-    logUpdate('pages', id, event, { changes: { ...set, category_id: updated.category_id } })
-    await Promise.all(Array.from(slugsToPurge).map(s => purgeCmsPage(s)))
-    return updated
+    await applyPageInvalidations(result.slugsToPurge, result.categoriesToPurge)
+    return result.page
   } catch (e: any) {
     if (e?.code === '23505') {
       throw createError({ statusCode: 409, statusMessage: 'A page with that slug already exists' })
+    }
+    if (e?.statusCode) {
+      throw createError({ statusCode: e.statusCode, statusMessage: e.statusMessage || e.message })
     }
     throw e
   }

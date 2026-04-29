@@ -123,6 +123,27 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     appName: process.env.APP_TITLE || 'My App',
+    mcpServerName: process.env.MCP_SERVER_NAME || 'doxa-cms',
+    mcpServerVersion: process.env.MCP_SERVER_VERSION || '1.0.0',
+    // ── MCP layer config (consumed by base-code/nuxt-blueprints/layers/mcp) ──
+    // These keys are read at runtime by the MCP layer. If you rename
+    // them or change shape the layer silently falls back to defaults
+    // (no rate limiting, no read-scope classification) — guard them
+    // when upgrading the layer.
+    //   mcpReadScopes: tools whose scope is in this list are exempt
+    //     from the per-token writes bucket. `pages.view` is the only
+    //     read scope today.
+    //   mcpRateLimits: per-token writes bucket is raised from the
+    //     layer default (20/min) to 60/min — a "publish 9 locales of
+    //     5 pages" Claude flow lands at 45 calls.
+    mcpReadScopes: ['pages.view'],
+    mcpRateLimits: {
+      writesPerToken: { limit: 60, windowMs: 60_000 }
+    },
+    // OAuth layer reads this when DCR registrations omit `scope`.
+    // Curated to the three CMS scopes; excludes admin/users/roles/
+    // settings even though those exist in PERMISSIONS.
+    oauthDcrDefaultScopes: ['pages.view', 'pages.write', 'pages.publish'],
     databaseUrl: process.env.DATABASE_URL || '',
     jwtSecret: process.env.JWT_SECRET || '',
     mailgunApiKey: process.env.MAILGUN_API_KEY || '',

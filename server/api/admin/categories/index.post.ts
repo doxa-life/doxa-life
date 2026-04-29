@@ -1,15 +1,12 @@
-// Admin: create a new category. Takes a slug and an optional set of
-// per-locale names. Slug must be unique against other categories and
-// must not collide with any top-level (uncategorized) page slug —
-// otherwise the public router can't tell `/contact` (a page) apart from
-// `/contact` (a bare category URL).
+// Admin: create a new CMS category. Slug must be unique against other
+// categories and must not collide with any uncategorized page slug.
+// All validation lives in the cmsCategories service.
 
-import { defineEventHandler, readBody, createError } from 'h3'
+import { defineEventHandler, readBody, createError, getHeader } from 'h3'
 import { requirePermission } from '../../../utils/rbac'
-import { db } from '../../../utils/database'
-import { createCategory } from '../../../database/categories'
-import { logCreate } from '../../../utils/activity-logger'
+import { createCmsCategory } from '../../../services/cmsCategories'
 import { ENABLED_LANGUAGE_CODES } from '../../../../config/languages'
+import { logEvent } from '../../../utils/activity-logger'
 
 interface Body {
   slug?: string
@@ -37,55 +34,29 @@ function normalizeTranslations(
 }
 
 export default defineEventHandler(async (event) => {
-  await requirePermission(event, 'pages.write')
+  const authUser = await requirePermission(event, 'pages.write')
   const body = await readBody<Body>(event)
 
-  const slug = (body?.slug ?? '').trim().replace(/^\/+|\/+$/g, '')
-  if (!slug) {
-    throw createError({ statusCode: 400, statusMessage: 'slug is required' })
-  }
-  if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Category slug must be lowercase letters, digits, and dashes (no slashes)'
-    })
-  }
-
   const translations = normalizeTranslations(body?.translations)
-  if (!translations.some(t => t.locale === 'en' && t.name)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'An English name is required'
-    })
-  }
-
-  // Guard against collision with an uncategorized page that owns the
-  // same slug at the URL root (the public router would ambiguously
-  // resolve `/contact`).
-  const collidingPage = await db
-    .selectFrom('pages')
-    .select('id')
-    .where('slug', '=', slug)
-    .where('category_id', 'is', null)
-    .executeTakeFirst()
-  if (collidingPage) {
-    throw createError({
-      statusCode: 409,
-      statusMessage: `A page already uses the slug "${slug}". Pick a different category slug or reassign that page.`
-    })
-  }
 
   try {
-    const category = await createCategory({
-      slug,
+    const category = await createCmsCategory({
+      slug: body?.slug ?? '',
       menu_order: Number.isFinite(body?.menu_order) ? Number(body.menu_order) : 0,
       translations
     })
-    logCreate('categories', category.id, event, { slug, translations: translations.length })
+    logEvent({
+      eventType: 'CREATE',
+      tableName: 'categories',
+      recordId: category.id,
+      userId: authUser.userId,
+      userAgent: getHeader(event, 'user-agent') || undefined,
+      metadata: { slug: category.slug, translations: translations.length, source: 'admin-ui' }
+    })
     return category
   } catch (e: any) {
-    if (e?.code === '23505') {
-      throw createError({ statusCode: 409, statusMessage: 'A category with that slug already exists' })
+    if (e?.statusCode) {
+      throw createError({ statusCode: e.statusCode, statusMessage: e.statusMessage || e.message })
     }
     throw e
   }
