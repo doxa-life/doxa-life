@@ -1,11 +1,38 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { existsSync, readdirSync, rmSync } from 'node:fs'
+import { join } from 'node:path'
 import { generateI18nLocales } from './config/languages'
+
+const LAYERS_DIR = '.layers'
+
+// Strip layer-level tsconfig.json files. Layers extracted from full Nuxt
+// projects often ship a tsconfig.json that references ./.nuxt/tsconfig.*.json
+// (only generated when the layer is opened as its own project). When the layer
+// lives under node_modules, Vite's tsconfig walker skips it. When it lives at
+// .layers/<name>, Vite picks it up and crashes on the missing references.
+function stripLayerTsconfigs() {
+  if (!existsSync(LAYERS_DIR)) return
+  for (const name of readdirSync(LAYERS_DIR)) {
+    const tsconfig = join(LAYERS_DIR, name, 'tsconfig.json')
+    if (existsSync(tsconfig)) rmSync(tsconfig)
+  }
+}
+
+stripLayerTsconfigs()
 
 export default defineNuxtConfig({
   extends: [
-    process.env.OAUTH_LAYER_PATH,
-    process.env.MCP_LAYER_PATH
-  ].filter(Boolean) as string[],
+    process.env.OAUTH_LAYER_PATH || ['github:corsacca/nuxt-blueprints/layers/oauth#master', {
+      giget: { dir: `${LAYERS_DIR}/oauth`, forceClean: true }
+    }],
+    process.env.MCP_LAYER_PATH || ['github:corsacca/nuxt-blueprints/layers/mcp#master', {
+      giget: { dir: `${LAYERS_DIR}/mcp`, forceClean: true }
+    }]
+  ],
+
+  hooks: {
+    'modules:before': stripLayerTsconfigs
+  },
 
   modules: [
     './modules/migrations',
