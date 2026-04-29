@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "doxa-cms": {
+      "type": "http",
+      "url": "http://localhost:3033/mcp"
+    }
+  }
+}

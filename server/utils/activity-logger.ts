@@ -21,10 +21,18 @@ interface LogEventOptions {
  * transaction — useful when the audit row must commit atomically with the
  * operation it describes (e.g. granting the first user the admin role).
  * Defaults to the global db for fire-and-forget use from helpers.
+ *
+ * Pass `{ throwOnError: true }` when the caller needs an audit-row failure
+ * to roll back its surrounding transaction. The MCP layer's `mcpLog` sets
+ * this when an executor is provided so a failed audit insert tears down
+ * the page/translation write that depends on it. Default `false` preserves
+ * the existing fire-and-forget admin-side behavior — there is nothing to
+ * roll back outside a transaction.
  */
 export async function logEvent(
   options: LogEventOptions,
-  executor: Kysely<Database> = db
+  executor: Kysely<Database> = db,
+  opts: { throwOnError?: boolean } = {}
 ): Promise<void> {
   try {
     await executor
@@ -41,8 +49,10 @@ export async function logEvent(
       })
       .execute()
   } catch (error) {
-    // Log error but don't throw - logging should never break the main flow
+    // Log error but don't throw by default - logging should never break the
+    // main flow for fire-and-forget callers.
     console.error('Failed to log activity:', error)
+    if (opts.throwOnError) throw error
   }
 }
 

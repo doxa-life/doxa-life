@@ -1,11 +1,13 @@
 // Admin: update a category — slug (cascades to every member page
 // slug), menu_order, and per-locale names. Returns the updated row.
 
-import { defineEventHandler, getRouterParam, readBody, createError } from 'h3'
+import { defineEventHandler, getRouterParam, readBody, createError, getHeader } from 'h3'
 import { requirePermission } from '../../../utils/rbac'
-import { db } from '../../../utils/database'
-import { updateCategory, purgeSlugs } from '../../../database/categories'
-import { logUpdate } from '../../../utils/activity-logger'
+import {
+  updateCmsCategory,
+  applyCategoryInvalidations
+} from '../../../services/cmsCategories'
+import { logEvent } from '../../../utils/activity-logger'
 import { ENABLED_LANGUAGE_CODES } from '../../../../config/languages'
 
 interface Body {
@@ -32,49 +34,32 @@ function normalizeTranslations(
 }
 
 export default defineEventHandler(async (event) => {
-  await requirePermission(event, 'pages.write')
+  const authUser = await requirePermission(event, 'pages.write')
   const id = getRouterParam(event, 'id')
   if (!id) throw createError({ statusCode: 400, statusMessage: 'id is required' })
 
   const body = await readBody<Body>(event)
-
-  const input: Parameters<typeof updateCategory>[1] = {}
-  if (body?.slug != null) {
-    const slug = String(body.slug).trim().replace(/^\/+|\/+$/g, '')
-    if (!slug || !/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Category slug must be lowercase letters, digits, and dashes (no slashes)'
-      })
-    }
-
-    const collidingPage = await db
-      .selectFrom('pages')
-      .select('id')
-      .where('slug', '=', slug)
-      .where('category_id', 'is', null)
-      .executeTakeFirst()
-    if (collidingPage) {
-      throw createError({
-        statusCode: 409,
-        statusMessage: `A page already uses the slug "${slug}".`
-      })
-    }
-
-    input.slug = slug
-  }
-  if (body?.menu_order !== undefined) {
-    input.menu_order = Number(body.menu_order) || 0
-  }
   const translations = normalizeTranslations(body?.translations)
-  if (translations) input.translations = translations
 
   try {
-    const result = await updateCategory(id, input)
-    await purgeSlugs(result.slugsToPurge)
-    logUpdate('categories', id, event, {
-      changes: Object.keys(input),
-      slugsPurged: result.slugsToPurge.length
+    const result = await updateCmsCategory({
+      id,
+      slug: body?.slug != null ? String(body.slug) : undefined,
+      menu_order: body?.menu_order !== undefined ? (Number(body.menu_order) || 0) : undefined,
+      translations
+    })
+    await applyCategoryInvalidations(result.slugsToPurge)
+    logEvent({
+      eventType: 'UPDATE',
+      tableName: 'categories',
+      recordId: id,
+      userId: authUser.userId,
+      userAgent: getHeader(event, 'user-agent') || undefined,
+      metadata: {
+        changes: (['slug', 'menu_order', 'translations'] as const).filter(k => body?.[k] !== undefined),
+        slugsPurged: result.slugsToPurge.length,
+        source: 'admin-ui'
+      }
     })
     return result.category
   } catch (e: any) {
@@ -82,7 +67,7 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 409, statusMessage: 'A category with that slug already exists' })
     }
     if (e?.statusCode) {
-      throw createError({ statusCode: e.statusCode, statusMessage: e.message })
+      throw createError({ statusCode: e.statusCode, statusMessage: e.statusMessage || e.message })
     }
     throw e
   }
