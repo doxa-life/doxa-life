@@ -174,6 +174,15 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2025-01-15',
 
+  experimental: {
+    // Disables @nuxt/nitro-server's per-event useAppConfig override. Without
+    // this, both nitropack and @nuxt/nitro-server register a `useAppConfig`
+    // server auto-import and unimport spams a "Duplicated imports" warning
+    // on every reload. We don't call useAppConfig anywhere, so dropping the
+    // override is a no-op for runtime behavior.
+    serverAppConfig: false
+  },
+
   vue: {
     compilerOptions: {
       isCustomElement: (tag: string) => ['feedback-web-component'].includes(tag)
