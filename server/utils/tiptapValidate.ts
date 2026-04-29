@@ -147,6 +147,15 @@ function isSafeColor(value: unknown): boolean {
   return false
 }
 
+// ── DoS limits ──────────────────────────────────────────────────────
+
+// Caps on the doc-tree shape, independent of serialized size. The schema
+// layer caps body_json at 1 MB; these stop pathological structure (deep
+// nesting or huge node count) that fits inside that budget but still
+// chews CPU at validate/render time.
+const MAX_DEPTH = 50
+const MAX_NODES = 25_000
+
 // ── Errors ──────────────────────────────────────────────────────────
 
 export class TiptapValidationError extends Error {
@@ -192,14 +201,24 @@ export function tiptapValidate(doc: unknown, opts: ValidateOptions = {}): assert
     throw new TiptapValidationError('Document content must be a non-empty array', '$.content')
   }
 
+  // Doc-tree shape budgets (see MAX_DEPTH / MAX_NODES). Single counter
+  // shared across the whole walk; depth tracked per recursion arm.
+  const counter = { nodes: 1 } // root counts as one
   for (let i = 0; i < root.content.length; i++) {
-    walkNode(root.content[i], `$.content[${i}]`, reject)
+    walkNode(root.content[i], `$.content[${i}]`, reject, 1, counter)
   }
 }
 
-function walkNode(node: JsonNode | undefined, path: string, rejectUnknown: boolean): void {
+function walkNode(node: JsonNode | undefined, path: string, rejectUnknown: boolean, depth: number, counter: { nodes: number }): void {
   if (!node || typeof node !== 'object') {
     throw new TiptapValidationError('Node must be an object', path)
+  }
+  counter.nodes++
+  if (counter.nodes > MAX_NODES) {
+    throw new TiptapValidationError(`Document exceeds ${MAX_NODES}-node cap`, path)
+  }
+  if (depth > MAX_DEPTH) {
+    throw new TiptapValidationError(`Document exceeds ${MAX_DEPTH}-level depth cap`, path)
   }
   const type = node.type
   if (!type || typeof type !== 'string') {
@@ -246,7 +265,7 @@ function walkNode(node: JsonNode | undefined, path: string, rejectUnknown: boole
   // Recurse into content
   if (Array.isArray(node.content)) {
     for (let i = 0; i < node.content.length; i++) {
-      walkNode(node.content[i], `${path}.content[${i}]`, rejectUnknown)
+      walkNode(node.content[i], `${path}.content[${i}]`, rejectUnknown, depth + 1, counter)
     }
   }
 }
