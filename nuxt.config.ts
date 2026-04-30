@@ -34,10 +34,17 @@ export default defineNuxtConfig({
     'modules:before': stripLayerTsconfigs,
     // Workaround for https://github.com/nuxt/nuxt/issues/33987
     // `fontless` (via @nuxt/ui → @nuxt/fonts) spawns an esbuild service
-    // it never disposes, so `nuxt build` completes but the Node process
+    // it never disposes, so `nuxt build` finishes but the Node process
     // hangs forever waiting on the orphaned esbuild child. Force-exit
-    // once Nuxt fires its close hook.
-    close: () => {
+    // when the build's close hook fires.
+    //
+    // Guard: `nuxt prepare` also calls `nuxt.close()` mid-flight (right
+    // after `prepare:types`) and the CLI then calls `writeTypes()` to
+    // emit tsconfig.app.json/shared.json/node.json. Exiting here would
+    // truncate that and the next `nuxt build` would fail with ENOENT
+    // on tsconfig.app.json. Same for dev shutdown — let it clean up.
+    close: (nuxt) => {
+      if (nuxt.options._prepare || nuxt.options.dev) return
       process.exit(0)
     }
   },
