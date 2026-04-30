@@ -55,6 +55,7 @@ async function onSubmit(e: Event) {
     if (response?.status === 'success') {
       messageClass.value = 'success'
       messageText.value = t('Thank you for your message. We will get back to you soon!')
+      window.goStats?.track('contact_submit', { metadata: { language: locale.value, country: country.value || null } })
       name.value = ''
       email.value = ''
       country.value = ''

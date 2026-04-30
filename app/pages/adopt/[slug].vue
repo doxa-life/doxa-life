@@ -112,9 +112,11 @@ async function onSubmit(e: Event) {
     if (response?.status === 'needs_verification') {
       verificationPending.value = true
       submitted.value = true
+      window.goStats?.track('adopt_submit', { metadata: { people_group: slug.value, status: 'needs_verification', language: locale.value } })
     } else if (response?.status === 'success') {
       messageClass.value = 'success'
       submitted.value = true
+      window.goStats?.track('adopt_submit', { metadata: { people_group: slug.value, status: 'success', language: locale.value } })
       // Reset fields
       firstName.value = ''
       lastName.value = ''
