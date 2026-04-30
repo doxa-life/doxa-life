@@ -406,6 +406,9 @@ watch(() => deleteState.password, () => {
       </form>
     </UCard>
 
+    <!-- Connected apps (OAuth grants) -->
+    <OauthConnectedApps />
+
     <!-- Sign Out -->
     <UCard>
       <template #header>
