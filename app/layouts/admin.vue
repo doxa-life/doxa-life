@@ -42,7 +42,16 @@ const navItems = computed<NavItem[]>(() => [
       }]
     : []),
   ...(hasPermission('users.view')
-    ? [{ to: '/admin/users', label: 'Users', icon: 'i-lucide-users' }]
+    ? [{
+        to: '/admin/users',
+        label: 'Users',
+        icon: 'i-lucide-users',
+        children: [
+          ...(hasPermission('users.manage')
+            ? [{ to: '/admin/oauth', label: 'OAuth' }]
+            : [])
+        ]
+      }]
     : []),
   ...(hasPermission('roles.view')
     ? [{ to: '/admin/roles', label: 'Roles', icon: 'i-lucide-shield' }]
@@ -58,10 +67,13 @@ const isActive = (to: string) => {
 }
 
 // A parent row is "expanded" when the user is somewhere inside its
-// section — keeps the submenu visible on the category pages.
+// section — keeps the submenu visible on the category pages. Also
+// expands when any child route is active, since some children (e.g.
+// /admin/oauth under Users) live outside the parent's URL tree.
 const isExpanded = (item: NavItem) => {
   if (!item.children?.length) return false
-  return isActive(item.to)
+  if (isActive(item.to)) return true
+  return item.children.some(c => isExactActive(c.to))
 }
 
 const isExactActive = (to: string) => route.path === to || route.path.startsWith(to + '/')
