@@ -141,11 +141,11 @@ watch(() => route.path, () => {
             {{ user?.display_name || user?.email }}
           </div>
           <NuxtLink
-            to="/"
+            to="/admin/profile"
             class="flex items-center gap-2 text-sm text-(--ui-text-muted) hover:text-(--ui-text) transition-colors"
           >
-            <UIcon name="i-lucide-arrow-left" class="size-4" />
-            <span>Back to app</span>
+            <UIcon name="i-lucide-user" class="size-4" />
+            <span>Profile</span>
           </NuxtLink>
         </div>
       </aside>
