@@ -31,7 +31,15 @@ export default defineNuxtConfig({
   ],
 
   hooks: {
-    'modules:before': stripLayerTsconfigs
+    'modules:before': stripLayerTsconfigs,
+    // Workaround for https://github.com/nuxt/nuxt/issues/33987
+    // `fontless` (via @nuxt/ui → @nuxt/fonts) spawns an esbuild service
+    // it never disposes, so `nuxt build` completes but the Node process
+    // hangs forever waiting on the orphaned esbuild child. Force-exit
+    // once Nuxt fires its close hook.
+    close: () => {
+      process.exit(0)
+    }
   },
 
   modules: [
