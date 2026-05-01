@@ -32,7 +32,9 @@ import langFamilyByLanguage from '../data/langFamilyByLanguage.json'
 // ── Emoji prefixes — make local results visually distinct from Mapbox ────────
 const EMOJI_PEOPLE   = '🗺️ '   // people group
 const EMOJI_COUNTRY  = '🌍 '   // country grouping
-const EMOJI_LANGUAGE = '🗣️ '   // language family / language
+const EMOJI_FAMILY   = '🌳 '   // language family
+const EMOJI_LANGUAGE = '🗣️ '   // language
+const EMOJI_DIALECT  = '💬 '   // dialect / variety
 const EMOJI_RELIGION = '🙏 '   // religion / religion family
 
 // ── Score weights ────────────────────────────────────────────────────────────
@@ -44,6 +46,35 @@ const SCORE_LANGUAGE = 10
 // ── Caps ─────────────────────────────────────────────────────────────────────
 const MAX_PER_CATEGORY = 5
 const MAX_TOTAL        = 20
+
+// ── Base-language + dialect parsing (mirrors useLanguageFamilyLegendData rules)
+// "Arabic, Shihhi" → base "Arabic", dialect "Shihhi"
+// "Pakistan Sign Language" → base "Sign Language", dialect "Pakistan"
+// "Bengali" → base "Bengali", dialect null
+const SUFFIX_GROUPS = [
+  [/ sign language$/i, 'Sign Language'],
+]
+function readBaseLanguage(label) {
+  if (!label || typeof label !== 'string') return ''
+  const comma = label.indexOf(',')
+  if (comma > 0) return label.slice(0, comma).trim()
+  for (const [re, base] of SUFFIX_GROUPS) {
+    if (re.test(label) && label.toLowerCase() !== base.toLowerCase()) return base
+  }
+  return label.trim()
+}
+function readDialectLabel(label) {
+  if (!label || typeof label !== 'string') return null
+  const comma = label.indexOf(',')
+  if (comma >= 0) return label.slice(comma + 1).trim() || null
+  for (const [re] of SUFFIX_GROUPS) {
+    if (re.test(label)) {
+      const prefix = label.replace(re, '').trim()
+      return prefix || null
+    }
+  }
+  return null
+}
 
 // ── Family lookup (same comma-inversion logic as useLanguageFamilyLegendData) ─
 function resolveFamily(label) {
@@ -125,7 +156,13 @@ function buildIndex(features) {
     const religionHay = norm(pg.religionName) + ' ' + norm(pg.religion) + ' ' + norm(pg.religionLabel) + ' ' + norm(pg.religionCode)
     const languageHay = norm(pg.language) + ' ' + norm(pg.languageFamily) + ' ' + norm(pg.languageCode)
 
-    const langLabel = strLabel(pg.language) || strLabel(pg.primaryLanguage) || ''
+    // Pull the comma-inverted label from _raw first (the original API form,
+    // e.g. "Arabic, Sudanese") — pg.language can be overwritten by useMapData.
+    const rawLang = pg._raw?.primary_language ?? pg._raw?.PrimaryLanguage
+    const langLabel = (rawLang && (typeof rawLang === 'object' ? (rawLang.label || rawLang.value) : rawLang))
+      || strLabel(pg.language) || strLabel(pg.primaryLanguage) || ''
+    const baseLang     = readBaseLanguage(langLabel)
+    const dialectLabel = readDialectLabel(langLabel)
     index.push({
       feature: pg,
       nameHay,
@@ -137,6 +174,8 @@ function buildIndex(features) {
       lng,
       familyDerived: resolveFamily(langLabel) || null,
       languageLabel: langLabel,
+      baseLang,
+      dialectLabel,
     })
   }
   return index
@@ -147,7 +186,9 @@ function buildIndex(features) {
  * categories.
  */
 function buildAggregates(entries) {
-  const aggregate = (keyFn, labelFn) => {
+  // extraFn(bucket, entry, isNew) lets a caller stash extra per-bucket data
+  // (e.g. originalLabels for dialect aggregates).
+  const aggregate = (keyFn, labelFn, extraFn) => {
     const map = new Map()
     for (const e of entries) {
       const key = keyFn(e)
@@ -162,8 +203,9 @@ function buildAggregates(entries) {
         existing.maxLng = Math.max(existing.maxLng, e.lng)
         existing.minLat = Math.min(existing.minLat, e.lat)
         existing.maxLat = Math.max(existing.maxLat, e.lat)
+        if (extraFn) extraFn(existing, e, false)
       } else {
-        map.set(key, {
+        const v = {
           key,
           label: strLabel(labelFn(e)) || key,
           count: 1,
@@ -172,7 +214,9 @@ function buildAggregates(entries) {
           minLng: e.lng, maxLng: e.lng,
           minLat: e.lat, maxLat: e.lat,
           memberIds: [String(e.feature.uniqueId ?? e.feature.id ?? e.feature.slug ?? '')],
-        })
+        }
+        if (extraFn) extraFn(v, e, true)
+        map.set(key, v)
       }
     }
     // finalize centroids
@@ -188,9 +232,35 @@ function buildAggregates(entries) {
       (e) => norm(e.feature.countryName) || norm(e.feature.country) || norm(e.feature.countryIso),
       (e) => e.feature.countryName || e.feature.country || e.feature.countryIso || ''
     ),
+    // Language families — derived from primary_language via langFamilyByLanguage lookup
+    families: aggregate(
+      (e) => norm(e.familyDerived),
+      (e) => e.familyDerived || ''
+    ),
+    // Languages — keyed by BASE language (e.g. "Arabic" not "Arabic, Sudanese")
+    // so a search for "Arabic" matches one row covering all Arabic dialects.
     languages: aggregate(
-      (e) => norm(e.feature.language) || norm(e.feature.languageFamily),
-      (e) => e.feature.language || e.feature.languageFamily || ''
+      (e) => norm(e.baseLang),
+      (e) => e.baseLang || ''
+    ),
+    // Dialects — only entries that have a dialectLabel; keyed by base+dialect
+    // so "Arabic, Sudanese" and "Sign Language, Pakistan" each get their own row.
+    // originalLabels accumulates the raw API labels needed to filter pins exactly.
+    dialects: aggregate(
+      (e) => e.dialectLabel ? `${norm(e.baseLang)}__${norm(e.dialectLabel)}` : '',
+      (e) => `${e.baseLang}, ${e.dialectLabel}`,
+      (bucket, e, isNew) => {
+        if (isNew) {
+          bucket.originalLabels = new Set([e.languageLabel])
+          bucket.familyDerived  = e.familyDerived || ''
+          bucket.baseLang       = e.baseLang || ''
+          bucket.dialectLabel   = e.dialectLabel || ''
+        } else {
+          bucket.originalLabels.add(e.languageLabel)
+          // Keep the first non-empty family in case some pins lack the lookup.
+          if (!bucket.familyDerived && e.familyDerived) bucket.familyDerived = e.familyDerived
+        }
+      }
     ),
     religions: aggregate(
       (e) => norm(e.feature.religionName) || norm(e.feature.religion),
@@ -234,15 +304,27 @@ function makePeopleFeature(entry) {
 function makeAggregateFeature(kind, agg) {
   let emoji, placeType, idPrefix
   switch (kind) {
-    case 'country':  emoji = EMOJI_COUNTRY;  placeType = 'doxa-country';  idPrefix = 'doxa-country-'; break
-    case 'language': emoji = EMOJI_LANGUAGE; placeType = 'doxa-language'; idPrefix = 'doxa-language-'; break
-    case 'religion': emoji = EMOJI_RELIGION; placeType = 'doxa-religion'; idPrefix = 'doxa-religion-'; break
-    default:         emoji = '';             placeType = 'doxa';          idPrefix = 'doxa-'
+    case 'country':         emoji = EMOJI_COUNTRY;  placeType = 'doxa-country';         idPrefix = 'doxa-country-';         break
+    case 'language-family': emoji = EMOJI_FAMILY;   placeType = 'doxa-language-family'; idPrefix = 'doxa-language-family-'; break
+    case 'language':        emoji = EMOJI_LANGUAGE; placeType = 'doxa-language';        idPrefix = 'doxa-language-';        break
+    case 'dialect':         emoji = EMOJI_DIALECT;  placeType = 'doxa-dialect';         idPrefix = 'doxa-dialect-';         break
+    case 'religion':        emoji = EMOJI_RELIGION; placeType = 'doxa-religion';        idPrefix = 'doxa-religion-';        break
+    default:                emoji = '';             placeType = 'doxa';                 idPrefix = 'doxa-'
   }
   const label = strLabel(agg.label) || agg.key
   const slug = slugify(agg.key)
   const center = [agg.lng, agg.lat]
   const display = `${label} (${agg.count})`
+
+  // Dialect features carry originalLabels + familyDerived so the geocoder
+  // result handler in research-map.vue can build a legend-matching dialect key
+  // and filter pins on the exact API language string.
+  const originalLabels = agg.originalLabels ? Array.from(agg.originalLabels) : undefined
+  const dialectExtra = (kind === 'dialect') ? {
+    familyDerived: agg.familyDerived || '',
+    baseLang:      agg.baseLang || '',
+    dialectLabel:  agg.dialectLabel || '',
+  } : null
 
   return {
     id: `${idPrefix}${slug}`,
@@ -259,6 +341,8 @@ function makeAggregateFeature(kind, agg) {
       label,
       memberIds: agg.memberIds,
       bounds: [agg.minLng, agg.minLat, agg.maxLng, agg.maxLat],
+      ...(originalLabels ? { originalLabels } : {}),
+      ...(dialectExtra || {}),
     },
     feature: null,
   }
@@ -298,7 +382,7 @@ export function useDoxaSearch(opts = {}) {
    */
   function searchGrouped(query) {
     const q = String(query || '').trim().toLowerCase()
-    const empty = { people: [], places: [], languages: [], religions: [] }
+    const empty = { people: [], places: [], families: [], languages: [], dialects: [], religions: [] }
     if (q.length < 2) return empty
 
     const tokens = q.split(/[\s,;]+/).filter(Boolean)
@@ -337,11 +421,13 @@ export function useDoxaSearch(opts = {}) {
         .sort((a, b) => b.count - a.count)
         .slice(0, MAX_PER_CATEGORY)
 
-    const places    = matchAgg(aggs.countries).map(a => makeAggregateFeature('country',  a))
-    const languages = matchAgg(aggs.languages).map(a => makeAggregateFeature('language', a))
-    const religions = matchAgg(aggs.religions).map(a => makeAggregateFeature('religion', a))
+    const places    = matchAgg(aggs.countries).map(a => makeAggregateFeature('country',         a))
+    const families  = matchAgg(aggs.families ).map(a => makeAggregateFeature('language-family', a))
+    const languages = matchAgg(aggs.languages).map(a => makeAggregateFeature('language',        a))
+    const dialects  = matchAgg(aggs.dialects ).map(a => makeAggregateFeature('dialect',         a))
+    const religions = matchAgg(aggs.religions).map(a => makeAggregateFeature('religion',        a))
 
-    return { people: peopleFeatures, places, languages, religions }
+    return { people: peopleFeatures, places, families, languages, dialects, religions }
   }
 
   /**
@@ -356,7 +442,8 @@ export function useDoxaSearch(opts = {}) {
   function search(query) {
     const activeFilter = typeof getActiveFilter === 'function' ? getActiveFilter() : null
     const g = searchGrouped(query)
-    const allFlat = [...g.people, ...g.places, ...g.languages, ...g.religions]
+    // Order: family → language → dialect (semantic-tree top-down) before places/religions.
+    const allFlat = [...g.people, ...g.families, ...g.languages, ...g.dialects, ...g.places, ...g.religions]
 
     if (!activeFilter?.key || !allFlat.length) {
       return allFlat.slice(0, MAX_TOTAL)
