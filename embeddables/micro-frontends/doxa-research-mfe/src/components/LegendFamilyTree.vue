@@ -86,12 +86,19 @@ function switchLegendTab(tabId) {
   else activeLegendTab.value = tabId  // fallback if store not injected
 }
 
-// ── Computed title (R8 addendum: surface parent of the currently selected child) ──
-// Default: title prop ("Language Families") on family tab; tab-derived label on others.
-// When a child is selected, replace the title with "Parent: <parent-label>" so the
-// user can see where the selection sits in the hierarchy without leaving the tab.
+// ── Computed title — "Field: Parent" pattern (qa-buildinng-round-1 R2 Bug 6) ──
+// The title row surfaces the IMMEDIATE PARENT of the currently selected row,
+// labelled by the parent's level. Parents traverse up the semantic tree:
+//   dialect → language → family.
+// Examples:
+//   • Family tab + Sign Language family selected      → "Family: Sign Language"
+//   • Family tab + Pakistan Sign Language selected    → "Family: Sign Language"
+//     (parent of the language under that family)
+//   • Languages tab + Arabic selected                 → "Family: Afro-Asiatic"
+//   • Dialects tab + "Arabic, Sudanese" selected      → "Language: Arabic"
+//   • No selection on any tab                         → tab name
 const computedTitle = computed(() => {
-  // Dialect selected → parent = the language ("Arabic")
+  // Dialect selected → parent is the language
   if (selectedDialectKey.value) {
     const dk = selectedDialectKey.value
     const lastSep = dk.lastIndexOf('__')
@@ -99,18 +106,22 @@ const computedTitle = computed(() => {
       const langPath = dk.slice(0, lastSep)
       const langSep = langPath.indexOf('__')
       const langLabel = langSep > 0 ? langPath.slice(langSep + 2) : langPath
-      return 'Parent: ' + langLabel
+      return 'Language: ' + langLabel
     }
   }
-  // Language selected → parent = the family. Look it up via languageRows.
+  // Language selected → parent is the family (look it up via languageRows)
   if (selectedLanguageKey.value) {
     const langRow = languageRows.value.find(r => r.label === selectedLanguageKey.value)
-    if (langRow?.familyKey) return 'Parent: ' + langRow.familyKey
+    if (langRow?.familyKey) return 'Family: ' + langRow.familyKey
   }
-  // No child selection — use tab-derived label (Tab 1 = title prop, Tab 2/3 = layer name).
+  // Family selected → "Family: <name>" (slightly recursive but explicit per QA R2)
+  if (selectedFamilyKey.value) {
+    return 'Family: ' + selectedFamilyKey.value
+  }
+  // No selection — fall back to the tab-derived label.
   if (activeLegendTab.value === 'language') return 'Languages'
   if (activeLegendTab.value === 'dialect')  return 'Dialects/Varieties'
-  return props.title
+  return props.title  // "Language Families" default
 })
 
 // ── Selection + dimming state ─────────────────────────────────────────────────
@@ -151,7 +162,7 @@ defineExpose({ switchLegendTab })
 
 useShadowStyles(`
 /* ── Outer wrapper ── */
-.legend-family-tree{--lft-caret-col:10px;display:flex;flex-direction:column;height:100%;min-height:0;}
+.legend-family-tree{--lft-caret-col:10px;--lft-deselect-col:24px;display:flex;flex-direction:column;height:100%;min-height:0;}
 
 /* ── Tab bar — lives above the CSS table. Compact pill tabs. ── */
 .lft-tab-bar{display:flex;gap:2px;padding:8px 10px 4px;flex-shrink:0;}
@@ -165,7 +176,7 @@ useShadowStyles(`
 .legend-container.collapsed .lft-tab-bar{display:none!important;}
 
 /* ── Grid table (identical to previous) ── */
-.lft-items{display:grid;grid-template-columns:var(--lft-caret-col) minmax(80px,1fr) auto auto var(--lft-caret-col);grid-auto-rows:auto;align-content:start;column-gap:6px;row-gap:6px;padding:0 0 12px;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;-ms-overflow-style:none;}
+.lft-items{display:grid;grid-template-columns:var(--lft-caret-col) minmax(80px,1fr) auto auto var(--lft-deselect-col);grid-auto-rows:auto;align-content:start;column-gap:6px;row-gap:6px;padding:0 0 12px;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;-ms-overflow-style:none;}
 .lft-items::-webkit-scrollbar{display:none;width:0;height:0;}
 .lft-title-row{display:grid;grid-template-columns:subgrid;grid-column:1 / -1;align-items:center;padding:12px 0 6px;position:sticky;top:0;z-index:5;background:#fff;}
 .lft-dark .lft-title-row{background:#3b463d;}
@@ -210,16 +221,13 @@ useShadowStyles(`
 .lft-has-selection .lft-row.lft-row-child-active:not(.lft-row-selected) .lft-item-inner{opacity:1!important;}
 .lft-has-selection .lft-row.lft-row-child-active:not(.lft-row-selected) .lft-item-inner:hover{opacity:0.92!important;}
 
-/* ── Inline X deselect button — chip pattern (Google Filters / MUI chips).
-   Absolute-positioned at the far right of the pill. Only visible on selected
-   rows. position:relative on .lft-item-inner anchors it without breaking the
-   subgrid. The pill spans grid columns 2 to -2; the right caret column (-1)
-   is empty, so right:-22px tucks the X into that gap and never overlaps the
-   population badge. ── */
-.lft-deselect-btn{display:none;position:absolute;right:-22px;top:50%;transform:translateY(-50%);width:16px;height:16px;background:rgba(0,0,0,0.55);border:none;border-radius:50%;padding:0;cursor:pointer;align-items:center;justify-content:center;color:#fff;transition:background 0.12s;outline:none;-webkit-tap-highlight-color:transparent;z-index:2;box-shadow:0 1px 3px rgba(0,0,0,0.35);}
+/* ── X deselect button — lives in the row's trailing grid column.
+   The pill spans columns 2 to -2; this button takes column 5 (-1).
+   No absolute positioning, no overlap. Hidden on non-selected rows. ── */
+.lft-deselect-btn{grid-column:-2 / -1;justify-self:center;align-self:center;display:none;width:18px;height:18px;background:rgba(0,0,0,0.55);border:none;border-radius:50%;padding:0;cursor:pointer;align-items:center;justify-content:center;color:#fff;transition:background 0.12s,transform 0.12s;outline:none;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 3px rgba(0,0,0,0.35);}
 .lft-row-selected .lft-deselect-btn{display:flex;}
-.lft-deselect-btn:hover{background:rgba(0,0,0,0.78);}
-.lft-dark .lft-deselect-btn{background:rgba(243,243,241,0.85);color:#1a1a2e;}
+.lft-deselect-btn:hover{background:rgba(0,0,0,0.78);transform:scale(1.06);}
+.lft-dark .lft-deselect-btn{background:rgba(243,243,241,0.88);color:#1a1a2e;}
 .lft-dark .lft-deselect-btn:hover{background:#F3F3F1;}
 
 /* ── Name + badges ── */
@@ -299,18 +307,18 @@ useShadowStyles(`
                     {{ col.key === 'population' ? fmtPop(row.population) : fmtCount(row.peopleGroupCount) }}
                   </span>
                 </span>
-                <button
-                  v-if="row.label === selectedFamilyKey"
-                  class="lft-deselect-btn"
-                  @click="(e) => deselectRow(row, e)"
-                  aria-label="Clear selection"
-                >
-                  <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
-                    <path d="M2 2L8 8M8 2L2 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                  </svg>
-                </button>
               </div>
             </div>
+            <button
+              v-if="row.label === selectedFamilyKey"
+              class="lft-deselect-btn"
+              @click="(e) => deselectRow(row, e)"
+              aria-label="Clear selection"
+            >
+              <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                <path d="M2 2L8 8M8 2L2 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
           </div>
 
           <!-- Child language rows (expanded family) -->
@@ -318,7 +326,10 @@ useShadowStyles(`
             <template v-for="child in childRowsFor(row.key)" :key="child.key">
               <div
                 class="lft-row lft-row-child"
-                :class="{ 'lft-row-selected': child.label === selectedLanguageKey }"
+                :class="{
+                  'lft-row-selected': child.label === selectedLanguageKey,
+                  'lft-row-child-active': row.label === selectedFamilyKey
+                }"
               >
                 <button
                   v-if="child.hasDialects"
@@ -341,18 +352,18 @@ useShadowStyles(`
                         {{ col.key === 'population' ? fmtPop(child.population) : fmtCount(child.peopleGroupCount) }}
                       </span>
                     </span>
-                    <button
-                      v-if="child.label === selectedLanguageKey"
-                      class="lft-deselect-btn"
-                      @click="(e) => deselectRow(child, e)"
-                      aria-label="Clear selection"
-                    >
-                      <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
-                        <path d="M2 2L8 8M8 2L2 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                      </svg>
-                    </button>
                   </div>
                 </div>
+                <button
+                  v-if="child.label === selectedLanguageKey"
+                  class="lft-deselect-btn"
+                  @click="(e) => deselectRow(child, e)"
+                  aria-label="Clear selection"
+                >
+                  <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                    <path d="M2 2L8 8M8 2L2 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </button>
               </div>
               <!-- Dialect grandchildren under language child -->
               <template v-if="child.hasDialects && isExpanded(child.key)">
@@ -361,7 +372,7 @@ useShadowStyles(`
                   :key="dialect.key"
                   class="lft-row lft-row-dialect"
                   :class="{
-                    'lft-row-child-active': child.label === selectedLanguageKey,
+                    'lft-row-child-active': child.label === selectedLanguageKey || row.label === selectedFamilyKey,
                     'lft-row-selected': dialect.key === selectedDialectKey
                   }"
                 >
@@ -373,18 +384,18 @@ useShadowStyles(`
                           {{ col.key === 'population' ? fmtPop(dialect.population) : fmtCount(dialect.peopleGroupCount) }}
                         </span>
                       </span>
-                      <button
-                        v-if="dialect.key === selectedDialectKey"
-                        class="lft-deselect-btn"
-                        @click="(e) => deselectRow(dialect, e)"
-                        aria-label="Clear selection"
-                      >
-                        <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
-                          <path d="M2 2L8 8M8 2L2 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                        </svg>
-                      </button>
                     </div>
                   </div>
+                  <button
+                    v-if="dialect.key === selectedDialectKey"
+                    class="lft-deselect-btn"
+                    @click="(e) => deselectRow(dialect, e)"
+                    aria-label="Clear selection"
+                  >
+                    <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                      <path d="M2 2L8 8M8 2L2 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                  </button>
                 </div>
               </template>
             </template>
@@ -422,18 +433,18 @@ useShadowStyles(`
                     {{ col.key === 'population' ? fmtPop(row.population) : fmtCount(row.peopleGroupCount) }}
                   </span>
                 </span>
-                <button
-                  v-if="row.label === selectedLanguageKey"
-                  class="lft-deselect-btn"
-                  @click="(e) => deselectRow(row, e)"
-                  aria-label="Clear selection"
-                >
-                  <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
-                    <path d="M2 2L8 8M8 2L2 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                  </svg>
-                </button>
               </div>
             </div>
+            <button
+              v-if="row.label === selectedLanguageKey"
+              class="lft-deselect-btn"
+              @click="(e) => deselectRow(row, e)"
+              aria-label="Clear selection"
+            >
+              <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                <path d="M2 2L8 8M8 2L2 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
           </div>
           <!-- Dialect children under language row -->
           <template v-if="row.hasDialects && isExpanded(row.key)">
@@ -454,18 +465,18 @@ useShadowStyles(`
                       {{ col.key === 'population' ? fmtPop(dialect.population) : fmtCount(dialect.peopleGroupCount) }}
                     </span>
                   </span>
-                  <button
-                    v-if="dialect.key === selectedDialectKey"
-                    class="lft-deselect-btn"
-                    @click="(e) => deselectRow(dialect, e)"
-                    aria-label="Clear selection"
-                  >
-                    <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
-                      <path d="M2 2L8 8M8 2L2 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                  </button>
                 </div>
               </div>
+              <button
+                v-if="dialect.key === selectedDialectKey"
+                class="lft-deselect-btn"
+                @click="(e) => deselectRow(dialect, e)"
+                aria-label="Clear selection"
+              >
+                <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 2L8 8M8 2L2 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </button>
             </div>
           </template>
         </template>
@@ -489,18 +500,18 @@ useShadowStyles(`
                     {{ col.key === 'population' ? fmtPop(row.population) : fmtCount(row.peopleGroupCount) }}
                   </span>
                 </span>
-                <button
-                  v-if="row.key === selectedDialectKey"
-                  class="lft-deselect-btn"
-                  @click="(e) => deselectRow(row, e)"
-                  aria-label="Clear selection"
-                >
-                  <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
-                    <path d="M2 2L8 8M8 2L2 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                  </svg>
-                </button>
               </div>
             </div>
+            <button
+              v-if="row.key === selectedDialectKey"
+              class="lft-deselect-btn"
+              @click="(e) => deselectRow(row, e)"
+              aria-label="Clear selection"
+            >
+              <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                <path d="M2 2L8 8M8 2L2 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
           </div>
         </template>
         <div v-else class="lft-empty">No dialect data available.</div>
