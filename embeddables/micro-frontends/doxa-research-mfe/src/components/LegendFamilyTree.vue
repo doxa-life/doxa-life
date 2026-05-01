@@ -19,7 +19,7 @@
  *   Emits `highlight` on parent channel AND dispatches `legend:highlight` window
  *   event (cross-shadow-DOM). Both carry the same payload.
  */
-import { defineProps, defineEmits, computed, inject, ref, onMounted, onBeforeUnmount } from 'vue'
+import { defineProps, defineEmits, computed, inject } from 'vue'
 import { useShadowStyles } from '@/composables/useShadowStyles.js'
 import { useLanguageFamilyLegendData } from '../composables/useLanguageFamilyLegendData.js'
 
@@ -61,21 +61,9 @@ const props = defineProps({
   tabLabels: {
     type: Array,
     default: () => [
-      {
-        id: 'family',
-        label: 'Language Families',
-        info: 'A language family is a group of languages descended from a common ancestor (e.g. Indo-European, Afro-Asiatic).'
-      },
-      {
-        id: 'language',
-        label: 'Languages',
-        info: 'A language is a system of communication used by a people (e.g. Arabic, Bengali, Hindi).'
-      },
-      {
-        id: 'dialect',
-        label: 'Dialects/Varieties',
-        info: 'A dialect/variety is a regional or social form of a language (e.g. Arabic, Sudanese; Arabic, Levantine).'
-      }
+      { id: 'family',   label: 'Language Families' },
+      { id: 'language', label: 'Languages'         },
+      { id: 'dialect',  label: 'Dialects/Varieties' }
     ]
   }
 })
@@ -96,44 +84,7 @@ const activeLegendTab = computed({
 function switchLegendTab(tabId) {
   if (mapStore?.setActiveLegendTab) mapStore.setActiveLegendTab(tabId)
   else activeLegendTab.value = tabId  // fallback if store not injected
-  // Close any open info popover when changing tabs.
-  openInfoTab.value = null
 }
-
-// ── Tab info popovers — per-tab "what is this?" definition (R8 addendum) ─────
-// openInfoTab holds the id of the tab whose popover is open (or null).
-// Click ⓘ → toggle for that tab. Click ⓘ on a different tab → swap.
-// Click outside → close. Escape key → close.
-const openInfoTab = ref(null)
-function toggleInfo(tabId, evt) {
-  evt?.stopPropagation()
-  openInfoTab.value = (openInfoTab.value === tabId) ? null : tabId
-}
-function onDocClick(evt) {
-  if (!openInfoTab.value) return
-  // Use composedPath() so the check works across the shadow-DOM boundary —
-  // event.target is rewritten to the host element from outside the shadow root.
-  const path = (typeof evt.composedPath === 'function') ? evt.composedPath() : []
-  for (const n of path) {
-    if (n && n.classList && n.classList.contains && n.classList.contains('lft-tab-info-wrap')) return
-  }
-  openInfoTab.value = null
-}
-function onEsc(evt) {
-  if (evt.key === 'Escape') openInfoTab.value = null
-}
-onMounted(() => {
-  if (typeof document !== 'undefined') {
-    document.addEventListener('click', onDocClick, true)
-    document.addEventListener('keydown', onEsc)
-  }
-})
-onBeforeUnmount(() => {
-  if (typeof document !== 'undefined') {
-    document.removeEventListener('click', onDocClick, true)
-    document.removeEventListener('keydown', onEsc)
-  }
-})
 
 // ── Computed title (R8 addendum: surface parent of the currently selected child) ──
 // Default: title prop ("Language Families") on family tab; tab-derived label on others.
@@ -204,8 +155,7 @@ useShadowStyles(`
 
 /* ── Tab bar — lives above the CSS table. Compact pill tabs. ── */
 .lft-tab-bar{display:flex;gap:2px;padding:8px 10px 4px;flex-shrink:0;}
-.lft-tab-info-wrap{flex:1;position:relative;display:flex;align-items:center;gap:2px;min-width:0;}
-.lft-tab-btn{flex:1;background:none;border:none;padding:4px 6px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;color:#6b7280;white-space:nowrap;transition:background 0.12s,color 0.12s;outline:none;-webkit-tap-highlight-color:transparent;overflow:hidden;text-overflow:ellipsis;}
+.lft-tab-btn{flex:1;background:none;border:none;padding:4px 6px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;color:#6b7280;white-space:nowrap;transition:background 0.12s,color 0.12s;outline:none;-webkit-tap-highlight-color:transparent;}
 .lft-tab-btn:hover{background:rgba(0,0,0,0.06);color:#374151;}
 .lft-tab-btn.lft-tab-active{background:rgba(0,0,0,0.10);color:#111827;}
 .lft-dark .lft-tab-btn{color:rgba(243,243,241,0.6);}
@@ -213,16 +163,6 @@ useShadowStyles(`
 .lft-dark .lft-tab-btn.lft-tab-active{background:rgba(255,255,255,0.14);color:#F3F3F1;}
 /* Hide tab bar when the legend card is collapsed */
 .legend-container.collapsed .lft-tab-bar{display:none!important;}
-
-/* ── Tab info button (ⓘ) + popover (R8 addendum) ── */
-.lft-tab-info-btn{flex:0 0 auto;background:transparent;border:none;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer;color:#9ca3af;transition:background 0.12s,color 0.12s;outline:none;-webkit-tap-highlight-color:transparent;}
-.lft-tab-info-btn:hover{background:rgba(0,0,0,0.06);color:#374151;}
-.lft-tab-info-btn.lft-tab-info-open{background:rgba(0,0,0,0.10);color:#111827;}
-.lft-dark .lft-tab-info-btn{color:rgba(243,243,241,0.55);}
-.lft-dark .lft-tab-info-btn:hover{background:rgba(255,255,255,0.10);color:#F3F3F1;}
-.lft-dark .lft-tab-info-btn.lft-tab-info-open{background:rgba(255,255,255,0.16);color:#F3F3F1;}
-.lft-tab-info-popover{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:20;background:#fff;color:#111827;border:1px solid rgba(0,0,0,0.10);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.15);padding:10px 12px;font-size:11px;line-height:1.45;font-weight:400;white-space:normal;}
-.lft-dark .lft-tab-info-popover{background:#3b463d;color:#F3F3F1;border-color:rgba(255,255,255,0.18);box-shadow:0 8px 24px rgba(0,0,0,0.5);}
 
 /* ── Grid table (identical to previous) ── */
 .lft-items{display:grid;grid-template-columns:var(--lft-caret-col) minmax(80px,1fr) auto auto var(--lft-caret-col);grid-auto-rows:auto;align-content:start;column-gap:6px;row-gap:6px;padding:0 0 12px;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;-ms-overflow-style:none;}
@@ -306,39 +246,17 @@ useShadowStyles(`
 <template>
   <div :class="['legend-family-tree', isDark ? 'lft-dark' : 'lft-light', { 'lft-has-selection': hasSelection }]">
 
-    <!-- ── Tab bar (above the CSS table) ── -->
+    <!-- ── Tab bar (above the CSS table). Tab definitions live in the toolbar
+         HelpButton, not inline ⓘ icons — keeps the legend uncluttered for the
+         eventual mobile rewrite. ── -->
     <div class="lft-tab-bar">
-      <div
+      <button
         v-for="tab in tabLabels"
         :key="tab.id"
-        class="lft-tab-info-wrap"
-      >
-        <button
-          class="lft-tab-btn"
-          :class="{ 'lft-tab-active': activeLegendTab === tab.id }"
-          @click="switchLegendTab(tab.id)"
-        >{{ tab.label }}</button>
-        <button
-          v-if="tab.info"
-          class="lft-tab-info-btn"
-          :class="{ 'lft-tab-info-open': openInfoTab === tab.id }"
-          :aria-label="`What is a ${tab.label.toLowerCase()}?`"
-          :aria-expanded="openInfoTab === tab.id"
-          @click="(e) => toggleInfo(tab.id, e)"
-        >
-          <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/>
-            <path d="M8 7.5V11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-            <circle cx="8" cy="5" r="0.9" fill="currentColor"/>
-          </svg>
-        </button>
-        <div
-          v-if="tab.info && openInfoTab === tab.id"
-          class="lft-tab-info-popover"
-          role="tooltip"
-          @click.stop
-        >{{ tab.info }}</div>
-      </div>
+        class="lft-tab-btn"
+        :class="{ 'lft-tab-active': activeLegendTab === tab.id }"
+        @click="switchLegendTab(tab.id)"
+      >{{ tab.label }}</button>
     </div>
 
     <!-- Optional content slot before the table rows -->
