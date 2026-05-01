@@ -62,7 +62,8 @@ const props = defineProps({
     type: Array,
     default: () => [
       { id: 'family',   label: 'Language Families' },
-      { id: 'language', label: 'Languages'         }
+      { id: 'language', label: 'Languages'         },
+      { id: 'dialect',  label: 'Dialects/Varieties' }
     ]
   }
 })
@@ -84,6 +85,33 @@ function switchLegendTab(tabId) {
   if (mapStore?.setActiveLegendTab) mapStore.setActiveLegendTab(tabId)
   else activeLegendTab.value = tabId  // fallback if store not injected
 }
+
+// ── Computed title (R8 addendum: surface parent of the currently selected child) ──
+// Default: title prop ("Language Families") on family tab; tab-derived label on others.
+// When a child is selected, replace the title with "Parent: <parent-label>" so the
+// user can see where the selection sits in the hierarchy without leaving the tab.
+const computedTitle = computed(() => {
+  // Dialect selected → parent = the language ("Arabic")
+  if (selectedDialectKey.value) {
+    const dk = selectedDialectKey.value
+    const lastSep = dk.lastIndexOf('__')
+    if (lastSep > 0) {
+      const langPath = dk.slice(0, lastSep)
+      const langSep = langPath.indexOf('__')
+      const langLabel = langSep > 0 ? langPath.slice(langSep + 2) : langPath
+      return 'Parent: ' + langLabel
+    }
+  }
+  // Language selected → parent = the family. Look it up via languageRows.
+  if (selectedLanguageKey.value) {
+    const langRow = languageRows.value.find(r => r.label === selectedLanguageKey.value)
+    if (langRow?.familyKey) return 'Parent: ' + langRow.familyKey
+  }
+  // No child selection — use tab-derived label (Tab 1 = title prop, Tab 2/3 = layer name).
+  if (activeLegendTab.value === 'language') return 'Languages'
+  if (activeLegendTab.value === 'dialect')  return 'Dialects/Varieties'
+  return props.title
+})
 
 // ── Selection + dimming state ─────────────────────────────────────────────────
 // hasSelection drives .lft-has-selection which dims non-selected rows at 30%.
@@ -147,7 +175,18 @@ useShadowStyles(`
 .lft-row{display:grid;grid-template-columns:subgrid;grid-column:1 / -1;align-items:center;min-height:36px;}
 .lft-row-child{margin-left:0;}
 .lft-row-dialect{margin-left:0;}
-.lft-name-dialect{padding-left:28px;font-weight:500;font-size:11px;font-style:italic;}
+/* Per-generation indent for nested rows (CSS table cells ignore padding,
+   so the indent goes on .lft-name inside the inner pill).
+   Gen 1 (family/language at root): 8px (.lft-name baseline below)
+   Gen 2 (language under family / dialect under language in tab 2): 24px (.lft-row-child .lft-name)
+   Gen 3 (dialect under language under family — tab 1 grandchildren): 40px (.lft-name-dialect) */
+.lft-name-dialect{padding-left:40px;font-weight:500;font-size:11px;font-style:italic;}
+/* Vertical hierarchy guide-line on child rows */
+.lft-row-child .lft-item-inner::before,
+.lft-row-dialect .lft-item-inner::before{content:'';position:absolute;left:8px;top:8px;bottom:8px;width:2px;border-radius:2px;background:rgba(255,255,255,0.45);pointer-events:none;}
+.lft-dark .lft-row-child .lft-item-inner::before,
+.lft-dark .lft-row-dialect .lft-item-inner::before{background:rgba(243,243,241,0.30);}
+.lft-row-dialect .lft-item-inner::before{left:24px;}
 .lft-caret-indent{margin-left:10px;}
 .lft-caret{grid-column:1;justify-self:center;align-self:center;width:14px;height:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#374151;background:transparent;border:none;padding:0;transition:transform 0.2s ease;outline:none;-webkit-tap-highlight-color:transparent;}
 .lft-caret:hover{background:rgba(0,0,0,0.06);border-radius:3px;color:#111;}
@@ -182,7 +221,7 @@ useShadowStyles(`
 
 /* ── Name + badges ── */
 .lft-name{padding:0 0 0 8px;font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.lft-row-child .lft-name{padding-left:18px;font-weight:600;}
+.lft-row-child .lft-name{padding-left:24px;font-weight:600;}
 .lft-badge{display:flex;align-items:center;justify-content:center;}
 .lft-badge-inner{display:inline-flex;align-items:center;justify-content:gap:4px;background:rgba(255,255,255,0.22);border-radius:6px;padding:1px 6px;font-size:10px;font-weight:700;font-family:'Courier New',monospace;white-space:nowrap;min-width:30px;text-align:center;}
 .lft-cluster-icon{display:inline-block;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px currentColor;opacity:0.85;}
@@ -227,7 +266,7 @@ useShadowStyles(`
         <span class="lft-title-caret-slot">
           <slot name="title-caret" />
         </span>
-        <span class="lft-title">{{ title }}</span>
+        <span class="lft-title">{{ computedTitle }}</span>
         <span v-for="col in columns" :key="col.key" class="lft-header-col">{{ col.label }}</span>
       </div>
 

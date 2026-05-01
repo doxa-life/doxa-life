@@ -42,7 +42,7 @@
     geocoder       — the raw MapboxGeocoder instance (for advanced usage)
 -->
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed, inject } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, inject, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDoxaSearch } from '../../composables/useDoxaSearch.js'
 
@@ -276,6 +276,21 @@ onMounted(() => {
   geocoder.value.on('error',  (e)  => emit('error', e))
 
   map.addControl(geocoder.value, 'top-left')
+})
+
+// Mapbox Geocoder sets `placeholder` once at construction; it has no public
+// updater method. Watch the effective placeholder and patch the DOM input
+// directly so the per-map prop can change as the user switches profile tabs.
+watch(effectivePlaceholder, (next) => {
+  const inst = geocoder.value
+  if (!inst) return
+  const inputEl = inst._inputEl || inst.container?.querySelector?.('input.mapboxgl-ctrl-geocoder--input')
+  if (inputEl) {
+    inputEl.placeholder = next
+    inputEl.setAttribute('placeholder', next)
+  }
+  // Also stash on the instance so any internal reads pick it up.
+  if (inst.options) inst.options.placeholder = next
 })
 
 onBeforeUnmount(() => {

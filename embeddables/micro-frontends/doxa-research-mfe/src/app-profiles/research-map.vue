@@ -295,6 +295,17 @@ const activeTab   = computed(() => tabs.value.find(t => t.id === activeTabId.val
 const activeLegendType = computed(() => activeTab.value?.legend ?? 'default')
 const activePopupAction = computed(() => activeTab.value?.popup ?? 'pray')
 
+// Per-tab geocoder placeholder. The Language Families tab makes the search
+// scope explicit ("Search language family, language, dialect/variety") so users
+// know the search is wired to the legend's hierarchy. Other tabs use the
+// default i18n placeholder ("Search people, place, language, religion").
+const geocoderPlaceholder = computed(() => {
+  if (activeTab.value?.id === 'language-families') {
+    return 'Search language family, language, dialect/variety'
+  }
+  return ''  // empty → GeocoderComponent falls back to i18n default
+})
+
 // ─── Map ID + container refs ─────────────────────────────────────────────────
 // Per-instance map ID. Each <doxa-map> on the page MUST have a unique value so
 // shared composables (mapStore, dataStore, clustering) don't bleed state
@@ -1089,6 +1100,7 @@ onBeforeUnmount(() => {
         :access-token="mapboxToken"
         :data-source-id="dataSource"
         :is-dark="isDark"
+        :placeholder="geocoderPlaceholder"
         @people-group-result="onGeocoderPeopleGroupResult"
         @aggregate-result="onGeocoderAggregateResult"
         @clear="onGeocoderClear"
