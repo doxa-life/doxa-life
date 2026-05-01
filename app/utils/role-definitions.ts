@@ -8,12 +8,17 @@ export interface RoleDefinition {
 
 export const ROLES = {
   admin: {
-    name: 'admin',
+    name: 'Admin',
     description: 'Full access to all features and user management.',
     permissions: [...PERMISSIONS]
   },
+  content_editor: {
+    name: 'Content Editor',
+    description: 'Can create, edit, and publish CMS pages and categories.',
+    permissions: ['admin.access', 'pages.view', 'pages.write', 'pages.publish']
+  },
   member: {
-    name: 'member',
+    name: 'Member',
     description: 'Basic authenticated access.',
     permissions: []
   }
@@ -22,6 +27,12 @@ export const ROLES = {
 export type StaticRoleName = keyof typeof ROLES
 
 export const STATIC_ROLE_NAMES = Object.keys(ROLES) as StaticRoleName[]
+
+export type StaticRoleEntry = RoleDefinition & { key: StaticRoleName }
+
+export const STATIC_ROLES: readonly StaticRoleEntry[] = (
+  Object.entries(ROLES) as [StaticRoleName, RoleDefinition][]
+).map(([key, def]) => ({ key, ...def }))
 
 export function getStaticRole(name: string): RoleDefinition | null {
   return (ROLES as Record<string, RoleDefinition>)[name] ?? null
