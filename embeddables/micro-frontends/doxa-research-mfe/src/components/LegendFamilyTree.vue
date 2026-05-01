@@ -211,13 +211,16 @@ useShadowStyles(`
 .lft-has-selection .lft-row.lft-row-child-active:not(.lft-row-selected) .lft-item-inner:hover{opacity:0.92!important;}
 
 /* ── Inline X deselect button — chip pattern (Google Filters / MUI chips).
-   Absolute-positioned at the far right of the pill. Only visible on selected rows.
-   position:relative on .lft-item-inner anchors it without breaking the subgrid. ── */
-.lft-deselect-btn{display:none;position:absolute;right:6px;top:50%;transform:translateY(-50%);width:16px;height:16px;background:rgba(255,255,255,0.28);border:none;border-radius:50%;padding:0;cursor:pointer;align-items:center;justify-content:center;color:currentColor;transition:background 0.12s;outline:none;-webkit-tap-highlight-color:transparent;z-index:1;}
+   Absolute-positioned at the far right of the pill. Only visible on selected
+   rows. position:relative on .lft-item-inner anchors it without breaking the
+   subgrid. The pill spans grid columns 2 to -2; the right caret column (-1)
+   is empty, so right:-22px tucks the X into that gap and never overlaps the
+   population badge. ── */
+.lft-deselect-btn{display:none;position:absolute;right:-22px;top:50%;transform:translateY(-50%);width:16px;height:16px;background:rgba(0,0,0,0.55);border:none;border-radius:50%;padding:0;cursor:pointer;align-items:center;justify-content:center;color:#fff;transition:background 0.12s;outline:none;-webkit-tap-highlight-color:transparent;z-index:2;box-shadow:0 1px 3px rgba(0,0,0,0.35);}
 .lft-row-selected .lft-deselect-btn{display:flex;}
-.lft-deselect-btn:hover{background:rgba(255,255,255,0.55);}
-.lft-dark .lft-deselect-btn{background:rgba(0,0,0,0.22);}
-.lft-dark .lft-deselect-btn:hover{background:rgba(0,0,0,0.42);}
+.lft-deselect-btn:hover{background:rgba(0,0,0,0.78);}
+.lft-dark .lft-deselect-btn{background:rgba(243,243,241,0.85);color:#1a1a2e;}
+.lft-dark .lft-deselect-btn:hover{background:#F3F3F1;}
 
 /* ── Name + badges ── */
 .lft-name{padding:0 0 0 8px;font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -474,13 +477,13 @@ useShadowStyles(`
           <div
             v-for="row in dialectRows"
             :key="row.key"
-            class="lft-row"
+            class="lft-row lft-row-dialect"
             :class="{ 'lft-row-selected': row.key === selectedDialectKey }"
           >
             <span class="lft-caret-spacer" />
             <div class="lft-item" @click="handleRowClick(row)">
               <div class="lft-item-inner" :style="{ backgroundColor: row.color }">
-                <span class="lft-name">{{ row.label }}</span>
+                <span class="lft-name lft-name-dialect">{{ row.label }}</span>
                 <span v-for="col in columns" :key="col.key" class="lft-badge">
                   <span class="lft-badge-inner">
                     {{ col.key === 'population' ? fmtPop(row.population) : fmtCount(row.peopleGroupCount) }}
