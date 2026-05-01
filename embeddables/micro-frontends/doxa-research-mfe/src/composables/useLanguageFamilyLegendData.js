@@ -125,8 +125,17 @@ function readFamily(p) {
   const langV = p.primary_language ?? p.primaryLanguage ?? p._raw?.PrimaryLanguage ?? p._raw?.primary_language
   const langLabel = unwrap(langV)
   if (langLabel) {
-    const derived = lookupFamilyFromLanguageLabel(String(langLabel).trim())
+    const lbl = String(langLabel).trim()
+    const derived = lookupFamilyFromLanguageLabel(lbl)
     if (derived) return derived
+    // SUFFIX_GROUPS fallback: e.g. "Pakistan Sign Language" lookup misses, but
+    // the suffix tells us this belongs to the "Sign Language" family/base.
+    // Without this, sign-language pins split between an `Unknown__Sign Language`
+    // bucket and a `Sign Language__Sign Language` bucket — duplicate row in
+    // the Languages tab, both highlighting on select (label-based match).
+    for (const [re, base] of SUFFIX_GROUPS) {
+      if (re.test(lbl)) return base
+    }
   }
   return 'Unknown'
 }
