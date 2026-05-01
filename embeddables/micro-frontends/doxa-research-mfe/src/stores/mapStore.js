@@ -65,6 +65,24 @@ export const useMapStore = defineStore('map', {
         selectedAffinityBlock: null,
         
         /**
+         * Currently selected language (null if none) — drives Tab 2 of LegendFamilyTree
+         * Example: 'Bengali'
+         */
+        selectedLanguage: null,
+
+        /**
+         * Currently selected dialect (null if none) — drives Tab 1/2/3 dialect row highlighting
+         * Shape: { key: 'family__lang__dialect', originalLabels: ['Arabic, Sudanese'] }
+         */
+        selectedDialect: null,
+
+        /**
+         * Active legend tab — 'family' | 'language' | 'dialect'
+         * Written by geocoder aggregate-result handler; read by LegendFamilyTree.
+         */
+        activeLegendTab: 'family',
+
+        /**
          * Currently selected gospel resource filter (null if none)
          * Example: 'bible', 'jesusFilm', 'noResources'
          */
@@ -351,8 +369,40 @@ export const useMapStore = defineStore('map', {
             this.selectedRegion = null;
             this.selectedAffinityBlock = null;
             this.selectedPeopleGroup = null;
-            
+
             this.selectedFamily = family;
+        },
+
+        setActiveLegendTab(tab) {
+            this.activeLegendTab = tab;
+        },
+
+        /**
+         * Select a specific language (Tab 2 of LegendFamilyTree)
+         * @param {string|null} language - Language label string or null to clear
+         */
+        selectLanguage(language) {
+            // Clear other legend selections
+            this.selectedRegion = null;
+            this.selectedAffinityBlock = null;
+            this.selectedPeopleGroup = null;
+            this.selectedDialect = null;
+
+            this.selectedLanguage = language;
+        },
+
+        /**
+         * Select a dialect (Tab 1/2/3 dialect row)
+         * @param {{ key: string, originalLabels: string[] }|null} dialect
+         */
+        selectDialect(dialect) {
+            this.selectedRegion = null;
+            this.selectedFamily = null;
+            this.selectedLanguage = null;
+            this.selectedAffinityBlock = null;
+            this.selectedPeopleGroup = null;
+
+            this.selectedDialect = dialect;
         },
 
         /**
@@ -402,6 +452,8 @@ export const useMapStore = defineStore('map', {
         clearSelections() {
             this.selectedRegion = null;
             this.selectedFamily = null;
+            this.selectedLanguage = null;
+            this.selectedDialect = null;
             this.selectedAffinityBlock = null;
             this.selectedResource = null;
             this.selectedPeopleGroup = null;
@@ -578,6 +630,8 @@ export const useMapStore = defineStore('map', {
         setSelectedRegion(region) { this.selectRegion(region); },
         clearSelectedRegion() { this.selectRegion(null); },
         clearSelectedResource() { this.selectResource(null); },
+        clearSelectedLanguage() { this.selectLanguage(null); },
+        clearSelectedDialect() { this.selectDialect(null); },
 
         // ========================================
         // Fullscreen Actions

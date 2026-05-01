@@ -27,6 +27,7 @@
  */
 
 import { computed } from 'vue'
+import langFamilyByLanguage from '../data/langFamilyByLanguage.json'
 
 // ── Emoji prefixes — make local results visually distinct from Mapbox ────────
 const EMOJI_PEOPLE   = '🗺️ '   // people group
@@ -43,6 +44,38 @@ const SCORE_LANGUAGE = 10
 // ── Caps ─────────────────────────────────────────────────────────────────────
 const MAX_PER_CATEGORY = 5
 const MAX_TOTAL        = 20
+
+// ── Family lookup (same comma-inversion logic as useLanguageFamilyLegendData) ─
+function resolveFamily(label) {
+  if (!label || typeof label !== 'string') return null
+  const parts = label.split(',').map(s => s.trim()).filter(Boolean)
+  if (parts.length >= 2) {
+    const fullReversed = [...parts].reverse().join(' ')
+    if (langFamilyByLanguage[fullReversed]) return langFamilyByLanguage[fullReversed]
+    if (parts.length >= 3) {
+      const twoReversed = [parts[1], parts[0]].join(' ')
+      if (langFamilyByLanguage[twoReversed]) return langFamilyByLanguage[twoReversed]
+    }
+  }
+  if (langFamilyByLanguage[label]) return langFamilyByLanguage[label]
+  const stripped = label.replace(/\s*\(.*?\)\s*$/, '').trim()
+  if (stripped !== label && langFamilyByLanguage[stripped]) return langFamilyByLanguage[stripped]
+  return null
+}
+
+// ── Section-header feature (non-clickable visual divider in suggestions) ──────
+function makeSectionHeader(label, isAllData) {
+  return {
+    id: `doxa-section-header-${slugify(label)}`,
+    place_name: label,
+    text: label,
+    center: [0, 0],
+    place_type: ['doxa-section-header'],
+    geometry: { type: 'Point', coordinates: [0, 0] },
+    properties: { headerLabel: label, isHeader: true, isAllDataSection: !!isAllData },
+    feature: null
+  }
+}
 
 /**
  * Slugify any text for use in a feature id ('doxa-pg-<slug>').
@@ -92,6 +125,7 @@ function buildIndex(features) {
     const religionHay = norm(pg.religionName) + ' ' + norm(pg.religion) + ' ' + norm(pg.religionLabel) + ' ' + norm(pg.religionCode)
     const languageHay = norm(pg.language) + ' ' + norm(pg.languageFamily) + ' ' + norm(pg.languageCode)
 
+    const langLabel = strLabel(pg.language) || strLabel(pg.primaryLanguage) || ''
     index.push({
       feature: pg,
       nameHay,
@@ -101,6 +135,8 @@ function buildIndex(features) {
       haystack: nameHay + ' ' + countryHay + ' ' + religionHay + ' ' + languageHay,
       lat,
       lng,
+      familyDerived: resolveFamily(langLabel) || null,
+      languageLabel: langLabel,
     })
   }
   return index
@@ -237,7 +273,7 @@ function makeAggregateFeature(kind, agg) {
  * @returns {{ search: (query:string)=>Array, searchGrouped: (query:string)=>object }}
  */
 export function useDoxaSearch(opts = {}) {
-  const { dataStore, dataSourceId } = opts
+  const { dataStore, dataSourceId, getActiveFilter } = opts
 
   // ── Select the active source's features reactively ─────────────────────────
   const features = computed(() => {
@@ -310,10 +346,55 @@ export function useDoxaSearch(opts = {}) {
 
   /**
    * Flat array form — what MapboxGeocoder's `localGeocoder` option expects.
+   * When getActiveFilter is provided and returns a live selection, results are
+   * split into two labelled sections: "Within [selection]" and "All DOXA Data".
+   * Section header features (place_type: doxa-section-header) are injected as
+   * visual dividers; clicking them is suppressed in GeocoderComponent.vue.
+   * "All DOXA Data" results carry properties._allDataSection = true so the
+   * geocoder handler knows to deselect the legend when they are clicked.
    */
   function search(query) {
+    const activeFilter = typeof getActiveFilter === 'function' ? getActiveFilter() : null
     const g = searchGrouped(query)
-    return [...g.people, ...g.places, ...g.languages, ...g.religions].slice(0, MAX_TOTAL)
+    const allFlat = [...g.people, ...g.places, ...g.languages, ...g.religions]
+
+    if (!activeFilter?.key || !allFlat.length) {
+      return allFlat.slice(0, MAX_TOTAL)
+    }
+
+    // Split people-group results into "within selection" and "outside"
+    const withinPeople = []
+    const outsidePeople = []
+    for (const feat of g.people) {
+      const entry = index.value.find(e => e.feature === feat.feature)
+      let matches = false
+      if (entry) {
+        if (activeFilter.kind === 'family') {
+          matches = (entry.familyDerived || '').toLowerCase() === activeFilter.key.toLowerCase()
+        } else if (activeFilter.kind === 'language') {
+          matches = entry.languageLabel.toLowerCase() === activeFilter.key.toLowerCase()
+        }
+      }
+      if (matches) withinPeople.push(feat)
+      else outsidePeople.push(feat)
+    }
+
+    // Build sectioned output
+    const result = []
+    const selectionLabel = activeFilter.key
+    if (withinPeople.length) {
+      result.push(makeSectionHeader('Within ' + selectionLabel, false))
+      result.push(...withinPeople.slice(0, MAX_PER_CATEGORY))
+    }
+    // "All DOXA Data" section: tag all results so geocoder handler can deselect legend
+    const allTagged = allFlat.map(f => ({
+      ...f,
+      properties: { ...f.properties, _allDataSection: true }
+    }))
+    result.push(makeSectionHeader('All DOXA Data', true))
+    result.push(...allTagged.slice(0, MAX_PER_CATEGORY))
+
+    return result.slice(0, MAX_TOTAL + 4) // extra room for the 2 header features
   }
 
   return { search, searchGrouped, index, aggregates }
