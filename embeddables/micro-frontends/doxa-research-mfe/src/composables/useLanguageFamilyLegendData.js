@@ -43,6 +43,7 @@
 
 import { computed, reactive } from 'vue'
 import { getLanguageFamilyColor, LANGUAGE_FAMILY_COLORS, canonicalFamilyName } from '../config/colors.js'
+import langFamilyByLanguage from '../data/langFamilyByLanguage.json'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Field readers — defensive against the four shapes we currently see in the
@@ -58,15 +59,86 @@ function unwrap(v) {
   if (v && typeof v === 'object' && 'label' in v) return v.label || v.value || ''
   return v
 }
+
+// The pray-tools API returns primary_language.label in comma-inverted format:
+// "Arabic, Shihhi" instead of the lookup key "Shihhi Arabic".
+// Strategy: reverse all comma-separated parts, join with space, then look up.
+// For parenthetical names like "Ainu (China)", also try stripping the parenthetical.
+function lookupFamilyFromLanguageLabel(label) {
+  if (!label || typeof label !== 'string') return null
+  const parts = label.split(',').map(s => s.trim()).filter(Boolean)
+  if (parts.length >= 2) {
+    // Try full reversal: "Arabic, Shihhi" → "Shihhi Arabic"
+    const fullReversed = [...parts].reverse().join(' ')
+    if (langFamilyByLanguage[fullReversed]) return langFamilyByLanguage[fullReversed]
+    // For 3+ parts, try reversing only the first two: "Arabic, Levantine, North" → "Levantine Arabic"
+    if (parts.length >= 3) {
+      const twoReversed = [parts[1], parts[0]].join(' ')
+      if (langFamilyByLanguage[twoReversed]) return langFamilyByLanguage[twoReversed]
+    }
+  }
+  // Try exact match (single-part label like "Arabic")
+  if (langFamilyByLanguage[label]) return langFamilyByLanguage[label]
+  // Strip parenthetical suffix for edge cases like "Ainu (China)"
+  const stripped = label.replace(/\s*\(.*?\)\s*$/, '').trim()
+  if (stripped !== label && langFamilyByLanguage[stripped]) return langFamilyByLanguage[stripped]
+  return null
+}
+
+// Suffix patterns where the last N words are the base language name and the
+// prefix is the dialect/variety. Format: [suffix, base, prefixJoiner]
+const SUFFIX_GROUPS = [
+  [/ sign language$/i, 'Sign Language'],
+]
+
+// "Arabic, Shihhi" → "Arabic"  /  "Pakistan Sign Language" → "Sign Language"  /  "Bengali" → "Bengali"
+function readBaseLanguage(label) {
+  if (!label || typeof label !== 'string') return '— Unknown —'
+  const comma = label.indexOf(',')
+  if (comma > 0) return label.slice(0, comma).trim()
+  for (const [re, base] of SUFFIX_GROUPS) {
+    if (re.test(label) && label.toLowerCase() !== base.toLowerCase()) return base
+  }
+  return label.trim()
+}
+// "Arabic, Shihhi" → "Shihhi"  /  "Pakistan Sign Language" → "Pakistan"  /  "Bengali" → null
+function readDialectLabel(label) {
+  if (!label || typeof label !== 'string') return null
+  const comma = label.indexOf(',')
+  if (comma >= 0) return label.slice(comma + 1).trim() || null
+  for (const [re] of SUFFIX_GROUPS) {
+    if (re.test(label)) {
+      const prefix = label.replace(re, '').trim()
+      return prefix || null
+    }
+  }
+  return null
+}
+
 function readFamily(p) {
   const v = p.language_family ?? p.languageFamily ?? p._raw?.LanguageFamily ?? p._raw?.language_family
   const s = unwrap(v)
-  // Bucket key MUST be deterministic case-canonical so "Sign Language" and
-  // "Sign language" merge into one row (UX 2026-04-27).
-  return canonicalFamilyName(s) || 'Unknown'
+  const canonical = canonicalFamilyName(s)
+  if (canonical && canonical !== 'Unknown') return canonical
+  // imb_language_family is null for all API records — derive client-side from
+  // primary_language using comma-inversion normalization + lookup (QA Round 3 A2).
+  const langV = p.primary_language ?? p.primaryLanguage ?? p._raw?.PrimaryLanguage ?? p._raw?.primary_language
+  const langLabel = unwrap(langV)
+  if (langLabel) {
+    const derived = lookupFamilyFromLanguageLabel(String(langLabel).trim())
+    if (derived) return derived
+  }
+  return 'Unknown'
 }
 function readLanguage(p) {
-  const v = p.primary_language ?? p.primaryLanguage ?? p._raw?.PrimaryLanguage ?? p._raw?.primary_language
+  // Read from _raw first (returns original API comma-inverted label like "Arabic, Sudanese").
+  // p.language may have been overwritten to the unwrapped value form by useMapData.
+  const raw = p._raw?.primary_language ?? p._raw?.PrimaryLanguage
+  if (raw) {
+    const rs = unwrap(raw)
+    if (rs) return String(rs).trim()
+  }
+  const v = p.primary_language ?? p.primaryLanguage ?? p.language
   const s = unwrap(v)
   return (s && String(s).trim()) || '— Unknown —'
 }
@@ -133,7 +205,8 @@ export function useLanguageFamilyLegendData(peopleGroupsRef, options = {}) {
   }
 
   // ── Aggregation: feature[] → Map<familyKey, { language → bucket }> ────────
-  // bucket = { peopleGroupCount, population, pinIds, languages: Map<langKey, bucket> }
+  // Outer key: family. Inner key: BASE language (first part before comma).
+  // Each language bucket has a nested dialects Map keyed by dialect label.
   const aggregated = computed(() => {
     const features = peopleGroupsRef?.value || []
     const families = new Map()
@@ -141,10 +214,13 @@ export function useLanguageFamilyLegendData(peopleGroupsRef, options = {}) {
     for (const item of features) {
       const p = readProps(item)
       const familyKey = readFamily(p)
-      const langKey = readLanguage(p)
+      const langLabel = readLanguage(p)   // e.g. "Arabic, Shihhi"
+      const baseLang  = readBaseLanguage(langLabel)   // e.g. "Arabic"
+      const dialectLabel = readDialectLabel(langLabel) // e.g. "Shihhi" | null
       const pop = readPopulation(p)
       const pinId = readPinId(item, p)
       const clusterId = readClusterId(item, p)
+      const c = readCoord(item, p)
 
       let fam = families.get(familyKey)
       if (!fam) {
@@ -162,30 +238,41 @@ export function useLanguageFamilyLegendData(peopleGroupsRef, options = {}) {
       fam.peopleGroupCount += 1
       fam.population += pop
       if (pinId != null) fam.pinIds.push(pinId)
-      const c = readCoord(item, p)
       if (c) fam.coords.push(c)
-      // First non-null clusterId wins for the family bucket. The cluster
-      // engine, when it lands, will be responsible for ensuring all features
-      // in a single cluster carry the same id — this is just a placeholder.
       if (clusterId && !fam.clusterId) fam.clusterId = clusterId
 
-      let lang = fam.languages.get(langKey)
+      let lang = fam.languages.get(baseLang)
       if (!lang) {
         lang = {
-          key: langKey,
+          key: baseLang,
           peopleGroupCount: 0,
           population: 0,
           pinIds: [],
           coords: [],
-          clusterId: null
+          clusterId: null,
+          dialects: new Map()
         }
-        fam.languages.set(langKey, lang)
+        fam.languages.set(baseLang, lang)
       }
       lang.peopleGroupCount += 1
       lang.population += pop
       if (pinId != null) lang.pinIds.push(pinId)
       if (c) lang.coords.push(c)
       if (clusterId && !lang.clusterId) lang.clusterId = clusterId
+
+      if (dialectLabel) {
+        let dialect = lang.dialects.get(dialectLabel)
+        if (!dialect) {
+          dialect = { key: dialectLabel, peopleGroupCount: 0, population: 0, pinIds: [], coords: [], originalLabels: new Set([langLabel]) }
+          lang.dialects.set(dialectLabel, dialect)
+        } else {
+          dialect.originalLabels.add(langLabel)
+        }
+        dialect.peopleGroupCount += 1
+        dialect.population += pop
+        if (pinId != null) dialect.pinIds.push(pinId)
+        if (c) dialect.coords.push(c)
+      }
     }
 
     return families
@@ -234,7 +321,7 @@ export function useLanguageFamilyLegendData(peopleGroupsRef, options = {}) {
     return list
   })
 
-  // ── Language rows for a given family — same sort order ────────────────────
+  // ── Language rows for a given family — Tab 1 child rows ──────────────────
   function childRowsFor(familyKey) {
     const fam = aggregated.value.get(familyKey)
     if (!fam) return []
@@ -250,12 +337,100 @@ export function useLanguageFamilyLegendData(peopleGroupsRef, options = {}) {
         familyKey,
         clusterId: lang.clusterId || undefined,
         pinIds: lang.pinIds,
-        coords: lang.coords
+        coords: lang.coords,
+        hasDialects: lang.dialects.size > 0
       })
     }
     out.sort(byPopulation)
     return out
   }
+
+  // ── Dialect rows for a given language row — key is "familyKey__baseLang" ──
+  // label is "Language, Dialect" (e.g. "Arabic, Sudanese") for context.
+  function dialectRowsFor(langRowKey) {
+    const sep = langRowKey.indexOf('__')
+    if (sep < 0) return []
+    const familyKey = langRowKey.slice(0, sep)
+    const baseLang  = langRowKey.slice(sep + 2)
+    const fam = aggregated.value.get(familyKey)
+    if (!fam) return []
+    const lang = fam.languages.get(baseLang)
+    if (!lang) return []
+    const out = []
+    for (const dialect of lang.dialects.values()) {
+      out.push({
+        key: `${langRowKey}__${dialect.key}`,
+        label: `${baseLang}, ${dialect.key}`,
+        dialectOnly: dialect.key,
+        color: getLanguageFamilyColor(familyKey),
+        peopleGroupCount: dialect.peopleGroupCount,
+        population: dialect.population,
+        kind: 'dialect',
+        languageKey: baseLang,
+        familyKey,
+        pinIds: dialect.pinIds,
+        coords: dialect.coords,
+        originalLabels: Array.from(dialect.originalLabels)
+      })
+    }
+    out.sort(byPopulation)
+    return out
+  }
+
+  // ── Flat language rows across ALL families — Tab 2 ────────────────────────
+  // One row per base language (e.g. "Arabic", not "Arabic, Shihhi").
+  const languageRows = computed(() => {
+    const families = aggregated.value
+    const out = []
+    for (const fam of families.values()) {
+      for (const lang of fam.languages.values()) {
+        out.push({
+          key: `${fam.key}__${lang.key}`,
+          label: lang.key,
+          color: getLanguageFamilyColor(fam.key),
+          peopleGroupCount: lang.peopleGroupCount,
+          population: lang.population,
+          kind: lang.clusterId ? 'cluster' : 'language',
+          familyKey: fam.key,
+          clusterId: lang.clusterId || undefined,
+          pinIds: lang.pinIds,
+          coords: lang.coords,
+          hasDialects: lang.dialects.size > 0
+        })
+      }
+    }
+    out.sort(byPopulation)
+    return out
+  })
+
+  // ── Flat dialect rows across ALL languages — Tab 3 ────────────────────────
+  // label is "Language, Dialect" (e.g. "Arabic, Sudanese") for context.
+  const dialectRows = computed(() => {
+    const families = aggregated.value
+    const out = []
+    for (const fam of families.values()) {
+      for (const lang of fam.languages.values()) {
+        for (const dialect of lang.dialects.values()) {
+          out.push({
+            key: `${fam.key}__${lang.key}__${dialect.key}`,
+            label: `${lang.key}, ${dialect.key}`,
+            dialectOnly: dialect.key,
+            color: getLanguageFamilyColor(fam.key),
+            peopleGroupCount: dialect.peopleGroupCount,
+            population: dialect.population,
+            kind: 'dialect',
+            languageKey: lang.key,
+            familyKey: fam.key,
+            pinIds: dialect.pinIds,
+            coords: dialect.coords,
+            originalLabels: Array.from(dialect.originalLabels)
+          })
+        }
+      }
+    }
+    out.sort(byPopulation)
+    return out
+  })
 
   // ── highlight — fires the legend:highlight window event ───────────────────
   // The map listener (research-map.vue) is responsible for dimming non-matching
@@ -277,6 +452,13 @@ export function useLanguageFamilyLegendData(peopleGroupsRef, options = {}) {
       detail.languageKey = row.label
       detail.familyKey   = row.familyKey
     }
+    if (row.kind === 'dialect') {
+      detail.dialectKey     = row.key  // full unique key "family__lang__dialect" for toggle detection
+      detail.dialectOnly    = row.dialectOnly || row.label
+      detail.languageKey    = row.languageKey
+      detail.familyKey      = row.familyKey
+      detail.originalLabels = row.originalLabels || []
+    }
     if (row.kind === 'cluster')  detail.clusterId   = row.clusterId
 
     if (typeof window !== 'undefined' && typeof window.CustomEvent === 'function') {
@@ -284,5 +466,5 @@ export function useLanguageFamilyLegendData(peopleGroupsRef, options = {}) {
     }
   }
 
-  return { rows, toggle, isExpanded, childRowsFor, highlight }
+  return { rows, languageRows, dialectRows, toggle, isExpanded, childRowsFor, dialectRowsFor, highlight }
 }

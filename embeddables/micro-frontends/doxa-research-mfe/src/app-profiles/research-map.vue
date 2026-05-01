@@ -51,6 +51,20 @@ import { useMapData }      from '../composables/useMapData.js'
 // (~117 KB). It's only needed when the user opens the poster dialog. Defer
 // the import until that happens — see `openPoster()` below.
 let _posterPromise = null
+
+// ── Geocoder-clear guard ─────────────────────────────────────────────────────
+// Prevents the feedback loop: legend-X → selectFamily(null) → watcher →
+// applyDimFilter(null) → _clearGeocoderProgrammatic() → 'clear' event →
+// onGeocoderClear → selectFamily(null) → watcher → ... (infinite).
+// _geoBeingCleared is set synchronously around every programmatic clear() call
+// so onGeocoderClear can tell it apart from a real user-X click.
+let _geoBeingCleared = false
+function _clearGeocoderProgrammatic() {
+  _geoBeingCleared = true
+  // geocoderRef.value.geocoder is the exposed ref<MapboxGeocoder>; .value is the instance.
+  geocoderRef.value?.geocoder?.value?.clear?.()
+  _geoBeingCleared = false
+}
 function loadPoster() {
   if (!_posterPromise) {
     _posterPromise = import('../composables/useMapPoster.js')
@@ -138,6 +152,10 @@ useShadowStyles(`
   .dg-main strong { font-weight:700; }
   .dg-meta { margin-top:2px;display:flex;flex-wrap:wrap;gap:4px 10px;font-size:11px;color:#555;line-height:1.35; }
   .dg-field strong { font-weight:600;color:#333;margin-right:2px; }
+  /* Geocoder section divider headers — non-clickable visual labels */
+  .suggestions li:has(.dg-section-header-item) > a { pointer-events:none!important;cursor:default!important;background:none!important;padding:4px 10px 2px!important; }
+  .dg-section-header-item { font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#9ca3af;padding:2px 0; }
+  .dsm-dark .dg-section-header-item { color:rgba(243,243,241,0.45); }
   @media(max-width:767px){
     .mapboxgl-ctrl-top-left { top:10px!important;left:10px!important;right:10px!important;width:calc(100% - 20px)!important;max-width:none!important; }
   }
@@ -288,6 +306,7 @@ provide('mapId', mapId)
 
 const rmRoot       = ref(null)
 const tabBar       = ref(null)
+const geocoderRef  = ref(null)
 
 // Auto-center the active tab on switch so users always see what they tapped,
 // even when the tab bar overflows the visible width (qa.md R8 spec).
@@ -587,7 +606,7 @@ function onLegendHighlight(evt) {
 }
 
 // Last-clicked highlight key per kind — clicking the same row again clears.
-const _lastHL = { family: null, language: null, region: null, prayer: null, engagement: null, adoption: null }
+const _lastHL = { family: null, language: null, dialect: null, region: null, prayer: null, engagement: null, adoption: null }
 
 function clearAllHighlights(m) {
   m.setPaintProperty('language-family-pins', 'circle-opacity', 1)
@@ -605,10 +624,15 @@ function clearAllHighlights(m) {
     m.setPaintProperty('regions-border', 'line-color', '#ffffff')
     m.setPaintProperty('regions-border', 'line-width', 1)
   }
-  _lastHL.family = _lastHL.language = _lastHL.region = null
+  _lastHL.family = _lastHL.language = _lastHL.dialect = _lastHL.region = null
   _lastHL.prayer = _lastHL.engagement = _lastHL.adoption = null
   // Highlights gone — clustering goes back to the full dataset on next pass.
   clustering.setSelectionFilter(null)
+  // Clear mapStore legend selections so LegendFamilyTree removes the selected
+  // row indicator + row dimming (QA R2 A1 / R4 A3).
+  if (mapStore.selectedFamily)   mapStore.selectFamily(null)
+  if (mapStore.selectedLanguage) mapStore.selectLanguage(null)
+  if (mapStore.selectedDialect)  mapStore.selectDialect(null)
 }
 
 // Same-tick dedupe — a single legend-row click fires applyDimFilter TWICE on
@@ -637,8 +661,12 @@ function applyDimFilter(detail) {
     kind = 'engagement'; property = detail.property || 'engagementStatus'; expectedValue = detail.expectedValue
   } else if (detail.kind === 'adoption') {
     kind = 'adoption'; property = detail.property || 'adoptionStatus'; expectedValue = detail.expectedValue
+  } else if (detail.kind === 'dialect') {
+    kind = 'dialect'; property = 'language'; expectedValue = detail.dialectKey || ''
   } else {
     clearAllHighlights(m)
+    _clearGeocoderProgrammatic()
+    for (const k of Object.keys(_lastHL)) _lastHL[k] = null
     _lastApplyKey = null; _lastApplyTs = 0
     return
   }
@@ -654,6 +682,7 @@ function applyDimFilter(detail) {
   // Toggle: same row clicked AGAIN (after the dedupe window) → clear highlight.
   if (_lastHL[kind] === expectedValue) {
     clearAllHighlights(m)
+    _clearGeocoderProgrammatic()
     _lastApplyKey = null; _lastApplyTs = 0
     return
   }
@@ -666,9 +695,8 @@ function applyDimFilter(detail) {
   // know which row to highlight visually (qa.md row-selection-indicator).
   if (kind === 'family')   mapStore.selectFamily?.(expectedValue)
   else if (kind === 'region') mapStore.selectRegion?.(expectedValue)
-  else if (kind === 'language' && typeof mapStore.selectLanguage === 'function') {
-    mapStore.selectLanguage(expectedValue)
-  }
+  else if (kind === 'language') mapStore.selectLanguage?.(expectedValue)
+  else if (kind === 'dialect') mapStore.selectDialect?.({ key: expectedValue, originalLabels: detail.originalLabels || [] })
 
   // Constrain MST/network clustering to just the selected slice so the
   // graph doesn't re-build across the full 2,069-pin dataset on every click.
@@ -725,8 +753,29 @@ function applyDimFilter(detail) {
     } else if (kind === 'adoption') {
       const want = expectedValue === 'hasAdoption'
       matchExpr = ['==', ['get', property], want]
+    } else if (kind === 'language') {
+      // Two grouping patterns:
+      //   comma-inverted: "Arabic" matches "Arabic" exact OR "Arabic, Shihhi" (prefix "Arabic,")
+      //   suffix-grouped: "Sign Language" matches "Pakistan Sign Language" (contains " Sign Language")
+      matchExpr = ['any',
+        ['==', ['get', property], expectedValue],
+        ['==', ['slice', ['get', property], 0, expectedValue.length + 1], expectedValue + ','],
+        ['in', ' ' + expectedValue, ['get', property]]
+      ]
+    } else if (kind === 'dialect') {
+      // Exact match against the original API label(s) stored on the dialect row.
+      // originalLabels e.g. ["Arabic, Sudanese"] or ["Pakistan Sign Language"].
+      const labels = detail.originalLabels || []
+      if (labels.length === 1) {
+        matchExpr = ['==', ['get', property], labels[0]]
+      } else if (labels.length > 1) {
+        matchExpr = ['in', ['get', property], ['literal', labels]]
+      } else {
+        // Fallback: shouldn't happen, but guard against empty labels array.
+        matchExpr = ['==', ['get', property], expectedValue]
+      }
     } else {
-      // family / language
+      // family
       matchExpr = ['==', ['get', property], expectedValue]
     }
 
@@ -797,14 +846,32 @@ function onGeocoderAggregateResult(evt) {
   // Scope MST clusters to the same slice so the cluster graph isn't re-built
   // across the full 2,069-pin dataset on every aggregate pick.
   clustering.setSelectionFilter({ property, value })
+
+  // Drive legend tab + store selection so legend row highlights correctly
+  if (evt.kind === 'language-family' || evt.kind === 'family') {
+    mapStore.selectFamily(evt.label)
+    mapStore.setActiveLegendTab('family')
+    // Legend row is the visual indicator → clear geocoder text (QA R6 A2)
+    _clearGeocoderProgrammatic()
+  } else if (evt.kind === 'language') {
+    mapStore.selectLanguage(evt.label)
+    mapStore.setActiveLegendTab('language')
+    _clearGeocoderProgrammatic()
+  }
+  // For country / region / religion: no legend row — keep geocoder text as the
+  // active-filter indicator. User clicks geocoder X to clear.
 }
 
 function onGeocoderClear() {
+  if (_geoBeingCleared) return  // programmatic clear, not a user-X click
   const m = map.value
   if (m && m.getLayer(_GEOCODER_FILTER_LAYER)) {
     try { m.setFilter(_GEOCODER_FILTER_LAYER, null) } catch (e) { /* no-op */ }
   }
   clustering.setSelectionFilter(null)
+  // Bidirectional sync — clearing search must also deselect the legend row (QA R7 Q4)
+  mapStore.selectFamily(null)
+  mapStore.selectLanguage(null)
 }
 
 // ─── Filter sync — ResearchMapFilterPanel writes to mapStore.filters ─────────
@@ -829,6 +896,14 @@ watch(() => mapStore.selectedFamily, (key) => {
   // LegendFamilyTree fires its own legend:highlight event for tree rows, so this
   // watcher only matters when something else writes selectedFamily directly.
   if (key) applyDimFilter({ kind: 'family', familyKey: key, coords: [] })
+  else applyDimFilter({ kind: null })
+})
+watch(() => mapStore.selectedLanguage, (key) => {
+  if (key) applyDimFilter({ kind: 'language', languageKey: key, coords: [] })
+  else applyDimFilter({ kind: null })
+})
+watch(() => mapStore.selectedDialect, (dialect) => {
+  if (dialect?.key) applyDimFilter({ kind: 'dialect', dialectKey: dialect.key, originalLabels: dialect.originalLabels || [], coords: [] })
   else applyDimFilter({ kind: null })
 })
 
@@ -1008,6 +1083,7 @@ onBeforeUnmount(() => {
       <!-- Geocoder search bar (top-left) — canonical clone from read-only
            simple-map mfe so tabs 1-3 stay visually identical. -->
       <GeocoderComponent
+        ref="geocoderRef"
         v-if="appReady && map"
         :map-instance="map"
         :access-token="mapboxToken"

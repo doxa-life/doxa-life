@@ -42,7 +42,7 @@
     geocoder       — the raw MapboxGeocoder instance (for advanced usage)
 -->
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch, computed, inject } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDoxaSearch } from '../../composables/useDoxaSearch.js'
 
@@ -97,6 +97,13 @@ function renderSuggestion(item) {
   if (!item) return ''
   const types = item.place_type || []
 
+  // Section dividers — rendered as non-interactive labels.
+  // CSS (.dg-section-header-item) makes the parent <li> non-clickable.
+  if (types.includes('doxa-section-header')) {
+    const label = esc(item.properties?.headerLabel || item.text || '')
+    return `<div class="dg-section-header-item">${label}</div>`
+  }
+
   if (types.includes('people-group')) {
     const props = item.properties || {}
     const name     = strLabel(props.name) || strLabel(props.displayName) || strLabel(item.text) || ''
@@ -137,9 +144,21 @@ function renderSuggestion(item) {
 // store instance directly) — the composable re-computes its index when the
 // underlying features change.
 const dataStore = inject('dataStore', null)
+const mapStore  = inject('mapStore',  null)
+
+// getActiveFilter is a closure over the live mapStore so each search call
+// reads the current selection without re-creating the geocoder instance.
+function getActiveFilter() {
+  if (!mapStore) return null
+  if (mapStore.selectedFamily)   return { kind: 'family',   key: mapStore.selectedFamily }
+  if (mapStore.selectedLanguage) return { kind: 'language', key: mapStore.selectedLanguage }
+  return null
+}
+
 const { search: doxaLocalGeocoder } = useDoxaSearch({
   dataStore,
-  dataSourceId: props.dataSourceId || undefined
+  dataSourceId: props.dataSourceId || undefined,
+  getActiveFilter
 })
 
 // Exposed so a parent can call geocoder.value.query('...') or add custom filters
@@ -214,9 +233,20 @@ onMounted(() => {
   // original normalized record so the parent can open the popup /
   // selectedPin highlight while Mapbox handles the flyTo.
   geocoder.value.on('result', (e) => {
-    emit('result', e)
     const f = e?.result
     if (!f) return
+
+    // Section headers are non-selectable visual dividers — swallow the event.
+    if (f.place_type?.includes('doxa-section-header')) return
+
+    // "All DOXA Data" result: deselect the active legend selection so the full
+    // pin set shows alongside the geocoder result (QA R1 A2 Option B).
+    if (f.properties?._allDataSection && mapStore) {
+      mapStore.selectFamily?.(null)
+      mapStore.selectLanguage?.(null)
+    }
+
+    emit('result', e)
     if (f.place_type?.includes('people-group') && f.feature) {
       // Wrap in a GeoJSON-Feature-like shape (properties + geometry) to match
       // what pin-click handlers pass to uiStore.selectPeopleGroup.
