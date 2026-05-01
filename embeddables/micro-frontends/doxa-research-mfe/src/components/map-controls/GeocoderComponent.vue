@@ -244,6 +244,7 @@ onMounted(() => {
     if (f.properties?._allDataSection && mapStore) {
       mapStore.selectFamily?.(null)
       mapStore.selectLanguage?.(null)
+      mapStore.selectDialect?.(null)
     }
 
     emit('result', e)
@@ -256,19 +257,28 @@ onMounted(() => {
         geometry: f.geometry || { type: 'Point', coordinates: f.center }
       })
     } else if (
-      f.place_type?.includes('doxa-country')  ||
-      f.place_type?.includes('doxa-language') ||
+      f.place_type?.includes('doxa-country')         ||
+      f.place_type?.includes('doxa-language-family') ||
+      f.place_type?.includes('doxa-language')        ||
+      f.place_type?.includes('doxa-dialect')         ||
       f.place_type?.includes('doxa-religion')
     ) {
-      // DOXA aggregate (country/language/religion). Parent handler dims
-      // non-matching pins and fitBounds on the member set.
+      // DOXA aggregate (country / language-family / language / dialect / religion).
+      // Parent handler dims non-matching pins and fitBounds on the member set,
+      // and for family/language/dialect kinds also drives the legend tab + selection.
       emit('aggregate-result', {
-        kind:      f.place_type[0].replace(/^doxa-/, ''),
-        label:     f.properties?.label || f.text,
-        count:     f.properties?.count || 0,
-        memberIds: f.properties?.memberIds || [],
-        bounds:    f.properties?.bounds || null,
-        center:    f.center
+        kind:           f.place_type[0].replace(/^doxa-/, ''),
+        label:          f.properties?.label || f.text,
+        count:          f.properties?.count || 0,
+        memberIds:      f.properties?.memberIds || [],
+        bounds:         f.properties?.bounds || null,
+        center:         f.center,
+        originalLabels: f.properties?.originalLabels || null,
+        familyDerived:  f.properties?.familyDerived || '',
+        baseLang:       f.properties?.baseLang || '',
+        dialectLabel:   f.properties?.dialectLabel || '',
+        slug:           f.properties?.slug || null,
+        id:             f.id || null
       })
     }
   })

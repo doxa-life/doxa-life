@@ -829,27 +829,46 @@ function onGeocoderAggregateResult(evt) {
   if (!evt || !m || !m.getLayer(_GEOCODER_FILTER_LAYER)) return
 
   // Map result.kind → the corresponding pin property to filter on.
-  // Fallbacks per kind cover the canonical aggregate shapes from useDoxaSearch.
+  // Note 'language-family' uses the derived `languageFamily` pin prop; 'dialect'
+  // exact-matches against `language` using originalLabels (e.g. "Arabic, Sudanese").
   let property = null
   switch (evt.kind) {
-    case 'country':  property = 'countryName';  break
-    case 'language': property = 'language';     break
-    case 'religion': property = 'religionName'; break
-    case 'region':   property = 'doxaRegion';   break
+    case 'country':         property = 'countryName';    break
+    case 'language-family': property = 'languageFamily'; break
+    case 'language':        property = 'language';       break
+    case 'dialect':         property = 'language';       break
+    case 'religion':        property = 'religionName';   break
+    case 'region':          property = 'doxaRegion';     break
     default: break
   }
-  // The aggregate's `label` is the human-readable string. useDoxaSearch sets
-  // `label` from the same field that drives `countryName` / `language` /
-  // `religionName` on the pin props, so a direct string compare is correct.
   const value = evt.label
   if (!property || value == null || value === '') return
 
-  // Mapbox `setFilter` keeps only matching pins visible. This is a hard filter
-  // (non-matches don't render), which is the requested UX: "only India pins
-  // stay full-opacity, all others dim out" — by removing them entirely the
-  // remaining pins read as full-opacity against the basemap.
+  // Build a per-kind filter expression. 'language' (base-language) matches the
+  // base exactly OR comma-prefix ("Arabic," → "Arabic, Sudanese") OR suffix-
+  // contains (" Sign Language" → "Pakistan Sign Language"). 'dialect' hard-
+  // matches against originalLabels — the raw API string on the pin.
   try {
-    m.setFilter(_GEOCODER_FILTER_LAYER, ['==', ['get', property], value])
+    let filterExpr
+    if (evt.kind === 'language') {
+      filterExpr = ['any',
+        ['==', ['get', property], value],
+        ['==', ['slice', ['get', property], 0, value.length + 1], value + ','],
+        ['in', ' ' + value, ['get', property]]
+      ]
+    } else if (evt.kind === 'dialect') {
+      const labels = Array.isArray(evt.originalLabels) ? evt.originalLabels : []
+      if (labels.length === 1) {
+        filterExpr = ['==', ['get', property], labels[0]]
+      } else if (labels.length > 1) {
+        filterExpr = ['in', ['get', property], ['literal', labels]]
+      } else {
+        filterExpr = ['==', ['get', property], value]
+      }
+    } else {
+      filterExpr = ['==', ['get', property], value]
+    }
+    m.setFilter(_GEOCODER_FILTER_LAYER, filterExpr)
   } catch (e) {
     // setFilter throws on style mid-load; swallow — clear-on-error is harmless.
   }
@@ -858,19 +877,33 @@ function onGeocoderAggregateResult(evt) {
   // across the full 2,069-pin dataset on every aggregate pick.
   clustering.setSelectionFilter({ property, value })
 
-  // Drive legend tab + store selection so legend row highlights correctly
+  // Drive legend tab + store selection so legend row highlights correctly.
+  // For family/language/dialect: legend row IS the active-filter indicator,
+  // so we clear the geocoder text. For country/region/religion the geocoder
+  // text stays visible as the indicator (QA R10 closeout).
   if (evt.kind === 'language-family' || evt.kind === 'family') {
     mapStore.selectFamily(evt.label)
     mapStore.setActiveLegendTab('family')
-    // Legend row is the visual indicator → clear geocoder text (QA R6 A2)
     _clearGeocoderProgrammatic()
   } else if (evt.kind === 'language') {
     mapStore.selectLanguage(evt.label)
     mapStore.setActiveLegendTab('language')
     _clearGeocoderProgrammatic()
+  } else if (evt.kind === 'dialect') {
+    // Build a legend-matching dialect key: "familyKey__baseLang__dialect".
+    // useDoxaSearch threads familyDerived/baseLang/dialectLabel onto the Carmen
+    // feature so we can construct the same key the legend's dialectRows compute.
+    const labels = Array.isArray(evt.originalLabels) ? evt.originalLabels : []
+    const family  = evt.familyDerived || ''
+    const baseLang = evt.baseLang     || ''
+    const dialect  = evt.dialectLabel || ''
+    const dialectKey = `${family}__${baseLang}__${dialect}`
+    mapStore.selectDialect?.({ key: dialectKey, originalLabels: labels })
+    mapStore.setActiveLegendTab('dialect')
+    _clearGeocoderProgrammatic()
   }
-  // For country / region / religion: no legend row — keep geocoder text as the
-  // active-filter indicator. User clicks geocoder X to clear.
+  // For country / region / religion: keep geocoder text as the active-filter
+  // indicator. User clicks geocoder X to clear.
 }
 
 function onGeocoderClear() {
@@ -883,6 +916,7 @@ function onGeocoderClear() {
   // Bidirectional sync — clearing search must also deselect the legend row (QA R7 Q4)
   mapStore.selectFamily(null)
   mapStore.selectLanguage(null)
+  mapStore.selectDialect?.(null)
 }
 
 // ─── Filter sync — ResearchMapFilterPanel writes to mapStore.filters ─────────
