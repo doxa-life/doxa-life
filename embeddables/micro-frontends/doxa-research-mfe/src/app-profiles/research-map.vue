@@ -537,6 +537,11 @@ function switchTab(tabId) {
   if (tabId === activeTabId.value) return
   activeTabId.value = tabId
   uiStore.setActiveTab?.(tabId)
+  // Clear the geocoder text on every map-tab switch so the previous tab's
+  // search query doesn't leak across tabs (qa-buildinng-round-1 Bug 11).
+  // _clearGeocoderProgrammatic uses _geoBeingCleared to skip the legend-
+  // deselect side effect — pure text reset.
+  _clearGeocoderProgrammatic()
   const tab = tabs.value.find(t => t.id === tabId)
   if (!tab || !map.value) return
   // Lazy-load regions GeoJSON the first time the user lands on this tab.

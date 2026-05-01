@@ -85,33 +85,28 @@ function lookupFamilyFromLanguageLabel(label) {
   return null
 }
 
-// Suffix patterns where the last N words are the base language name and the
-// prefix is the dialect/variety. Format: [suffix, base, prefixJoiner]
-const SUFFIX_GROUPS = [
+// Suffix patterns used ONLY to derive the language FAMILY for entries whose
+// API `imb_language_family` is null and aren't in `langFamilyByLanguage.json`.
+// Per QA building-round-1 R2 A1: each individual sign language ("Pakistan
+// Sign Language", "American Sign Language") is a legitimate language under
+// the "Sign Language" family — they must NOT be collapsed into one base
+// "Sign Language" language row. So this regex doesn't touch baseLang/dialect.
+const FAMILY_SUFFIXES = [
   [/ sign language$/i, 'Sign Language'],
 ]
 
-// "Arabic, Shihhi" → "Arabic"  /  "Pakistan Sign Language" → "Sign Language"  /  "Bengali" → "Bengali"
+// "Arabic, Shihhi" → "Arabic"  /  "Pakistan Sign Language" → "Pakistan Sign Language"  /  "Bengali" → "Bengali"
 function readBaseLanguage(label) {
   if (!label || typeof label !== 'string') return '— Unknown —'
   const comma = label.indexOf(',')
   if (comma > 0) return label.slice(0, comma).trim()
-  for (const [re, base] of SUFFIX_GROUPS) {
-    if (re.test(label) && label.toLowerCase() !== base.toLowerCase()) return base
-  }
   return label.trim()
 }
-// "Arabic, Shihhi" → "Shihhi"  /  "Pakistan Sign Language" → "Pakistan"  /  "Bengali" → null
+// "Arabic, Shihhi" → "Shihhi"  /  "Pakistan Sign Language" → null  /  "Bengali" → null
 function readDialectLabel(label) {
   if (!label || typeof label !== 'string') return null
   const comma = label.indexOf(',')
   if (comma >= 0) return label.slice(comma + 1).trim() || null
-  for (const [re] of SUFFIX_GROUPS) {
-    if (re.test(label)) {
-      const prefix = label.replace(re, '').trim()
-      return prefix || null
-    }
-  }
   return null
 }
 
@@ -128,12 +123,10 @@ function readFamily(p) {
     const lbl = String(langLabel).trim()
     const derived = lookupFamilyFromLanguageLabel(lbl)
     if (derived) return derived
-    // SUFFIX_GROUPS fallback: e.g. "Pakistan Sign Language" lookup misses, but
-    // the suffix tells us this belongs to the "Sign Language" family/base.
-    // Without this, sign-language pins split between an `Unknown__Sign Language`
-    // bucket and a `Sign Language__Sign Language` bucket — duplicate row in
-    // the Languages tab, both highlighting on select (label-based match).
-    for (const [re, base] of SUFFIX_GROUPS) {
+    // FAMILY_SUFFIXES: e.g. "Pakistan Sign Language" not in lookup, but the
+    // suffix puts it in the "Sign Language" family. baseLang stays as the
+    // full string ("Pakistan Sign Language") so each variant is its own row.
+    for (const [re, base] of FAMILY_SUFFIXES) {
       if (re.test(lbl)) return base
     }
   }

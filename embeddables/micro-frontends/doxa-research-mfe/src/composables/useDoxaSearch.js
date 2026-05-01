@@ -48,31 +48,25 @@ const MAX_PER_CATEGORY = 5
 const MAX_TOTAL        = 20
 
 // ── Base-language + dialect parsing (mirrors useLanguageFamilyLegendData rules)
+// Per QA building-round-1 R2 A1: each individual sign language is its own
+// language; "Pakistan Sign Language" stays whole as the base. The suffix
+// regex is reserved for FAMILY resolution only (see resolveFamily below).
 // "Arabic, Shihhi" → base "Arabic", dialect "Shihhi"
-// "Pakistan Sign Language" → base "Sign Language", dialect "Pakistan"
+// "Pakistan Sign Language" → base "Pakistan Sign Language", dialect null
 // "Bengali" → base "Bengali", dialect null
-const SUFFIX_GROUPS = [
+const FAMILY_SUFFIXES = [
   [/ sign language$/i, 'Sign Language'],
 ]
 function readBaseLanguage(label) {
   if (!label || typeof label !== 'string') return ''
   const comma = label.indexOf(',')
   if (comma > 0) return label.slice(0, comma).trim()
-  for (const [re, base] of SUFFIX_GROUPS) {
-    if (re.test(label) && label.toLowerCase() !== base.toLowerCase()) return base
-  }
   return label.trim()
 }
 function readDialectLabel(label) {
   if (!label || typeof label !== 'string') return null
   const comma = label.indexOf(',')
   if (comma >= 0) return label.slice(comma + 1).trim() || null
-  for (const [re] of SUFFIX_GROUPS) {
-    if (re.test(label)) {
-      const prefix = label.replace(re, '').trim()
-      return prefix || null
-    }
-  }
   return null
 }
 
@@ -91,6 +85,11 @@ function resolveFamily(label) {
   if (langFamilyByLanguage[label]) return langFamilyByLanguage[label]
   const stripped = label.replace(/\s*\(.*?\)\s*$/, '').trim()
   if (stripped !== label && langFamilyByLanguage[stripped]) return langFamilyByLanguage[stripped]
+  // FAMILY_SUFFIXES fallback so sign-language pins agree with the legend's
+  // family bucketing (e.g. "Pakistan Sign Language" → "Sign Language" family).
+  for (const [re, base] of FAMILY_SUFFIXES) {
+    if (re.test(label)) return base
+  }
   return null
 }
 
