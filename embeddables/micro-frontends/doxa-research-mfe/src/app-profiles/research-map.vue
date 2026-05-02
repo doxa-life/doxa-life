@@ -133,9 +133,13 @@ const PeopleGroupDetail = defineAsyncComponent(() => import('../components/Peopl
 // New components written in this same wave:
 import ResearchMapSideMenu    from '../components/ResearchMapSideMenu.vue'
 import ResearchMapFilterPanel from '../components/ResearchMapFilterPanel.vue'
+import SemanticTreeLegend     from '../components/SemanticTreeLegend.vue'
 // Per-map mediator instance (PPLR-ported). createPplrInstance + provideInstance
 // give the SemanticTreeLegend its selection/activeTab/theme refs via inject().
 import { createPplrInstance, provideInstance } from '../composables/usePplrInstance.js'
+// langTree adapter — converts our normalized people-groups into the generic
+// {id,label,color,count,pop,filter,children} shape SemanticTreeLegend takes.
+import { useLanguageFamilyLegendData } from '../composables/useLanguageFamilyLegendData.js'
 
 // PERF: PosterDialog only renders when the user opens the poster export
 // flow. Async-import it so the dialog's deps don't load on every map boot.
@@ -471,11 +475,64 @@ provide('normalizedPeopleGroups', mapData.normalizedPeopleGroups)
 // Per-map "instance" mediator store, ported word-for-word from PPLR's
 // SemanticTreeLegend pattern. Each <doxa-map> custom element gets its own
 // instance; SemanticTreeLegend reads/writes selection + activeTab + theme
-// via inject. Existing mapStore-driven applyDimFilter pipeline is unaffected
-// because LegendDesktop translates the legend's @select payload back into
-// the legend:highlight window event the existing handlers already listen to.
+// via inject.
 const pplrInstance = createPplrInstance(mapId)
 provideInstance(pplrInstance)
+
+// ── langTree + tabs + select handler for SemanticTreeLegend ─────────────────
+// PPLR's component is mounted as a standalone sibling of the map (its own
+// .stl-panel chrome handles positioning, collapse-to-pill, theme). We feed it
+// the langTree directly here instead of routing through LegendDesktop.
+const _langPgRef = { get value() { return mapData.normalizedPeopleGroups.value || [] } }
+const { langTree } = useLanguageFamilyLegendData(_langPgRef)
+const LANG_TABS = [
+  { id: 'family',   label: 'Lang Family',
+    info: 'A language family is a group of languages descended from a common ancestor (e.g. Indo-European, Afro-Asiatic).' },
+  { id: 'language', label: 'Language',
+    info: 'A language is a system of communication used by a people (e.g. Arabic, Bengali, Hindi).' },
+  { id: 'dialect',  label: 'Dialect/Variety',
+    info: 'A dialect/variety is a regional or social form of a language (e.g. Arabic, Sudanese; Pakistan Sign Language).' },
+]
+function _findNodeInTree(nodes, predicate) {
+  for (const n of nodes) {
+    if (predicate(n)) return n
+    if (n.children?.length) {
+      const f = _findNodeInTree(n.children, predicate)
+      if (f) return f
+    }
+  }
+  return null
+}
+// PPLR's onLegendSelect verbatim semantics: setFilter(node.filter) on select,
+// setFilter(null) on null. Plus mirror to mapStore for back-compat with the
+// rest of the app (geocoder, popup, fly-to all read mapStore.selected*).
+function onSemanticTreeSelect(node) {
+  const m = map.value
+  if (!node) {
+    if (m && m.getLayer('language-family-pins')) {
+      try { m.setFilter('language-family-pins', null) } catch (_) {}
+      m.setPaintProperty('language-family-pins', 'circle-opacity', 1)
+      m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', 1)
+    }
+    if (mapStore.selectedFamily)   mapStore.selectFamily(null)
+    if (mapStore.selectedLanguage) mapStore.selectLanguage(null)
+    if (mapStore.selectedDialect)  mapStore.selectDialect?.(null)
+    _clearGeocoderProgrammatic()
+    return
+  }
+  if (m && m.getLayer('language-family-pins') && node.filter) {
+    try { m.setFilter('language-family-pins', node.filter) } catch (_) {}
+    m.setPaintProperty('language-family-pins', 'circle-opacity', 1)
+    m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', 1)
+  }
+  // Mirror selection into mapStore (loop-safe via legend's _lastInternalId).
+  const id = String(node.id || '')
+  if (id.startsWith('fam:'))      mapStore.selectFamily?.(node.label)
+  else if (id.startsWith('lang:')) mapStore.selectLanguage?.(node.label)
+  else if (id.startsWith('dial:')) {
+    mapStore.selectDialect?.({ key: id.slice(5), originalLabels: node.originalLabels || [] })
+  }
+}
 // Theme bridge: keep the SemanticTreeLegend in sync with the app's dark-mode
 // state (driven by uiStore.theme via the isDark computed defined later).
 watch(() => uiStore.theme, (t) => { pplrInstance.theme.value = (t === 'dark' ? 'dark' : 'light') }, { immediate: true })
@@ -493,29 +550,36 @@ watch(() => uiStore.theme, (t) => { pplrInstance.theme.value = (t === 'dark' ? '
 // legend:highlight → research-map.applyDimFilter → mapStore.selectXxx (no-op
 // if already set). The bridge watcher then fires with the same selection,
 // but the SemanticTreeLegend's _lastInternalId guard catches the round-trip.
-function _bridgeSelection(kind, payload) {
-  if (!payload) {
+function _bridgeSelection(kind, fullNode) {
+  if (!fullNode) {
     const cur = pplrInstance.selection.value
     if (cur && cur.id?.startsWith(kind + ':')) pplrInstance.selection.value = null
     return
   }
-  pplrInstance.selection.value = payload
+  // Full node from langTree carries color/children/filter — needed for the
+  // legend's row highlight, descendant-dim exemption, and parent breadcrumb.
+  pplrInstance.selection.value = fullNode
 }
 watch(() => mapStore.selectedFamily, (key) => {
   if (!key) return _bridgeSelection('fam', null)
-  _bridgeSelection('fam', { id: `fam:${key}`, label: key, depth: 0 })
+  const node = _findNodeInTree(langTree.value, n => n.id.startsWith('fam:') && n.label === key)
+  if (node) _bridgeSelection('fam', { ...node, depth: 0 })
 })
 watch(() => mapStore.selectedLanguage, (key) => {
   if (!key) return _bridgeSelection('lang', null)
-  // The legend's tree keys langs as `lang:family__lang`. We don't know the
-  // family from selectedLanguage alone — pass an unprefixed id; findAncestor
-  // will still match on substring. (Acceptable: the language might briefly
-  // show under whichever family node the legend resolves first.)
-  _bridgeSelection('lang', { id: `lang:__${key}`, label: key, depth: 1 })
+  // Match by label across all language nodes — the geocoder gives us "Arabic"
+  // without a family prefix, so we look up the first matching language node
+  // (sorted by population, so the most-populated family wins; usually correct).
+  const node = _findNodeInTree(langTree.value, n => n.id.startsWith('lang:') && n.label === key)
+  if (node) _bridgeSelection('lang', { ...node, depth: 1 })
 })
 watch(() => mapStore.selectedDialect, (dialect) => {
   if (!dialect?.key) return _bridgeSelection('dial', null)
-  _bridgeSelection('dial', { id: `dial:${dialect.key}`, label: dialect.key, depth: 2 })
+  // Dialect mapStore keys already include the family prefix
+  // ("family__baseLang__dialect"); langTree dialect ids prepend "dial:".
+  const fullId = `dial:${dialect.key}`
+  const node = _findNodeInTree(langTree.value, n => n.id === fullId)
+  if (node) _bridgeSelection('dial', { ...node, depth: 2 })
 })
 
 // ─── Poster composable (lazy) ────────────────────────────────────────────────
@@ -1264,14 +1328,24 @@ onBeforeUnmount(() => {
         <ResearchMapFilterPanel />
       </ResearchMapSideMenu>
 
-      <!-- Legend — desktop card + mobile bottom sheet, responsive -->
+      <!-- Legend — desktop card + mobile bottom sheet, responsive.
+           For the language-family tab, the SemanticTreeLegend mounts standalone
+           (its own .stl-panel chrome handles positioning, collapse-to-pill, theme).
+           Other tabs use the existing LegendDesktop card. -->
       <div class="rm-legend-desktop-slot">
         <LegendDesktop
-          v-if="appReady"
+          v-if="appReady && activeLegendType !== 'language-family'"
           :legend-type="activeLegendType"
           :popup-action="activePopupAction"
           :initially-collapsed="false"
           :is-dark="isDark"
+        />
+        <SemanticTreeLegend
+          v-else-if="appReady"
+          :nodes="langTree"
+          :tabs="LANG_TABS"
+          title="Language Families"
+          @select="onSemanticTreeSelect"
         />
       </div>
       <div class="rm-legend-mobile-slot">
