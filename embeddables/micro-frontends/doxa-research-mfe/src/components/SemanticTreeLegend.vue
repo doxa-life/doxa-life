@@ -63,6 +63,19 @@ function collectAllDescendantIds(node, out = new Set()) {
   }
   return out
 }
+// Resolve a sparse {id} payload to the full node in props.nodes — needed when
+// instance.selection is set externally (geocoder bridge from research-map.vue
+// passes id+label+depth only, no children). Without this, descendants dim.
+function findNodeById(nodes, id) {
+  for (const n of nodes) {
+    if (n.id === id) return n
+    if (n.children?.length) {
+      const f = findNodeById(n.children, id)
+      if (f) return f
+    }
+  }
+  return null
+}
 
 // ── Derived ────────────────────────────────────────────────────────────────────
 const treeDepth = computed(() => treeMaxDepth(props.nodes))
@@ -234,10 +247,14 @@ const hasSel   = computed(() => selectedId.value !== null)
 const hasCount = computed(() => props.columns.includes('count'))
 const hasPop   = computed(() => props.columns.includes('pop'))
 
-// Descendants of the selected node — kept full-opacity so the user can drill in
+// Descendants of the selected node — kept full-opacity so the user can drill in.
+// Resolves the full node via id lookup when selection came from the bridge
+// (which only sets {id, label, depth}; no children array).
 const selectedDescendants = computed(() => {
-  if (!selectedNode.value) return new Set()
-  return collectAllDescendantIds(selectedNode.value)
+  const sel = selectedNode.value
+  if (!sel) return new Set()
+  const fullNode = sel.children ? sel : (findNodeById(props.nodes, sel.id) || sel)
+  return collectAllDescendantIds(fullNode)
 })
 
 // ── Parent breadcrumb (uses parent's TAB name, not generic "Parent:") ────────

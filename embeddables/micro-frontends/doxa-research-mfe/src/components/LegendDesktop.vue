@@ -70,6 +70,17 @@ useShadowStyles(`
 .legend-container.collapsed .lft-items{padding:0!important;align-content:center;overflow:visible!important;}
 .legend-container.collapsed .lft-title-row{padding:0!important;position:static!important;background:transparent!important;}
 .legend-container.collapsed .lrg-title-row{position:static!important;background:transparent!important;}
+
+/* SemanticTreeLegend (PPLR-ported) collapse parity — preserve the rounded-pill
+   collapse-to-circle aesthetic from before. Hide everything below the titlebar
+   so only the title (containing our caret + "Legend"/breadcrumb) shows.
+   The .stl-inner border + box-shadow is also removed in collapsed state so the
+   inner doesn't double up on the .legend-container's pill chrome. */
+.legend-container.collapsed .semantic-tree-legend .stl-tabs-wrap,
+.legend-container.collapsed .semantic-tree-legend .stl-col-hdr,
+.legend-container.collapsed .semantic-tree-legend .stl-rows{display:none!important;}
+.legend-container.collapsed .semantic-tree-legend .stl-inner{background:transparent!important;border:none!important;box-shadow:none!important;border-radius:0!important;}
+.legend-container.collapsed .semantic-tree-legend .stl-titlebar{padding:0 12px!important;border-bottom:none!important;min-height:36px!important;}
 .legend-section-label{padding:8px 12px 4px;font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:0.5px;text-transform:uppercase;}
 .legend-dark .legend-section-label{color:rgba(243,243,241,0.55);}
 
