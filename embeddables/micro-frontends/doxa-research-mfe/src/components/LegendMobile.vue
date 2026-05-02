@@ -101,10 +101,12 @@ useShadowStyles(`
 .legend-mobile-sheet.collapsed .lrg-title-row,
 .legend-mobile-sheet.collapsed .lft-title-row,
 .legend-mobile-sheet.collapsed .stl-titlebar{padding:0 36px 0 36px!important;display:flex;align-items:center;justify-content:center;height:48px;min-height:0!important;border-bottom:none!important;}
+/* line-height:1.4 (not 1) so the descender of 'g' in "Legend" / "Engagement
+   Progress" isn't clipped at the bottom — qa: 2026-05-02. */
 .legend-mobile-sheet.collapsed .stl-tb-title,
 .legend-mobile-sheet.collapsed .lrg-title,
 .legend-mobile-sheet.collapsed .lrg-title-row .lrg-title,
-.legend-mobile-sheet.collapsed .lft-title{font-size:13px!important;letter-spacing:0.02em!important;line-height:1!important;}
+.legend-mobile-sheet.collapsed .lft-title{font-size:13px!important;letter-spacing:0.02em!important;line-height:1.4!important;}
 /* Hide tree/data content when collapsed so only the title bar shows. */
 .legend-mobile-sheet.collapsed .stl-tabs-wrap,
 .legend-mobile-sheet.collapsed .stl-col-hdr,
@@ -129,9 +131,11 @@ useShadowStyles(`
 .legend-mobile-sheet .stl-inner{border:none!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;}
 .legend-mobile-sheet .stl-reopen{display:none!important;}
 .legend-mobile-sheet .stl-collapse-btn{display:none!important;}
-/* The embedded title bar still has its own padding that fights mobile
-   sheet's left-padding (28px clears the .mobile-collapse-caret). Trim. */
-.legend-mobile-sheet .stl-titlebar{padding:0 12px 4px 0!important;border-bottom-color:rgba(0,0,0,0.08)!important;}
+/* (Removed iter-1 rule that was setting padding-left:0 here — it was
+    overriding the iter-5 padding-left:36px rule above, causing the caret
+    to overlap the title text "Lan-guage Families" → "guage Families"
+    visible. qa: 2026-05-02.) Border-bottom color preserved. */
+.legend-mobile-sheet .stl-titlebar{border-bottom-color:rgba(0,0,0,0.08)!important;}
 
 /* ── Mobile language-family tree overrides ──
    IMPORTANT: do NOT override .lft-title-row grid-template-columns here.
