@@ -1237,6 +1237,14 @@ function applyContainerScale(width) {
 }
 
 onMounted(async () => {
+  // uiStore.init() registers the page-level ResizeObserver that drives
+  // updateBreakpoint() — without this, breakpoint stays at default 'desktop'
+  // and uiStore.isMobile is permanently false even on mobile devices, so
+  // any code branching on isMobile (LegendDesktop's internal LegendMobile
+  // mount, mobile-only feature gates, etc.) runs the desktop path.
+  // The CSS @media path on .rm-legend-mobile-slot still works either way,
+  // but isMobile-driven branches don't. (qa: 2026-05-02 mobile audit.)
+  uiStore.init?.()
   activeTabId.value = tabs.value[0]?.id ?? 'doxa-regions'
   // Container-scale: set CSS vars now + observe future resizes.
   if (rmRoot.value) {
