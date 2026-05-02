@@ -52,10 +52,20 @@ useShadowStyles(`
 /* Content padding — symmetric, 12px top/bottom only. Caret no longer needs
    a wide left gutter (it's now in-flow inside the title row), and no right
    padding keeps the scrollbar at the far edge.
+   display:flex+column gives child components (.stl-panel / .legend-row-group)
+   a DEFINITE height via flex:1 — height:100% on a non-flex parent with only
+   flex:1 (no explicit height) falls back to auto, which made the inner
+   scrollable shorter than the sheet on tier-3 fullyOpen and left a white
+   gap at the bottom (qa: 2026-05-02 iter-10).
    IMPORTANT: NO backticks anywhere in this comment block — it lives
    inside a JS template literal (useShadowStyles) and a stray backtick
    silently closes the string and blanks the entire mobile stylesheet. */
-.legend-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 0;-webkit-overflow-scrolling:touch;}
+.legend-content{flex:1;min-height:0;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;padding:12px 0;-webkit-overflow-scrolling:touch;}
+/* Constrain only the table/tree shells to the .legend-content viewport so
+   their inner scroll containers (.stl-rows / .lrg-items) bound correctly.
+   PeopleGroupDetail keeps its natural size and lets .legend-content scroll. */
+.legend-mobile-sheet .legend-content>.stl-panel,
+.legend-mobile-sheet .legend-content>.legend-row-group{flex:1;min-height:0;}
 
 /* LegendRows --lrg-caret-col bumped from 10px → 28px on mobile so column 1
    accommodates the slotted .mobile-collapse-caret (20px wide) with 4px
@@ -128,7 +138,7 @@ useShadowStyles(`
    inner tree rendering to fill the sheet's content area; the sheet
    already provides drag-strip + collapse caret + chrome. Override
    positioning, hide the desktop-only collapse affordances. */
-.legend-mobile-sheet .stl-panel{position:static!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;width:100%!important;z-index:auto!important;display:flex;flex-direction:column;height:100%;}
+.legend-mobile-sheet .stl-panel{position:static!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;width:100%!important;z-index:auto!important;display:flex;flex-direction:column;min-height:0;}
 .legend-mobile-sheet .stl-panel.closed{transform:none!important;opacity:1!important;pointer-events:auto!important;}
 .legend-mobile-sheet .stl-inner{border:none!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;}
 .legend-mobile-sheet .stl-reopen{display:none!important;}
