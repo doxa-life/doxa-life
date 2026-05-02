@@ -34,10 +34,14 @@ useShadowStyles(`
 .sheet-drag-strip{position:absolute;top:0;left:0;right:0;height:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;z-index:2;}
 .pull-tab-handle{width:40px;height:4px;background:#ccc;border-radius:2px;}
 
-/* Collapse caret — same arrangement as desktop's .legend-collapse-caret. */
-.mobile-collapse-caret{position:absolute;top:14px;left:6px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:#666;padding:0;z-index:3;transition:transform 0.3s ease-out;transform-origin:center;outline:none;-webkit-tap-highlight-color:transparent;}
+/* Collapse caret — styled to match the PPLR-port .stl-collapse-btn the user
+   called out as "professional gray highlighted button" on desktop. Light-bg
+   variant since the mobile sheet renders on a white background. */
+.mobile-collapse-caret{position:absolute;top:12px;left:10px;width:22px;height:20px;display:flex;align-items:center;justify-content:center;background:rgba(110,118,129,0.12);border:1px solid #d0d7de;border-radius:5px;cursor:pointer;color:#57606a;padding:0;z-index:3;transition:transform 0.3s ease-out,color 0.12s,background 0.12s,border-color 0.12s;transform-origin:center;outline:none;-webkit-tap-highlight-color:transparent;}
 .mobile-collapse-caret:focus{outline:none;}
-.mobile-collapse-caret:hover{color:#333;}
+.mobile-collapse-caret:hover{color:#3b463d;background:rgba(59,70,61,0.10);border-color:#3b463d;}
+.legend-mobile-sheet.sheet-dark .mobile-collapse-caret{background:rgba(110,118,129,0.18);border-color:#30363d;color:#8b949e;}
+.legend-mobile-sheet.sheet-dark .mobile-collapse-caret:hover{color:#c9d1d9;background:rgba(59,70,61,0.22);border-color:#73A17F;}
 
 /* Detail-mode close X — top-right corner */
 .detail-close-btn{position:absolute;top:10px;right:12px;background:none;border:none;padding:4px;cursor:pointer;color:#666;display:flex;align-items:center;justify-content:center;z-index:3;transition:color 0.2s ease;}
@@ -75,12 +79,18 @@ useShadowStyles(`
    16px top-corner radius — square edges look cleaner when the sheet
    is acting as a thin bottom footer. Rounded corners return when
    expanded (user feedback 2026-04-27). */
-.legend-mobile-sheet.collapsed{box-shadow:0 -2px 8px rgba(0,0,0,0.15);height:auto !important;min-height:0;border-top-left-radius:0;border-top-right-radius:0;}
-.legend-mobile-sheet.collapsed .legend-content{padding-top:0!important;padding-bottom:0!important;}
+.legend-mobile-sheet.collapsed{box-shadow:0 -2px 8px rgba(0,0,0,0.15);height:44px !important;min-height:44px;border-top-left-radius:0;border-top-right-radius:0;}
+.legend-mobile-sheet.collapsed .legend-content{padding-top:0!important;padding-bottom:0!important;display:flex;align-items:center;}
 .legend-mobile-sheet.collapsed .lrg-items,
 .legend-mobile-sheet.collapsed .lft-items{padding:0!important;}
 .legend-mobile-sheet.collapsed .lrg-title-row,
-.legend-mobile-sheet.collapsed .lft-title-row{padding:16px 0!important;}
+.legend-mobile-sheet.collapsed .lft-title-row{padding:0!important;}
+/* When collapsed, also hide the SemanticTreeLegend's tabs + column headers
+   + rows so only the titlebar shows (3-tier-collapse "footer" mode). */
+.legend-mobile-sheet.collapsed .stl-tabs-wrap,
+.legend-mobile-sheet.collapsed .stl-col-hdr,
+.legend-mobile-sheet.collapsed .stl-rows{display:none!important;}
+.legend-mobile-sheet.collapsed .stl-titlebar{padding:0 0 0 44px!important;border-bottom:none!important;min-height:0!important;height:44px;display:flex;align-items:center;}
 
 /* ── SemanticTreeLegend embedded-in-sheet overrides ──
    The PPLR-ported SemanticTreeLegend was designed for standalone desktop

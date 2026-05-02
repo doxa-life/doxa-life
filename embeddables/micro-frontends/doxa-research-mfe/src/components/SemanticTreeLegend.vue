@@ -405,13 +405,16 @@ useShadowStyles(`
   font: 600 9px ui-monospace, monospace;
   color: #6e7681; text-transform: uppercase; letter-spacing: 0.05em;
 }
+/* Center-aligned UPGs/Pop column header (qa: 2026-05-02 — user explicitly
+   requested center over right-align so the header label sits on the same
+   x-center as the numeric value below; reduces eye drift across rows). */
 .stl-hdr-num {
-  width: var(--stl-num-w); text-align: right; flex-shrink: 0;
+  width: var(--stl-num-w); text-align: center; flex-shrink: 0;
   font: 600 9px ui-monospace, monospace;
   color: #6e7681; text-transform: uppercase; letter-spacing: 0.05em;
   background: transparent; border: none; cursor: pointer;
   padding: 0; transition: color 0.1s;
-  display: inline-flex; align-items: center; justify-content: flex-end; gap: 3px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 3px;
 }
 .stl-hdr-num:hover { color: #c9d1d9; }
 .stl-hdr-num.active { color: #73A17F; }
@@ -540,8 +543,9 @@ useShadowStyles(`
   font: 11.5px system-ui, sans-serif; color: #e6edf3;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+/* Center-aligned numeric data — paired with center-aligned header above. */
 .stl-num {
-  width: var(--stl-num-w); text-align: right; flex-shrink: 0;
+  width: var(--stl-num-w); text-align: center; flex-shrink: 0;
   font: 10.5px ui-monospace, monospace; color: #8b949e;
   font-variant-numeric: tabular-nums;
 }
