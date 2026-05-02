@@ -514,8 +514,17 @@ export function useLanguageFamilyLegendData(peopleGroupsRef, options = {}) {
         color: familyColor,
         count: fam.peopleGroupCount,
         pop:   fam.population,
+        // Belt-and-suspenders: match pins by derived languageFamily property OR
+        // by any enumerated language string under this family. The property
+        // path catches pins where useMapLayers' deriveFamilyFromLanguage hit
+        // (most pins, after the iter-2 fix); the language-list path catches
+        // any pin whose `language` value matches a label the legend bucketed
+        // here even if the property derivation missed (e.g. format variance).
         filter: allFamilyLangs.length > 0
-          ? ['in', ['get', 'language'], ['literal', Array.from(new Set(allFamilyLangs))]]
+          ? ['any',
+              ['==', ['get', 'languageFamily'], fam.key],
+              ['in', ['get', 'language'], ['literal', Array.from(new Set(allFamilyLangs))]]
+            ]
           : ['==', ['get', 'languageFamily'], fam.key],
         children: [],
       }

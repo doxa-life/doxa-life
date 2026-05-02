@@ -25,7 +25,12 @@ useShadowStyles(`
    and collapsed. Using 'all' would also animate top/left/position and cause
    layout thrash on state flips. Emphasized-decelerate curve mirrors
    Material Design 3 snap-open, settle-closed feel. */
-.legend-container{position:absolute;top:54px;left:10px;width:var(--map-legend-width,340px);max-height:calc(100vh - 74px);background:#fff;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.12),0 1px 3px rgba(0,0,0,0.08);z-index:1000;overflow:hidden;display:flex;flex-direction:column;transition:width 200ms cubic-bezier(0.2,0,0,1),max-height 200ms cubic-bezier(0.2,0,0,1),min-width 200ms cubic-bezier(0.2,0,0,1),border-radius 200ms linear,box-shadow 200ms linear;will-change:width,max-height;}
+/* top/left/width aligned to SemanticTreeLegend's .stl-panel (top:60px,
+   left:8px, width:380px) so the LegendDesktop card and the SemanticTreeLegend
+   sit at exactly the same position+size — no visible jump when the user
+   clicks a pin and the detail panel swaps in over the language-family legend
+   (qa: 2026-05-02). */
+.legend-container{position:absolute;top:60px;left:8px;width:var(--map-legend-width,380px);max-height:calc(100vh - 80px);background:#fff;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.12),0 1px 3px rgba(0,0,0,0.08);z-index:1000;overflow:hidden;display:flex;flex-direction:column;transition:width 200ms cubic-bezier(0.2,0,0,1),max-height 200ms cubic-bezier(0.2,0,0,1),min-width 200ms cubic-bezier(0.2,0,0,1),border-radius 200ms linear,box-shadow 200ms linear;will-change:width,max-height;}
 /* Collapsed: card matches geocoder shape — 36px tall pill with 20px radius.
    Name track auto-sizes to fit "Legend" text (no empty slack on the right).
    .lrg-items padding cleared so the single title row centers inside 36px. */
