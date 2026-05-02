@@ -152,7 +152,10 @@ useShadowStyles(`
        400/360/280 px responsive widths the simple-map mfe uses. The
        --map-legend-width / --map-btn-size / --map-toolbar-gap / --map-font-md
        / --map-font-sm CSS vars are set by applyContainerScale() below. ── */
-  .mapboxgl-ctrl-top-left { top:10px!important;left:10px!important;width:var(--map-legend-width,340px)!important;max-width:var(--map-legend-width,340px)!important;z-index:1200!important; }
+  /* Geocoder column matches the SemanticTreeLegend's .stl-panel — left:8px,
+     width:380px — so the search bar and the legend stack as one column at
+     the same x-edge (PPLR alignment, qa: 2026-05-02). */
+  .mapboxgl-ctrl-top-left { top:12px!important;left:8px!important;width:380px!important;max-width:380px!important;z-index:1200!important; }
   .mapboxgl-ctrl-top-left .mapboxgl-ctrl { margin:0!important;float:none!important; }
   .mapboxgl-ctrl-geocoder { width:100%!important;max-width:100%!important;min-width:0!important;border-radius:20px!important;box-shadow:0 2px 8px rgba(0,0,0,0.15)!important;background:#fff; }
   .mapboxgl-ctrl-geocoder--input { border-radius:20px!important; }
@@ -1339,12 +1342,17 @@ onBeforeUnmount(() => {
       </ResearchMapSideMenu>
 
       <!-- Legend — desktop card + mobile bottom sheet, responsive.
-           For the language-family tab, the SemanticTreeLegend mounts standalone
-           (its own .stl-panel chrome handles positioning, collapse-to-pill, theme).
-           Other tabs use the existing LegendDesktop card. -->
+           For the language-family tab, SemanticTreeLegend mounts standalone
+           (its own .stl-panel chrome handles positioning, collapse-to-pill,
+           theme). Other tabs use the existing LegendDesktop card.
+           HOWEVER: pin click on the map writes to uiStore.legendMode='detail'
+           + selectedPeopleGroup, which LegendDesktop's PeopleGroupDetail-swap
+           renders. We re-mount LegendDesktop in detail mode even on the
+           language-family tab so the people-group detail panel still appears
+           when a pin is clicked there (qa: 2026-05-02). -->
       <div class="rm-legend-desktop-slot">
         <LegendDesktop
-          v-if="appReady && activeLegendType !== 'language-family'"
+          v-if="appReady && (activeLegendType !== 'language-family' || (uiStore.legendMode === 'detail' && uiStore.selectedPeopleGroup))"
           :legend-type="activeLegendType"
           :popup-action="activePopupAction"
           :initially-collapsed="false"
