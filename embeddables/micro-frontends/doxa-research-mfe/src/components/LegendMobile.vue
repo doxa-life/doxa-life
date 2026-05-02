@@ -5,7 +5,8 @@ import { useShadowStyles } from '@/composables/useShadowStyles.js'
 import { useLegendData } from '@/composables/useLegendData.js'
 import { RESEARCH_LEGEND_OPTIONS } from '../composables/researchLegendOptions.js'
 import LegendRows from './LegendRows.vue'
-import LegendFamilyTree from './LegendFamilyTree.vue'
+import SemanticTreeLegend from './SemanticTreeLegend.vue'
+import { useLanguageFamilyLegendData } from '../composables/useLanguageFamilyLegendData.js'
 import PeopleGroupDetail from './PeopleGroupDetail.vue'
 
 const { t } = useI18n()
@@ -162,6 +163,15 @@ const peopleGroupsForFamilyTree = computed(() => {
   }
   return out
 })
+
+// SemanticTreeLegend tree adapter (mobile copy — same composable, same shape).
+const _pgRefMobile = { get value() { return peopleGroupsForFamilyTree.value } }
+const { langTree: langTreeForMobile } = useLanguageFamilyLegendData(_pgRefMobile)
+const LANG_TABS_MOBILE = [
+  { id: 'family',   label: 'Lang Family', info: 'A language family is a group of languages descended from a common ancestor.' },
+  { id: 'language', label: 'Language',    info: 'A language is a system of communication used by a people.' },
+  { id: 'dialect',  label: 'Dialect',     info: 'A dialect/variety is a regional or social form of a language.' },
+]
 
 // Touch gesture state
 const touchStartY = ref(0)
@@ -357,19 +367,15 @@ onBeforeUnmount(() => {
           :action="popupAction"
         />
 
-        <!-- Language-family tab: same component used by LegendDesktop. The
-             card/sheet chrome stays here; only the table comes from the tree.
-             Mobile-specific tap-target sizing (44px) is applied via the
-             .legend-mobile-sheet .lft-* CSS overrides at the top of this
-             file — the tree component itself is unchanged. -->
-        <LegendFamilyTree
+        <!-- Language-family tab: SemanticTreeLegend (PPLR-ported, R4).
+             Same component as LegendDesktop; the mobile sheet just provides
+             different chrome. Tree-data adapter is wired the same way. -->
+        <SemanticTreeLegend
           v-else-if="legendType === 'language-family'"
-          :peopleGroups="peopleGroupsForFamilyTree"
-          :title="legendTitle"
-          :columns="legendColumns"
-          :isDark="isDark"
-          :fmtPop="fmtPop"
-          :fmtCount="fmtCount"
+          :nodes="langTreeForMobile"
+          :tabs="LANG_TABS_MOBILE"
+          :title="legendTitle || 'Language Families'"
+          :columns="['count', 'pop']"
         />
 
         <!-- disableCollapse is FORCED TRUE here too — child-row carets are
