@@ -82,6 +82,23 @@ useShadowStyles(`
 .legend-mobile-sheet.collapsed .lrg-title-row,
 .legend-mobile-sheet.collapsed .lft-title-row{padding:16px 0!important;}
 
+/* ── SemanticTreeLegend embedded-in-sheet overrides ──
+   The PPLR-ported SemanticTreeLegend was designed for standalone desktop
+   use — its .stl-panel uses absolute positioning anchored to the map area
+   with fixed width 380px, plus a separate .stl-reopen pill and
+   .stl-collapse-btn. Inside the mobile bottom sheet we just need the
+   inner tree rendering to fill the sheet's content area; the sheet
+   already provides drag-strip + collapse caret + chrome. Override
+   positioning, hide the desktop-only collapse affordances. */
+.legend-mobile-sheet .stl-panel{position:static!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;width:100%!important;z-index:auto!important;display:flex;flex-direction:column;height:100%;}
+.legend-mobile-sheet .stl-panel.closed{transform:none!important;opacity:1!important;pointer-events:auto!important;}
+.legend-mobile-sheet .stl-inner{border:none!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;}
+.legend-mobile-sheet .stl-reopen{display:none!important;}
+.legend-mobile-sheet .stl-collapse-btn{display:none!important;}
+/* The embedded title bar still has its own padding that fights mobile
+   sheet's left-padding (28px clears the .mobile-collapse-caret). Trim. */
+.legend-mobile-sheet .stl-titlebar{padding:0 12px 4px 0!important;border-bottom-color:rgba(0,0,0,0.08)!important;}
+
 /* ── Mobile language-family tree overrides ──
    IMPORTANT: do NOT override .lft-title-row grid-template-columns here.
    The desktop CSS makes the title-row a SUBGRID of .lft-items so the
