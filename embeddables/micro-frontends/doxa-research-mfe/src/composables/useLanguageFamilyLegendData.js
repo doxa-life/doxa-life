@@ -481,5 +481,69 @@ export function useLanguageFamilyLegendData(peopleGroupsRef, options = {}) {
     }
   }
 
-  return { rows, languageRows, dialectRows, toggle, isExpanded, setExpansionToOnly, childRowsFor, dialectRowsFor, highlight }
+  // ── langTree — generic semantic-tree shape for SemanticTreeLegend ─────────
+  // Per QA building-round-1 R4 decision: ported PPLR's SemanticTreeLegend takes
+  // a generic tree of nodes ({ id, label, color, count, pop, filter, children }).
+  // This computed converts our family/language/dialect aggregation into that
+  // shape with pre-built Mapbox filter expressions, so a single @select event
+  // from the legend can drive the pin-layer filter directly (no kind-specific
+  // dispatch logic needed downstream).
+  const langTree = computed(() => {
+    const families = aggregated.value
+    const out = []
+    for (const fam of families.values()) {
+      const familyColor = getLanguageFamilyColor(fam.key)
+      const familyNode = {
+        id:    `fam:${fam.key}`,
+        label: fam.key,
+        color: familyColor,
+        count: fam.peopleGroupCount,
+        pop:   fam.population,
+        filter: ['==', ['get', 'languageFamily'], fam.key],
+        children: [],
+      }
+      for (const lang of fam.languages.values()) {
+        const langKey = lang.key
+        const langNode = {
+          id:    `lang:${fam.key}__${langKey}`,
+          label: langKey,
+          color: familyColor,
+          count: lang.peopleGroupCount,
+          pop:   lang.population,
+          // Match base + comma-prefix + suffix-contains so "Arabic" catches
+          // "Arabic, Sudanese" and "Sign Language" catches "Pakistan Sign Language".
+          filter: ['any',
+            ['==', ['get', 'language'], langKey],
+            ['==', ['slice', ['get', 'language'], 0, langKey.length + 1], langKey + ','],
+            ['in', ' ' + langKey, ['get', 'language']]
+          ],
+          children: [],
+        }
+        for (const dialect of lang.dialects.values()) {
+          const labels = Array.from(dialect.originalLabels)
+          langNode.children.push({
+            id:    `dial:${fam.key}__${langKey}__${dialect.key}`,
+            label: `${langKey}, ${dialect.key}`,
+            color: familyColor,
+            count: dialect.peopleGroupCount,
+            pop:   dialect.population,
+            // Exact match against the original API label(s) — handles both
+            // comma-inverted ("Arabic, Sudanese") and suffix-grouped
+            // ("Pakistan Sign Language") cases.
+            filter: labels.length === 1
+              ? ['==', ['get', 'language'], labels[0]]
+              : ['in', ['get', 'language'], ['literal', labels]],
+            originalLabels: labels,
+            children: [],
+          })
+        }
+        familyNode.children.push(langNode)
+      }
+      out.push(familyNode)
+    }
+    out.sort((a, b) => (b.pop - a.pop) || (b.count - a.count))
+    return out
+  })
+
+  return { rows, languageRows, dialectRows, langTree, toggle, isExpanded, setExpansionToOnly, childRowsFor, dialectRowsFor, highlight }
 }

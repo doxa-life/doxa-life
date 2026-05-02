@@ -133,6 +133,9 @@ const PeopleGroupDetail = defineAsyncComponent(() => import('../components/Peopl
 // New components written in this same wave:
 import ResearchMapSideMenu    from '../components/ResearchMapSideMenu.vue'
 import ResearchMapFilterPanel from '../components/ResearchMapFilterPanel.vue'
+// Per-map mediator instance (PPLR-ported). createPplrInstance + provideInstance
+// give the SemanticTreeLegend its selection/activeTab/theme refs via inject().
+import { createPplrInstance, provideInstance } from '../composables/usePplrInstance.js'
 
 // PERF: PosterDialog only renders when the user opens the poster export
 // flow. Async-import it so the dialog's deps don't load on every map boot.
@@ -460,9 +463,22 @@ const legend = useLegendData({
   legendType: activeLegendType
 })
 provide('legendRows', legend.rows)
-// LegendFamilyTree needs raw normalized people-groups (not pre-aggregated rows).
-// mapData owns the normalized array; expose it to LegendDesktop via inject.
+// SemanticTreeLegend (and LegendFamilyTree.legacy) need raw normalized
+// people-groups, not pre-aggregated legendRows. mapData owns the normalized
+// array; expose to descendants.
 provide('normalizedPeopleGroups', mapData.normalizedPeopleGroups)
+
+// Per-map "instance" mediator store, ported word-for-word from PPLR's
+// SemanticTreeLegend pattern. Each <doxa-map> custom element gets its own
+// instance; SemanticTreeLegend reads/writes selection + activeTab + theme
+// via inject. Existing mapStore-driven applyDimFilter pipeline is unaffected
+// because LegendDesktop translates the legend's @select payload back into
+// the legend:highlight window event the existing handlers already listen to.
+const pplrInstance = createPplrInstance(mapId)
+provideInstance(pplrInstance)
+// Theme bridge: keep the SemanticTreeLegend in sync with the app's dark-mode
+// state (driven by uiStore.theme via the isDark computed defined later).
+watch(() => uiStore.theme, (t) => { pplrInstance.theme.value = (t === 'dark' ? 'dark' : 'light') }, { immediate: true })
 
 // ─── Poster composable (lazy) ────────────────────────────────────────────────
 // Instantiated only when the user opens the poster dialog. The composable +
@@ -784,6 +800,11 @@ function applyDimFilter(detail) {
     } else if (kind === 'adoption') {
       const want = expectedValue === 'hasAdoption'
       matchExpr = ['==', ['get', property], want]
+    } else if (detail.filterExpr) {
+      // The new SemanticTreeLegend ships pre-built Mapbox filter expressions
+      // on each tree node. When a legend click fires legend:highlight, the
+      // adapter forwards detail.filterExpr verbatim — no rebuild needed.
+      matchExpr = detail.filterExpr
     } else if (kind === 'language') {
       // Two grouping patterns:
       //   comma-inverted: "Arabic" matches "Arabic" exact OR "Arabic, Shihhi" (prefix "Arabic,")
