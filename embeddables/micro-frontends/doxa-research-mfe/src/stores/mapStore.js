@@ -365,10 +365,12 @@ export const useMapStore = defineStore('map', {
          * @param {string|null} family - Family name string or null to clear
          */
         selectFamily(family) {
-            // Clear other selections
+            // Clear other selections (legend levels are mutually exclusive — Bug 13)
             this.selectedRegion = null;
             this.selectedAffinityBlock = null;
             this.selectedPeopleGroup = null;
+            this.selectedLanguage = null;
+            this.selectedDialect = null;
 
             this.selectedFamily = family;
         },
@@ -382,10 +384,12 @@ export const useMapStore = defineStore('map', {
          * @param {string|null} language - Language label string or null to clear
          */
         selectLanguage(language) {
-            // Clear other legend selections
+            // Clear other legend selections (mutually exclusive — Bug 13: clicking a
+            // child language while a family is selected swaps the selection cleanly)
             this.selectedRegion = null;
             this.selectedAffinityBlock = null;
             this.selectedPeopleGroup = null;
+            this.selectedFamily = null;
             this.selectedDialect = null;
 
             this.selectedLanguage = language;
