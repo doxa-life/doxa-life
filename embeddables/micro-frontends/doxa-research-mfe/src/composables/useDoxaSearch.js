@@ -441,8 +441,13 @@ export function useDoxaSearch(opts = {}) {
   function search(query) {
     const activeFilter = typeof getActiveFilter === 'function' ? getActiveFilter() : null
     const g = searchGrouped(query)
-    // Order: family → language → dialect (semantic-tree top-down) before places/religions.
-    const allFlat = [...g.people, ...g.families, ...g.languages, ...g.dialects, ...g.places, ...g.religions]
+    // Semantic-tree matches FIRST (families/languages/dialects), then people,
+    // places, religions. Earlier ordering put people first, which combined with
+    // MAX_PER_CATEGORY=5 buried the language entry when 5+ people-groups
+    // matched the same token (e.g. typing "arabic" returned 5 Arabic-speaking
+    // PGs and zero "Arabic" language row in the All-Data section, even though
+    // the language was searchable). qa: 2026-05-02.
+    const allFlat = [...g.families, ...g.languages, ...g.dialects, ...g.people, ...g.places, ...g.religions]
 
     if (!activeFilter?.key || !allFlat.length) {
       return allFlat.slice(0, MAX_TOTAL)
@@ -472,15 +477,23 @@ export function useDoxaSearch(opts = {}) {
       result.push(makeSectionHeader('Within ' + selectionLabel, false))
       result.push(...withinPeople.slice(0, MAX_PER_CATEGORY))
     }
-    // "All DOXA Data" section: tag all results so geocoder handler can deselect legend
-    const allTagged = allFlat.map(f => ({
-      ...f,
-      properties: { ...f.properties, _allDataSection: true }
-    }))
+    // "All DOXA Data" section: take a sampling from EACH kind so the language
+    // / dialect entries don't get buried by people-group hits. Earlier code
+    // sliced the flat list at MAX_PER_CATEGORY=5; with people first that
+    // ate every slot. Now: 3 each of families/languages/dialects + up to 5
+    // people + 2 each of places/religions, all tagged with _allDataSection.
+    const allTagged = [
+      ...g.families.slice(0,  3),
+      ...g.languages.slice(0, 3),
+      ...g.dialects.slice(0,  3),
+      ...g.people.slice(0,    5),
+      ...g.places.slice(0,    2),
+      ...g.religions.slice(0, 2),
+    ].map(f => ({ ...f, properties: { ...f.properties, _allDataSection: true } }))
     result.push(makeSectionHeader('All DOXA Data', true))
-    result.push(...allTagged.slice(0, MAX_PER_CATEGORY))
+    result.push(...allTagged)
 
-    return result.slice(0, MAX_TOTAL + 4) // extra room for the 2 header features
+    return result.slice(0, MAX_TOTAL + 8) // extra room for 2 headers + extra all-data items
   }
 
   return { search, searchGrouped, index, aggregates }

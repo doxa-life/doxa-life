@@ -80,18 +80,33 @@ useShadowStyles(`
    16px top-corner radius — square edges look cleaner when the sheet
    is acting as a thin bottom footer. Rounded corners return when
    expanded (user feedback 2026-04-27). */
-.legend-mobile-sheet.collapsed{box-shadow:0 -2px 8px rgba(0,0,0,0.15);height:44px !important;min-height:44px;border-top-left-radius:0;border-top-right-radius:0;}
-.legend-mobile-sheet.collapsed .legend-content{padding-top:0!important;padding-bottom:0!important;display:flex;align-items:center;}
+.legend-mobile-sheet.collapsed{box-shadow:0 -2px 8px rgba(0,0,0,0.15);height:48px !important;min-height:48px;border-top-left-radius:0;border-top-right-radius:0;}
+.legend-mobile-sheet.collapsed .legend-content{padding:0!important;display:flex;align-items:center;height:48px;}
 .legend-mobile-sheet.collapsed .lrg-items,
-.legend-mobile-sheet.collapsed .lft-items{padding:0!important;}
+.legend-mobile-sheet.collapsed .lft-items{padding:0!important;align-content:center;height:48px;}
+/* Title rows: padding-left:44px clears the absolute .mobile-collapse-caret
+   (left:10px + 24px width = 34px right-edge, +10px gap). align-items:center
+   + height:48px ensures the title text is vertically centered in the
+   collapsed footer instead of hugging the top edge.
+   Font-size bumped to 13px (from default 10-11px) for legibility — the
+   "LEGEND" text was minute when collapsed (qa: 2026-05-02). */
 .legend-mobile-sheet.collapsed .lrg-title-row,
-.legend-mobile-sheet.collapsed .lft-title-row{padding:0!important;}
-/* When collapsed, also hide the SemanticTreeLegend's tabs + column headers
-   + rows so only the titlebar shows (3-tier-collapse "footer" mode). */
+.legend-mobile-sheet.collapsed .lft-title-row,
+.legend-mobile-sheet.collapsed .stl-titlebar{padding:0 0 0 44px!important;display:flex;align-items:center;height:48px;min-height:0!important;border-bottom:none!important;}
+.legend-mobile-sheet.collapsed .stl-tb-title,
+.legend-mobile-sheet.collapsed .lrg-title,
+.legend-mobile-sheet.collapsed .lrg-title-row .lrg-title,
+.legend-mobile-sheet.collapsed .lft-title{font-size:13px!important;letter-spacing:0.04em!important;line-height:1!important;}
+/* Hide tree/data content when collapsed so only the title bar shows. */
 .legend-mobile-sheet.collapsed .stl-tabs-wrap,
 .legend-mobile-sheet.collapsed .stl-col-hdr,
-.legend-mobile-sheet.collapsed .stl-rows{display:none!important;}
-.legend-mobile-sheet.collapsed .stl-titlebar{padding:0 0 0 44px!important;border-bottom:none!important;min-height:0!important;height:44px;display:flex;align-items:center;}
+.legend-mobile-sheet.collapsed .stl-rows,
+.legend-mobile-sheet.collapsed .lrg-row,
+.legend-mobile-sheet.collapsed .lrg-footer,
+.legend-mobile-sheet.collapsed .lrg-header-col,
+.legend-mobile-sheet.collapsed .lft-row,
+.legend-mobile-sheet.collapsed .lft-row-child,
+.legend-mobile-sheet.collapsed .lft-header-col{display:none!important;}
 
 /* ── SemanticTreeLegend embedded-in-sheet overrides ──
    The PPLR-ported SemanticTreeLegend was designed for standalone desktop
