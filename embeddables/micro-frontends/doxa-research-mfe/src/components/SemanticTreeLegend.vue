@@ -332,6 +332,8 @@ useShadowStyles(`
   border-bottom: 1px solid #21262d;
   min-height: 32px;
 }
+.stl-tb-caret-slot { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.stl-tb-caret-slot:empty { display: none; }
 .stl-tb-title,
 .stl-tb-eyebrow {
   font: 600 10px ui-monospace, monospace;
@@ -671,7 +673,13 @@ useShadowStyles(`
     <div class="stl-inner">
 
       <div class="stl-titlebar">
+        <!-- #title-caret slot — parent (e.g., LegendMobile) injects its own
+             caret here so it's vertically aligned with the title text via
+             flex align-items:center. Falls through to PPLR's default
+             .stl-collapse-btn when no slot is provided (desktop). -->
+        <span class="stl-tb-caret-slot"><slot name="title-caret" /></span>
         <button
+          v-if="!$slots['title-caret']"
           class="stl-collapse-btn"
           :class="{ closed: !panelOpen }"
           :title="panelOpen ? 'Collapse legend' : 'Expand legend'"
