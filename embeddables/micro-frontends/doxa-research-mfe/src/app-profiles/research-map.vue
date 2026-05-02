@@ -1216,7 +1216,11 @@ function applyContainerScale(width) {
     el.style.setProperty('--map-toolbar-gap',  '8px')
     el.style.setProperty('--map-font-md',      '13px')
     el.style.setProperty('--map-font-sm',      '11px')
-    el.style.setProperty('--map-legend-width', '400px')
+    // 380px matches SemanticTreeLegend's .stl-panel + the geocoder pill
+    // (qa: 2026-05-02 — pin-detail card was 400px and looked WIDER than the
+    // language-family legend below it; unify to 380px so the swap reads
+    // as same-card different-content).
+    el.style.setProperty('--map-legend-width', '380px')
   } else if (width >= 500) {
     el.style.setProperty('--map-btn-size',     '36px')
     el.style.setProperty('--map-toolbar-gap',  '6px')

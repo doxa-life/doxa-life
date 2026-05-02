@@ -10,6 +10,41 @@ import { buildColorExpression } from '../config/colorStrategies.js';
 import { getRegionColor, COLOR_MODES } from '../config/colors.js';
 import { getCircleRadiusInterpolation, getCircleStrokeWidthInterpolation } from '@/config/zoom.js';
 import { useMapEvents } from './useMapEvents.js';
+import langFamilyByLanguage from '../data/langFamilyByLanguage.json';
+
+// ── Client-side language → family derivation ────────────────────────────────
+// API field `imb_language_family` is null for all 2,069 records (qa-feedback1
+// Round 5 A2). The legend bucketing (useLanguageFamilyLegendData.readFamily)
+// derives family client-side via langFamilyByLanguage; mirror the same
+// derivation here so pin features carry the correct languageFamily property.
+// Without this, the languageFamily color strategy paints pins as 'Unknown'
+// (gray/black) and PPLR-style property filters miss them.
+const FAMILY_SUFFIXES_PIN = [
+  [/ sign language$/i, 'Sign Language'],
+];
+function deriveFamilyFromLanguage(label) {
+  if (!label || typeof label !== 'string') return null;
+  const lbl = label.trim();
+  // Comma-inverted lookup: "Arabic, Sudanese" → "Sudanese Arabic"
+  const parts = lbl.split(',').map(s => s.trim()).filter(Boolean);
+  if (parts.length >= 2) {
+    const fullReversed = [...parts].reverse().join(' ');
+    if (langFamilyByLanguage[fullReversed]) return langFamilyByLanguage[fullReversed];
+    if (parts.length >= 3) {
+      const twoReversed = [parts[1], parts[0]].join(' ');
+      if (langFamilyByLanguage[twoReversed]) return langFamilyByLanguage[twoReversed];
+    }
+  }
+  if (langFamilyByLanguage[lbl]) return langFamilyByLanguage[lbl];
+  // Strip parenthetical suffix: "Ainu (China)" → "Ainu"
+  const stripped = lbl.replace(/\s*\(.*?\)\s*$/, '').trim();
+  if (stripped !== lbl && langFamilyByLanguage[stripped]) return langFamilyByLanguage[stripped];
+  // Suffix groups: "Pakistan Sign Language" → "Sign Language"
+  for (const [re, base] of FAMILY_SUFFIXES_PIN) {
+    if (re.test(lbl)) return base;
+  }
+  return null;
+}
 
 /**
  * useMapLayers composable - manages Mapbox layer creation and updates
@@ -70,7 +105,16 @@ export function useMapLayers(options = {}) {
                 peopleId3: pg.peopleId3 || '',
                 name: pg.name,
                 language: pg.language,
-                languageFamily: pg.languageFamily || pg._normalized?.languageFamily || 'Unknown',
+                // Derive languageFamily client-side when API is null. The api
+                // field `imb_language_family` is null for all 2,069 PGs; without
+                // this fallback, every pin's languageFamily is 'Unknown' which
+                // breaks the languageFamily color strategy AND any property-
+                // based family filter (the legend's family-bucket only
+                // catches whatever subset of langs the lookup happened to hit).
+                languageFamily: pg.languageFamily
+                  || pg._normalized?.languageFamily
+                  || deriveFamilyFromLanguage(pg.language)
+                  || 'Unknown',
                 affinityBlock: pg.affinityBlock || pg.affbloc || pg.Affbloc || pg._normalized?.affinityBlock || 'Unknown',
                 // Prefer the top-level `pg.doxaRegion` because useMapData's
                 // backfill loop canonicalizes raw value forms ("africa",
