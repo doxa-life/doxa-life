@@ -34,11 +34,10 @@ useShadowStyles(`
 .sheet-drag-strip{position:absolute;top:0;left:0;right:0;height:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;z-index:2;}
 .pull-tab-handle{width:40px;height:4px;background:#ccc;border-radius:2px;}
 
-/* Collapse caret — matches PPLR's light-theme .stl-collapse-btn rule
-   (background:rgba(208,215,222,0.4); border:#d0d7de; color:#57606a) verbatim
-   so the mobile caret reads as the same "professional gray button" the user
-   sees on desktop. Bumped border weight to 1.5px for visibility on white. */
-.mobile-collapse-caret{position:absolute;top:11px;left:10px;width:24px;height:22px;display:flex;align-items:center;justify-content:center;background:rgba(208,215,222,0.5);border:1px solid #afb8c1;border-radius:5px;cursor:pointer;color:#3b463d;padding:0;z-index:3;transition:transform 0.3s ease-out,color 0.12s,background 0.12s,border-color 0.12s;transform-origin:center;outline:none;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 2px rgba(0,0,0,0.05);}
+/* Collapse caret — smaller (20×20 vs 24×22), z-index bumped to 10 so it
+   floats ABOVE the legend grid (was hiding behind .stl-rows on language-
+   family tab — qa: 2026-05-02). Light gray pill matching PPLR aesthetic. */
+.mobile-collapse-caret{position:absolute;top:14px;left:8px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;background:rgba(208,215,222,0.5);border:1px solid #afb8c1;border-radius:5px;cursor:pointer;color:#3b463d;padding:0;z-index:10;transition:transform 0.3s ease-out,color 0.12s,background 0.12s,border-color 0.12s;transform-origin:center;outline:none;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 2px rgba(0,0,0,0.05);}
 .mobile-collapse-caret:focus{outline:none;}
 .mobile-collapse-caret:hover{color:#1f2328;background:#eaeef2;border-color:#3b463d;}
 .legend-mobile-sheet.sheet-dark .mobile-collapse-caret{background:rgba(110,118,129,0.22);border-color:#30363d;color:#c9d1d9;box-shadow:none;}
@@ -58,7 +57,11 @@ useShadowStyles(`
    IMPORTANT: NO backticks anywhere in this comment block — it lives
    inside a JS template literal (useShadowStyles) and a stray backtick
    silently closes the string and blanks the entire mobile stylesheet. */
-.legend-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 0 12px 28px;-webkit-overflow-scrolling:touch;}
+/* Reduced left padding 28px → 8px (qa: 2026-05-02 — caret is now z-index:10
+   over the grid, no longer needs a wide left gutter to keep clear; padding
+   was creating a chunky empty strip). Title rows handle their own padding-
+   left:36px to clear the caret. */
+.legend-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 0 12px 8px;-webkit-overflow-scrolling:touch;}
 .legend-content::-webkit-scrollbar{width:4px;}
 .legend-content::-webkit-scrollbar-track{background:transparent;}
 .legend-content::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.18);border-radius:4px;}
@@ -84,19 +87,24 @@ useShadowStyles(`
 .legend-mobile-sheet.collapsed .legend-content{padding:0!important;display:flex;align-items:center;height:48px;}
 .legend-mobile-sheet.collapsed .lrg-items,
 .legend-mobile-sheet.collapsed .lft-items{padding:0!important;align-content:center;height:48px;}
-/* Title rows: padding-left:44px clears the absolute .mobile-collapse-caret
-   (left:10px + 24px width = 34px right-edge, +10px gap). align-items:center
-   + height:48px ensures the title text is vertically centered in the
-   collapsed footer instead of hugging the top edge.
-   Font-size bumped to 13px (from default 10-11px) for legibility — the
-   "LEGEND" text was minute when collapsed (qa: 2026-05-02). */
+/* Expanded state: SemanticTreeLegend's .stl-titlebar gets padding-left:36px
+   to clear the absolute caret (left:8px + 20px width = 28px right-edge +
+   8px gap). Mixed-case title (text-transform:none) so it matches the other
+   tabs ("Language Families" not "LANGUAGE FAMILIES"). Font matches the
+   LegendRows .lrg-title weight. */
+.legend-mobile-sheet .stl-titlebar{padding-left:36px!important;border-bottom:1px solid rgba(33,38,45,0.10)!important;}
+.legend-mobile-sheet .stl-tb-title{text-transform:none!important;letter-spacing:0!important;font:600 14px system-ui,sans-serif!important;color:#1f2328!important;}
+.legend-mobile-sheet.sheet-dark .stl-tb-title{color:#F3F3F1!important;}
+/* Collapsed state: title rows centered horizontally to match LegendRows'
+   centered title on Prayer/Engagement/Adoption tabs. align-items:center
+   + height:48px ensures vertical centering. */
 .legend-mobile-sheet.collapsed .lrg-title-row,
 .legend-mobile-sheet.collapsed .lft-title-row,
-.legend-mobile-sheet.collapsed .stl-titlebar{padding:0 0 0 44px!important;display:flex;align-items:center;height:48px;min-height:0!important;border-bottom:none!important;}
+.legend-mobile-sheet.collapsed .stl-titlebar{padding:0 36px 0 36px!important;display:flex;align-items:center;justify-content:center;height:48px;min-height:0!important;border-bottom:none!important;}
 .legend-mobile-sheet.collapsed .stl-tb-title,
 .legend-mobile-sheet.collapsed .lrg-title,
 .legend-mobile-sheet.collapsed .lrg-title-row .lrg-title,
-.legend-mobile-sheet.collapsed .lft-title{font-size:13px!important;letter-spacing:0.04em!important;line-height:1!important;}
+.legend-mobile-sheet.collapsed .lft-title{font-size:13px!important;letter-spacing:0.02em!important;line-height:1!important;}
 /* Hide tree/data content when collapsed so only the title bar shows. */
 .legend-mobile-sheet.collapsed .stl-tabs-wrap,
 .legend-mobile-sheet.collapsed .stl-col-hdr,
