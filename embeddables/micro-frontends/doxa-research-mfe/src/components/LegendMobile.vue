@@ -34,14 +34,15 @@ useShadowStyles(`
 .sheet-drag-strip{position:absolute;top:0;left:0;right:0;height:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;z-index:2;}
 .pull-tab-handle{width:40px;height:4px;background:#ccc;border-radius:2px;}
 
-/* Collapse caret — styled to match the PPLR-port .stl-collapse-btn the user
-   called out as "professional gray highlighted button" on desktop. Light-bg
-   variant since the mobile sheet renders on a white background. */
-.mobile-collapse-caret{position:absolute;top:12px;left:10px;width:22px;height:20px;display:flex;align-items:center;justify-content:center;background:rgba(110,118,129,0.12);border:1px solid #d0d7de;border-radius:5px;cursor:pointer;color:#57606a;padding:0;z-index:3;transition:transform 0.3s ease-out,color 0.12s,background 0.12s,border-color 0.12s;transform-origin:center;outline:none;-webkit-tap-highlight-color:transparent;}
+/* Collapse caret — matches PPLR's light-theme .stl-collapse-btn rule
+   (background:rgba(208,215,222,0.4); border:#d0d7de; color:#57606a) verbatim
+   so the mobile caret reads as the same "professional gray button" the user
+   sees on desktop. Bumped border weight to 1.5px for visibility on white. */
+.mobile-collapse-caret{position:absolute;top:11px;left:10px;width:24px;height:22px;display:flex;align-items:center;justify-content:center;background:rgba(208,215,222,0.5);border:1px solid #afb8c1;border-radius:5px;cursor:pointer;color:#3b463d;padding:0;z-index:3;transition:transform 0.3s ease-out,color 0.12s,background 0.12s,border-color 0.12s;transform-origin:center;outline:none;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 2px rgba(0,0,0,0.05);}
 .mobile-collapse-caret:focus{outline:none;}
-.mobile-collapse-caret:hover{color:#3b463d;background:rgba(59,70,61,0.10);border-color:#3b463d;}
-.legend-mobile-sheet.sheet-dark .mobile-collapse-caret{background:rgba(110,118,129,0.18);border-color:#30363d;color:#8b949e;}
-.legend-mobile-sheet.sheet-dark .mobile-collapse-caret:hover{color:#c9d1d9;background:rgba(59,70,61,0.22);border-color:#73A17F;}
+.mobile-collapse-caret:hover{color:#1f2328;background:#eaeef2;border-color:#3b463d;}
+.legend-mobile-sheet.sheet-dark .mobile-collapse-caret{background:rgba(110,118,129,0.22);border-color:#30363d;color:#c9d1d9;box-shadow:none;}
+.legend-mobile-sheet.sheet-dark .mobile-collapse-caret:hover{color:#fff;background:rgba(59,70,61,0.32);border-color:#73A17F;}
 
 /* Detail-mode close X — top-right corner */
 .detail-close-btn{position:absolute;top:10px;right:12px;background:none;border:none;padding:4px;cursor:pointer;color:#666;display:flex;align-items:center;justify-content:center;z-index:3;transition:color 0.2s ease;}
