@@ -34,10 +34,12 @@ useShadowStyles(`
 .sheet-drag-strip{position:absolute;top:0;left:0;right:0;height:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;z-index:2;}
 .pull-tab-handle{width:40px;height:4px;background:#ccc;border-radius:2px;}
 
-/* Collapse caret — smaller (20×20 vs 24×22), z-index bumped to 10 so it
-   floats ABOVE the legend grid (was hiding behind .stl-rows on language-
-   family tab — qa: 2026-05-02). Light gray pill matching PPLR aesthetic. */
-.mobile-collapse-caret{position:absolute;top:14px;left:8px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;background:rgba(208,215,222,0.5);border:1px solid #afb8c1;border-radius:5px;cursor:pointer;color:#3b463d;padding:0;z-index:10;transition:transform 0.3s ease-out,color 0.12s,background 0.12s,border-color 0.12s;transform-origin:center;outline:none;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 2px rgba(0,0,0,0.05);}
+/* Collapse caret — in-flow, injected via #title-caret slot into the title
+   row's column-1 caret slot (LegendRows .lrg-title-caret-slot or
+   SemanticTreeLegend .stl-tb-caret-slot). Vertical alignment with the
+   title text comes from the slot's align-items:center, so no absolute
+   positioning or padding offsets are needed (qa: 2026-05-02 iter-9). */
+.mobile-collapse-caret{width:20px;height:20px;display:flex;align-items:center;justify-content:center;background:rgba(208,215,222,0.5);border:1px solid #afb8c1;border-radius:5px;cursor:pointer;color:#3b463d;padding:0;transition:transform 0.3s ease-out,color 0.12s,background 0.12s,border-color 0.12s;transform-origin:center;outline:none;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 2px rgba(0,0,0,0.05);flex-shrink:0;}
 .mobile-collapse-caret:focus{outline:none;}
 .mobile-collapse-caret:hover{color:#1f2328;background:#eaeef2;border-color:#3b463d;}
 .legend-mobile-sheet.sheet-dark .mobile-collapse-caret{background:rgba(110,118,129,0.22);border-color:#30363d;color:#c9d1d9;box-shadow:none;}
@@ -47,30 +49,21 @@ useShadowStyles(`
 .detail-close-btn{position:absolute;top:10px;right:12px;background:none;border:none;padding:4px;cursor:pointer;color:#666;display:flex;align-items:center;justify-content:center;z-index:3;transition:color 0.2s ease;}
 .detail-close-btn:hover{color:#333;}
 
-/* Content padding — 28px left clears the absolutely-positioned
-   mobile-collapse-caret (left:6px, width:18px). NO right padding so
-   the scrollbar sits at the FAR RIGHT edge (otherwise we get an ugly
-   gap between the content and the scrollbar in detail mode). The
-   detail-close-btn at right:12px is z-index:3 absolute and floats
-   over content — it does not need padding to "make room" for it.
-   Top 12px clears the drag strip overlay.
+/* Content padding — symmetric, 12px top/bottom only. Caret no longer needs
+   a wide left gutter (it's now in-flow inside the title row), and no right
+   padding keeps the scrollbar at the far edge.
    IMPORTANT: NO backticks anywhere in this comment block — it lives
    inside a JS template literal (useShadowStyles) and a stray backtick
    silently closes the string and blanks the entire mobile stylesheet. */
-/* Reduced left padding 28px → 8px (qa: 2026-05-02 — caret is now z-index:10
-   over the grid, no longer needs a wide left gutter to keep clear; padding
-   was creating a chunky empty strip). Title rows handle their own padding-
-   left:36px to clear the caret. */
-.legend-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 0 12px 8px;-webkit-overflow-scrolling:touch;}
+.legend-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 0;-webkit-overflow-scrolling:touch;}
 
-/* Bump LegendRows' --lrg-caret-col on mobile from 10px → 32px so column 1
-   actually accommodates the absolute .mobile-collapse-caret (20px wide at
-   left:8px = right edge x=28). With col-1 = 32px wide, the title row's
-   subgrid gives column 2 enough offset that "Prayer Progress" /
-   "Engagement Progress" / "Adoption Progress" text starts AFTER the caret
-   right edge, no overlap. Same widening on column 5 (the right gutter)
-   keeps the legend visually balanced. qa: 2026-05-02. */
-.legend-mobile-sheet .legend-row-group{--lrg-caret-col:32px;}
+/* LegendRows --lrg-caret-col bumped from 10px → 28px on mobile so column 1
+   accommodates the slotted .mobile-collapse-caret (20px wide) with 4px
+   breathing room on each side — caret doesn't hug the sheet edge. The
+   title row's subgrid offsets the title text so it begins right after
+   the caret without overlap. Same widening on column 5 (right gutter)
+   keeps the table visually balanced. qa: 2026-05-02 iter-9. */
+.legend-mobile-sheet .legend-row-group{--lrg-caret-col:28px;}
 .legend-content::-webkit-scrollbar{width:4px;}
 .legend-content::-webkit-scrollbar-track{background:transparent;}
 .legend-content::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.18);border-radius:4px;}
@@ -78,10 +71,9 @@ useShadowStyles(`
 
 /* Collapsed state — hide data rows AND column labels but keep the title
    row visible. Mirrors desktop: collapsed legend shows only "Legend".
-   Collapsed-mode padding override aligns the title text vertical center
-   with the absolute mobile-collapse-caret (top:14, height:18 -> center
-   y=23). Title font 13px line-height 1.2 -> half-height ~8. So title
-   text top should land at y ~= 16 -> total padding above title = 16. */
+   The title row becomes a centered flex layout so the slotted caret
+   and the title text sit beside each other, vertically and horizontally
+   centered in the 48px footer. */
 .legend-mobile-sheet.collapsed .legend-content .lrg-row,
 .legend-mobile-sheet.collapsed .legend-content .lrg-footer,
 .legend-mobile-sheet.collapsed .legend-content .lrg-header-col,
@@ -96,20 +88,21 @@ useShadowStyles(`
 .legend-mobile-sheet.collapsed .legend-content{padding:0!important;display:flex;align-items:center;height:48px;}
 .legend-mobile-sheet.collapsed .lrg-items,
 .legend-mobile-sheet.collapsed .lft-items{padding:0!important;align-content:center;height:48px;}
-/* Expanded state: SemanticTreeLegend's .stl-titlebar gets padding-left:36px
-   to clear the absolute caret (left:8px + 20px width = 28px right-edge +
-   8px gap). Mixed-case title (text-transform:none) so it matches the other
-   tabs ("Language Families" not "LANGUAGE FAMILIES"). Font matches the
-   LegendRows .lrg-title weight. */
-.legend-mobile-sheet .stl-titlebar{padding-left:36px!important;border-bottom:1px solid rgba(33,38,45,0.10)!important;}
+/* Expanded state: SemanticTreeLegend's .stl-titlebar — caret is in the
+   slot now, so no padding-left hack. Mixed-case title (text-transform:none)
+   so it matches the other tabs ("Language Families" not "LANGUAGE FAMILIES").
+   Font matches the LegendRows .lrg-title weight. Tighten left padding from
+   PPLR's 12px → 8px so the caret sits closer to the sheet edge. */
+.legend-mobile-sheet .stl-titlebar{padding:8px 12px 8px 8px!important;border-bottom:1px solid rgba(33,38,45,0.10)!important;}
 .legend-mobile-sheet .stl-tb-title{text-transform:none!important;letter-spacing:0!important;font:600 14px system-ui,sans-serif!important;color:#1f2328!important;}
 .legend-mobile-sheet.sheet-dark .stl-tb-title{color:#F3F3F1!important;}
-/* Collapsed state: title rows centered horizontally to match LegendRows'
-   centered title on Prayer/Engagement/Adoption tabs. align-items:center
-   + height:48px ensures vertical centering. */
+/* Collapsed state: title rows become a centered flex layout so the slotted
+   caret and "Legend" text sit beside each other, both vertically and
+   horizontally centered in the 48px footer. gap:8px gives the caret a bit
+   of breathing room from the title text. */
 .legend-mobile-sheet.collapsed .lrg-title-row,
 .legend-mobile-sheet.collapsed .lft-title-row,
-.legend-mobile-sheet.collapsed .stl-titlebar{padding:0 36px 0 36px!important;display:flex;align-items:center;justify-content:center;height:48px;min-height:0!important;border-bottom:none!important;}
+.legend-mobile-sheet.collapsed .stl-titlebar{padding:0 16px!important;display:flex;align-items:center;justify-content:center;gap:8px;height:48px;min-height:0!important;border-bottom:none!important;}
 /* line-height:1.4 (not 1) so the descender of 'g' in "Legend" / "Engagement
    Progress" isn't clipped at the bottom — qa: 2026-05-02. */
 .legend-mobile-sheet.collapsed .stl-tb-title,
@@ -397,17 +390,10 @@ onBeforeUnmount(() => {
         <div v-if="showPullTab" class="pull-tab-handle"></div>
       </div>
 
-      <!-- Collapse caret — absolutely positioned, same pattern as desktop. -->
-      <button
-        class="mobile-collapse-caret"
-        :style="{ transform: `rotate(${caretRotation}deg)` }"
-        @click.stop="handleCaretClick"
-        :aria-label="t('aria.toggleLegend')"
-      >
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+      <!-- (Collapse caret moved into the title row's column 1 via #title-caret
+           slot below, so it's vertically aligned with the title text via
+           grid/flex align-items:center — matching desktop's slot pattern.
+           No more absolute positioning or padding hacks.) -->
 
       <!-- Detail-mode close X — absolutely positioned top-right -->
       <button
@@ -432,19 +418,30 @@ onBeforeUnmount(() => {
         />
 
         <!-- Language-family tab: SemanticTreeLegend (PPLR-ported, R4).
-             Same component as LegendDesktop; the mobile sheet just provides
-             different chrome. Tree-data adapter is wired the same way. -->
+             Caret injected via #title-caret slot so it sits in column 1 of
+             the .stl-titlebar, vertically aligned with the title text. -->
         <SemanticTreeLegend
           v-else-if="legendType === 'language-family'"
           :nodes="langTreeForMobile"
           :tabs="LANG_TABS_MOBILE"
           :title="legendTitle || 'Language Families'"
           :columns="['count', 'pop']"
-        />
+        >
+          <template #title-caret>
+            <button class="mobile-collapse-caret"
+              :style="{ transform: `rotate(${caretRotation}deg)` }"
+              @click.stop="handleCaretClick"
+              :aria-label="t('aria.toggleLegend')">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </template>
+        </SemanticTreeLegend>
 
-        <!-- disableCollapse is FORCED TRUE here too — child-row carets are
-             feature-flagged off. Flip back to `disableCollapse` (prop
-             passthrough) when the sub-row expand UI is ready. -->
+        <!-- Other tabs: LegendRows. Caret injected via #title-caret slot so
+             it sits in .lrg-title-caret-slot at grid-column:1 of the title
+             row, vertically aligned with the title via subgrid align-self. -->
         <LegendRows
           v-else
           :title="legendTitle"
@@ -460,7 +457,18 @@ onBeforeUnmount(() => {
           :fmtPop="fmtPop"
           :fmtCount="fmtCount"
           @filter-click="handleRowFilterClick"
-        />
+        >
+          <template #title-caret>
+            <button class="mobile-collapse-caret"
+              :style="{ transform: `rotate(${caretRotation}deg)` }"
+              @click.stop="handleCaretClick"
+              :aria-label="t('aria.toggleLegend')">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </template>
+        </LegendRows>
       </div>
     </div>
   </div><!-- /.legend-sheet-root -->
