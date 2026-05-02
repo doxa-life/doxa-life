@@ -62,6 +62,15 @@ useShadowStyles(`
    was creating a chunky empty strip). Title rows handle their own padding-
    left:36px to clear the caret. */
 .legend-content{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 0 12px 8px;-webkit-overflow-scrolling:touch;}
+
+/* Bump LegendRows' --lrg-caret-col on mobile from 10px → 32px so column 1
+   actually accommodates the absolute .mobile-collapse-caret (20px wide at
+   left:8px = right edge x=28). With col-1 = 32px wide, the title row's
+   subgrid gives column 2 enough offset that "Prayer Progress" /
+   "Engagement Progress" / "Adoption Progress" text starts AFTER the caret
+   right edge, no overlap. Same widening on column 5 (the right gutter)
+   keeps the legend visually balanced. qa: 2026-05-02. */
+.legend-mobile-sheet .legend-row-group{--lrg-caret-col:32px;}
 .legend-content::-webkit-scrollbar{width:4px;}
 .legend-content::-webkit-scrollbar-track{background:transparent;}
 .legend-content::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.18);border-radius:4px;}
