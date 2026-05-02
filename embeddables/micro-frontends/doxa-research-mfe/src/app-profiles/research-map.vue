@@ -62,7 +62,19 @@ let _geoBeingCleared = false
 function _clearGeocoderProgrammatic() {
   _geoBeingCleared = true
   // geocoderRef.value.geocoder is the exposed ref<MapboxGeocoder>; .value is the instance.
-  geocoderRef.value?.geocoder?.value?.clear?.()
+  const inst = geocoderRef.value?.geocoder?.value
+  inst?.clear?.()
+  // Belt-and-suspenders: Mapbox geocoder's clear() sometimes leaves the
+  // selected feature's text in the DOM input (especially after user picked
+  // an aggregate result). Force-reset the input element directly so tab
+  // switches don't carry over the prior tab's "Afro-Asiatic (219)" text.
+  // qa: 2026-05-02 — user reported persistent search text across tabs.
+  const input = inst?._inputEl
+    || inst?.container?.querySelector?.('input.mapboxgl-ctrl-geocoder--input')
+  if (input) {
+    input.value = ''
+    try { input.dispatchEvent(new Event('input', { bubbles: true })) } catch (_) {}
+  }
   _geoBeingCleared = false
 }
 
