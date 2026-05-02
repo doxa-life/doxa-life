@@ -364,17 +364,22 @@ const geocoderRef  = ref(null)
 
 // Auto-center the active tab on switch so users always see what they tapped,
 // even when the tab bar overflows the visible width (qa.md R8 spec).
+// Per-tab legend tier memory: switching tabs saves the outgoing tab's
+// legend state and restores the incoming tab's prior state (default
+// 'collapsed' on first visit). Replaces the iter-3 always-collapse-on-
+// switch behavior, which the user found jarring — they want returning
+// to a tab to restore whatever tier (collapsed / open / fullyOpen) they
+// last had it at. qa: 2026-05-02.
+const _tabLegendState = new Map()
 watch(() => activeTabId?.value, async (newTabId, oldTabId) => {
-  // Reset the mobile bottom-sheet to the collapsed footer tier on every tab
-  // change. Without this, switching FROM Prayer at 'fullyOpen' INTO Language
-  // Families inherits 'fullyOpen' — the user perceives that as a phantom 70%
-  // tier they never defined, and the collapse-cycle gets stuck flipping
-  // between 'fullyOpen' and 'open' instead of reaching the footer
-  // (qa: 2026-05-02 mobile audit). Skip on the very first activation
-  // (oldTabId === undefined) since uiStore.legendState defaults to
-  // 'collapsed' on store creation anyway.
   if (oldTabId !== undefined && newTabId !== oldTabId) {
-    uiStore.collapseLegend?.()
+    // Save outgoing tab's current state under the OLD tab id.
+    if (oldTabId) _tabLegendState.set(oldTabId, uiStore.legendState)
+    // Restore incoming tab's state (collapsed default for first visit).
+    const restored = _tabLegendState.get(newTabId) || 'collapsed'
+    if (restored === 'fullyOpen')   uiStore.fullyOpenLegend?.()
+    else if (restored === 'open')   uiStore.openLegend?.()
+    else                             uiStore.collapseLegend?.()
   }
   await nextTick()
   const btn = tabBar.value?.querySelector('.rm-tab.active')

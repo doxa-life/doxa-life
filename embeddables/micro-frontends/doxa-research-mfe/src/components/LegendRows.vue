@@ -156,9 +156,13 @@ useShadowStyles(`
 /* Name — first pill column (col 2 of parent grid, col 1 of the subgrid). */
 .lrg-name{grid-column:1;padding:0 0 0 8px;font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-/* Badges — auto-placed into the remaining subgrid tracks. Centered in track. */
+/* Badges — auto-placed into the remaining subgrid tracks. Centered in track.
+   Background darkens the row color by 28% (mix with #000) so white badge text
+   stays readable on bright rows like the engagement-tab "Engaged" green. The
+   previous mix used currentColor (which is white in light mode), so on bright
+   rows it LIGHTENED the badge — wrong direction. qa: 2026-05-02. */
 .lrg-badge{display:flex;align-items:center;justify-content:center;}
-.lrg-badge-inner{display:inline-block;background:color-mix(in srgb, var(--lrg-item-color, #888), currentColor 22%);border-radius:8px;padding:2px 10px;font-size:11px;font-weight:600;font-family:'Courier New',monospace;white-space:nowrap;min-width:32px;text-align:center;}
+.lrg-badge-inner{display:inline-block;background:color-mix(in srgb, var(--lrg-item-color, #888), #000 28%);border-radius:8px;padding:2px 10px;font-size:11px;font-weight:600;font-family:'Courier New',monospace;white-space:nowrap;min-width:32px;text-align:center;}
 
 /* Footer — col 1 empty (matches caret column), col 2 label, trailing values. */
 .lrg-footer{display:grid;grid-template-columns:subgrid;grid-column:1 / -1;align-items:center;padding:5px 0;border-top:1px solid rgba(0,0,0,0.07);font-size:11px;font-weight:600;color:#555;background:#fff;position:sticky;bottom:0;}
@@ -166,14 +170,16 @@ useShadowStyles(`
 .lrg-footer-label{grid-column:2;color:#777;}
 .lrg-footer-value{text-align:center;font-family:'Courier New',monospace;}
 
-/* ── Light mode ── text over colored pills is white */
+/* ── Light mode ── text over colored pills is white. Badge text gets the
+   same shadow as the label so the count/pop digits stay readable on bright
+   backgrounds (engagement-tab "Engaged" green was unreadable without it). */
 .lrg-light .lrg-name{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.35);}
-.lrg-light .lrg-badge-inner{color:#fff;}
+.lrg-light .lrg-badge-inner{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.4);}
 .lrg-light .lrg-caret{color:#666;}
 
 /* ── Dark mode ── */
 .lrg-dark .lrg-name{color:#F3F3F1;text-shadow:0 1px 2px rgba(0,0,0,0.4);}
-.lrg-dark .lrg-badge-inner{color:#F3F3F1;}
+.lrg-dark .lrg-badge-inner{color:#F3F3F1;text-shadow:0 1px 2px rgba(0,0,0,0.4);}
 .lrg-dark .lrg-caret{color:rgba(243,243,241,0.75);}
 .lrg-dark .lrg-title{color:#F3F3F1;}
 .lrg-dark .lrg-header-col{color:rgba(243,243,241,0.65);}
