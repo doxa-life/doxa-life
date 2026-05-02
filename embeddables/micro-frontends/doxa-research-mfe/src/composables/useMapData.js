@@ -32,11 +32,40 @@ function unwrapLabel(v) {
     if (typeof v === 'object') return v.label || v.value || '';
     return String(v);
 }
+// Suffix groups: families derivable from the language name's tail when no
+// langFamilyByLanguage entry exists (e.g. "Pakistan Sign Language" → "Sign
+// Language" family). Mirrors the legend's FAMILY_SUFFIXES.
+const FAMILY_SUFFIXES_DATA = [
+    [/ sign language$/i, 'Sign Language'],
+];
 function deriveLanguageFamily(pg) {
     const existing = unwrapLabel(pg.languageFamily);
     if (existing) return existing;
     const langLabel = unwrapLabel(pg.language || pg.primary_language);
-    return langFamilyByLanguage[langLabel] || '';
+    if (!langLabel || typeof langLabel !== 'string') return '';
+    const lbl = langLabel.trim();
+    // Comma-inverted lookup: API returns "Arabic, Sudanese" but
+    // langFamilyByLanguage keys are "Sudanese Arabic" (standard form). Reverse
+    // the comma-separated parts and join with space, then look up.
+    const parts = lbl.split(',').map(s => s.trim()).filter(Boolean);
+    if (parts.length >= 2) {
+        const fullReversed = [...parts].reverse().join(' ');
+        if (langFamilyByLanguage[fullReversed]) return langFamilyByLanguage[fullReversed];
+        if (parts.length >= 3) {
+            const twoReversed = [parts[1], parts[0]].join(' ');
+            if (langFamilyByLanguage[twoReversed]) return langFamilyByLanguage[twoReversed];
+        }
+    }
+    // Direct lookup (single-word labels like "Bengali")
+    if (langFamilyByLanguage[lbl]) return langFamilyByLanguage[lbl];
+    // Strip parenthetical: "Ainu (China)" → "Ainu"
+    const stripped = lbl.replace(/\s*\(.*?\)\s*$/, '').trim();
+    if (stripped !== lbl && langFamilyByLanguage[stripped]) return langFamilyByLanguage[stripped];
+    // Suffix groups (sign languages, etc.)
+    for (const [re, base] of FAMILY_SUFFIXES_DATA) {
+        if (re.test(lbl)) return base;
+    }
+    return '';
 }
 
 /**
