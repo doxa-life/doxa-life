@@ -352,7 +352,18 @@ const geocoderRef  = ref(null)
 
 // Auto-center the active tab on switch so users always see what they tapped,
 // even when the tab bar overflows the visible width (qa.md R8 spec).
-watch(() => activeTabId?.value, async () => {
+watch(() => activeTabId?.value, async (newTabId, oldTabId) => {
+  // Reset the mobile bottom-sheet to the collapsed footer tier on every tab
+  // change. Without this, switching FROM Prayer at 'fullyOpen' INTO Language
+  // Families inherits 'fullyOpen' — the user perceives that as a phantom 70%
+  // tier they never defined, and the collapse-cycle gets stuck flipping
+  // between 'fullyOpen' and 'open' instead of reaching the footer
+  // (qa: 2026-05-02 mobile audit). Skip on the very first activation
+  // (oldTabId === undefined) since uiStore.legendState defaults to
+  // 'collapsed' on store creation anyway.
+  if (oldTabId !== undefined && newTabId !== oldTabId) {
+    uiStore.collapseLegend?.()
+  }
   await nextTick()
   const btn = tabBar.value?.querySelector('.rm-tab.active')
   btn?.scrollIntoView?.({ inline: 'center', block: 'nearest', behavior: 'smooth' })
