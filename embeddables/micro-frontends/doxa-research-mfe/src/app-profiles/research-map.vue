@@ -556,6 +556,16 @@ function _bridgeSelection(kind, fullNode) {
     if (cur && cur.id?.startsWith(kind + ':')) pplrInstance.selection.value = null
     return
   }
+  // If the legend already holds a selection of the same kind+label, skip the
+  // overwrite — the user's click landed on a specific node (with its exact
+  // family prefix in the id). A label-matched lookup here may pick a DIFFERENT
+  // family bucket if the same label appears in two families (e.g. Bengali
+  // under Indo-European AND under "Unknown" if some pins have null
+  // imb_language_family + no lookup hit). Overwriting with the wrong id
+  // breaks the legend's _lastInternalId guard and triggers an unwanted
+  // depth-based tab switch on what should be a same-tab row click.
+  const cur = pplrInstance.selection.value
+  if (cur && cur.id?.startsWith(kind + ':') && cur.label === fullNode.label) return
   // Full node from langTree carries color/children/filter — needed for the
   // legend's row highlight, descendant-dim exemption, and parent breadcrumb.
   pplrInstance.selection.value = fullNode
