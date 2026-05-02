@@ -157,8 +157,15 @@ useShadowStyles(`
      the same x-edge (PPLR alignment, qa: 2026-05-02). */
   .mapboxgl-ctrl-top-left { top:12px!important;left:8px!important;width:380px!important;max-width:380px!important;z-index:1200!important; }
   .mapboxgl-ctrl-top-left .mapboxgl-ctrl { margin:0!important;float:none!important; }
-  .mapboxgl-ctrl-geocoder { width:100%!important;max-width:100%!important;min-width:0!important;border-radius:20px!important;box-shadow:0 2px 8px rgba(0,0,0,0.15)!important;background:#fff; }
-  .mapboxgl-ctrl-geocoder--input { border-radius:20px!important; }
+  /* Pill geometry + PPLR-matched focus ring (qa: 2026-05-02). border-radius
+     999px matches PPLR's .pgc-input-wrap; focus-within ring uses PPLR's
+     accent rgba(59,70,61,0.18) so the search bar reads as one column with
+     the SemanticTreeLegend below it. Input font-size:13px / placeholder
+     12px mirror PPLR's typography. */
+  .mapboxgl-ctrl-geocoder { width:100%!important;max-width:100%!important;min-width:0!important;border-radius:999px!important;box-shadow:0 2px 8px rgba(0,0,0,0.15)!important;background:#fff;transition:box-shadow 0.12s,border-color 0.12s; }
+  .mapboxgl-ctrl-geocoder:focus-within { box-shadow:0 2px 8px rgba(0,0,0,0.15),0 0 0 3px rgba(59,70,61,0.18)!important; }
+  .mapboxgl-ctrl-geocoder--input { border-radius:999px!important;font-size:13px!important; }
+  .mapboxgl-ctrl-geocoder--input::placeholder { font-size:12px!important; }
   .mapboxgl-ctrl-geocoder:has(.mapboxgl-ctrl-geocoder--input:not(:placeholder-shown)) .mapboxgl-ctrl-geocoder--button { display:block!important; }
   .mapboxgl-ctrl-geocoder--suggestions { z-index:1200!important;position:absolute;max-height:60vh!important;overflow-y:auto!important; }
   .suggestions { border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);max-height:60vh!important;overflow-y:auto!important; }
@@ -185,6 +192,7 @@ useShadowStyles(`
        .rm-root by the isDark binding). Without these rules the geocoder stays
        white in dark mode (qa.md Round 3 Q4). ── */
   .dsm-dark .mapboxgl-ctrl-geocoder { background:#4e594f!important;border:1px solid rgba(255,255,255,0.14)!important;box-shadow:0 2px 8px rgba(0,0,0,0.4)!important; }
+  .dsm-dark .mapboxgl-ctrl-geocoder:focus-within { box-shadow:0 2px 8px rgba(0,0,0,0.4),0 0 0 3px rgba(115,161,127,0.22)!important; }
   .dsm-dark .mapboxgl-ctrl-geocoder--input { color:#F3F3F1!important;background:transparent!important; }
   .dsm-dark .mapboxgl-ctrl-geocoder--input::placeholder { color:rgba(243,243,241,0.65)!important; }
   .dsm-dark .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--icon { fill:rgba(243,243,241,0.75)!important; }
