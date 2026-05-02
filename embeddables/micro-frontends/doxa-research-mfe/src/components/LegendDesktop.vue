@@ -7,11 +7,11 @@ import { defineAsyncComponent } from 'vue'
 import LegendRows from './LegendRows.vue'
 import PeopleGroupDetail from './PeopleGroupDetail.vue'
 // Async-import the heavier branches so the boot bundle stays lean.
-const LegendMobile        = defineAsyncComponent(() => import('./LegendMobile.vue'))
-// LegendFamilyTree archived — replaced by SemanticTreeLegend (PPLR-ported,
-// QA building-round-1 R4 decision). Kept around as .legacy.vue for reference.
-const SemanticTreeLegend  = defineAsyncComponent(() => import('./SemanticTreeLegend.vue'))
-import { useLanguageFamilyLegendData } from '../composables/useLanguageFamilyLegendData.js'
+const LegendMobile = defineAsyncComponent(() => import('./LegendMobile.vue'))
+// Language-family tab is now handled by <SemanticTreeLegend> mounted directly
+// in research-map.vue as a standalone sibling (PPLR's panel chrome owns its
+// positioning + collapse-to-pill). LegendDesktop only renders the other tabs
+// (Prayer / Engagement / Adoption / Doxa Regions) via LegendRows.
 import { RESEARCH_LEGEND_OPTIONS } from '../composables/researchLegendOptions.js'
 
 const { t } = useI18n()
@@ -203,59 +203,8 @@ const peopleGroupsForFamilyTree = computed(() => {
   return out
 })
 
-// ── SemanticTreeLegend tree adapter ─────────────────────────────────────────
-// Run the existing aggregation composable here so we can derive the generic
-// tree shape the new component takes (langTree). Keeps the data pipeline
-// uniform and lets us drop LegendFamilyTree entirely.
-const peopleGroupsRef = { get value() { return peopleGroupsForFamilyTree.value } }
-const { langTree } = useLanguageFamilyLegendData(peopleGroupsRef)
-
-// Per-tab info text + ordering for the SemanticTreeLegend.
-const LANG_TABS = [
-  { id: 'family',
-    label: 'Lang Family',
-    info: 'A language family is a group of languages descended from a common ancestor (e.g. Indo-European, Afro-Asiatic).' },
-  { id: 'language',
-    label: 'Language',
-    info: 'A language is a system of communication used by a people (e.g. Arabic, Bengali, Hindi).' },
-  { id: 'dialect',
-    label: 'Dialect/Variety',
-    info: 'A dialect/variety is a regional or social form of a language (e.g. Arabic, Sudanese; Pakistan Sign Language).' },
-]
-
-// Translate the new component's @select payload back into the legend:highlight
-// detail shape research-map.vue already listens for. Keeps the existing
-// applyDimFilter pipeline in place — only the data adapter and the legend
-// component change. mapId is included so multi-map pages stay scoped.
-function onSemanticTreeSelect(node) {
-  if (typeof window === 'undefined' || typeof window.CustomEvent !== 'function') return
-  if (!node) {
-    window.dispatchEvent(new CustomEvent('legend:highlight', { detail: { kind: null, mapId } }))
-    return
-  }
-  const id = String(node.id || '')
-  let detail = null
-  if (id.startsWith('fam:')) {
-    detail = { kind: 'family', familyKey: node.label, filterExpr: node.filter, pinIds: [], coords: [], mapId }
-  } else if (id.startsWith('lang:')) {
-    const after = id.slice(5)
-    const sep = after.indexOf('__')
-    const familyKey = sep > 0 ? after.slice(0, sep) : ''
-    detail = { kind: 'language', languageKey: node.label, familyKey, filterExpr: node.filter, pinIds: [], coords: [], mapId }
-  } else if (id.startsWith('dial:')) {
-    const after = id.slice(5)
-    detail = {
-      kind: 'dialect',
-      dialectKey: after,
-      originalLabels: node.originalLabels || [],
-      filterExpr: node.filter,
-      pinIds: [], coords: [], mapId
-    }
-  }
-  if (detail) {
-    window.dispatchEvent(new CustomEvent('legend:highlight', { detail }))
-  }
-}
+// (SemanticTreeLegend tree adapter moved up to research-map.vue — it mounts
+// the legend as a standalone sibling for the language-family tab.)
 
 // Instance ID — injected from doxa-simple-map (provided per <doxa-map> instance)
 // Used to scope window events so multiple maps on the same page don't interfere
@@ -396,32 +345,10 @@ onBeforeUnmount(() => {
         :action="popupAction"
       />
 
-      <!-- Language Families tab: SemanticTreeLegend (PPLR-ported, R4).
-           The card-level collapse caret slots into the legend's titlebar so
-           the collapse-to-circle (36px pill) chrome remains consistent with
-           the other tabs — that's our app's rounded aesthetic, intentionally
-           preserved when porting the inner tree rendering. -->
-      <SemanticTreeLegend
-        v-else-if="legendType === 'language-family'"
-        :nodes="langTree"
-        :tabs="LANG_TABS"
-        :title="legendTitle || 'Language Families'"
-        :columns="['count', 'pop']"
-        @select="onSemanticTreeSelect"
-      >
-        <template #title-caret>
-          <button
-            class="legend-collapse-caret"
-            :class="{ rotated: isCollapsed }"
-            @click.stop="toggleCollapse"
-            :aria-label="t('aria.toggleLegend')"
-          >
-            <svg width="8" height="8" viewBox="0 0 20 20" fill="none">
-              <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </template>
-      </SemanticTreeLegend>
+      <!-- Language-family tab is now handled by <SemanticTreeLegend> mounted
+           directly in research-map.vue as a standalone sibling. LegendDesktop
+           is hidden for that tab via parent v-if. No branch here. -->
+      <template v-else-if="legendType === 'language-family'"></template>
 
       <!-- Universal data-driven legend rows.
            The title comes from here — rendered as the first row of the table,
