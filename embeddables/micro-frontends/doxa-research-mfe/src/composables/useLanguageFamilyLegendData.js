@@ -205,6 +205,19 @@ export function useLanguageFamilyLegendData(peopleGroupsRef, options = {}) {
   function toggle(familyKey) {
     expanded[familyKey] = !expanded[familyKey]
   }
+  /**
+   * Reset the expansion map so ONLY the given keys are expanded. Used by the
+   * geocoder→legend reveal flow: when a search result selects a row, collapse
+   * every other family/language and expand just the ancestor chain leading to
+   * the new selection (per qa-buildinng-round-1 R3 A5 / Bug 10).
+   */
+  function setExpansionToOnly(keys) {
+    const set = new Set(Array.isArray(keys) ? keys : [])
+    for (const k of Object.keys(expanded)) {
+      if (!set.has(k)) expanded[k] = false
+    }
+    for (const k of set) expanded[k] = true
+  }
 
   // ── Aggregation: feature[] → Map<familyKey, { language → bucket }> ────────
   // Outer key: family. Inner key: BASE language (first part before comma).
@@ -468,5 +481,5 @@ export function useLanguageFamilyLegendData(peopleGroupsRef, options = {}) {
     }
   }
 
-  return { rows, languageRows, dialectRows, toggle, isExpanded, childRowsFor, dialectRowsFor, highlight }
+  return { rows, languageRows, dialectRows, toggle, isExpanded, setExpansionToOnly, childRowsFor, dialectRowsFor, highlight }
 }

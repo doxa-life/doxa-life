@@ -19,7 +19,7 @@
  *   Emits `highlight` on parent channel AND dispatches `legend:highlight` window
  *   event (cross-shadow-DOM). Both carry the same payload.
  */
-import { defineProps, defineEmits, computed, inject } from 'vue'
+import { defineProps, defineEmits, computed, inject, ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useShadowStyles } from '@/composables/useShadowStyles.js'
 import { useLanguageFamilyLegendData } from '../composables/useLanguageFamilyLegendData.js'
 
@@ -72,8 +72,12 @@ const emit = defineEmits(['highlight'])
 
 const peopleGroupsRef = { get value() { return props.peopleGroups } }
 
-const { rows, languageRows, dialectRows, toggle, isExpanded, childRowsFor, dialectRowsFor, highlight } =
+const { rows, languageRows, dialectRows, toggle, isExpanded, setExpansionToOnly, childRowsFor, dialectRowsFor, highlight } =
   useLanguageFamilyLegendData(peopleGroupsRef, { aggregator: props.aggregator })
+
+// Root element ref — used by the geocoder-reveal handler to scrollIntoView the
+// currently selected row.
+const lftRoot = ref(null)
 
 // ── Legend tabs ───────────────────────────────────────────────────────────────
 const activeLegendTab = computed({
@@ -143,6 +147,59 @@ function handleCaretClick(familyKey, evt) {
   evt.stopPropagation()
   toggle(familyKey)
 }
+
+// ── Geocoder-reveal handler (qa-buildinng-round-1 R3 Bug 10) ──────────────────
+// research-map.vue dispatches `legend:reveal-selected` after a geocoder result
+// drives mapStore.select{Family,Language,Dialect}. We:
+//   1. Compute the ancestor-chain keys that should be expanded (e.g. dialect
+//      "Afro-Asiatic__Arabic__Sudanese" → expand "Afro-Asiatic" and
+//      "Afro-Asiatic__Arabic"). Everything else collapses.
+//   2. After Vue paints, scroll the .lft-row-selected element into view.
+// We do NOT collapse on every selection change — only on this explicit reveal
+// signal — so direct legend-row clicks leave the user's expansion state alone.
+function computeRevealKeys() {
+  const keys = []
+  if (selectedFamilyKey.value) keys.push(selectedFamilyKey.value)
+  if (selectedLanguageKey.value) {
+    const langRow = languageRows.value.find(r => r.label === selectedLanguageKey.value)
+    if (langRow?.familyKey) keys.push(langRow.familyKey)
+    if (langRow?.key) keys.push(langRow.key)
+  }
+  if (selectedDialectKey.value) {
+    const dk = selectedDialectKey.value
+    const lastSep = dk.lastIndexOf('__')
+    if (lastSep > 0) {
+      const langPath = dk.slice(0, lastSep)  // "family__lang"
+      keys.push(langPath)
+      const langSep = langPath.indexOf('__')
+      if (langSep > 0) keys.push(langPath.slice(0, langSep))  // family
+    }
+  }
+  return keys
+}
+
+async function handleLegendReveal() {
+  const keys = computeRevealKeys()
+  setExpansionToOnly(keys)
+  await nextTick()
+  const root = lftRoot.value
+  if (!root) return
+  const target = root.querySelector('.lft-row.lft-row-selected')
+  if (target && typeof target.scrollIntoView === 'function') {
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+}
+
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    window.addEventListener('legend:reveal-selected', handleLegendReveal)
+  }
+})
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('legend:reveal-selected', handleLegendReveal)
+  }
+})
 
 // X deselect: clear the matching mapStore field.
 // research-map.vue watchers call clearAllHighlights when the field goes null.
@@ -221,12 +278,14 @@ useShadowStyles(`
 .lft-has-selection .lft-row.lft-row-child-active:not(.lft-row-selected) .lft-item-inner{opacity:1!important;}
 .lft-has-selection .lft-row.lft-row-child-active:not(.lft-row-selected) .lft-item-inner:hover{opacity:0.92!important;}
 
-/* ── X deselect button — lives in the row's trailing grid column.
-   The pill spans columns 2 to -2; this button takes column 5 (-1).
-   No absolute positioning, no overlap. Hidden on non-selected rows. ── */
-.lft-deselect-btn{grid-column:-2 / -1;justify-self:center;align-self:center;display:none;width:18px;height:18px;background:rgba(0,0,0,0.55);border:none;border-radius:50%;padding:0;cursor:pointer;align-items:center;justify-content:center;color:#fff;transition:background 0.12s,transform 0.12s;outline:none;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 3px rgba(0,0,0,0.35);}
+/* ── X deselect button — square chip attached to the pill's right edge.
+   Lives in the row's trailing grid column (-1). margin-left:-6px overlaps
+   the row's column-gap so the X visually attaches to the pill with no gap.
+   Border-radius rounds only the right corners, matching the pill's right
+   side. The chip "sticks out" from the pill into the trailing column. ── */
+.lft-deselect-btn{grid-column:-2 / -1;align-self:stretch;justify-self:stretch;display:none;margin-left:-6px;background:rgba(0,0,0,0.55);border:none;border-radius:0 6px 6px 0;padding:0;cursor:pointer;align-items:center;justify-content:center;color:#fff;transition:background 0.12s;outline:none;-webkit-tap-highlight-color:transparent;}
 .lft-row-selected .lft-deselect-btn{display:flex;}
-.lft-deselect-btn:hover{background:rgba(0,0,0,0.78);transform:scale(1.06);}
+.lft-deselect-btn:hover{background:rgba(0,0,0,0.78);}
 .lft-dark .lft-deselect-btn{background:rgba(243,243,241,0.88);color:#1a1a2e;}
 .lft-dark .lft-deselect-btn:hover{background:#F3F3F1;}
 
@@ -255,7 +314,7 @@ useShadowStyles(`
 </script>
 
 <template>
-  <div :class="['legend-family-tree', isDark ? 'lft-dark' : 'lft-light', { 'lft-has-selection': hasSelection }]">
+  <div ref="lftRoot" :class="['legend-family-tree', isDark ? 'lft-dark' : 'lft-light', { 'lft-has-selection': hasSelection }]">
 
     <!-- ── Tab bar (above the CSS table). Tab definitions live in the toolbar
          HelpButton, not inline ⓘ icons — keeps the legend uncluttered for the

@@ -65,6 +65,16 @@ function _clearGeocoderProgrammatic() {
   geocoderRef.value?.geocoder?.value?.clear?.()
   _geoBeingCleared = false
 }
+
+// Tells the legend to collapse other expanded families and scroll the newly
+// selected row into view. Only fired on geocoder-driven selections so direct
+// legend-row clicks don't disturb the user's manual expansion state
+// (per qa-buildinng-round-1 R3 A5 — auto-collapse only on search reveal).
+function _emitLegendReveal() {
+  if (typeof window === 'undefined') return
+  if (typeof window.CustomEvent !== 'function') return
+  window.dispatchEvent(new CustomEvent('legend:reveal-selected', { detail: { mapId } }))
+}
 function loadPoster() {
   if (!_posterPromise) {
     _posterPromise = import('../composables/useMapPoster.js')
@@ -276,7 +286,10 @@ const uiStore   = inject('uiStore')
 // stays warm; flip `doxaRegions: true` to bring it back).
 const FEATURES = {
   doxaRegions:    false,
-  hamburgerMenu:  false  // canonical default — emit/listen mismatch + drawer surplus
+  hamburgerMenu:  false,  // canonical default — emit/listen mismatch + drawer surplus
+  // Per QA building-round-1 R3 A4: clear the geocoder text on tab switch by
+  // default; flip to true to preserve the previous tab's query when returning.
+  geocoderPersistAcrossTabs: false
 }
 
 const ALL_TABS = [
@@ -540,8 +553,10 @@ function switchTab(tabId) {
   // Clear the geocoder text on every map-tab switch so the previous tab's
   // search query doesn't leak across tabs (qa-buildinng-round-1 Bug 11).
   // _clearGeocoderProgrammatic uses _geoBeingCleared to skip the legend-
-  // deselect side effect — pure text reset.
-  _clearGeocoderProgrammatic()
+  // deselect side effect — pure text reset. Flip the FEATURES flag to keep
+  // search queries across tabs (the user said "could go either way" — sticking
+  // with clear-on-switch as the default per A4).
+  if (!FEATURES.geocoderPersistAcrossTabs) _clearGeocoderProgrammatic()
   const tab = tabs.value.find(t => t.id === tabId)
   if (!tab || !map.value) return
   // Lazy-load regions GeoJSON the first time the user lands on this tab.
@@ -890,10 +905,12 @@ function onGeocoderAggregateResult(evt) {
     mapStore.selectFamily(evt.label)
     mapStore.setActiveLegendTab('family')
     _clearGeocoderProgrammatic()
+    _emitLegendReveal()
   } else if (evt.kind === 'language') {
     mapStore.selectLanguage(evt.label)
     mapStore.setActiveLegendTab('language')
     _clearGeocoderProgrammatic()
+    _emitLegendReveal()
   } else if (evt.kind === 'dialect') {
     // Build a legend-matching dialect key: "familyKey__baseLang__dialect".
     // useDoxaSearch threads familyDerived/baseLang/dialectLabel onto the Carmen
@@ -906,6 +923,7 @@ function onGeocoderAggregateResult(evt) {
     mapStore.selectDialect?.({ key: dialectKey, originalLabels: labels })
     mapStore.setActiveLegendTab('dialect')
     _clearGeocoderProgrammatic()
+    _emitLegendReveal()
   }
   // For country / region / religion: keep geocoder text as the active-filter
   // indicator. User clicks geocoder X to clear.
@@ -942,19 +960,22 @@ watch(() => mapStore.selectedRegion, (key) => {
   if (key) applyDimFilter({ kind: 'region', regionKey: key, coords: [] })
   else applyDimFilter({ kind: null })
 })
+// Legend selections are mutually exclusive (Bug 13). When the user swaps from
+// family → language, mapStore.selectLanguage() also nulls selectedFamily — but
+// the watcher mustn't fire applyDimFilter({kind:null}) for that cascade clear,
+// because clearAllHighlights() would erase the new language selection. The
+// guard: only run the kind:null clear when EVERY level is null.
 watch(() => mapStore.selectedFamily, (key) => {
-  // LegendFamilyTree fires its own legend:highlight event for tree rows, so this
-  // watcher only matters when something else writes selectedFamily directly.
   if (key) applyDimFilter({ kind: 'family', familyKey: key, coords: [] })
-  else applyDimFilter({ kind: null })
+  else if (!mapStore.selectedLanguage && !mapStore.selectedDialect) applyDimFilter({ kind: null })
 })
 watch(() => mapStore.selectedLanguage, (key) => {
   if (key) applyDimFilter({ kind: 'language', languageKey: key, coords: [] })
-  else applyDimFilter({ kind: null })
+  else if (!mapStore.selectedFamily && !mapStore.selectedDialect) applyDimFilter({ kind: null })
 })
 watch(() => mapStore.selectedDialect, (dialect) => {
   if (dialect?.key) applyDimFilter({ kind: 'dialect', dialectKey: dialect.key, originalLabels: dialect.originalLabels || [], coords: [] })
-  else applyDimFilter({ kind: null })
+  else if (!mapStore.selectedFamily && !mapStore.selectedLanguage) applyDimFilter({ kind: null })
 })
 
 // LegendRows row-clicks on the prayer / engagement / adoption tabs route through
