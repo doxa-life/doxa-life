@@ -493,13 +493,30 @@ export function useLanguageFamilyLegendData(peopleGroupsRef, options = {}) {
     const out = []
     for (const fam of families.values()) {
       const familyColor = getLanguageFamilyColor(fam.key)
+      // Collect EVERY language string under this family — base lang + every
+      // dialect's originalLabels. The pin layer's `languageFamily` property is
+      // mostly 'Unknown' (API field is null for all 2,069 records); the legend
+      // family bucket is itself a client-side derivation. So filter against
+      // `language` (which IS populated reliably) using the full enumerated
+      // set, instead of the unreliable `languageFamily` property.
+      const allFamilyLangs = []
+      for (const lang of fam.languages.values()) {
+        if (lang.key && lang.key !== '— Unknown —') allFamilyLangs.push(lang.key)
+        for (const dialect of lang.dialects.values()) {
+          for (const orig of dialect.originalLabels) {
+            if (orig) allFamilyLangs.push(orig)
+          }
+        }
+      }
       const familyNode = {
         id:    `fam:${fam.key}`,
         label: fam.key,
         color: familyColor,
         count: fam.peopleGroupCount,
         pop:   fam.population,
-        filter: ['==', ['get', 'languageFamily'], fam.key],
+        filter: allFamilyLangs.length > 0
+          ? ['in', ['get', 'language'], ['literal', Array.from(new Set(allFamilyLangs))]]
+          : ['==', ['get', 'languageFamily'], fam.key],
         children: [],
       }
       for (const lang of fam.languages.values()) {

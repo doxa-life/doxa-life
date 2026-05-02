@@ -480,6 +480,44 @@ provideInstance(pplrInstance)
 // state (driven by uiStore.theme via the isDark computed defined later).
 watch(() => uiStore.theme, (t) => { pplrInstance.theme.value = (t === 'dark' ? 'dark' : 'light') }, { immediate: true })
 
+// ── Selection bridge: mapStore → pplrInstance.selection ──────────────────────
+// Geocoder picks (and any other external mutators) write to mapStore. The
+// SemanticTreeLegend reads instance.selection to highlight + auto-expand the
+// matching row. This watcher projects mapStore changes onto the instance using
+// id strings that match the langTree node ids (fam:X / lang:X__Y / dial:X__Y__Z).
+// findAncestorChain inside the legend uses these ids to resolve actual nodes
+// in props.nodes; the bridge only needs to pass id+label+depth — not the full
+// node object.
+//
+// Loop guard: when the legend itself emits @select, LegendDesktop dispatches
+// legend:highlight → research-map.applyDimFilter → mapStore.selectXxx (no-op
+// if already set). The bridge watcher then fires with the same selection,
+// but the SemanticTreeLegend's _lastInternalId guard catches the round-trip.
+function _bridgeSelection(kind, payload) {
+  if (!payload) {
+    const cur = pplrInstance.selection.value
+    if (cur && cur.id?.startsWith(kind + ':')) pplrInstance.selection.value = null
+    return
+  }
+  pplrInstance.selection.value = payload
+}
+watch(() => mapStore.selectedFamily, (key) => {
+  if (!key) return _bridgeSelection('fam', null)
+  _bridgeSelection('fam', { id: `fam:${key}`, label: key, depth: 0 })
+})
+watch(() => mapStore.selectedLanguage, (key) => {
+  if (!key) return _bridgeSelection('lang', null)
+  // The legend's tree keys langs as `lang:family__lang`. We don't know the
+  // family from selectedLanguage alone — pass an unprefixed id; findAncestor
+  // will still match on substring. (Acceptable: the language might briefly
+  // show under whichever family node the legend resolves first.)
+  _bridgeSelection('lang', { id: `lang:__${key}`, label: key, depth: 1 })
+})
+watch(() => mapStore.selectedDialect, (dialect) => {
+  if (!dialect?.key) return _bridgeSelection('dial', null)
+  _bridgeSelection('dial', { id: `dial:${dialect.key}`, label: dialect.key, depth: 2 })
+})
+
 // ─── Poster composable (lazy) ────────────────────────────────────────────────
 // Instantiated only when the user opens the poster dialog. The composable +
 // off-screen Mapbox instance + PDF pipeline are ~117 KB; keep them off the
