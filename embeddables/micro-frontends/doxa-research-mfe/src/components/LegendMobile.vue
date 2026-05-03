@@ -141,6 +141,15 @@ useShadowStyles(`
 .legend-mobile-sheet .stl-panel{position:static!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;width:100%!important;z-index:auto!important;display:flex;flex-direction:column;min-height:0;}
 .legend-mobile-sheet .stl-panel.closed{transform:none!important;opacity:1!important;pointer-events:auto!important;}
 .legend-mobile-sheet .stl-inner{border:none!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;}
+/* min-height:0 is REQUIRED on .stl-rows for the flex:1+overflow:auto to
+   actually scroll inside the constrained mobile sheet. The base .stl-rows
+   only sets flex:1 — without min-height:0, the flex item's default
+   min-height:auto = content height, so a long list grows past the parent
+   instead of scrolling, leaving white space below the panel on tier-3
+   fullyOpen (qa: 2026-05-02 iter-11). LegendRows' .lrg-items already has
+   min-height:0 in its base CSS, which is why iter-10 fixed Prayer/Engagement/
+   Adoption but missed Language Families. */
+.legend-mobile-sheet .stl-rows{min-height:0;}
 .legend-mobile-sheet .stl-reopen{display:none!important;}
 .legend-mobile-sheet .stl-collapse-btn{display:none!important;}
 /* (Removed iter-1 rule that was setting padding-left:0 here — it was
