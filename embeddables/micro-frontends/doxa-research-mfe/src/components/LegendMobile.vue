@@ -49,6 +49,14 @@ useShadowStyles(`
 .detail-close-btn{position:absolute;top:10px;right:12px;background:none;border:none;padding:4px;cursor:pointer;color:#666;display:flex;align-items:center;justify-content:center;z-index:3;transition:color 0.2s ease;}
 .detail-close-btn:hover{color:#333;}
 
+/* Collapsed-detail footer — mimics LegendRows collapsed-state footer
+   (caret + centered title) but for PeopleGroupDetail mode. Renders only
+   when state=collapsed AND mode=detail (template v-if). Sits below the
+   12px drag-strip so the strip's tap+drag still works to expand. */
+.collapsed-detail-footer{position:absolute;top:12px;left:0;right:0;height:36px;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;cursor:pointer;background:transparent;}
+.collapsed-detail-title{font:600 13px system-ui,sans-serif;letter-spacing:0.02em;line-height:1.4;color:#1f2328;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.legend-mobile-sheet.sheet-dark .collapsed-detail-title{color:#F3F3F1;}
+
 /* Content padding — symmetric, 12px top/bottom only. Caret no longer needs
    a wide left gutter (it's now in-flow inside the title row), and no right
    padding keeps the scrollbar at the far edge.
@@ -441,9 +449,11 @@ onBeforeUnmount(() => {
            grid/flex align-items:center — matching desktop's slot pattern.
            No more absolute positioning or padding hacks.) -->
 
-      <!-- Detail-mode close X — absolutely positioned top-right -->
+      <!-- Detail-mode close X — absolutely positioned top-right.
+           Hidden when collapsed so the footer is clean (the user can re-expand
+           via the collapsed-detail-footer caret to reach the X). -->
       <button
-        v-if="legendMode === 'detail'"
+        v-if="legendMode === 'detail' && legendState !== 'collapsed'"
         class="detail-close-btn"
         @click.stop="handleCloseDetail"
         :aria-label="t('aria.backToLegend')"
@@ -453,10 +463,32 @@ onBeforeUnmount(() => {
         </svg>
       </button>
 
+      <!-- Collapsed-detail footer: shown only when sheet is collapsed AND in
+           detail mode. PeopleGroupDetail isn't designed to render at 48px, so
+           we render a footer-style title bar inline (caret + people-group
+           name) that mimics the LegendRows / SemanticTreeLegend collapsed
+           footer pattern. (qa: 2026-05-03 user feedback iter-16) -->
+      <div
+        v-if="legendState === 'collapsed' && legendMode === 'detail' && selectedPeopleGroup"
+        class="collapsed-detail-footer"
+        @click="handleCaretClick"
+      >
+        <button class="mobile-collapse-caret"
+          :style="{ transform: `rotate(${caretRotation}deg)` }"
+          :aria-label="t('aria.toggleLegend')"
+          tabindex="-1"
+        >
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+            <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <span class="collapsed-detail-title">{{ legendTitle }}</span>
+      </div>
+
       <!-- Sheet body — same LegendRows invocation as desktop. -->
       <div class="legend-content">
         <PeopleGroupDetail
-          v-if="legendMode === 'detail' && selectedPeopleGroup"
+          v-if="legendMode === 'detail' && selectedPeopleGroup && legendState !== 'collapsed'"
           :peopleGroup="selectedPeopleGroup"
           :hideHeader="true"
           :dark="isDark"
