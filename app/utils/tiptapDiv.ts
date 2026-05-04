@@ -10,7 +10,7 @@
 
 import { Node } from '@tiptap/core'
 
-const PRESERVED_DATA_ATTRS = [
+export const PRESERVED_DATA_ATTRS = [
   'data-width',
   'data-width-sm',
   'data-width-md',

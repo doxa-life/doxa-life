@@ -5,6 +5,7 @@ import { db, sql } from '../../utils/database'
 import { logRegisterAttempt, logEvent } from '../../utils/activity-logger'
 import { sendTemplateEmail } from '../../utils/email'
 import { checkRateLimit, logRateLimitExceeded } from '../../utils/rate-limit'
+import { getSetting } from '../../utils/site-settings'
 import { readBody, getHeader, setResponseHeader, getRequestURL, setCookie } from 'h3'
 import { useRuntimeConfig, createError } from '#imports'
 import { ROLES } from '~~/app/utils/role-definitions'
@@ -22,6 +23,15 @@ export default defineEventHandler(async (event) => {
 
   if (display_name.length < 2) {
     throw createError({ statusCode: 400, statusMessage: 'Display name must be at least 2 characters long' })
+  }
+
+  // Reject before rate-limiting so disabled-registration attempts don't burn
+  // the IP bucket. First-user bootstrap is unaffected — a brand-new install
+  // never has the toggle off (default true) and admins typically only flip it
+  // off after at least one admin exists.
+  const registrationEnabled = await getSetting('auth.public_registration_enabled')
+  if (!registrationEnabled) {
+    throw createError({ statusCode: 403, statusMessage: 'Public registration is disabled' })
   }
 
   // Check rate limit by IP
@@ -48,6 +58,7 @@ export default defineEventHandler(async (event) => {
   const userId = randomUUID()
   const tokenKey = randomUUID()
   const now = new Date().toISOString()
+  const tokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
 
   // First-user check + insert run atomically inside a transaction, with a
   // session-level advisory lock to serialize concurrent registrations. The
@@ -88,6 +99,7 @@ export default defineEventHandler(async (event) => {
         display_name,
         avatar: '',
         token_key: tokenKey,
+        token_expires_at: firstUser ? null : tokenExpiresAt,
       })
       .execute()
 
@@ -114,7 +126,7 @@ export default defineEventHandler(async (event) => {
     setCookie(event, 'auth-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 120
     })
 

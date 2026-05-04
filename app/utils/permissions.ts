@@ -10,7 +10,10 @@ export const PERMISSIONS = [
   'roles.view',
   'roles.manage',
   'pages.view',
-  'pages.manage'
+  'pages.write',
+  'pages.publish',
+  'settings.view',
+  'settings.edit'
 ] as const
 
 export type Permission = typeof PERMISSIONS[number]
@@ -43,9 +46,21 @@ export const PERMISSION_META: Record<string, { title: string; description: strin
     title: 'View CMS pages',
     description: 'See the CMS pages list and read existing translations.'
   },
-  'pages.manage': {
-    title: 'Manage CMS pages',
-    description: 'Create, edit, publish, translate, and delete CMS pages.'
+  'pages.write': {
+    title: 'Edit CMS pages',
+    description: 'Create, edit, translate, and delete CMS pages, categories, and assets.'
+  },
+  'pages.publish': {
+    title: 'Publish CMS pages',
+    description: 'Publish and unpublish CMS pages.'
+  },
+  'settings.view': {
+    title: 'View site settings',
+    description: 'See the site settings page and current values.'
+  },
+  'settings.edit': {
+    title: 'Edit site settings',
+    description: 'Change site settings such as the public registration toggle.'
   }
 }
 

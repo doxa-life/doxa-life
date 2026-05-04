@@ -1,3 +1,8 @@
+// @ts-nocheck
+// Legacy: one-shot importer used during the WordPress → marketing-rebuild
+// migration. Relies on the old `pages.parent_slug` column which was
+// dropped in migration 010. Kept for reference only.
+//
 // Phase 7 importer: walks scripts/scraped/ and upserts each JSON into
 // the `pages` + `page_translations` tables. Pages are created if they
 // don't exist (using the parent_slug + menu_order from pageList.ts).

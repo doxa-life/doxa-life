@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
+import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { randomBytes } from 'crypto'
 
@@ -10,7 +10,7 @@ const SIGNED_URL_EXPIRATION = 60 * 60 * 24 * 7 // 7 days in seconds
 // Get S3 settings from environment variables
 function getS3Settings() {
   // Try to get runtime config first (for production builds), then fallback to process.env
-  let S3_ENDPOINT, S3_REGION, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_BUCKET_NAME
+  let S3_ENDPOINT, S3_REGION, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_BUCKET_NAME, S3_PUBLIC_BASE_URL
 
   try {
     // Use runtime config if available (production build)
@@ -20,6 +20,7 @@ function getS3Settings() {
     S3_ACCESS_KEY_ID = config.s3AccessKeyId || process.env.S3_ACCESS_KEY_ID
     S3_SECRET_ACCESS_KEY = config.s3SecretAccessKey || process.env.S3_SECRET_ACCESS_KEY
     S3_BUCKET_NAME = config.s3BucketName || process.env.S3_BUCKET_NAME
+    S3_PUBLIC_BASE_URL = config.s3PublicBaseUrl || process.env.S3_PUBLIC_BASE_URL
   } catch {
     // Fallback to process.env (development mode)
     S3_ENDPOINT = process.env.S3_ENDPOINT
@@ -27,6 +28,7 @@ function getS3Settings() {
     S3_ACCESS_KEY_ID = process.env.S3_ACCESS_KEY_ID
     S3_SECRET_ACCESS_KEY = process.env.S3_SECRET_ACCESS_KEY
     S3_BUCKET_NAME = process.env.S3_BUCKET_NAME
+    S3_PUBLIC_BASE_URL = process.env.S3_PUBLIC_BASE_URL
   }
 
   return {
@@ -34,7 +36,8 @@ function getS3Settings() {
     region: S3_REGION || 'us-west-004',
     accessKeyId: S3_ACCESS_KEY_ID,
     secretAccessKey: S3_SECRET_ACCESS_KEY,
-    bucketName: S3_BUCKET_NAME
+    bucketName: S3_BUCKET_NAME,
+    publicBaseUrl: S3_PUBLIC_BASE_URL
   }
 }
 
@@ -79,7 +82,8 @@ export interface UploadResult {
 export async function uploadToS3(
   fileData: Buffer,
   originalFilename: string,
-  contentType: string
+  contentType: string,
+  visibility: 'public' | 'private' = 'private'
 ): Promise<UploadResult> {
   try {
     const client = getS3Client()
@@ -100,8 +104,9 @@ export async function uploadToS3(
 
     await client.send(command)
 
-    // Generate signed URL for private bucket access
-    const url = await generateSignedUrl(key)
+    // Generate URL based on visibility: public returns a stable URL via the
+    // configured public base, private returns a time-limited signed URL
+    const url = visibility === 'public' ? getPublicUrl(key) : await generateSignedUrl(key)
 
     return {
       url,
@@ -112,6 +117,19 @@ export async function uploadToS3(
     console.error('S3 upload error:', error)
     throw new Error(`Failed to upload file to storage: ${error.message}`)
   }
+}
+
+/**
+ * Build a stable public URL for an object key, using S3_PUBLIC_BASE_URL
+ * (e.g. a Cloudflare R2 custom domain). Throws if the base URL is not set.
+ */
+export function getPublicUrl(key: string): string {
+  const settings = getS3Settings()
+  if (!settings.publicBaseUrl) {
+    throw new Error('S3_PUBLIC_BASE_URL is not configured. Set it to your bucket\'s public custom domain to use public uploads or public URLs.')
+  }
+  const base = settings.publicBaseUrl.replace(/\/$/, '')
+  return `${base}/${key}`
 }
 
 /**
@@ -152,6 +170,102 @@ export async function generateSignedUrl(key: string, expiresIn: number = SIGNED_
   } catch (error: any) {
     console.error('S3 signed URL generation error:', error)
     throw new Error(`Failed to generate signed URL: ${error.message}`)
+  }
+}
+
+/**
+ * Generate a presigned PUT URL for direct browser/agent uploads to S3.
+ *
+ * Both the Content-Type and the byte size (Content-Length) are signed
+ * into the URL — the uploading client must send headers matching both
+ * exactly or S3 rejects with SignatureDoesNotMatch. This caps the
+ * upload size at the value you sign in (defending against runaway
+ * uploads to a public bucket) and binds the declared MIME to the
+ * upload without our server having to handle the bytes.
+ *
+ * Returned URL only authorizes a single PUT to the specified key.
+ * After the upload completes, callers should still validate the
+ * actual bytes (e.g. magic-byte sniff via a Range GET) — Content-Type
+ * binding only constrains the response header S3 stores, not the
+ * payload itself. See finalizeImageUpload() in cmsAssets.
+ */
+export async function createPresignedUploadUrl(
+  key: string,
+  contentType: string,
+  contentLength: number,
+  expiresIn: number = 5 * 60 // 5 minutes
+): Promise<string> {
+  try {
+    const client = getS3Client()
+    const settings = getS3Settings()
+
+    const command = new PutObjectCommand({
+      Bucket: settings.bucketName,
+      Key: key,
+      ContentType: contentType,
+      ContentLength: contentLength
+    })
+
+    return await getSignedUrl(client, command, {
+      expiresIn,
+      // Explicitly tell the signer to include Content-Length in the
+      // signed-headers list. Without this the AWS SDK signs only the
+      // host + content-type by default for PUT presigns.
+      unhoistableHeaders: new Set(['content-length'])
+    })
+  } catch (error: any) {
+    console.error('S3 presigned URL generation error:', error)
+    throw new Error(`Failed to generate presigned upload URL: ${error.message}`)
+  }
+}
+
+/**
+ * Read a byte range from an S3 object. Used by finalizeImageUpload
+ * to sniff magic bytes after a presigned PUT — we never trust the
+ * agent's claimed Content-Type without verifying the payload.
+ */
+export async function getObjectByteRange(
+  key: string,
+  start: number,
+  end: number
+): Promise<Buffer> {
+  const client = getS3Client()
+  const settings = getS3Settings()
+  const command = new GetObjectCommand({
+    Bucket: settings.bucketName,
+    Key: key,
+    Range: `bytes=${start}-${end}`
+  })
+  const result = await client.send(command)
+  if (!result.Body) throw new Error('S3 returned empty body')
+  // result.Body is a stream in Node — collect to buffer
+  const stream = result.Body as NodeJS.ReadableStream
+  const chunks: Buffer[] = []
+  for await (const chunk of stream) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : Buffer.from(chunk as Uint8Array))
+  }
+  return Buffer.concat(chunks)
+}
+
+/**
+ * HEAD an S3 object to read its metadata (Content-Length, Content-Type).
+ * Returns null if the object doesn't exist.
+ */
+export async function headObject(key: string): Promise<{ contentLength: number; contentType: string | undefined } | null> {
+  const client = getS3Client()
+  const settings = getS3Settings()
+  try {
+    const result = await client.send(new HeadObjectCommand({
+      Bucket: settings.bucketName,
+      Key: key
+    }))
+    return {
+      contentLength: Number(result.ContentLength ?? 0),
+      contentType: result.ContentType
+    }
+  } catch (e: any) {
+    if (e?.name === 'NotFound' || e?.$metadata?.httpStatusCode === 404) return null
+    throw e
   }
 }
 

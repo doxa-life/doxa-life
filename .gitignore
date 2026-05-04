@@ -6,6 +6,9 @@
 .cache
 dist
 
+# Extended layers (downloaded by c12/giget)
+.layers
+
 # Node dependencies
 node_modules
 
@@ -45,3 +48,6 @@ embeddables/micro-frontends/_template/
 !.env.example
 
 package-lock.json
+plans
+.claude
+.vscode

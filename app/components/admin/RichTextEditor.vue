@@ -10,51 +10,30 @@
 // server-side via its own HTML → Tiptap conversion).
 
 import { useEditor, EditorContent } from '@tiptap/vue-3'
-import type { Editor } from '@tiptap/core'
-import StarterKit from '@tiptap/starter-kit'
-import Image from '@tiptap/extension-image'
-import TextAlign from '@tiptap/extension-text-align'
-import { TextStyle } from '@tiptap/extension-text-style'
-import Color from '@tiptap/extension-color'
-import Highlight from '@tiptap/extension-highlight'
-import Typography from '@tiptap/extension-typography'
-import Subscript from '@tiptap/extension-subscript'
-import Superscript from '@tiptap/extension-superscript'
-import Youtube from '@tiptap/extension-youtube'
-import { Div } from '~/utils/tiptapDiv'
-import { UupgsListNode } from '~/utils/tiptapUupgsList'
+import type { Editor, JSONContent } from '@tiptap/core'
+import { buildTiptapExtensions } from '~/utils/tiptapExtensions'
 import { uploadImage } from '~/composables/useImageUpload'
 
 const props = withDefaults(defineProps<{
-  modelValue: Record<string, any>
+  modelValue: JSONContent
   placeholder?: string
 }>(), {
   placeholder: 'Start writing…'
 })
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: Record<string, any>): void
+  (e: 'update:modelValue', value: JSONContent): void
 }>()
 
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const uploading = ref(false)
+const linkPopoverOpen = ref(false)
+const linkUrl = ref('')
+const linkOpenInNewTab = ref(false)
 
 const editor = useEditor({
   content: props.modelValue,
-  extensions: [
-    StarterKit.configure({ link: { openOnClick: false, autolink: true } }),
-    Image,
-    TextAlign.configure({ types: ['heading', 'paragraph'] }),
-    TextStyle,
-    Color,
-    Highlight,
-    Typography,
-    Subscript,
-    Superscript,
-    Youtube,
-    Div,
-    UupgsListNode
-  ],
+  extensions: buildTiptapExtensions(),
   onUpdate({ editor: e }) {
     emit('update:modelValue', e.getJSON())
   }
@@ -79,23 +58,74 @@ function cmd(fn: (e: Editor) => void) {
   if (editor.value) fn(editor.value)
 }
 
-function isActive(name: string, attrs?: Record<string, any>): boolean {
+function isActive(name: string, attrs?: Record<string, unknown>): boolean {
   return editor.value?.isActive(name, attrs) ?? false
 }
 
-function isActiveAttrs(attrs: Record<string, any>): boolean {
-  return editor.value?.isActive(attrs) ?? false
+function setAlign(align: 'left' | 'center' | 'right') {
+  const e = editor.value
+  if (!e) return
+  if (e.isActive('image')) {
+    e.chain().focus().updateAttributes('image', { align }).run()
+  } else {
+    e.chain().focus().setTextAlign(align).run()
+  }
 }
 
-function promptForLink() {
-  const prev = editor.value?.getAttributes('link').href || ''
-  const url = window.prompt('Link URL', prev)
-  if (url === null) return
-  if (url === '') {
-    editor.value?.chain().focus().extendMarkRange('link').unsetLink().run()
+function isAlignActive(align: 'left' | 'center' | 'right'): boolean {
+  const e = editor.value
+  if (!e) return false
+  if (e.isActive('image')) {
+    return e.getAttributes('image').align === align
+  }
+  return e.isActive({ textAlign: align })
+}
+
+function syncLinkState() {
+  const attrs = editor.value?.getAttributes('link') ?? {}
+  linkUrl.value = attrs.href || ''
+  linkOpenInNewTab.value = attrs.target === '_blank'
+}
+
+function linkAttrs() {
+  return linkOpenInNewTab.value
+    ? { href: linkUrl.value, target: '_blank', rel: 'noopener noreferrer' }
+    : { href: linkUrl.value, target: null, rel: null }
+}
+
+function applyLink() {
+  const e = editor.value
+  const url = linkUrl.value.trim()
+  if (!e) return
+  if (!url) {
+    removeLink()
     return
   }
-  editor.value?.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+  linkUrl.value = url
+
+  const isEmpty = e.state.selection.empty
+  let chain = e.chain().focus().extendMarkRange('link').setLink(linkAttrs())
+  if (isEmpty && !e.isActive('link')) {
+    chain = chain.insertContent({ type: 'text', text: url })
+  }
+  chain.run()
+  linkPopoverOpen.value = false
+}
+
+function removeLink() {
+  editor.value?.chain().focus().extendMarkRange('link').unsetLink().run()
+  linkUrl.value = ''
+  linkPopoverOpen.value = false
+}
+
+function openLink() {
+  if (!linkUrl.value) return
+  window.open(linkUrl.value, '_blank', 'noopener,noreferrer')
+}
+
+function onLinkPopoverUpdate(open: boolean) {
+  linkPopoverOpen.value = open
+  if (open) syncLinkState()
 }
 
 async function insertImage() {
@@ -111,8 +141,8 @@ async function onFileChosen(e: Event) {
   try {
     const { url } = await uploadImage(file)
     editor.value?.chain().focus().setImage({ src: url, alt: file.name }).run()
-  } catch (err: any) {
-    window.alert(err?.message || 'Image upload failed')
+  } catch (err: unknown) {
+    window.alert(err instanceof Error ? err.message : 'Image upload failed')
   } finally {
     uploading.value = false
   }
@@ -122,6 +152,17 @@ function insertYoutube() {
   const url = window.prompt('YouTube URL')
   if (!url) return
   editor.value?.commands.setYoutubeVideo({ src: url })
+}
+
+function insertUupgsList() {
+  editor.value?.chain().focus().insertContent({ type: 'uupgsList' }).run()
+}
+
+function insertVerse() {
+  editor.value?.chain().focus().insertContent({
+    type: 'verse',
+    content: [{ type: 'paragraph' }]
+  }).run()
 }
 
 // Clicks on the padding area around the ProseMirror content don't move
@@ -153,13 +194,42 @@ function onBodyClick(e: MouseEvent) {
       <UButton size="xs" variant="ghost" :color="isActive('blockquote') ? 'primary' : 'neutral'" icon="i-lucide-quote" aria-label="Blockquote" @click="cmd(e => e.chain().focus().toggleBlockquote().run())" />
       <UButton size="xs" variant="ghost" :color="isActive('codeBlock') ? 'primary' : 'neutral'" icon="i-lucide-code" aria-label="Code block" @click="cmd(e => e.chain().focus().toggleCodeBlock().run())" />
       <div class="w-px bg-(--ui-border) mx-1" />
-      <UButton size="xs" variant="ghost" :color="isActiveAttrs({ textAlign: 'left' }) ? 'primary' : 'neutral'" icon="i-lucide-align-left" aria-label="Align left" @click="cmd(e => e.chain().focus().setTextAlign('left').run())" />
-      <UButton size="xs" variant="ghost" :color="isActiveAttrs({ textAlign: 'center' }) ? 'primary' : 'neutral'" icon="i-lucide-align-center" aria-label="Align center" @click="cmd(e => e.chain().focus().setTextAlign('center').run())" />
-      <UButton size="xs" variant="ghost" :color="isActiveAttrs({ textAlign: 'right' }) ? 'primary' : 'neutral'" icon="i-lucide-align-right" aria-label="Align right" @click="cmd(e => e.chain().focus().setTextAlign('right').run())" />
+      <UButton size="xs" variant="ghost" :color="isAlignActive('left') ? 'primary' : 'neutral'" icon="i-lucide-align-left" aria-label="Align left" @click="setAlign('left')" />
+      <UButton size="xs" variant="ghost" :color="isAlignActive('center') ? 'primary' : 'neutral'" icon="i-lucide-align-center" aria-label="Align center" @click="setAlign('center')" />
+      <UButton size="xs" variant="ghost" :color="isAlignActive('right') ? 'primary' : 'neutral'" icon="i-lucide-align-right" aria-label="Align right" @click="setAlign('right')" />
       <div class="w-px bg-(--ui-border) mx-1" />
-      <UButton size="xs" variant="ghost" :color="isActive('link') ? 'primary' : 'neutral'" icon="i-lucide-link" aria-label="Link" @click="promptForLink" />
+      <UPopover :open="linkPopoverOpen" :ui="{ content: 'p-3 w-80' }" @update:open="onLinkPopoverUpdate">
+        <UButton size="xs" variant="ghost" :color="isActive('link') ? 'primary' : 'neutral'" icon="i-lucide-link" aria-label="Link" @click="syncLinkState" />
+
+        <template #content>
+          <div class="space-y-3">
+            <UInput
+              v-model="linkUrl"
+              autofocus
+              type="url"
+              placeholder="https://example.com"
+              @keydown.enter.prevent="applyLink"
+            />
+
+            <label class="flex items-center gap-2 text-sm text-(--ui-text)">
+              <UCheckbox v-model="linkOpenInNewTab" />
+              <span>Open in new tab</span>
+            </label>
+
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex gap-1">
+                <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-external-link" aria-label="Open link" :disabled="!linkUrl" @click="openLink" />
+                <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-trash-2" aria-label="Remove link" :disabled="!linkUrl && !isActive('link')" @click="removeLink" />
+              </div>
+              <UButton size="xs" color="primary" label="Apply" :disabled="!linkUrl.trim()" @click="applyLink" />
+            </div>
+          </div>
+        </template>
+      </UPopover>
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-image" aria-label="Image" :loading="uploading" @click="insertImage" />
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-youtube" aria-label="YouTube" @click="insertYoutube" />
+      <UButton size="xs" variant="ghost" :color="isActive('uupgsList') ? 'primary' : 'neutral'" icon="i-lucide-globe" label="UUPG list" aria-label="Insert UUPG list" @click="insertUupgsList" />
+      <UButton size="xs" variant="ghost" :color="isActive('verse') ? 'primary' : 'neutral'" icon="i-lucide-book-open" label="Verse" aria-label="Insert verse" @click="insertVerse" />
       <div class="w-px bg-(--ui-border) mx-1" />
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-undo-2" aria-label="Undo" @click="cmd(e => e.chain().focus().undo().run())" />
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-redo-2" aria-label="Redo" @click="cmd(e => e.chain().focus().redo().run())" />
@@ -194,4 +264,81 @@ function onBodyClick(e: MouseEvent) {
 .tiptap-body :deep(img) { max-width: 100%; height: auto; border-radius: 0.375rem; }
 .tiptap-body :deep(iframe) { max-width: 100%; }
 .tiptap-body :deep(.ProseMirror:focus) { outline: none; }
+
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip) {
+  display: block;
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px dashed var(--ui-border-accented, var(--ui-border));
+  border-radius: 0.5rem;
+  background: var(--ui-bg-elevated);
+  color: var(--ui-text);
+  user-select: none;
+  cursor: grab;
+}
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip.is-selected) {
+  outline: 2px solid var(--ui-primary);
+  outline-offset: 1px;
+}
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip__header) {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip__icon) { font-size: 1rem; }
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip__detail) {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--ui-text-muted);
+  font-family: var(--ui-font-mono, ui-monospace, monospace);
+}
+
+.tiptap-body :deep(.doxa-verse--editor) {
+  background-color: var(--color-surface-brand, var(--ui-primary));
+  color: #fff;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+.tiptap-body :deep(.doxa-verse__ref-bar) {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+.tiptap-body :deep(.doxa-verse__ref-input) {
+  flex: 1;
+  max-width: 280px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.625rem;
+  font: inherit;
+  outline: none;
+}
+.tiptap-body :deep(.doxa-verse__ref-input::placeholder) {
+  color: rgba(255, 255, 255, 0.6);
+}
+.tiptap-body :deep(.doxa-verse__ref-input:focus) {
+  border-color: rgba(255, 255, 255, 0.6);
+}
+.tiptap-body :deep(.doxa-verse__content p) {
+  text-align: center;
+  color: #fff;
+  margin: 0.5rem 0;
+}
+.tiptap-body :deep(.doxa-verse__content p:first-child) { margin-top: 0; }
+.tiptap-body :deep(.doxa-verse__content p:last-child) { margin-bottom: 0; }
+.tiptap-body :deep(.doxa-verse__citation) {
+  text-align: right;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8rem;
+  font-style: italic;
+  margin-top: 0.5rem;
+}
 </style>

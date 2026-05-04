@@ -8,6 +8,7 @@
 import { db } from '../utils/database'
 import type { PagesTable, PageTranslationsTable } from './schema'
 import type { Selectable } from 'kysely'
+import { sql } from 'kysely'
 
 export type Page = Selectable<PagesTable>
 export type PageTranslation = Selectable<PageTranslationsTable>
@@ -19,21 +20,20 @@ export interface LocalizedPage {
   requestedLocale: string
 }
 
+export async function getPageSlug(id: string): Promise<string | null> {
+  const row = await db
+    .selectFrom('pages')
+    .select('slug')
+    .where('id', '=', id)
+    .executeTakeFirst()
+  return row?.slug ?? null
+}
+
 export async function listPages(): Promise<Page[]> {
   return db
     .selectFrom('pages')
     .selectAll()
-    .orderBy('parent_slug', 'asc')
-    .orderBy('menu_order', 'asc')
-    .orderBy('slug', 'asc')
-    .execute()
-}
-
-export async function getPageChildren(parentSlug: string): Promise<Page[]> {
-  return db
-    .selectFrom('pages')
-    .selectAll()
-    .where('parent_slug', '=', parentSlug)
+    .orderBy('category_id', 'asc')
     .orderBy('menu_order', 'asc')
     .orderBy('slug', 'asc')
     .execute()
@@ -82,55 +82,16 @@ export async function getPageBySlug(
   return null
 }
 
-export async function getChildTranslations(
-  parentSlug: string,
-  locale: string,
-  fallbackLocale = 'en'
-): Promise<Array<{ page: Page; translation: PageTranslation }>> {
-  const children = await getPageChildren(parentSlug)
-  if (children.length === 0) return []
-  const ids = children.map(c => c.id)
-
-  const preferred = await db
-    .selectFrom('page_translations')
-    .selectAll()
-    .where('page_id', 'in', ids)
-    .where('locale', '=', locale)
-    .where('status', '=', 'published')
-    .execute()
-  const haveLocale = new Set(preferred.map(p => p.page_id))
-
-  const missing = ids.filter(id => !haveLocale.has(id))
-  let fallbacks: PageTranslation[] = []
-  if (missing.length && locale !== fallbackLocale) {
-    fallbacks = await db
-      .selectFrom('page_translations')
-      .selectAll()
-      .where('page_id', 'in', missing)
-      .where('locale', '=', fallbackLocale)
-      .where('status', '=', 'published')
-      .execute()
-  }
-
-  const byPageId = new Map<string, PageTranslation>()
-  for (const t of preferred) byPageId.set(t.page_id, t)
-  for (const t of fallbacks) byPageId.set(t.page_id, t)
-
-  return children
-    .map(page => ({ page, translation: byPageId.get(page.id)! }))
-    .filter(entry => Boolean(entry.translation))
-}
-
 export async function createPage(input: {
   slug: string
-  parent_slug?: string | null
+  category_id?: string | null
   menu_order?: number
 }): Promise<Page> {
   const row = await db
     .insertInto('pages')
     .values({
       slug: input.slug,
-      parent_slug: input.parent_slug ?? null,
+      category_id: input.category_id ?? null,
       menu_order: input.menu_order ?? 0
     })
     .returningAll()
@@ -140,6 +101,72 @@ export async function createPage(input: {
 
 export async function deletePage(id: string): Promise<void> {
   await db.deleteFrom('pages').where('id', '=', id).execute()
+}
+
+// Moves a page into a new category (or detaches it by passing null)
+// and rewrites its slug so the `{category.slug}/...` prefix stays
+// consistent. Returns the set of slugs that need cache purging (old
+// slug + new slug).
+export async function setPageCategory(
+  pageId: string,
+  newCategoryId: string | null
+): Promise<{ page: Page; slugsToPurge: string[] }> {
+  return db.transaction().execute(async trx => {
+    const page = await trx
+      .selectFrom('pages')
+      .selectAll()
+      .where('id', '=', pageId)
+      .executeTakeFirst()
+    if (!page) {
+      throw Object.assign(new Error('Page not found'), { statusCode: 404 })
+    }
+
+    const oldSlug = page.slug
+    const oldCategoryId = page.category_id
+
+    // Figure out the slug leaf (everything after the current category
+    // prefix) so we can re-prefix it under the new category.
+    let leaf = oldSlug
+    if (oldCategoryId) {
+      const oldCategory = await trx
+        .selectFrom('categories')
+        .select('slug')
+        .where('id', '=', oldCategoryId)
+        .executeTakeFirst()
+      if (oldCategory && oldSlug.startsWith(`${oldCategory.slug}/`)) {
+        leaf = oldSlug.slice(oldCategory.slug.length + 1)
+      }
+    }
+
+    let newSlug: string
+    if (newCategoryId) {
+      const newCategory = await trx
+        .selectFrom('categories')
+        .select('slug')
+        .where('id', '=', newCategoryId)
+        .executeTakeFirst()
+      if (!newCategory) {
+        throw Object.assign(new Error('Category not found'), { statusCode: 404 })
+      }
+      newSlug = `${newCategory.slug}/${leaf}`
+    } else {
+      newSlug = leaf
+    }
+
+    const updated = await trx
+      .updateTable('pages')
+      .set({
+        category_id: newCategoryId,
+        slug: newSlug,
+        updated: sql`now()`
+      })
+      .where('id', '=', pageId)
+      .returningAll()
+      .executeTakeFirstOrThrow()
+
+    const slugsToPurge = oldSlug === newSlug ? [oldSlug] : [oldSlug, newSlug]
+    return { page: updated, slugsToPurge }
+  })
 }
 
 export async function upsertTranslation(input: {

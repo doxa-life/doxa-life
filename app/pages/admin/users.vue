@@ -1,40 +1,53 @@
 <script setup lang="ts">
 import { h, resolveComponent } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
-import { ROLES, type RoleDefinition } from '~~/app/utils/role-definitions'
+import { STATIC_ROLES } from '~~/app/utils/role-definitions'
 
 definePageMeta({
   layout: 'admin',
   middleware: ['auth', 'admin']
 })
 
+type UserStatus = 'active' | 'not_verified' | 'pending_invite' | 'expired_invite'
+
 interface AdminUserRow {
   id: string
   display_name: string
   email: string
   verified: boolean
+  status: UserStatus
   created: string
   last_login: string | null
   roles: string[]
 }
 
+const STATUS_META: Record<UserStatus, { label: string; color: 'success' | 'warning' | 'info' | 'error'; icon: string }> = {
+  active: { label: 'Active', color: 'success', icon: 'i-lucide-badge-check' },
+  not_verified: { label: 'Not verified', color: 'warning', icon: 'i-lucide-mail-warning' },
+  pending_invite: { label: 'Pending invite', color: 'info', icon: 'i-lucide-mail' },
+  expired_invite: { label: 'Expired invite', color: 'error', icon: 'i-lucide-mail-x' }
+}
+
 interface AssignableRole {
+  key: string
   name: string
   description: string
   source: 'static' | 'custom'
   permissions: string[]
 }
 
-const staticRoles = Object.values(ROLES) as RoleDefinition[]
-
 const availableRoles = computed<AssignableRole[]>(() =>
-  staticRoles.map(r => ({
+  STATIC_ROLES.map(r => ({
+    key: r.key,
     name: r.name,
     description: r.description,
     source: 'static' as const,
     permissions: [...r.permissions]
   }))
 )
+
+const roleLabel = (key: string) =>
+  STATIC_ROLES.find(r => r.key === key)?.name ?? key
 
 const { permissions: myPermissions, hasPermission } = usePermissions()
 
@@ -67,7 +80,7 @@ const { user: currentUser } = useAuth()
 const page = ref(1)
 const pageSize = ref(50)
 const search = ref('')
-const sortField = ref<'display_name' | 'email' | 'verified' | 'created' | 'last_login'>('created')
+const sortField = ref<'display_name' | 'email' | 'status' | 'created' | 'last_login'>('created')
 const sortDir = ref<'asc' | 'desc'>('desc')
 
 const searchDebounced = ref('')
@@ -88,7 +101,7 @@ const queryKey = computed(() => ({
   dir: sortDir.value
 }))
 
-const { data, pending, error } = await useFetch<UsersResponse>('/api/admin/users', {
+const { data, pending, error, refresh } = await useFetch<UsersResponse>('/api/admin/users', {
   query: queryKey,
   watch: [queryKey],
   default: () => ({ rows: [], total: 0, page: 1, pageSize: 50 })
@@ -183,11 +196,15 @@ const columns: TableColumn<AdminUserRow>[] = [
     header: sortableHeader('Email', 'email')
   },
   {
-    accessorKey: 'verified',
-    header: sortableHeader('Verified', 'verified'),
-    cell: ({ row }) => row.original.verified
-      ? h(UIcon, { name: 'i-lucide-check', class: 'size-5 text-(--ui-success)' })
-      : h('span', { class: 'text-(--ui-text-muted)' }, '—')
+    accessorKey: 'status',
+    header: sortableHeader('Status', 'status'),
+    cell: ({ row }) => {
+      const meta = STATUS_META[row.original.status] ?? STATUS_META.active
+      return h(UBadge, { color: meta.color, variant: 'subtle', size: 'sm' }, () => [
+        h(UIcon, { name: meta.icon, class: 'size-3 mr-1' }),
+        meta.label
+      ])
+    }
   },
   {
     accessorKey: 'roles',
@@ -203,7 +220,7 @@ const columns: TableColumn<AdminUserRow>[] = [
           color: r === 'admin' ? 'warning' : 'neutral',
           variant: 'subtle',
           size: 'sm'
-        }, () => r))
+        }, () => roleLabel(r)))
       )
     }
   },
@@ -249,12 +266,12 @@ const openRow = (row: AdminUserRow) => {
   editRoles.value = [...(row.roles ?? [])]
 }
 
-const toggleRole = (name: string) => {
-  const idx = editRoles.value.indexOf(name)
+const toggleRole = (key: string) => {
+  const idx = editRoles.value.indexOf(key)
   if (idx === -1) {
-    editRoles.value = [...editRoles.value, name]
+    editRoles.value = [...editRoles.value, key]
   } else {
-    editRoles.value = editRoles.value.filter(r => r !== name)
+    editRoles.value = editRoles.value.filter(r => r !== key)
   }
 }
 
@@ -340,6 +357,99 @@ const handleSave = async () => {
   }
 }
 
+// Resend invite/verification
+const resending = ref(false)
+
+const handleResend = async () => {
+  if (!selectedUser.value) return
+  resending.value = true
+  try {
+    const result = await $fetch<{ success: boolean; type: 'invite' | 'verification' }>(
+      `/api/admin/users/${selectedUser.value.id}/resend-invite`,
+      { method: 'POST' }
+    )
+    toast.add({
+      title: result.type === 'invite' ? 'Invite resent' : 'Verification resent',
+      color: 'success'
+    })
+
+    if (selectedUser.value.status === 'expired_invite') {
+      const updated = { ...selectedUser.value, status: 'pending_invite' as UserStatus }
+      selectedUser.value = updated
+      if (data.value) {
+        data.value = {
+          ...data.value,
+          rows: data.value.rows.map(r => r.id === updated.id ? updated : r)
+        }
+      }
+    }
+  } catch (err: any) {
+    toast.add({
+      title: 'Resend failed',
+      description: err?.data?.statusMessage || err?.message || 'Failed to resend',
+      color: 'error'
+    })
+  } finally {
+    resending.value = false
+  }
+}
+
+// Invite modal
+const inviteModalOpen = ref(false)
+const inviting = ref(false)
+const inviteForm = reactive({
+  email: '',
+  display_name: '',
+  roles: [] as string[]
+})
+const inviteError = ref('')
+
+const openInviteModal = () => {
+  inviteForm.email = ''
+  inviteForm.display_name = ''
+  inviteForm.roles = []
+  inviteError.value = ''
+  inviteModalOpen.value = true
+}
+
+const toggleInviteRole = (key: string) => {
+  const idx = inviteForm.roles.indexOf(key)
+  if (idx === -1) {
+    inviteForm.roles = [...inviteForm.roles, key]
+  } else {
+    inviteForm.roles = inviteForm.roles.filter(r => r !== key)
+  }
+}
+
+const inviteValid = computed(() =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteForm.email.trim()) &&
+  inviteForm.display_name.trim().length >= 2
+)
+
+const handleInvite = async () => {
+  if (!inviteValid.value || inviting.value) return
+  inviteError.value = ''
+  inviting.value = true
+  try {
+    const response = await $fetch<{ user: { email: string } }>('/api/admin/users', {
+      method: 'POST',
+      body: {
+        email: inviteForm.email.trim().toLowerCase(),
+        display_name: inviteForm.display_name.trim(),
+        roles: inviteForm.roles
+      }
+    })
+
+    toast.add({ title: 'Invite sent', description: response.user.email, color: 'success' })
+    inviteModalOpen.value = false
+    await refresh()
+  } catch (err: any) {
+    inviteError.value = err?.data?.statusMessage || err?.message || 'Failed to send invite'
+  } finally {
+    inviting.value = false
+  }
+}
+
 // Delete flow
 const deleteModalOpen = ref(false)
 const deleting = ref(false)
@@ -387,12 +497,22 @@ const handleDelete = async () => {
   <div>
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
       <h1 class="text-3xl font-bold">Users</h1>
-      <UInput
-        v-model="search"
-        placeholder="Search name or email..."
-        icon="i-lucide-search"
-        class="w-full sm:w-80"
-      />
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <UInput
+          v-model="search"
+          placeholder="Search name or email..."
+          icon="i-lucide-search"
+          class="flex-1 sm:w-80"
+        />
+        <UButton
+          v-if="canManageUsers"
+          icon="i-lucide-user-plus"
+          color="primary"
+          @click="openInviteModal"
+        >
+          Invite user
+        </UButton>
+      </div>
     </div>
 
     <UAlert v-if="error" color="error" :title="error.statusMessage || 'Failed to load users'" class="mb-4" />
@@ -457,7 +577,7 @@ const handleDelete = async () => {
                   size="sm"
                 >
                   <UIcon v-if="role === 'admin'" name="i-lucide-shield" class="size-3 mr-1" />
-                  {{ role }}
+                  {{ roleLabel(role) }}
                 </UBadge>
               </div>
               <a
@@ -467,18 +587,26 @@ const handleDelete = async () => {
                 <UIcon name="i-lucide-mail" class="size-3.5 shrink-0" />
                 <span class="truncate">{{ selectedUser.email }}</span>
               </a>
-              <div class="mt-2.5">
+              <div class="mt-2.5 flex items-center gap-2 flex-wrap">
                 <UBadge
-                  :color="selectedUser.verified ? 'success' : 'neutral'"
+                  :color="STATUS_META[selectedUser.status].color"
                   variant="subtle"
                   size="sm"
                 >
-                  <UIcon
-                    :name="selectedUser.verified ? 'i-lucide-badge-check' : 'i-lucide-circle-dashed'"
-                    class="size-3 mr-1"
-                  />
-                  {{ selectedUser.verified ? 'Verified' : 'Unverified' }}
+                  <UIcon :name="STATUS_META[selectedUser.status].icon" class="size-3 mr-1" />
+                  {{ STATUS_META[selectedUser.status].label }}
                 </UBadge>
+                <UButton
+                  v-if="!selectedUser.verified && canManageUsers"
+                  size="xs"
+                  color="primary"
+                  variant="soft"
+                  :icon="selectedUser.status === 'pending_invite' || selectedUser.status === 'expired_invite' ? 'i-lucide-mail' : 'i-lucide-mail-check'"
+                  :loading="resending"
+                  @click="handleResend"
+                >
+                  {{ selectedUser.status === 'not_verified' ? 'Resend verification' : 'Resend invite' }}
+                </UButton>
               </div>
             </div>
           </section>
@@ -566,7 +694,7 @@ const handleDelete = async () => {
             <div class="space-y-2">
               <label
                 v-for="role in availableRoles"
-                :key="role.name"
+                :key="role.key"
                 class="flex items-start gap-3 p-3 rounded-lg border border-(--ui-border) transition-colors"
                 :class="canAssignRole(role)
                   ? 'hover:bg-(--ui-bg-accented) cursor-pointer'
@@ -579,9 +707,9 @@ const handleDelete = async () => {
                   :disabled="canAssignRole(role)"
                 >
                   <UCheckbox
-                    :model-value="editRoles.includes(role.name)"
+                    :model-value="editRoles.includes(role.key)"
                     :disabled="savingRoles || !canAssignRole(role)"
-                    @update:model-value="toggleRole(role.name)"
+                    @update:model-value="toggleRole(role.key)"
                   />
                 </UTooltip>
                 <div class="flex-1 min-w-0">
@@ -621,6 +749,120 @@ const handleDelete = async () => {
         </div>
       </template>
     </USlideover>
+
+    <UModal v-model:open="inviteModalOpen" :dismissible="!inviting">
+      <template #content>
+        <form class="p-6 space-y-5" @submit.prevent="handleInvite">
+          <div class="flex items-start gap-3">
+            <div class="shrink-0 size-10 rounded-full bg-(--ui-primary)/10 flex items-center justify-center">
+              <UIcon name="i-lucide-user-plus" class="size-5 text-(--ui-primary)" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-lg font-semibold">Invite user</h3>
+              <p class="text-sm text-(--ui-text-muted) mt-1">
+                They'll receive an email with a link to set a password and activate their account. The link expires in 7 days.
+              </p>
+            </div>
+          </div>
+
+          <UAlert
+            v-if="inviteError"
+            color="error"
+            variant="soft"
+            :title="inviteError"
+            :close-button="{ icon: 'i-lucide-x', color: 'gray', variant: 'ghost' }"
+            @close="inviteError = ''"
+          />
+
+          <UFormField label="Email" required>
+            <UInput
+              v-model="inviteForm.email"
+              type="email"
+              placeholder="user@example.com"
+              size="lg"
+              :disabled="inviting"
+              autocomplete="off"
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField label="Display name" required>
+            <UInput
+              v-model="inviteForm.display_name"
+              type="text"
+              placeholder="Their name"
+              size="lg"
+              :disabled="inviting"
+              autocomplete="off"
+              class="w-full"
+            />
+          </UFormField>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">Roles</label>
+            <div class="space-y-2">
+              <label
+                v-for="role in availableRoles"
+                :key="role.key"
+                class="flex items-start gap-3 p-3 rounded-lg border border-(--ui-border) transition-colors"
+                :class="canAssignRole(role)
+                  ? 'hover:bg-(--ui-bg-accented) cursor-pointer'
+                  : 'opacity-60 cursor-not-allowed'"
+              >
+                <UTooltip
+                  :text="!canAssignRole(role)
+                    ? `You lack: ${missingPermsForRole(role).join(', ')}`
+                    : ''"
+                  :disabled="canAssignRole(role)"
+                >
+                  <UCheckbox
+                    :model-value="inviteForm.roles.includes(role.key)"
+                    :disabled="inviting || !canAssignRole(role)"
+                    @update:model-value="toggleInviteRole(role.key)"
+                  />
+                </UTooltip>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="font-medium">{{ role.name }}</span>
+                    <UBadge
+                      v-if="!canAssignRole(role)"
+                      color="warning"
+                      variant="subtle"
+                      size="sm"
+                    >
+                      Cannot assign
+                    </UBadge>
+                  </div>
+                  <div v-if="role.description" class="text-sm text-(--ui-text-muted) mt-0.5">
+                    {{ role.description }}
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-end gap-3 pt-2">
+            <UButton
+              type="button"
+              variant="ghost"
+              color="neutral"
+              :disabled="inviting"
+              @click="inviteModalOpen = false"
+            >
+              Cancel
+            </UButton>
+            <UButton
+              type="submit"
+              icon="i-lucide-send"
+              :loading="inviting"
+              :disabled="!inviteValid || inviting"
+            >
+              Send invite
+            </UButton>
+          </div>
+        </form>
+      </template>
+    </UModal>
 
     <UModal v-model:open="deleteModalOpen" :dismissible="!deleting">
       <template #content>
