@@ -361,12 +361,14 @@ function handlePullTabTouchEnd(event) {
   if (!movedUp && !movedDown) return
 
   // ── Mode-aware release behavior (qa: 2026-05-03 user feedback) ────────────
-  // Legend (data) mode → free-drag: leave the sheet wherever the user
+  // Any non-detail legend tab → free-drag: leave the sheet wherever the user
   // released, no snap to fullyOpen. They want to interact with the legend
   // AND the map at the same time, not have the legend take over the screen.
-  // Detail mode → ladder-snap: a slight upward pull jumps to fullyOpen so
+  // 'detail' mode → ladder-snap: a slight upward pull jumps to fullyOpen so
   // the people-group photo + content fills the screen for reading.
-  if (legendMode.value === 'data') {
+  // (uiStore default legendMode is 'prayer'; the previous iter-13 check
+  // against 'data' never matched, which is why the snap kept firing.)
+  if (legendMode.value !== 'detail') {
     // Only snap if dragged down past the collapse threshold (small height).
     // Otherwise keep the custom height already set during touchmove. State
     // stays 'open' (or 'fullyOpen' if it started there) so showPullTab
