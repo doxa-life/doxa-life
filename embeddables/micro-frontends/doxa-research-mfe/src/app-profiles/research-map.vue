@@ -242,12 +242,17 @@ useShadowStyles(`
     background:#4e594f;
     border-bottom:1px solid rgba(255,255,255,0.10);
     height:44px;
-    /* 16px inline padding so the first tab ("Prayer") sits visibly to the
-       right of the rounded-corner edge by default (UX 2026-04-27). The tab
-       bar is .rm-map-area-wide; rounded slot eats ~30px of each top corner
-       but the user explicitly accepts that visual underlap. Active-tab
-       scrollIntoView matches the same value so taps land cleanly. */
-    padding-inline:16px;
+    /* Inline padding clears the rounded slot corner so the first tab
+       ("Prayer") doesn't sit under the curve. Desktop bumps the start side
+       to 36px because .rounded-xlg eats a much larger chunk of the
+       top-left corner than the standard 16px gutter; end side stays 16px.
+       Mobile @media block below resets both sides back to 16px since the
+       mobile slot uses a smaller radius and the existing 16px is correct
+       there (qa: 2026-05-04 user feedback — desktop only). Active-tab
+       scrollIntoView still uses 16px scroll-padding which is fine — the
+       tab is already visible, just nudged by the static padding. */
+    padding-inline-start:36px;
+    padding-inline-end:16px;
     scroll-padding-inline:16px;
     gap:var(--spacing-3xl,28px);
     z-index:10;overflow-x:auto;scrollbar-width:thin;
