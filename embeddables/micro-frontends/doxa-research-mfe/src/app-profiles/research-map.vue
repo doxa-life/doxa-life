@@ -1227,6 +1227,30 @@ async function onMapReady(normalizedPeopleGroups) {
     schedule(() => { void ensureRegionsLoaded() })
   }
 
+  // Click-on-empty-map clears any active legend-row filter so dimmed pins
+  // restore (qa: 2026-05-02 iter-12 — user reported clicking a row dimmed
+  // non-matching pins as expected, but clicking off the row left the dim
+  // state stuck). Mapbox layer-specific handlers fire BEFORE this generic
+  // one, so we just check queryRenderedFeatures for the relevant interactive
+  // layers; if empty, the click landed on empty map.
+  map.value.on('click', (e) => {
+    const interactiveLayers = ['language-family-pins', 'regions-fill']
+      .filter(id => map.value.getLayer(id))
+    const hits = interactiveLayers.length
+      ? map.value.queryRenderedFeatures(e.point, { layers: interactiveLayers })
+      : []
+    if (hits.length) return
+    const hadFilter =
+      uiStore.prayerFilter || uiStore.engagementFilter || uiStore.adoptionFilter ||
+      mapStore.selectedFamily || mapStore.selectedLanguage || mapStore.selectedDialect ||
+      mapStore.selectedRegion
+    if (!hadFilter) return
+    if (uiStore.prayerFilter)     uiStore.setPrayerFilter?.(null)
+    if (uiStore.engagementFilter) uiStore.setEngagementFilter?.(null)
+    if (uiStore.adoptionFilter)   uiStore.setAdoptionFilter?.(null)
+    clearAllHighlights(map.value)
+  })
+
   mapStore.setMapReady(mapId)
   appReady.value = true
 }
