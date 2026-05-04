@@ -37,6 +37,16 @@ const { data: uupg, error: uupgError } = await useAsyncData<UupgDetail | null>(
 
 const notFound = computed(() => !uupg.value || 'error' in (uupg.value as UupgDetail))
 
+// Prayer signup URL for this same UUPG, mirroring the pattern used in
+// research/[slug]/index.vue so the "I meant to pray, not adopt" callout
+// links to the right locale + slug.
+const prayUrl = computed(() => {
+  const base = config.public.prayBaseUrl
+  const s = slug.value
+  const path = locale.value !== 'en' ? `/${locale.value}/${s}` : `/${s}`
+  return `${base}${path}?source=doxalife`
+})
+
 // Adoption form state
 const firstName = ref('')
 const lastName = ref('')
@@ -183,6 +193,15 @@ async function onSubmit(e: Event) {
         </div>
       </div>
 
+      <div v-if="!submitted" class="text-card surface-brand-lightest">
+        <div class="stack stack--sm">
+          <p>{{ t('Adoption is a much bigger commitment than signing up to pray. If you only wish to pray, click the button below. Please remember to also sign up to pray after you fill out the adoption form.') }}</p>
+          <a :href="prayUrl" class="button compact mx-auto">
+            {{ t('Sign up to pray for {0}', [uupg.name]) }}
+          </a>
+        </div>
+      </div>
+
       <!-- Post-submit verification screen (from template-adoption-form.php lines 236-254) -->
       <div v-if="submitted && verificationPending" class="text-card shadow text-center">
         <div class="stack">
@@ -280,7 +299,7 @@ async function onSubmit(e: Event) {
             </div>
             <div class="form-control color-primary-darker">
               <input id="confirm-public-display" v-model="confirmPublicDisplay" type="checkbox" name="confirm_public_display">
-              <label for="confirm-public-display">{{ t('I am happy for this church name to appear publicly on this site.') }}</label>
+              <label for="confirm-public-display">{{ t('Show publicly that my church adopted this people group.') }}</label>
             </div>
             <div>
               <label for="country">{{ t('Location of Church/Group') }}</label>
