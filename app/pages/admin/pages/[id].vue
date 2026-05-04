@@ -251,9 +251,11 @@ async function saveAll(statusOverride?: 'draft' | 'published', localeOverride?: 
     await refresh()
     return true
   } catch (e: any) {
+    const status = e?.statusCode || e?.response?.status
+    const detail = e?.data?.statusMessage || e?.data?.message || e?.statusMessage || e?.message
     toast.add({
-      title: 'Save failed',
-      description: e?.data?.statusMessage || e?.message,
+      title: status ? `Save failed (${status})` : 'Save failed',
+      description: detail || 'Unexpected error — please try again',
       color: 'error'
     })
     return false
