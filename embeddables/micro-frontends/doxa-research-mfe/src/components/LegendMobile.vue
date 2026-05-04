@@ -141,6 +141,14 @@ useShadowStyles(`
 .legend-mobile-sheet .stl-panel{position:static!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;width:100%!important;z-index:auto!important;display:flex;flex-direction:column;min-height:0;}
 .legend-mobile-sheet .stl-panel.closed{transform:none!important;opacity:1!important;pointer-events:auto!important;}
 .legend-mobile-sheet .stl-inner{border:none!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;}
+/* Slim row height on mobile prayer/engagement/adoption tabs so they read
+   as thin/dense like desktop, not chunky touch-targets (qa: 2026-05-03 user
+   feedback — "desktop legend rows are thinner, can you make mobile match").
+   Drops .lrg-item-inner min-height 36→28, vertical padding 6→2, and tightens
+   the .lrg-items row-gap 6→3 for the same compact-table feel. */
+.legend-mobile-sheet .lrg-item-inner{min-height:28px!important;padding:2px 0!important;}
+.legend-mobile-sheet .lrg-items{row-gap:3px!important;}
+
 /* min-height:0 is REQUIRED on .stl-rows for the flex:1+overflow:auto to
    actually scroll inside the constrained mobile sheet. The base .stl-rows
    only sets flex:1 — without min-height:0, the flex item's default
@@ -351,6 +359,23 @@ function handlePullTabTouchEnd(event) {
 
   // Pure tap (no movement) — let the @click handler own the cascade.
   if (!movedUp && !movedDown) return
+
+  // ── Mode-aware release behavior (qa: 2026-05-03 user feedback) ────────────
+  // Legend (data) mode → free-drag: leave the sheet wherever the user
+  // released, no snap to fullyOpen. They want to interact with the legend
+  // AND the map at the same time, not have the legend take over the screen.
+  // Detail mode → ladder-snap: a slight upward pull jumps to fullyOpen so
+  // the people-group photo + content fills the screen for reading.
+  if (legendMode.value === 'data') {
+    // Only snap if dragged down past the collapse threshold (small height).
+    // Otherwise keep the custom height already set during touchmove. State
+    // stays 'open' (or 'fullyOpen' if it started there) so showPullTab
+    // remains true and the sheet keeps its expanded chrome.
+    if (currentHeight < availHeight * 0.12) {
+      uiStore.collapseLegend()
+    }
+    return
+  }
 
   const startedFullyOpen = startHeight >= availHeight * 0.55
   const startedOpen      = startHeight >= availHeight * 0.2 && !startedFullyOpen
