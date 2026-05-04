@@ -67,6 +67,8 @@ export default defineEventHandler(async (event) => {
     if (e?.statusCode) {
       throw createError({ statusCode: e.statusCode, statusMessage: e.statusMessage || e.message })
     }
-    throw e
+    console.error('[admin/pages/[id]/translations/[locale].put] unhandled error', { id, locale, error: e })
+    const message = e instanceof Error ? e.message : String(e)
+    throw createError({ statusCode: 500, statusMessage: message || 'Unexpected server error' })
   }
 })
