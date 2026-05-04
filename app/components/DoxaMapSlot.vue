@@ -52,6 +52,13 @@ const tagName = props.bundle === 'research-map' ? 'doxa-research-map' : 'doxa-ma
   inset: 0;
   width: 100%;
   height: 100%;
+  /* Inherit any border-radius the host page gave the slot (e.g. .rounded-md /
+     .rounded-xlg on the research page). Without this, the bare custom element
+     paints a rectangular background during the brief window between page
+     render and IIFE registration / first map paint, producing the
+     "square corners flash to rounded corners" flicker reported 2026-05-04. */
+  border-radius: inherit;
+  overflow: hidden;
 }
 
 .doxa-map-slot :deep(doxa-map:fullscreen),
