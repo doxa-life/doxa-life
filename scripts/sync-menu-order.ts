@@ -1,3 +1,10 @@
+// @ts-nocheck
+// Legacy: this script targeted the live WordPress site during the
+// initial import. It relies on the old `pages.parent_slug` column
+// which was dropped in migration 010. Kept for reference only —
+// ongoing page ordering happens via the admin drag-and-drop UI on
+// each category's edit page.
+//
 // Sync the `pages.menu_order` column from the live WP site's rendered
 // sidebar. The WP theme orders children by `wp_posts.menu_order` and
 // renders them in that order inside <aside class="sidebar"><ul>…</ul>.

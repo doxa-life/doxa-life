@@ -58,7 +58,7 @@ export async function translateTexts(
 
   params.append('model_type', 'quality_optimized')
 
-  const apiUrl = config.deeplApiUrl || 'https://api-free.deepl.com'
+  const apiUrl = config.deeplApiUrl || 'https://api.deepl.com'
   console.log(`[DeepL] Translating ${texts.length} text(s) → ${targetLang}${sourceLang ? ` from ${sourceLang}` : ''}${glossaryId ? ` (glossary: ${glossaryId})` : ''}`)
 
   const response = await fetch(`${apiUrl}/v2/translate`, {

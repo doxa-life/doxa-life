@@ -38,12 +38,24 @@ useHead(() => ({
 
 // Layout-level behaviours shared across all public pages
 useSmoothScroll()
+
+// Dim the main content while navigating so clicking a sidebar link has
+// visible feedback immediately (the top progress bar alone still leaves
+// the body looking frozen because Nuxt blocks the transition until the
+// new page's useAsyncData resolves).
+const { isLoading } = useLoadingIndicator()
 </script>
 
 <template>
   <div class="page">
+    <!-- Browser-style top-of-page progress bar during route changes.
+         Nuxt's default useAsyncData blocks navigation until the new
+         page's data resolves, so without this the UI appears frozen
+         between click and content swap. White so it shows against the
+         dark header; the component sits at z-index ≫ page content. -->
+    <NuxtLoadingIndicator color="#ffffff" :height="4" />
     <TheHeader />
-    <main class="site-main">
+    <main class="site-main" :class="{ 'site-main--loading': isLoading }">
       <slot />
     </main>
     <TheFooter />
@@ -63,5 +75,12 @@ useSmoothScroll()
   right: 16px;
   bottom: 16px;
   z-index: 2147483647;
+}
+.site-main {
+  transition: opacity 150ms ease-out;
+}
+.site-main--loading {
+  opacity: 0.45;
+  pointer-events: none;
 }
 </style>

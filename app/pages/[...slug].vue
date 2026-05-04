@@ -18,10 +18,14 @@ interface ChildPage {
   menu_order: number
 }
 
+type PageTheme = 'default' | 'green'
+
 interface PageResponse {
   slug: string
-  parent_slug: string | null
+  category_id: string | null
+  category_slug: string | null
   menu_order: number
+  theme: PageTheme
   custom_css: string | null
   requested_locale: string
   resolved_locale: string
@@ -33,17 +37,21 @@ interface PageResponse {
   og_image: string | null
   body_html: string
   body_is_empty: boolean
-  menu_parent: { slug: string; title: string }
+  menu_parent: { slug: string; title: string } | null
   children: ChildPage[]
 }
 
 import { h, render, getCurrentInstance } from 'vue'
 import { UUPGS_LIST_PLACEHOLDER_CLASS } from '~/utils/tiptapUupgsList'
+import { GENERAL_RESOURCES_PLACEHOLDER_CLASS } from '~/utils/tiptapGeneralResources'
 import UupgsList from '~/components/public/UupgsList.vue'
+import GeneralResources from '~/components/public/GeneralResources.vue'
+import { buildUupgListTranslations } from '~/utils/uupgListTranslations'
 
 const route = useRoute()
-const { locale } = useI18n()
+const { t, locale } = useI18n()
 const localePath = useLocalePath()
+const runtimeConfig = useRuntimeConfig()
 
 const slug = computed(() => {
   const raw = route.params.slug
@@ -63,13 +71,12 @@ const { data, error } = await useAsyncData<PageResponse | null>(
       if (e?.statusCode === 404) return null
       throw e
     }
-  },
-  { watch: [() => slug.value, () => locale.value] }
+  }
 )
 
 if (!data.value && !error.value) {
   // Explicit 404 if the page isn't in the CMS (or not published)
-  throw createError({ statusCode: 404, statusMessage: 'Page not found', fatal: true })
+  throw createError({ statusCode: 404, statusMessage: 'Page not found' })
 }
 
 // <head>
@@ -81,57 +88,119 @@ useHead(() => {
       ...(data.value.meta_description ? [{ name: 'description', content: data.value.meta_description }] : []),
       ...(data.value.og_image ? [{ property: 'og:image', content: data.value.og_image }] : [])
     ],
+    // Tagging the <body> with a theme class lets _themes.scss paint the
+    // page in brand colors (e.g. green) without the author writing CSS.
+    bodyAttrs: {
+      class: data.value.theme && data.value.theme !== 'default'
+        ? `page-theme-${data.value.theme}`
+        : undefined
+    },
     // Port of WP's per-page `_page_custom_css` meta — see
     // `output_page_custom_css` in marketing-theme/functions.php.
+    // Rendered at `bodyClose` so it lands after Vite's injected app CSS
+    // in dev and after `<link rel=stylesheet>` tags in prod, winning the
+    // cascade regardless of where main.scss ends up in <head>.
     style: data.value.custom_css
-      ? [{ key: `page-custom-css-${data.value.slug}`, innerHTML: data.value.custom_css }]
+      ? [{
+          key: `page-custom-css-${data.value.slug}`,
+          tagPosition: 'bodyClose' as const,
+          innerHTML: data.value.custom_css
+        }]
       : []
   }
 })
 
 const hasSidebar = computed(() => (data.value?.children.length ?? 0) > 0)
-const isParentSelf = computed(() => data.value?.menu_parent.slug === data.value?.slug)
+// A page renders its children as cards (instead of sidebar + body) when
+// it's the category's default landing AND its own body is empty. Useful
+// for pure index pages like /resources.
+const isCategoryDefault = computed(() =>
+  Boolean(data.value && data.value.category_slug && data.value.menu_order === 0)
+)
 const showChildGrid = computed(() =>
-  // Parent page with no body content → render children as cards
-  Boolean(data.value && isParentSelf.value && data.value.body_is_empty && data.value.children.length > 0)
+  Boolean(
+    data.value
+      && isCategoryDefault.value
+      && data.value.body_is_empty
+      && data.value.children.length > 0
+  )
 )
 
 useTextHighlight()
 
-// The body_html is rendered via v-html, so the embedded
-// <div class="doxa-uupgs-list-slot" data-uupgs-list-props="…"></div>
-// placeholders come through as plain DOM. After each render, mount
-// the real Vue <UupgsList> component into each slot. Using h() + render()
-// with the host app's context so the mounted component still resolves
-// useI18n / useRuntimeConfig.
+// The body_html is rendered via v-html, so custom-node placeholder divs
+// (doxa-uupgs-list-slot, doxa-general-resources-slot, …) come through
+// as plain DOM. After each render, mount the real Vue component into
+// each slot. Using h() + render() with the host app's context so the
+// mounted component still resolves useI18n / useRuntimeConfig.
 const instance = getCurrentInstance()
 const mountedSlots = new Set<HTMLElement>()
 
-function hydrateUupgsListSlots() {
+// Default props for CMS-embedded UUPG lists. Tiptap stores the node
+// attributes raw, so a plain `<uupgs-list>` dropped into the editor
+// comes through with every prop null. Mirror the /pray call site
+// (6 highlighted select-cards, collapsed-on-load) so embeds feel the
+// same anywhere, then let the attribute-serialized props override
+// where the editor explicitly set something.
+function defaultUupgsListProps(): Record<string, any> {
+  const prayBaseUrl = runtimeConfig.public.prayBaseUrl as string
+  const selectUrl = locale.value !== 'en' ? `${prayBaseUrl}/${locale.value}/` : `${prayBaseUrl}/`
+  return {
+    languageCode: locale.value,
+    selectUrl,
+    researchUrl: localePath('/research') + '/',
+    t: buildUupgListTranslations(t),
+    perPage: 6,
+    morePerPage: 12,
+    dontShowListOnLoad: true,
+    useSelectCard: true,
+    useHighlightedUUPGs: true
+  }
+}
+
+const SLOT_COMPONENTS: Array<{
+  className: string
+  dataAttr: string
+  component: any
+  defaults?: () => Record<string, any>
+}> = [
+  {
+    className: UUPGS_LIST_PLACEHOLDER_CLASS,
+    dataAttr: 'data-uupgs-list-props',
+    component: UupgsList,
+    defaults: defaultUupgsListProps
+  },
+  { className: GENERAL_RESOURCES_PLACEHOLDER_CLASS, dataAttr: 'data-general-resources-props', component: GeneralResources }
+]
+
+function hydrateSlots() {
   if (!import.meta.client) return
-  const slots = document.querySelectorAll<HTMLElement>(`.${UUPGS_LIST_PLACEHOLDER_CLASS}`)
-  for (const slot of slots) {
-    if (mountedSlots.has(slot)) continue
-    const raw = slot.getAttribute('data-uupgs-list-props') || '{}'
-    let props: Record<string, any> = {}
-    try {
-      props = JSON.parse(raw)
-    } catch (e) {
-      console.error('[UupgsList slot] failed to parse props', e, raw)
-      continue
-    }
-    const vnode = h(UupgsList, props)
-    if (instance?.appContext) vnode.appContext = instance.appContext
-    try {
-      render(vnode, slot)
-      mountedSlots.add(slot)
-    } catch (e) {
-      console.error('[UupgsList slot] failed to mount', e)
+  for (const { className, dataAttr, component, defaults } of SLOT_COMPONENTS) {
+    const slots = document.querySelectorAll<HTMLElement>(`.${className}`)
+    for (const slot of slots) {
+      if (mountedSlots.has(slot)) continue
+      const raw = slot.getAttribute(dataAttr) || '{}'
+      let parsed: Record<string, any> = {}
+      try {
+        parsed = JSON.parse(raw)
+      } catch (e) {
+        console.error(`[${className}] failed to parse props`, e, raw)
+        continue
+      }
+      const props = defaults ? { ...defaults(), ...parsed } : parsed
+      const vnode = h(component, props)
+      if (instance?.appContext) vnode.appContext = instance.appContext
+      try {
+        render(vnode, slot)
+        mountedSlots.add(slot)
+      } catch (e) {
+        console.error(`[${className}] failed to mount`, e)
+      }
     }
   }
 }
 
-function unmountUupgsListSlots() {
+function unmountSlots() {
   for (const slot of mountedSlots) {
     try { render(null, slot) } catch { /* ignore */ }
   }
@@ -141,16 +210,16 @@ function unmountUupgsListSlots() {
 // Hydrate once on mount (the watch above fires before the DOM is in
 // place so `querySelectorAll` would be empty).
 onMounted(() => {
-  nextTick(hydrateUupgsListSlots)
+  nextTick(hydrateSlots)
 })
 
 // Re-hydrate on client-side navigation when body_html changes.
 watch(() => data.value?.body_html, () => {
-  unmountUupgsListSlots()
-  nextTick(hydrateUupgsListSlots)
+  unmountSlots()
+  nextTick(hydrateSlots)
 })
 
-onBeforeUnmount(unmountUupgsListSlots)
+onBeforeUnmount(unmountSlots)
 </script>
 
 <template>
@@ -160,14 +229,10 @@ onBeforeUnmount(unmountUupgsListSlots)
         <nav class="stack" aria-label="Child pages navigation">
           <div>
             <ul class="stack | max-width-xs" role="list">
-              <li>
-                <NuxtLink
-                  class="font-size-lg"
-                  :class="{ 'current-link': data.slug === data.menu_parent.slug }"
-                  :to="localePath(`/${data.menu_parent.slug}`)"
-                >
+              <li v-if="data.menu_parent">
+                <span class="font-size-lg category-heading">
                   {{ data.menu_parent.title }}
-                </NuxtLink>
+                </span>
               </li>
               <li v-for="child in data.children" :key="child.slug">
                 <NuxtLink

@@ -1,13 +1,19 @@
 // Admin: upsert a page's translation for a given locale. Saves as
-// draft unless `status: 'published'` is passed. All fields optional
-// except `title` and `body_json`.
+// draft unless `status: 'published'` is passed.
+//
+// Calls upsertCmsPageTranslation, which now applies tiptapValidate
+// (the XSS allowlist) and the lossy-overwrite guard. Admin clients
+// only ever pass body_json (no markdown), so the lossy guard is
+// effectively inert here — it only fires when body_markdown is the
+// input branch.
 
-import { defineEventHandler, getRouterParam, readBody, createError } from 'h3'
+import { defineEventHandler, getRouterParam, readBody, createError, getHeader } from 'h3'
 import { requirePermission } from '../../../../../utils/rbac'
-import { upsertTranslation } from '../../../../../database/pages'
-import { ENABLED_LANGUAGE_CODES } from '../../../../../../config/languages'
-import { logUpdate } from '../../../../../utils/activity-logger'
-import { db } from '../../../../../utils/database'
+import {
+  upsertCmsPageTranslation,
+  applyTranslationInvalidations
+} from '../../../../../services/cmsTranslations'
+import { logEvent } from '../../../../../utils/activity-logger'
 
 interface Body {
   title?: string
@@ -21,49 +27,48 @@ interface Body {
 }
 
 export default defineEventHandler(async (event) => {
-  await requirePermission(event, 'pages.manage')
+  const authUser = await requirePermission(event, 'pages.write')
   const id = getRouterParam(event, 'id')
   const locale = getRouterParam(event, 'locale')
   if (!id) throw createError({ statusCode: 400, statusMessage: 'id is required' })
-  if (!locale || !ENABLED_LANGUAGE_CODES.includes(locale)) {
-    throw createError({ statusCode: 400, statusMessage: 'locale is not enabled' })
-  }
-
-  const page = await db
-    .selectFrom('pages')
-    .select('id')
-    .where('id', '=', id)
-    .executeTakeFirst()
-  if (!page) throw createError({ statusCode: 404, statusMessage: 'Page not found' })
+  if (!locale) throw createError({ statusCode: 400, statusMessage: 'locale is required' })
 
   const body = await readBody<Body>(event)
-  const title = (body?.title ?? '').trim()
-  if (!title) throw createError({ statusCode: 400, statusMessage: 'title is required' })
   if (!body?.body_json || typeof body.body_json !== 'object') {
     throw createError({ statusCode: 400, statusMessage: 'body_json is required' })
   }
-  if (body.status && body.status !== 'draft' && body.status !== 'published') {
-    throw createError({ statusCode: 400, statusMessage: 'status must be draft or published' })
+
+  try {
+    const result = await upsertCmsPageTranslation({
+      page_id: id,
+      locale,
+      title: (body.title ?? '').trim(),
+      body_json: body.body_json,
+      excerpt: body.excerpt ?? null,
+      featured_image: body.featured_image ?? null,
+      meta_title: body.meta_title ?? null,
+      meta_description: body.meta_description ?? null,
+      og_image: body.og_image ?? null,
+      status: body.status
+    })
+
+    logEvent({
+      eventType: 'UPDATE',
+      tableName: 'page_translations',
+      recordId: result.translation.id,
+      userId: authUser.userId,
+      userAgent: getHeader(event, 'user-agent') || undefined,
+      metadata: { page_id: id, locale, status: result.translation.status, source: 'admin-ui' }
+    })
+
+    await applyTranslationInvalidations(result.pageSlug, result.categoryId, locale)
+    return result.translation
+  } catch (e: any) {
+    if (e?.statusCode) {
+      throw createError({ statusCode: e.statusCode, statusMessage: e.statusMessage || e.message })
+    }
+    console.error('[admin/pages/[id]/translations/[locale].put] unhandled error', { id, locale, error: e })
+    const message = e instanceof Error ? e.message : String(e)
+    throw createError({ statusCode: 500, statusMessage: message || 'Unexpected server error' })
   }
-
-  const translation = await upsertTranslation({
-    page_id: id,
-    locale,
-    title,
-    body_json: body.body_json,
-    excerpt: body.excerpt ?? null,
-    featured_image: body.featured_image ?? null,
-    meta_title: body.meta_title ?? null,
-    meta_description: body.meta_description ?? null,
-    og_image: body.og_image ?? null,
-    status: body.status
-  })
-
-  logUpdate('page_translations', translation.id, event, {
-    page_id: id,
-    locale,
-    status: translation.status
-  })
-
-  return translation
 })

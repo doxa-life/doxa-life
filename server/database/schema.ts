@@ -7,12 +7,19 @@ export interface UsersTable {
   email: string
   display_name: string
   avatar: Generated<string>
-  password: Generated<string>
+  password: ColumnType<string | null, string | null | undefined, string | null>
   verified: Generated<boolean>
   roles: Generated<string[]>
   token_key: Generated<string>
+  token_expires_at: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>
   pending_email: string | null
   email_change_token: string | null
+}
+
+export interface SiteSettingsTable {
+  key: string
+  value: ColumnType<unknown, unknown, unknown>
+  updated: ColumnType<Date, string | undefined, string>
 }
 
 export interface PasswordResetRequestsTable {
@@ -35,13 +42,32 @@ export interface ActivityLogsTable {
   metadata: Generated<Record<string, any>>
 }
 
+export type PageTheme = 'default' | 'green'
+
 export interface PagesTable {
   id: Generated<string>
   slug: string
-  parent_slug: string | null
+  category_id: string | null
   menu_order: Generated<number>
   custom_css: string | null
+  theme: Generated<PageTheme>
   created: ColumnType<Date, Date | string | undefined, Date | string>
+  updated: ColumnType<Date, Date | string | undefined, Date | string>
+}
+
+export interface CategoriesTable {
+  id: Generated<string>
+  slug: string
+  menu_order: Generated<number>
+  created: ColumnType<Date, Date | string | undefined, Date | string>
+  updated: ColumnType<Date, Date | string | undefined, Date | string>
+}
+
+export interface CategoryTranslationsTable {
+  id: Generated<string>
+  category_id: string
+  locale: string
+  name: string
   updated: ColumnType<Date, Date | string | undefined, Date | string>
 }
 
@@ -62,8 +88,11 @@ export interface PageTranslationsTable {
 
 export interface Database {
   users: UsersTable
+  site_settings: SiteSettingsTable
   password_reset_requests: PasswordResetRequestsTable
   activity_logs: ActivityLogsTable
   pages: PagesTable
   page_translations: PageTranslationsTable
+  categories: CategoriesTable
+  category_translations: CategoryTranslationsTable
 }

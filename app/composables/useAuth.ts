@@ -52,7 +52,10 @@ export const useAuth = () => {
         const redirectTo = route.query.redirect as string
 
         if (redirectTo && redirectTo.startsWith('/')) {
-          await navigateTo(redirectTo)
+          // Force a full-page navigation so server-only routes (e.g. /oauth/authorize)
+          // are reached. SPA navigation falls through the Nuxt pages router and hits
+          // the [...slug].vue catch-all, which never invokes the server handler.
+          await navigateTo(redirectTo, { external: true })
         } else {
           await navigateTo('/')
         }

@@ -18,6 +18,18 @@ const loading = ref(false)
 const error = ref('')
 const success = ref(false)
 
+// Public site settings — used to render a "registration disabled" notice
+// when the admin has turned the toggle off. Server endpoint also rejects with
+// 403, but rendering this state proactively avoids letting users fill the form
+// only to be denied on submit.
+const { data: publicSettings } = await useFetch<{ 'auth.public_registration_enabled'?: boolean }>(
+  '/api/settings/public',
+  { default: () => ({ 'auth.public_registration_enabled': true }) }
+)
+const registrationEnabled = computed(() =>
+  publicSettings.value?.['auth.public_registration_enabled'] !== false
+)
+
 const passwordMatch = computed(() => {
   if (!state.confirmPassword) return true
   return state.password === state.confirmPassword
@@ -105,8 +117,21 @@ const redirectToLogin = () => {
 
     <!-- Register Card -->
       <UCard :ui="{ body: 'p-6 sm:p-8' }">
+        <!-- Disabled state -->
+        <div v-if="!registrationEnabled" class="space-y-4">
+          <UAlert
+            color="warning"
+            variant="soft"
+            title="Public registration is disabled"
+            description="New accounts are added by administrator invitation. Ask your administrator to send you an invite."
+          />
+          <UButton color="primary" size="lg" block @click="redirectToLogin">
+            Back to Login
+          </UButton>
+        </div>
+
         <!-- Success Message -->
-        <div v-if="success" class="space-y-4">
+        <div v-else-if="success" class="space-y-4">
           <UAlert
             color="success"
             variant="soft"

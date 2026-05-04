@@ -178,7 +178,7 @@ const mapSrc = computed(() => {
 
             <a
               v-if="locale === 'en'"
-              href="./resources"
+              :href="`/research/${slug}/resources/`"
               class="button compact | resources-button"
             >{{ t('View Adoption Resources') }}</a>
           </div>
