@@ -233,6 +233,13 @@ const uiStore = inject('uiStore')
 const mapStore = inject('mapStore')
 const dataStore = inject('dataStore')
 
+// Provided by research-map app profile so the mobile SemanticTreeLegend
+// row-clicks fire the same dim/clear pipeline as the desktop instance
+// (qa: 2026-05-03 iter-18 — without this, deselecting a language-family
+// row didn't restore the dimmed pins because mapStore.selectFamily was
+// never updated by the mobile flow).
+const onSemanticTreeSelect = inject('onSemanticTreeSelect', () => {})
+
 // ── Data-driven legend (universal for all legend types) ─────────────────────
 const legendTypeRef = toRef(props, 'legendType')
 const {
@@ -512,6 +519,7 @@ onBeforeUnmount(() => {
           :tabs="LANG_TABS_MOBILE"
           :title="legendTitle || 'Language Families'"
           :columns="['count', 'pop']"
+          @select="onSemanticTreeSelect"
         >
           <template #title-caret>
             <button class="mobile-collapse-caret"
