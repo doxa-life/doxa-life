@@ -23,9 +23,14 @@ import {
 import { PRAYER_COLORS, FULL_PRAYER_THRESHOLD, getPrayerColor } from './prayerColors.js';
 
 // ── Engagement colors ─────────────────────────────────────────────────────────
+// Unified neon green (#39ff14) for engagement AND adoption hasX states — same
+// hex drives BOTH pin color AND legend row color, so pins and rows match each
+// other within a tab AND across tabs (user feedback 2026-05-03: "want pen
+// color and legend row color same green, not different greens between
+// engagement and adoption"). #39ff14 matches research-mfe's engagement neon.
 export const ENGAGEMENT_COLORS = {
     notEngaged: '#1a1a2e',     // Near-black
-    hasEngagement: '#73A17F'   // DOXA --color-brand-primary-darker ($color-green-100)
+    hasEngagement: '#39ff14'   // Neon green — unified across simple-map adoption + engagement
 }
 
 export const ENGAGEMENT_LABELS = {
@@ -36,7 +41,7 @@ export const ENGAGEMENT_LABELS = {
 // ── Adoption colors ───────────────────────────────────────────────────────────
 export const ADOPTION_COLORS = {
     notAdopted: '#1a1a2e',  // Near-black (matches engagement "not" color)
-    hasAdoption: '#22c55e'  // Bright green — easier to see on the adoption map (feedback 2026-04-20)
+    hasAdoption: '#39ff14'  // Neon green — same as engagement (user feedback 2026-05-03)
 }
 
 export const ADOPTION_LABELS = {
