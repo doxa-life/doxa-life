@@ -223,7 +223,14 @@ useShadowStyles(`
   .dsm-dark .dg-meta { color:rgba(243,243,241,0.75)!important; }
   .dsm-dark .dg-field strong { color:#F3F3F1!important; }
 
-  .rm-root { position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;background:#ffffff;color:#1f2937; }
+  /* isolation:isolate forces .rm-root to form its own stacking context so
+     internal z-indexes (geocoder 1200, legend 1000, toolbar 10) compare only
+     against each other and do NOT leak out to compete with page-level
+     elements like the site nav / hamburger menu (qa: 2026-05-04 user
+     reported the geocoder pill rendering above the page menu). Without
+     this, the host element doesn't establish a stacking context and the
+     internal 1200 wins against any page elements with z-index < 1200. */
+  .rm-root { position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;background:#ffffff;color:#1f2937;isolation:isolate; }
   .rm-root.rm-dark { background:#1a1a2e;color:#F3F3F1; }
 
   /* Tab bar: matches the doxa-life site header — dark green-grey background,
