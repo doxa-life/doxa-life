@@ -80,6 +80,15 @@ useTextHighlight()
       </div>
     </section>
 
+    <section>
+      <div class="container stack stack--lg">
+        <h2>{{ t('Prayer Progress') }}</h2>
+        <DoxaMapSlot map-id="pray-map" :profile-config="prayMapConfig" class="rounded-md">
+          <FeedbackWidgetSlot :profile-config="prayFeedbackConfig" />
+        </DoxaMapSlot>
+      </div>
+    </section>
+
     <section class="surface-brand-light">
       <div class="container stack stack--3xl">
         <h2>{{ t('Where do I start?') }}</h2>
@@ -188,15 +197,6 @@ useTextHighlight()
           useSelectCard
           useHighlightedUUPGs
         />
-      </div>
-    </section>
-
-    <section>
-      <div class="container stack stack--lg">
-        <h2>{{ t('Prayer Progress') }}</h2>
-        <DoxaMapSlot map-id="pray-map" :profile-config="prayMapConfig" class="rounded-md">
-          <FeedbackWidgetSlot :profile-config="prayFeedbackConfig" />
-        </DoxaMapSlot>
       </div>
     </section>
 
