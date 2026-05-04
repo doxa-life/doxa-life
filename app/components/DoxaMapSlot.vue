@@ -56,9 +56,15 @@ const tagName = props.bundle === 'research-map' ? 'doxa-research-map' : 'doxa-ma
      .rounded-xlg on the research page). Without this, the bare custom element
      paints a rectangular background during the brief window between page
      render and IIFE registration / first map paint, producing the
-     "square corners flash to rounded corners" flicker reported 2026-05-04. */
+     "square corners flash to rounded corners" flicker reported 2026-05-04.
+     contain:paint forces a new paint-containment layer so any WebGL canvas
+     or shadow-DOM content inside the host is clipped to the rounded box
+     even before the inner Mapbox canvas finishes its first frame — without
+     contain:paint some browsers paint the canvas past the rounded clip
+     until the next composited repaint. */
   border-radius: inherit;
   overflow: hidden;
+  contain: paint;
 }
 
 .doxa-map-slot :deep(doxa-map:fullscreen),
