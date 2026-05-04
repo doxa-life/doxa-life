@@ -322,10 +322,14 @@ const FEATURES = {
   geocoderPersistAcrossTabs: false
 }
 
+// Tab order: Prayer → Adoption → Engagement → Language Families
+// (qa: 2026-05-04 user feedback — Adoption swapped before Engagement so
+// the order reads as the user-flow ladder Prayer → Adopt → Engage rather
+// than the previous alphabetical Engagement-before-Adoption.)
 const ALL_TABS = [
   { id: 'prayer',            label: 'Prayer',            colorStrategy: 'prayerProgress', legend: 'prayer',            popup: 'pray',  feature: null            },
-  { id: 'engagement',        label: 'Engagement',        colorStrategy: 'engagement',     legend: 'engagement',        popup: 'pray',  feature: null            },
   { id: 'adoption',          label: 'Adoption',          colorStrategy: 'adoption',       legend: 'adoption',          popup: 'adopt', feature: null            },
+  { id: 'engagement',        label: 'Engagement',        colorStrategy: 'engagement',     legend: 'engagement',        popup: 'pray',  feature: null            },
   { id: 'doxa-regions',      label: 'Doxa Regions',      colorStrategy: 'doxaRegion',     legend: 'doxa-regions',      popup: 'pray',  feature: 'doxaRegions'   },
   { id: 'language-families', label: 'Language Families', colorStrategy: 'languageFamily', legend: 'language-family',   popup: 'pray',  feature: null            }
 ]
