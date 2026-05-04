@@ -76,7 +76,7 @@ const { data, error } = await useAsyncData<PageResponse | null>(
 
 if (!data.value && !error.value) {
   // Explicit 404 if the page isn't in the CMS (or not published)
-  throw createError({ statusCode: 404, statusMessage: 'Page not found', fatal: true })
+  throw createError({ statusCode: 404, statusMessage: 'Page not found' })
 }
 
 // <head>
