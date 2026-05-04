@@ -110,7 +110,7 @@ useShadowStyles(`
    Title row + every data row is a subgrid of these tracks.
    align-content:start — CRITICAL: without this, grid auto-rows STRETCH to
    fill flex:1 parent. Packing rows to the top keeps them at natural height. */
-.lrg-items{display:grid;grid-template-columns:var(--lrg-grid-cols, var(--lrg-caret-col) minmax(80px,1fr) auto auto var(--lrg-caret-col));grid-auto-rows:auto;align-content:start;column-gap:6px;row-gap:6px;padding:12px 0;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;-ms-overflow-style:none;}
+.lrg-items{display:grid;grid-template-columns:var(--lrg-grid-cols, var(--lrg-caret-col) minmax(80px,1fr) auto auto var(--lrg-caret-col));grid-auto-rows:auto;align-content:start;column-gap:6px;row-gap:3px;padding:12px 0;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;-ms-overflow-style:none;}
 .lrg-items::-webkit-scrollbar{display:none;width:0;height:0;}
 
 /* Title row — first row of the table. Plain (not colored). Shares tracks.
@@ -130,7 +130,7 @@ useShadowStyles(`
    subgrid stays flat. LegendMobile.vue overrides these at higher specificity
    so mobile keeps its own block layout. */
 .lrg-item{display:contents;cursor:pointer;}
-.lrg-item-inner{display:grid;grid-template-columns:subgrid;grid-column:2 / -2;align-items:center;border-radius:6px;min-height:36px;padding:6px 0;transition:opacity 0.15s ease;}
+.lrg-item-inner{display:grid;grid-template-columns:subgrid;grid-column:2 / -2;align-items:center;border-radius:6px;min-height:28px;padding:2px 0;transition:opacity 0.15s ease;}
 .lrg-item-inner:hover{opacity:0.92;}
 .lrg-item.selected .lrg-item-inner{outline:2px solid rgba(0,0,0,0.25);outline-offset:-2px;}
 
@@ -147,9 +147,14 @@ useShadowStyles(`
 /* Name — first pill column (col 2 of parent grid, col 1 of the subgrid). */
 .lrg-name{grid-column:1;padding:0 0 0 8px;font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-/* Badges — auto-placed into the remaining subgrid tracks. Centered in track. */
+/* Badges — auto-placed into the remaining subgrid tracks. Centered in track.
+   Background mixes the row color with #000 28% (darken) instead of currentColor
+   (which would lighten on bright rows like the unified neon #39ff14, washing
+   out the white digits). text-shadow on the digits adds readability over any
+   row background. (qa: 2026-05-04 user feedback — green too bright around
+   badges on simple-map.) */
 .lrg-badge{display:flex;align-items:center;justify-content:center;}
-.lrg-badge-inner{display:inline-block;background:color-mix(in srgb, var(--lrg-item-color, #888), currentColor 22%);border-radius:8px;padding:2px 10px;font-size:11px;font-weight:600;font-family:'Courier New',monospace;white-space:nowrap;min-width:32px;text-align:center;}
+.lrg-badge-inner{display:inline-block;background:color-mix(in srgb, var(--lrg-item-color, #888), #000 28%);border-radius:8px;padding:2px 10px;font-size:11px;font-weight:600;font-family:'Courier New',monospace;white-space:nowrap;min-width:32px;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,0.45);}
 
 /* Footer — col 1 empty (matches caret column), col 2 label, trailing values. */
 .lrg-footer{display:grid;grid-template-columns:subgrid;grid-column:1 / -1;align-items:center;padding:5px 0;border-top:1px solid rgba(0,0,0,0.07);font-size:11px;font-weight:600;color:#555;background:#fff;position:sticky;bottom:0;}
