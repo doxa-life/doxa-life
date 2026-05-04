@@ -74,7 +74,11 @@ useShadowStyles(`
 .legend-mobile-sheet.collapsed .legend-content .lrg-row,
 .legend-mobile-sheet.collapsed .legend-content .lrg-footer,
 .legend-mobile-sheet.collapsed .legend-content .lrg-header-col{display:none!important;}
-.legend-mobile-sheet.collapsed{box-shadow:0 -2px 8px rgba(0,0,0,0.15);height:52px !important;min-height:52px;}
+/* Flat top edges in collapsed footer mode — matches the research-map
+   pattern (qa: 2026-05-04 user feedback). Rounded corners return when the
+   sheet is expanded since the base .legend-mobile-sheet rule still sets
+   border-top-*-radius:16px and only the .collapsed override zeroes them. */
+.legend-mobile-sheet.collapsed{box-shadow:0 -2px 8px rgba(0,0,0,0.15);height:52px !important;min-height:52px;border-top-left-radius:0;border-top-right-radius:0;}
 .legend-mobile-sheet.collapsed .lrg-items{grid-template-columns:var(--lrg-caret-col) auto var(--lrg-caret-col) !important;padding:0 !important;align-content:center;}
 .legend-mobile-sheet.collapsed .lrg-title-row{padding:0 !important;}
 
