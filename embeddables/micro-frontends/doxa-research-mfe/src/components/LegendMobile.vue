@@ -487,13 +487,21 @@ onBeforeUnmount(() => {
 
       <!-- Sheet body — same LegendRows invocation as desktop. -->
       <div class="legend-content">
-        <PeopleGroupDetail
-          v-if="legendMode === 'detail' && selectedPeopleGroup && legendState !== 'collapsed'"
-          :peopleGroup="selectedPeopleGroup"
-          :hideHeader="true"
-          :dark="isDark"
-          :action="popupAction"
-        />
+        <!-- Detail-mode branch — wrapped in <template v-if> so when the sheet
+             is collapsed in detail mode the v-else-if fallbacks (Semantic-
+             TreeLegend / LegendRows) DO NOT render. Without this wrap the
+             collapsed-detail-footer above + the v-else-if titlebar both
+             showed the people-group name, producing the duplicated label
+             reported 2026-05-03 iter-17. -->
+        <template v-if="legendMode === 'detail' && selectedPeopleGroup">
+          <PeopleGroupDetail
+            v-if="legendState !== 'collapsed'"
+            :peopleGroup="selectedPeopleGroup"
+            :hideHeader="true"
+            :dark="isDark"
+            :action="popupAction"
+          />
+        </template>
 
         <!-- Language-family tab: SemanticTreeLegend (PPLR-ported, R4).
              Caret injected via #title-caret slot so it sits in column 1 of
