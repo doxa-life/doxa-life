@@ -19,6 +19,24 @@ const adoptBase = computed(() => {
 const { stats, adoptedPercent, reload } = usePrayerStatistics()
 onMounted(() => reload())
 
+const config = useRuntimeConfig()
+const mapboxToken = config.public.mapboxToken as string
+
+const adoptMapConfig = JSON.stringify({
+  profile: 'doxa-simple-map',
+  dataSource: 'pray-tools',
+  tk: mapboxToken,
+  tabs: [{ id: 'adoption', colorStrategy: 'adoption', legend: 'adoption', popup: 'adoption' }]
+})
+
+const adoptFeedbackConfig = JSON.stringify({
+  profile: 'chat-bubble',
+  apiBase: 'https://support.gospelambition.org',
+  enabled: true,
+  instanceId: 'fb-adopt-map',
+  projectId: 'dd1d9144-3da9-4a3b-87e8-7c17d9e94af0'
+})
+
 useTextHighlight()
 </script>
 
@@ -59,6 +77,20 @@ useTextHighlight()
           />
         </div>
       </div>
+    </section>
+
+    <section class="stack stack--md container">
+      <div>
+        <h1
+          class="color-brand-light highlight"
+          data-highlight-index="1"
+          data-highlight-last
+          data-highlight-color="primary"
+        >{{ t('Adoption Progress') }}</h1>
+      </div>
+      <DoxaMapSlot map-id="adopt-map" :profile-config="adoptMapConfig" class="rounded-md">
+        <FeedbackWidgetSlot :profile-config="adoptFeedbackConfig" />
+      </DoxaMapSlot>
     </section>
 
     <section class="surface-brand-light">

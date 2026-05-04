@@ -1,0 +1,12 @@
+{
+  "labels": {
+    "country": "Țară:",
+    "population": "Populație:",
+    "language": "Limbă:",
+    "religion": "Religie:",
+    "languageFamily": "Familie de limbi:"
+  },
+  "messages": {
+    "noDescription": "Nicio descriere disponibilă."
+  }
+}

@@ -1,0 +1,42 @@
+[
+    {
+        "value": "C",
+        "label": "Christianity"
+    },
+    {
+        "value": "M",
+        "label": "Islam"
+    },
+    {
+        "value": "B",
+        "label": "Buddhism"
+    },
+    {
+        "value": "E",
+        "label": "Ethnoreligion"
+    },
+    {
+        "value": "H",
+        "label": "Hinduism"
+    },
+    {
+        "value": "N",
+        "label": "Unaffiliated"
+    },
+    {
+        "value": "S",
+        "label": "Sikhism"
+    },
+    {
+        "value": "O",
+        "label": "Other"
+    },
+    {
+        "value": "J",
+        "label": "Judaism"
+    },
+    {
+        "value": "U",
+        "label": "Unknown"
+    }
+]

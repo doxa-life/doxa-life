@@ -1,0 +1,35 @@
+{
+  "title": {
+    "prayer": "祷告进度",
+    "engagement": "参与进度",
+    "adoption": "认领进度",
+    "languageFamilies": "语系",
+    "doxaRegions": "Doxa 区域",
+    "affinityBlocs": "亲缘板块",
+    "gospelResources": "福音资源"
+  },
+  "header": {
+    "collapsed": "图例",
+    "peopleGroupFallback": "民族群体"
+  },
+  "prayer": {
+    "needsPrayer": "需要祷告",
+    "hasPrayer": "已有祷告",
+    "fullPrayerCoverage": "全面祷告覆盖"
+  },
+  "engagement": {
+    "needsEngagement": "需要参与",
+    "hasEngagement": "已有参与"
+  },
+  "adoption": {
+    "needsAdoption": "需要认领",
+    "hasAdoption": "已有认领"
+  },
+  "columns": {
+    "upgs": "UPGs",
+    "population": "人口"
+  },
+  "footer": {
+    "total": "总计"
+  }
+}

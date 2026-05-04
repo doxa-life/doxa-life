@@ -21,11 +21,33 @@ logs
 .fleet
 .idea
 
+# Plugin-local CLAUDE.md files are kept on disk for Claude context but not tracked
+public/plugins/**/CLAUDE.md
+
+# Guard: source code belongs in ../micro-frontends/ or ../web-components/, never
+# under public/. Legacy public/plugins/ is being retired.
+public/plugins/
+
+# Per-embeddable hygiene: ignore node_modules, env, dist, and legacy dist
+# inside every embeddable source tree. Built bundles land at two places:
+#   1. embeddables/<kind>/<name>/app/*.iife.js  — always; private, consumed
+#      inside this monorepo. Tracked so Nuxt builds can rely on it.
+#   2. public/js/<name>.iife.js                 — only when PUBLISH_TO_PUBLIC=true
+#      is set; served publicly for external embeds. Also tracked.
+embeddables/**/node_modules/
+embeddables/**/dist/
+embeddables/**/.env
+embeddables/**/.env.*
+!embeddables/**/.env.example
+embeddables/**/CLAUDE.md
+embeddables/micro-frontends/_template/
+
 # Local env files
 .env
 .env.*
 !.env.example
 
+package-lock.json
 plans
 .claude
 .vscode

@@ -6,6 +6,15 @@
 
 const { locale, locales } = useI18n()
 
+const config = useRuntimeConfig()
+const siteFeedbackConfig = JSON.stringify({
+  profile: 'chat-bubble',
+  apiBase: 'https://support.gospelambition.org',
+  enabled: true,
+  instanceId: 'fb-site',
+  projectId: '3c0e8534-f593-4222-8315-31dda4514760'
+})
+
 // Direction attribute per locale (Arabic = rtl)
 const currentLocale = computed(() =>
   locales.value.find(l => typeof l === 'object' && 'code' in l && l.code === locale.value)
@@ -50,12 +59,23 @@ const { isLoading } = useLoadingIndicator()
       <slot />
     </main>
     <TheFooter />
+    <ClientOnly>
+      <div class="site-feedback-widget">
+        <feedback-web-component :profile-config="siteFeedbackConfig" />
+      </div>
+    </ClientOnly>
   </div>
 </template>
 
 <style lang="scss" src="~/assets/styles/main.scss"></style>
 
 <style scoped>
+.site-feedback-widget {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2147483647;
+}
 .site-main {
   transition: opacity 150ms ease-out;
 }

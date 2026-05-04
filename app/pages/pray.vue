@@ -18,6 +18,23 @@ const { stats, prayerCoveragePercent } = usePrayerStatistics()
 const { reload } = usePrayerStatistics()
 onMounted(() => reload())
 
+const mapboxToken = config.public.mapboxToken as string
+
+const prayMapConfig = JSON.stringify({
+  profile: 'doxa-simple-map',
+  dataSource: 'pray-tools',
+  tk: mapboxToken,
+  tabs: [{ id: 'prayer', colorStrategy: 'prayer', legend: 'prayer', popup: 'prayer' }]
+})
+
+const prayFeedbackConfig = JSON.stringify({
+  profile: 'chat-bubble',
+  apiBase: 'https://support.gospelambition.org',
+  enabled: true,
+  instanceId: 'fb-pray-map',
+  projectId: '809ee16b-46e2-4bcd-a93d-b7ea0879d93d'
+})
+
 useTextHighlight()
 </script>
 
@@ -60,6 +77,15 @@ useTextHighlight()
             style="background-image: url('/assets/images/pray-01-hero.jpg');"
           />
         </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container stack stack--lg">
+        <h2>{{ t('Prayer Progress') }}</h2>
+        <DoxaMapSlot map-id="pray-map" :profile-config="prayMapConfig" class="rounded-md">
+          <FeedbackWidgetSlot :profile-config="prayFeedbackConfig" />
+        </DoxaMapSlot>
       </div>
     </section>
 
@@ -171,18 +197,6 @@ useTextHighlight()
           useSelectCard
           useHighlightedUUPGs
         />
-      </div>
-    </section>
-
-    <section>
-      <div class="container stack stack--lg">
-        <h2>{{ t('Prayer Progress') }}</h2>
-        <ClientOnly>
-          <PrayerMap
-            :research-url="localePath('/research') + '/'"
-            :language-code="locale"
-          />
-        </ClientOnly>
       </div>
     </section>
 

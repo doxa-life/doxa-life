@@ -1,0 +1,573 @@
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount, inject, toRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useShadowStyles } from '@/composables/useShadowStyles.js'
+import { useLegendData } from '@/composables/useLegendData.js'
+import { RESEARCH_LEGEND_OPTIONS } from '../composables/researchLegendOptions.js'
+import LegendRows from './LegendRows.vue'
+import SemanticTreeLegend from './SemanticTreeLegend.vue'
+import { useLanguageFamilyLegendData } from '../composables/useLanguageFamilyLegendData.js'
+import PeopleGroupDetail from './PeopleGroupDetail.vue'
+
+const { t } = useI18n()
+
+useShadowStyles(`
+/* ── Mobile bottom sheet — chrome only.
+   The TABLE (title + column labels + data rows) is rendered by LegendRows,
+   the SAME component desktop uses, with all the same default CSS. Mobile
+   no longer overrides any .lrg-* rule — the bottom sheet is purely
+   mobile chrome (pull tab, collapse/expand caret, touch drag). ── */
+.floating-mini-image{position:absolute;left:16px;bottom:calc(30% + 16px);z-index:999;pointer-events:auto;cursor:pointer;}
+.mini-image{width:120px;height:150px;object-fit:cover;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.25);display:block;}
+
+/* Containment root: clamps absolute children to the map area. */
+.legend-sheet-root{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.legend-sheet-root>*{pointer-events:auto;}
+
+/* Sheet shell — no padding; drag strip and caret are absolutely
+   positioned overlays. Legend content owns the top padding, matching
+   desktop's arrangement so caret+title align on the same visual baseline. */
+.legend-mobile-sheet{position:absolute;bottom:0;left:0;right:0;z-index:1000;background:white;border-top-left-radius:16px;border-top-right-radius:16px;box-shadow:0 -4px 20px rgba(0,0,0,0.2);transition:height 0.3s ease-out;display:flex;flex-direction:column;overflow:hidden;max-height:calc(100% - 80px);}
+
+/* Drag strip — thin top overlay holding the pull-tab handle + touch
+   gestures. z-index puts it above content. */
+.sheet-drag-strip{position:absolute;top:0;left:0;right:0;height:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;z-index:2;}
+.pull-tab-handle{width:40px;height:4px;background:#ccc;border-radius:2px;}
+
+/* Collapse caret — in-flow, injected via #title-caret slot into the title
+   row's column-1 caret slot (LegendRows .lrg-title-caret-slot or
+   SemanticTreeLegend .stl-tb-caret-slot). Vertical alignment with the
+   title text comes from the slot's align-items:center, so no absolute
+   positioning or padding offsets are needed (qa: 2026-05-02 iter-9). */
+.mobile-collapse-caret{width:20px;height:20px;display:flex;align-items:center;justify-content:center;background:rgba(208,215,222,0.5);border:1px solid #afb8c1;border-radius:5px;cursor:pointer;color:#3b463d;padding:0;transition:transform 0.3s ease-out,color 0.12s,background 0.12s,border-color 0.12s;transform-origin:center;outline:none;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 2px rgba(0,0,0,0.05);flex-shrink:0;}
+.mobile-collapse-caret:focus{outline:none;}
+.mobile-collapse-caret:hover{color:#1f2328;background:#eaeef2;border-color:#3b463d;}
+.legend-mobile-sheet.sheet-dark .mobile-collapse-caret{background:rgba(110,118,129,0.22);border-color:#30363d;color:#c9d1d9;box-shadow:none;}
+.legend-mobile-sheet.sheet-dark .mobile-collapse-caret:hover{color:#fff;background:rgba(59,70,61,0.32);border-color:#73A17F;}
+
+/* Detail-mode close X — top-right corner */
+.detail-close-btn{position:absolute;top:10px;right:12px;background:none;border:none;padding:4px;cursor:pointer;color:#666;display:flex;align-items:center;justify-content:center;z-index:3;transition:color 0.2s ease;}
+.detail-close-btn:hover{color:#333;}
+
+/* Collapsed-detail footer — mimics LegendRows collapsed-state footer
+   (caret + centered title) but for PeopleGroupDetail mode. Renders only
+   when state=collapsed AND mode=detail (template v-if). Sits below the
+   12px drag-strip so the strip's tap+drag still works to expand. */
+.collapsed-detail-footer{position:absolute;top:12px;left:0;right:0;height:36px;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;cursor:pointer;background:transparent;}
+.collapsed-detail-title{font:600 13px system-ui,sans-serif;letter-spacing:0.02em;line-height:1.4;color:#1f2328;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.legend-mobile-sheet.sheet-dark .collapsed-detail-title{color:#F3F3F1;}
+
+/* Content padding — symmetric, 12px top/bottom only. Caret no longer needs
+   a wide left gutter (it's now in-flow inside the title row), and no right
+   padding keeps the scrollbar at the far edge.
+   display:flex+column gives child components (.stl-panel / .legend-row-group)
+   a DEFINITE height via flex:1 — height:100% on a non-flex parent with only
+   flex:1 (no explicit height) falls back to auto, which made the inner
+   scrollable shorter than the sheet on tier-3 fullyOpen and left a white
+   gap at the bottom (qa: 2026-05-02 iter-10).
+   IMPORTANT: NO backticks anywhere in this comment block — it lives
+   inside a JS template literal (useShadowStyles) and a stray backtick
+   silently closes the string and blanks the entire mobile stylesheet. */
+.legend-content{flex:1;min-height:0;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;padding:12px 0;-webkit-overflow-scrolling:touch;}
+/* Constrain only the table/tree shells to the .legend-content viewport so
+   their inner scroll containers (.stl-rows / .lrg-items) bound correctly.
+   PeopleGroupDetail keeps its natural size and lets .legend-content scroll. */
+.legend-mobile-sheet .legend-content>.stl-panel,
+.legend-mobile-sheet .legend-content>.legend-row-group{flex:1;min-height:0;}
+
+/* LegendRows --lrg-caret-col bumped from 10px → 28px on mobile so column 1
+   accommodates the slotted .mobile-collapse-caret (20px wide) with 4px
+   breathing room on each side — caret doesn't hug the sheet edge. The
+   title row's subgrid offsets the title text so it begins right after
+   the caret without overlap. Same widening on column 5 (right gutter)
+   keeps the table visually balanced. qa: 2026-05-02 iter-9. */
+.legend-mobile-sheet .legend-row-group{--lrg-caret-col:28px;}
+.legend-content::-webkit-scrollbar{width:4px;}
+.legend-content::-webkit-scrollbar-track{background:transparent;}
+.legend-content::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.18);border-radius:4px;}
+.legend-content::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,0.3);}
+
+/* Collapsed state — hide data rows AND column labels but keep the title
+   row visible. Mirrors desktop: collapsed legend shows only "Legend".
+   The title row becomes a centered flex layout so the slotted caret
+   and the title text sit beside each other, vertically and horizontally
+   centered in the 48px footer. */
+.legend-mobile-sheet.collapsed .legend-content .lrg-row,
+.legend-mobile-sheet.collapsed .legend-content .lrg-footer,
+.legend-mobile-sheet.collapsed .legend-content .lrg-header-col,
+.legend-mobile-sheet.collapsed .legend-content .lft-row,
+.legend-mobile-sheet.collapsed .legend-content .lft-row-child,
+.legend-mobile-sheet.collapsed .legend-content .lft-header-col{display:none!important;}
+/* Fully-collapsed sheet (showing only "Legend" + caret) drops the
+   16px top-corner radius — square edges look cleaner when the sheet
+   is acting as a thin bottom footer. Rounded corners return when
+   expanded (user feedback 2026-04-27). */
+.legend-mobile-sheet.collapsed{box-shadow:0 -2px 8px rgba(0,0,0,0.15);height:48px !important;min-height:48px;border-top-left-radius:0;border-top-right-radius:0;}
+.legend-mobile-sheet.collapsed .legend-content{padding:0!important;display:flex;align-items:center;height:48px;}
+.legend-mobile-sheet.collapsed .lrg-items,
+.legend-mobile-sheet.collapsed .lft-items{padding:0!important;align-content:center;height:48px;}
+/* Expanded state: SemanticTreeLegend's .stl-titlebar — caret is in the
+   slot now, so no padding-left hack. Mixed-case title (text-transform:none)
+   so it matches the other tabs ("Language Families" not "LANGUAGE FAMILIES").
+   Font matches the LegendRows .lrg-title weight. Tighten left padding from
+   PPLR's 12px → 8px so the caret sits closer to the sheet edge. */
+.legend-mobile-sheet .stl-titlebar{padding:8px 12px 8px 8px!important;border-bottom:1px solid rgba(33,38,45,0.10)!important;}
+.legend-mobile-sheet .stl-tb-title{text-transform:none!important;letter-spacing:0!important;font:600 14px system-ui,sans-serif!important;color:#1f2328!important;}
+.legend-mobile-sheet.sheet-dark .stl-tb-title{color:#F3F3F1!important;}
+/* Collapsed state: title rows become a centered flex layout so the slotted
+   caret and "Legend" text sit beside each other, both vertically and
+   horizontally centered in the 48px footer. gap:8px gives the caret a bit
+   of breathing room from the title text. */
+.legend-mobile-sheet.collapsed .lrg-title-row,
+.legend-mobile-sheet.collapsed .lft-title-row,
+.legend-mobile-sheet.collapsed .stl-titlebar{padding:0 16px!important;display:flex;align-items:center;justify-content:center;gap:8px;height:48px;min-height:0!important;border-bottom:none!important;}
+/* line-height:1.4 (not 1) so the descender of 'g' in "Legend" / "Engagement
+   Progress" isn't clipped at the bottom — qa: 2026-05-02. */
+.legend-mobile-sheet.collapsed .stl-tb-title,
+.legend-mobile-sheet.collapsed .lrg-title,
+.legend-mobile-sheet.collapsed .lrg-title-row .lrg-title,
+.legend-mobile-sheet.collapsed .lft-title{font-size:13px!important;letter-spacing:0.02em!important;line-height:1.4!important;}
+/* Hide tree/data content when collapsed so only the title bar shows. */
+.legend-mobile-sheet.collapsed .stl-tabs-wrap,
+.legend-mobile-sheet.collapsed .stl-col-hdr,
+.legend-mobile-sheet.collapsed .stl-rows,
+.legend-mobile-sheet.collapsed .lrg-row,
+.legend-mobile-sheet.collapsed .lrg-footer,
+.legend-mobile-sheet.collapsed .lrg-header-col,
+.legend-mobile-sheet.collapsed .lft-row,
+.legend-mobile-sheet.collapsed .lft-row-child,
+.legend-mobile-sheet.collapsed .lft-header-col{display:none!important;}
+
+/* ── SemanticTreeLegend embedded-in-sheet overrides ──
+   The PPLR-ported SemanticTreeLegend was designed for standalone desktop
+   use — its .stl-panel uses absolute positioning anchored to the map area
+   with fixed width 380px, plus a separate .stl-reopen pill and
+   .stl-collapse-btn. Inside the mobile bottom sheet we just need the
+   inner tree rendering to fill the sheet's content area; the sheet
+   already provides drag-strip + collapse caret + chrome. Override
+   positioning, hide the desktop-only collapse affordances. */
+.legend-mobile-sheet .stl-panel{position:static!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;width:100%!important;z-index:auto!important;display:flex;flex-direction:column;min-height:0;}
+.legend-mobile-sheet .stl-panel.closed{transform:none!important;opacity:1!important;pointer-events:auto!important;}
+.legend-mobile-sheet .stl-inner{border:none!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;}
+/* Slim row height on mobile prayer/engagement/adoption tabs so they read
+   as thin/dense like desktop, not chunky touch-targets (qa: 2026-05-03 user
+   feedback — "desktop legend rows are thinner, can you make mobile match").
+   Drops .lrg-item-inner min-height 36→28, vertical padding 6→2, and tightens
+   the .lrg-items row-gap 6→3 for the same compact-table feel. */
+.legend-mobile-sheet .lrg-item-inner{min-height:28px!important;padding:2px 0!important;}
+.legend-mobile-sheet .lrg-items{row-gap:3px!important;}
+
+/* min-height:0 is REQUIRED on .stl-rows for the flex:1+overflow:auto to
+   actually scroll inside the constrained mobile sheet. The base .stl-rows
+   only sets flex:1 — without min-height:0, the flex item's default
+   min-height:auto = content height, so a long list grows past the parent
+   instead of scrolling, leaving white space below the panel on tier-3
+   fullyOpen (qa: 2026-05-02 iter-11). LegendRows' .lrg-items already has
+   min-height:0 in its base CSS, which is why iter-10 fixed Prayer/Engagement/
+   Adoption but missed Language Families. */
+.legend-mobile-sheet .stl-rows{min-height:0;}
+.legend-mobile-sheet .stl-reopen{display:none!important;}
+.legend-mobile-sheet .stl-collapse-btn{display:none!important;}
+/* (Removed iter-1 rule that was setting padding-left:0 here — it was
+    overriding the iter-5 padding-left:36px rule above, causing the caret
+    to overlap the title text "Lan-guage Families" → "guage Families"
+    visible. qa: 2026-05-02.) Border-bottom color preserved. */
+.legend-mobile-sheet .stl-titlebar{border-bottom-color:rgba(0,0,0,0.08)!important;}
+
+/* ── Mobile language-family tree overrides ──
+   IMPORTANT: do NOT override .lft-title-row grid-template-columns here.
+   The desktop CSS makes the title-row a SUBGRID of .lft-items so the
+   UPGS / POPULATION column headers line up with the data rows' badges.
+   An explicit grid-template-columns on the title-row breaks subgrid
+   inheritance and causes the misaligned headers we saw in user feedback
+   (2026-04-27).
+   Tap-area: rows are 44px tall (Apple HIG) so the row is comfortably
+   tappable; the in-row caret stays slim like desktop. The colored pill
+   keeps its desktop look.
+   No backticks anywhere in this comment block — see the earlier note. */
+.legend-mobile-sheet .lft-row{min-height:44px;column-gap:8px;}
+.legend-mobile-sheet .lft-row-child{margin-left:0;}
+.legend-mobile-sheet .lft-item-inner{min-height:36px;padding:6px 8px;}
+.legend-mobile-sheet .lft-name{font-size:13px;}
+/* Collapsed-state row hiding lives in the unified block above (handles
+   both .lrg-* and .lft-* in one place). */
+
+/* ── Dark mode (class-based, driven by isDark prop) ── */
+.sheet-dark{background:#3b463d!important;box-shadow:0 -4px 20px rgba(0,0,0,0.5)!important;}
+.sheet-dark .mobile-collapse-caret{color:rgba(243,243,241,0.75)!important;}
+.sheet-dark .mobile-collapse-caret:hover{color:#F3F3F1!important;}
+.sheet-dark .detail-close-btn{color:rgba(243,243,241,0.75)!important;}
+.sheet-dark .detail-close-btn:hover{color:#F3F3F1!important;}
+.sheet-dark .pull-tab-handle{background:rgba(243,243,241,0.3)!important;}
+.sheet-dark .legend-content{background:#3b463d!important;}
+.sheet-dark .legend-content::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.2);}
+`, 'legend-mobile-sheet')
+
+const props = defineProps({
+  legendType: {
+    type: String,
+    required: true
+  },
+  isDark: {
+    type: Boolean,
+    default: false
+  },
+  /** Popup action forwarded to PeopleGroupDetail — 'pray' | 'adopt' | 'none'. */
+  popupAction: {
+    type: String,
+    default: 'pray',
+    validator: (v) => ['pray', 'adopt', 'none'].includes(v)
+  },
+  /**
+   * Disable collapse/expand caret for single-tier legends.
+   * When true, hides the caret UI but keeps underlying functionality intact.
+   */
+  disableCollapse: {
+    type: Boolean,
+    default: false
+  }
+})
+
+// Stores — injected from ProfileLoader (instance-scoped)
+const uiStore = inject('uiStore')
+const mapStore = inject('mapStore')
+const dataStore = inject('dataStore')
+
+// Provided by research-map app profile so the mobile SemanticTreeLegend
+// row-clicks fire the same dim/clear pipeline as the desktop instance
+// (qa: 2026-05-03 iter-18 — without this, deselecting a language-family
+// row didn't restore the dimmed pins because mapStore.selectFamily was
+// never updated by the mobile flow).
+const onSemanticTreeSelect = inject('onSemanticTreeSelect', () => {})
+
+// ── Data-driven legend (universal for all legend types) ─────────────────────
+const legendTypeRef = toRef(props, 'legendType')
+const {
+  items: legendDataItems, columns: legendColumns, title: legendDataTitle,
+  activeFilter, setFilter, totalCount, totalPopulation,
+  fmtPop, fmtCount
+} = useLegendData(legendTypeRef, RESEARCH_LEGEND_OPTIONS)
+
+// LegendFamilyTree consumes the raw normalized people-groups (not pre-aggregated).
+// research-map.vue provides the array via inject('normalizedPeopleGroups') —
+// same contract as LegendDesktop. Falls back to scanning dataStore.sources so
+// the tree still renders if the inject isn't wired (e.g. test harnesses).
+const normalizedPeopleGroupsRef = inject('normalizedPeopleGroups', null)
+const peopleGroupsForFamilyTree = computed(() => {
+  if (normalizedPeopleGroupsRef?.value?.length) return normalizedPeopleGroupsRef.value
+  const out = []
+  for (const id in (dataStore?.sources || {})) {
+    const src = dataStore.sources[id]
+    if (src?.features?.length) out.push(...src.features)
+  }
+  return out
+})
+
+// SemanticTreeLegend tree adapter (mobile copy — same composable, same shape).
+const _pgRefMobile = { get value() { return peopleGroupsForFamilyTree.value } }
+const { langTree: langTreeForMobile } = useLanguageFamilyLegendData(_pgRefMobile)
+const LANG_TABS_MOBILE = [
+  { id: 'family',   label: 'Lang Family', info: 'A language family is a group of languages descended from a common ancestor.' },
+  { id: 'language', label: 'Language',    info: 'A language is a system of communication used by a people.' },
+  { id: 'dialect',  label: 'Dialect',     info: 'A dialect/variety is a regional or social form of a language.' },
+]
+
+// Touch gesture state
+const touchStartY = ref(0)
+const touchStartHeight = ref(0)
+const containerHeight = ref(0) // actual container height (not window height)
+const isDragging = ref(false)
+
+// Computed properties from stores
+const legendState = computed(() => uiStore.legendState)
+const legendHeight = computed(() => uiStore.legendHeight)
+const caretRotation = computed(() => uiStore.caretRotation)
+const showPullTab = computed(() => uiStore.showPullTab)
+const legendMode = computed(() => uiStore.legendMode)
+const selectedPeopleGroup = computed(() => uiStore.selectedPeopleGroup)
+
+// Legend title — swaps based on legend state and selection
+const legendTitle = computed(() => {
+  if (legendMode.value === 'detail' && selectedPeopleGroup.value) {
+    return selectedPeopleGroup.value.properties?.name || t('legend.header.peopleGroupFallback')
+  }
+
+  if (legendState.value === 'collapsed') {
+    return t('legend.header.collapsed')
+  }
+
+  return legendDataTitle.value
+})
+
+// Handle row click from LegendRowGroup
+function handleRowFilterClick(filterKey) {
+  uiStore.handleLegendItemClick()
+  setFilter(filterKey)
+}
+
+// Methods
+function handleCaretClick() {
+  uiStore.toggleLegend()
+}
+
+function handleCloseDetail() {
+  uiStore.selectPeopleGroup(null) // Return to data-view mode
+  uiStore.openLegend() // Snap back to 30% so map is visible
+}
+
+// Mini-image URL for the floating image above drawer at 30%
+const miniImageUrl = computed(() => {
+  if (!selectedPeopleGroup.value) return null
+  const props_ = selectedPeopleGroup.value.properties || {}
+  // TODO: `_raw.ImageURL` is a DOXA CSV-specific fallback. Generic usage
+  // should rely on a normalized `imageUrl` field from the data source.
+  return props_.imageUrl || props_._raw?.ImageURL || null
+})
+
+// Touch gesture handlers for pull tab
+function handlePullTabTouchStart(event) {
+  if (legendState.value !== 'collapsed') {
+    touchStartY.value = event.touches[0].clientY
+    const sheet = event.currentTarget.parentElement
+    touchStartHeight.value = sheet.offsetHeight
+    // Store the map container height (parent of the sheet) for clamping
+    containerHeight.value = sheet.parentElement?.offsetHeight || window.innerHeight
+    isDragging.value = true
+  }
+}
+
+function handlePullTabTouchMove(event) {
+  if (!isDragging.value) return
+
+  event.preventDefault() // Prevent scrolling while dragging
+
+  const currentY = event.touches[0].clientY
+  const deltaY = touchStartY.value - currentY // Positive = drag up, Negative = drag down
+
+  // Calculate new height
+  const newHeight = touchStartHeight.value + deltaY
+  const availHeight = containerHeight.value || window.innerHeight
+
+  // Clamp between 30% and (container - toolbar)
+  const minHeight = availHeight * 0.3
+  const maxHeight = availHeight - 56 // 56px = map toolbar height
+  const clampedHeight = Math.max(minHeight, Math.min(maxHeight, newHeight))
+
+  // Set height dynamically (smooth dragging)
+  uiStore.setLegendHeight(`${clampedHeight}px`)
+}
+
+function handlePullTabTouchEnd(event) {
+  isDragging.value = false
+
+  // Read actual pixel height of the sheet — DO NOT parse legendHeight.value
+  // because it's a mixed-unit CSS string ('48px' / '30%' / 'calc(100% - 80px)').
+  const sheet = event?.currentTarget?.parentElement
+  const currentHeight = sheet ? sheet.offsetHeight : touchStartHeight.value
+  const startHeight   = touchStartHeight.value
+  const availHeight   = containerHeight.value || window.innerHeight
+
+  // Gesture direction — ignore a few pixels of noise from tap vs true drag.
+  const JITTER = 8
+  const movedUp   = currentHeight > startHeight + JITTER
+  const movedDown = currentHeight < startHeight - JITTER
+
+  // Pure tap (no movement) — let the @click handler own the cascade.
+  if (!movedUp && !movedDown) return
+
+  // ── Mode-aware release behavior (qa: 2026-05-03 user feedback) ────────────
+  // Any non-detail legend tab → free-drag: leave the sheet wherever the user
+  // released, no snap to fullyOpen. They want to interact with the legend
+  // AND the map at the same time, not have the legend take over the screen.
+  // 'detail' mode → ladder-snap: a slight upward pull jumps to fullyOpen so
+  // the people-group photo + content fills the screen for reading.
+  // (uiStore default legendMode is 'prayer'; the previous iter-13 check
+  // against 'data' never matched, which is why the snap kept firing.)
+  if (legendMode.value !== 'detail') {
+    // Only snap if dragged down past the collapse threshold (small height).
+    // Otherwise keep the custom height already set during touchmove. State
+    // stays 'open' (or 'fullyOpen' if it started there) so showPullTab
+    // remains true and the sheet keeps its expanded chrome.
+    if (currentHeight < availHeight * 0.12) {
+      uiStore.collapseLegend()
+    }
+    return
+  }
+
+  const startedFullyOpen = startHeight >= availHeight * 0.55
+  const startedOpen      = startHeight >= availHeight * 0.2 && !startedFullyOpen
+
+  if (movedDown && startedFullyOpen) {
+    // Any noticeable downward drag from fullyOpen → 30% (one step down the ladder).
+    uiStore.openLegend()
+  } else if (movedDown && startedOpen) {
+    // Dragged down from 30% → collapse.
+    uiStore.collapseLegend()
+  } else if (movedUp) {
+    // Upward drag → fully open.
+    uiStore.fullyOpenLegend()
+  } else {
+    // Fallback — shouldn't normally hit given the early return above.
+    uiStore.openLegend()
+  }
+}
+
+// Lifecycle hooks
+onMounted(() => {
+  // mounted
+})
+
+onBeforeUnmount(() => {
+  // cleanup
+})
+</script>
+
+<template>
+  <!-- Containment wrapper: ensures position:absolute children are clipped to the map area
+       and never escape the shadow DOM host / staging frame. -->
+  <div class="legend-sheet-root">
+    <!-- Floating mini-image: fixed 16px above the sheet's resting position (30%).
+         The sheet slides UP over it — the image never moves. -->
+    <div
+      v-if="legendMode === 'detail' && selectedPeopleGroup && legendState === 'open' && miniImageUrl"
+      class="floating-mini-image"
+      @click="uiStore.fullyOpenLegend()"
+    >
+      <img
+        :src="miniImageUrl"
+        :alt="selectedPeopleGroup.properties?.name"
+        class="mini-image"
+      />
+    </div>
+
+    <div class="legend-mobile-sheet" :class="[legendState, { 'sheet-dark': isDark }]" :style="{ height: legendHeight }">
+      <!-- Thin drag strip at the very top: pull-tab visual + touch gestures. -->
+      <div class="sheet-drag-strip"
+        @click="handleCaretClick"
+        @touchstart="showPullTab ? handlePullTabTouchStart($event) : null"
+        @touchmove="showPullTab ? handlePullTabTouchMove($event) : null"
+        @touchend="showPullTab ? handlePullTabTouchEnd($event) : null"
+      >
+        <div v-if="showPullTab" class="pull-tab-handle"></div>
+      </div>
+
+      <!-- (Collapse caret moved into the title row's column 1 via #title-caret
+           slot below, so it's vertically aligned with the title text via
+           grid/flex align-items:center — matching desktop's slot pattern.
+           No more absolute positioning or padding hacks.) -->
+
+      <!-- Detail-mode close X — absolutely positioned top-right.
+           Hidden when collapsed so the footer is clean (the user can re-expand
+           via the collapsed-detail-footer caret to reach the X). -->
+      <button
+        v-if="legendMode === 'detail' && legendState !== 'collapsed'"
+        class="detail-close-btn"
+        @click.stop="handleCloseDetail"
+        :aria-label="t('aria.backToLegend')"
+      >
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+          <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <!-- Collapsed-detail footer: shown only when sheet is collapsed AND in
+           detail mode. PeopleGroupDetail isn't designed to render at 48px, so
+           we render a footer-style title bar inline (caret + people-group
+           name) that mimics the LegendRows / SemanticTreeLegend collapsed
+           footer pattern. (qa: 2026-05-03 user feedback iter-16) -->
+      <div
+        v-if="legendState === 'collapsed' && legendMode === 'detail' && selectedPeopleGroup"
+        class="collapsed-detail-footer"
+        @click="handleCaretClick"
+      >
+        <button class="mobile-collapse-caret"
+          :style="{ transform: `rotate(${caretRotation}deg)` }"
+          :aria-label="t('aria.toggleLegend')"
+          tabindex="-1"
+        >
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+            <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <span class="collapsed-detail-title">{{ legendTitle }}</span>
+      </div>
+
+      <!-- Sheet body — same LegendRows invocation as desktop. -->
+      <div class="legend-content">
+        <!-- Detail-mode branch — wrapped in <template v-if> so when the sheet
+             is collapsed in detail mode the v-else-if fallbacks (Semantic-
+             TreeLegend / LegendRows) DO NOT render. Without this wrap the
+             collapsed-detail-footer above + the v-else-if titlebar both
+             showed the people-group name, producing the duplicated label
+             reported 2026-05-03 iter-17. -->
+        <template v-if="legendMode === 'detail' && selectedPeopleGroup">
+          <PeopleGroupDetail
+            v-if="legendState !== 'collapsed'"
+            :peopleGroup="selectedPeopleGroup"
+            :hideHeader="true"
+            :dark="isDark"
+            :action="popupAction"
+          />
+        </template>
+
+        <!-- Language-family tab: SemanticTreeLegend (PPLR-ported, R4).
+             Caret injected via #title-caret slot so it sits in column 1 of
+             the .stl-titlebar, vertically aligned with the title text. -->
+        <SemanticTreeLegend
+          v-else-if="legendType === 'language-family'"
+          :nodes="langTreeForMobile"
+          :tabs="LANG_TABS_MOBILE"
+          :title="legendTitle || 'Language Families'"
+          :columns="['count', 'pop']"
+          @select="onSemanticTreeSelect"
+        >
+          <template #title-caret>
+            <button class="mobile-collapse-caret"
+              :style="{ transform: `rotate(${caretRotation}deg)` }"
+              @click.stop="handleCaretClick"
+              :aria-label="t('aria.toggleLegend')">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </template>
+        </SemanticTreeLegend>
+
+        <!-- Other tabs: LegendRows. Caret injected via #title-caret slot so
+             it sits in .lrg-title-caret-slot at grid-column:1 of the title
+             row, vertically aligned with the title via subgrid align-self. -->
+        <LegendRows
+          v-else
+          :title="legendTitle"
+          :items="legendDataItems"
+          :columns="legendColumns"
+          :activeFilter="activeFilter"
+          :isDark="isDark"
+          :hideColumnHeader="false"
+          :showFooter="false"
+          :disableCollapse="true"
+          :totalCount="totalCount"
+          :totalPopulation="totalPopulation"
+          :fmtPop="fmtPop"
+          :fmtCount="fmtCount"
+          @filter-click="handleRowFilterClick"
+        >
+          <template #title-caret>
+            <button class="mobile-collapse-caret"
+              :style="{ transform: `rotate(${caretRotation}deg)` }"
+              @click.stop="handleCaretClick"
+              :aria-label="t('aria.toggleLegend')">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </template>
+        </LegendRows>
+      </div>
+    </div>
+  </div><!-- /.legend-sheet-root -->
+</template>
+
+<style scoped>
+/* All runtime styles are injected via useShadowStyles above. */
+</style>

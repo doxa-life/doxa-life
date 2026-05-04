@@ -21,6 +21,10 @@ function stripLayerTsconfigs() {
 stripLayerTsconfigs()
 
 export default defineNuxtConfig({
+  // Embeddables (micro-frontends + web-components) have their own Vite builds —
+  // Nuxt must not watch or scan their source trees.
+  ignore: ['embeddables/**'],
+
   extends: [
     process.env.OAUTH_LAYER_PATH || ['github:corsacca/nuxt-blueprints/layers/oauth#master', {
       giget: { dir: `${LAYERS_DIR}/oauth`, forceClean: true }
@@ -231,7 +235,7 @@ export default defineNuxtConfig({
 
   vue: {
     compilerOptions: {
-      isCustomElement: (tag: string) => ['feedback-web-component'].includes(tag)
+      isCustomElement: (tag: string) => ['doxa-map', 'doxa-research-map', 'feedback-web-component'].includes(tag)
     }
   },
 
@@ -241,6 +245,13 @@ export default defineNuxtConfig({
         '@vue/devtools-core',
         '@vue/devtools-kit'
       ]
+    },
+    vue: {
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag: string) => ['doxa-map', 'doxa-research-map', 'feedback-web-component'].includes(tag)
+        }
+      }
     }
   },
 
