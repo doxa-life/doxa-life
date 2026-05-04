@@ -545,6 +545,12 @@ function _findNodeInTree(nodes, predicate) {
 // PPLR's onLegendSelect verbatim semantics: setFilter(node.filter) on select,
 // setFilter(null) on null. Plus mirror to mapStore for back-compat with the
 // rest of the app (geocoder, popup, fly-to all read mapStore.selected*).
+// Provided to LegendMobile so its embedded <SemanticTreeLegend> can wire
+// @select to the same handler as the desktop instance — without this,
+// mobile row-clicks updated only instance.selection (shared via inject)
+// and never reached mapStore.selectFamily → applyDimFilter, so the
+// dim-on-select / restore-on-deselect path never ran (qa: 2026-05-03 iter-18).
+provide('onSemanticTreeSelect', (node) => onSemanticTreeSelect(node))
 function onSemanticTreeSelect(node) {
   const m = map.value
   if (!node) {
