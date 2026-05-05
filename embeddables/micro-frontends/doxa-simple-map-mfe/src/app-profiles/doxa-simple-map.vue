@@ -192,6 +192,11 @@ const FEATURES = {
   infoButton:    false,
   overlapDensity: false,
   darkPinBorder:  false,
+  // Geocoder search bar feature-flagged OFF on simple-map per user request
+  // (qa: 2026-05-04 — research-map keeps its geocoder; only the simple-map
+  // pages on home/pray/adopt should NOT show search). Flip to true to
+  // restore. Wraps the <GeocoderComponent v-if> in the template.
+  geocoder:      false,
 }
 
 // ─── Config from ProfileLoader ────────────────────────────────────────────────
@@ -1004,7 +1009,7 @@ onBeforeUnmount(() => {
            a people-group result we open the detail popup in addition to the
            default flyTo behavior. -->
       <GeocoderComponent
-        v-if="appReady && map"
+        v-if="FEATURES.geocoder && appReady && map"
         :map-instance="map"
         :access-token="mapboxToken"
         :is-dark="isDark"

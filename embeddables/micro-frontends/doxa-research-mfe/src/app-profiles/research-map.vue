@@ -533,6 +533,12 @@ provide('normalizedPeopleGroups', mapData.normalizedPeopleGroups)
 // via inject.
 const pplrInstance = createPplrInstance(mapId)
 provideInstance(pplrInstance)
+// Default the SemanticTreeLegend internal tab to "Language" (index 1)
+// instead of "Language Family" (index 0). Most users aren't familiar with
+// the term "language family", so opening on the Language tab reads more
+// naturally (qa: 2026-05-04 user feedback). Users can still click up to
+// the Language Family tab; this only changes the default.
+pplrInstance.activeTab.value = 1
 
 // ── langTree + tabs + select handler for SemanticTreeLegend ─────────────────
 // PPLR's component is mounted as a standalone sibling of the map (its own
