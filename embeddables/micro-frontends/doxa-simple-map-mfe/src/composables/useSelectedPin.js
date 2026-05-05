@@ -9,7 +9,11 @@ import { watch, inject } from 'vue';
 // ─────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────
-const GO_ORANGE          = '#FF6600';   // Mandarin neon orange
+// Simple black pin replaces the previous orange "GO" marker per user
+// feedback (qa: 2026-05-04 — "just want a simple black indicator pen
+// for which people group you have selected"). Constant name kept for
+// minimal diff against the rest of the file's references.
+const GO_ORANGE          = '#1a1a1a';   // Black indicator (was '#FF6600')
 const HIGHLIGHT_LAYER_ID = 'selected-pin-highlight';
 
 /**
@@ -22,61 +26,29 @@ function createGoMarkerElement() {
 
     el.innerHTML = `
 <style>
-/* Wrapper is sized to match the visible SVG pin exactly (34 x 43).
-   Previously the wrapper was 60px tall with flex bottom-alignment, which
-   caused Mapbox's anchor:'bottom' to anchor 17px below the pin tip —
-   making the marker render slightly off-center from the selected lat/lng
-   when zoomed in. Sizing wrapper=pin eliminates the anchor mismatch. */
+/* Simple black pin: no glow halo, no shimmer animation, no "GO" text.
+   Just a black teardrop with a white outline so it stays visible on any
+   basemap (qa: 2026-05-04 — user wants a simple black indicator). */
 .doxa-go-pin-wrapper {
   position: relative;
-  width: 34px;
-  height: 43px;
+  width: 28px;
+  height: 36px;
   pointer-events: none;
   overflow: visible;
 }
-.doxa-go-pin__glow-ambient {
-  position: absolute;
-  /* Center the ambient glow on the pin's visual base (bottom 1/3). */
-  bottom: -2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 102, 0, 0.22) 0%,
-    rgba(255, 102, 0, 0.07) 55%,
-    rgba(255, 102, 0, 0.00) 75%
-  );
-  animation: goHaze 2.6s ease-in-out infinite;
-  pointer-events: none;
-}
 .doxa-go-pin__svg {
   position: relative;
-  z-index: 2;
-  width: 34px;
-  height: 43px;
-  filter: drop-shadow(0 0 3px rgba(255, 102, 0, 0.55));
-  animation: goPinShimmer 2.6s ease-in-out infinite;
-}
-@keyframes goHaze {
-  0%, 100% { opacity: 0.50; transform: translateX(-50%) scale(1.00); }
-  50%       { opacity: 0.90; transform: translateX(-50%) scale(1.12); }
-}
-@keyframes goPinShimmer {
-  0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 102, 0, 0.45)); }
-  50%       { filter: drop-shadow(0 0 6px rgba(255, 120, 0, 0.80)); }
+  width: 28px;
+  height: 36px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.35));
 }
 </style>
-
-<div class="doxa-go-pin__glow-ambient"></div>
 
 <svg
   class="doxa-go-pin__svg"
   viewBox="0 0 28 36"
   xmlns="http://www.w3.org/2000/svg"
-  aria-label="GO - Unreached People Group"
+  aria-label="Selected people group"
 >
   <path
     d="M14 1 C6.8 1 1 6.8 1 14 C1 24 14 35 14 35 C14 35 27 24 27 14 C27 6.8 21.2 1 14 1 Z"
@@ -86,13 +58,6 @@ function createGoMarkerElement() {
     d="M14 1 C6.8 1 1 6.8 1 14 C1 24 14 35 14 35 C14 35 27 24 27 14 C27 6.8 21.2 1 14 1 Z"
     fill="${GO_ORANGE}"
   />
-  <circle cx="14" cy="14" r="8" fill="rgba(0,0,0,0.15)" />
-  <text
-    x="14" y="18"
-    font-family="Arial Black, Arial, sans-serif"
-    font-size="8" font-weight="900"
-    text-anchor="middle" fill="white" letter-spacing="0.8"
-  >GO</text>
 </svg>
 `;
 
