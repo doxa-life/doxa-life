@@ -292,15 +292,20 @@ onMounted(async () => {
 
   mapboxgl.accessToken = mapboxToken
 
-  map = new mapboxgl.Map({
-    container: containerRef.value,
-    style: 'mapbox://styles/mapbox/light-v11',
-    projection: 'mercator',
-    center: [20, 10],
-    zoom: 1.5,
-    minZoom: 1,
-    maxZoom: 12
-  })
+  try {
+    map = new mapboxgl.Map({
+      container: containerRef.value,
+      style: 'mapbox://styles/mapbox/light-v11',
+      projection: 'mercator',
+      center: [20, 10],
+      zoom: 1.5,
+      minZoom: 1,
+      maxZoom: 12
+    })
+  } catch (err) {
+    console.error('Prayer map: failed to initialize map', err)
+    return
+  }
 
   map.addControl(new mapboxgl.NavigationControl(), 'top-right')
   map.scrollZoom.disable()
