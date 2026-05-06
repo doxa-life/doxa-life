@@ -49,7 +49,10 @@ export default defineEventHandler(async (event) => {
       meta_title: body.meta_title ?? null,
       meta_description: body.meta_description ?? null,
       og_image: body.og_image ?? null,
-      status: body.status
+      status: body.status,
+      actor_user_id: authUser.userId,
+      source: 'admin-ui',
+      user_agent: getHeader(event, 'user-agent') || null
     })
 
     logEvent({

@@ -34,6 +34,12 @@ export interface UpsertTranslationInput {
   og_image?: string | null
   status?: 'draft' | 'published'
   allow_lossy_overwrite?: boolean
+  // Audit context for the version-history snapshot. The fields are
+  // optional because some background paths may not have a user; the
+  // snapshot still gets written, just with NULLs.
+  actor_user_id?: string | null
+  source?: 'admin-ui' | 'mcp' | 'deepl'
+  user_agent?: string | null
 }
 
 export interface UpsertTranslationResult {
@@ -161,6 +167,35 @@ export async function upsertCmsPageTranslation(input: UpsertTranslationInput): P
       })
       .returningAll()
       .executeTakeFirstOrThrow()
+  }
+
+  // Best-effort version snapshot. Mirrors the activity-logger pattern:
+  // a logging failure must not poison a successful save.
+  try {
+    await db
+      .insertInto('page_translation_versions')
+      .values({
+        page_id: input.page_id,
+        locale: input.locale,
+        title,
+        body_json: body_json as never,
+        excerpt: input.excerpt ?? null,
+        featured_image: input.featured_image ?? null,
+        meta_title: input.meta_title ?? null,
+        meta_description: input.meta_description ?? null,
+        og_image: input.og_image ?? null,
+        status: translation.status,
+        created_by_user_id: input.actor_user_id ?? null,
+        source: input.source ?? 'admin-ui',
+        user_agent: input.user_agent ?? null
+      })
+      .execute()
+  } catch (e) {
+    console.error('[cmsTranslations] failed to write version snapshot', {
+      page_id: input.page_id,
+      locale: input.locale,
+      error: e
+    })
   }
 
   return {
