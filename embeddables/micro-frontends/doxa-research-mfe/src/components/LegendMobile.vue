@@ -81,7 +81,7 @@ useShadowStyles(`
    title row's subgrid offsets the title text so it begins right after
    the caret without overlap. Same widening on column 5 (right gutter)
    keeps the table visually balanced. qa: 2026-05-02 iter-9. */
-.legend-mobile-sheet .legend-row-group{--lrg-caret-col:28px;}
+.legend-mobile-sheet .legend-row-group{--lrg-caret-col:24px;}
 .legend-content::-webkit-scrollbar{width:4px;}
 .legend-content::-webkit-scrollbar-track{background:transparent;}
 .legend-content::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.18);border-radius:4px;}
