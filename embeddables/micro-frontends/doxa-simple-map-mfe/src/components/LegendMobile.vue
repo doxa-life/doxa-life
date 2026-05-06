@@ -42,12 +42,16 @@ useShadowStyles(`
 .sheet-drag-strip{position:absolute;top:0;left:0;right:0;height:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;z-index:2;touch-action:none;-webkit-user-select:none;}
 .pull-tab-handle{width:40px;height:4px;background:#ccc;border-radius:2px;}
 
-/* Collapse caret — rendered into LegendRows' #title-caret slot, so it lives
-   in the grid's caret column (col 1), centered with zero padding. Rotation
-   is driven inline via :style (caretRotation deg). */
-.mobile-collapse-caret{width:10px;height:10px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:#666;padding:0;transition:transform 180ms cubic-bezier(0.2,0,0,1);transform-origin:center;outline:none;-webkit-tap-highlight-color:transparent;will-change:transform;}
+/* Collapse caret — pill button mirroring the research-map pattern
+   so the caret reads more clearly in the centered collapsed footer
+   (qa: 2026-05-06 user feedback — small monochrome arrow was hard to
+   see; bumping to 20px pill with gray background + border matches the
+   research-mfe LegendMobile caret). Slotted into LegendRows .lrg-title-
+   caret-slot at grid col 1, so --lrg-caret-col is bumped to 28px on
+   mobile to keep the caret from overlapping the title text. */
+.mobile-collapse-caret{width:20px;height:20px;display:flex;align-items:center;justify-content:center;background:rgba(208,215,222,0.5);border:1px solid #afb8c1;border-radius:5px;cursor:pointer;color:#3b463d;padding:0;transition:transform 0.3s ease-out,color 0.12s,background 0.12s,border-color 0.12s;transform-origin:center;outline:none;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 2px rgba(0,0,0,0.05);flex-shrink:0;}
 .mobile-collapse-caret:focus{outline:none;}
-.mobile-collapse-caret:hover{color:#333;}
+.mobile-collapse-caret:hover{color:#1f2328;background:#eaeef2;border-color:#3b463d;}
 
 /* Detail-mode close X — top-right corner */
 .detail-close-btn{position:absolute;top:10px;right:12px;background:none;border:none;padding:4px;cursor:pointer;color:#666;display:flex;align-items:center;justify-content:center;z-index:3;transition:color 0.2s ease;}
@@ -81,6 +85,19 @@ useShadowStyles(`
 .legend-mobile-sheet.collapsed{box-shadow:0 -2px 8px rgba(0,0,0,0.15);height:52px !important;min-height:52px;border-top-left-radius:0;border-top-right-radius:0;}
 .legend-mobile-sheet.collapsed .lrg-items{grid-template-columns:var(--lrg-caret-col) auto var(--lrg-caret-col) !important;padding:0 !important;align-content:center;}
 .legend-mobile-sheet.collapsed .lrg-title-row{padding:0 !important;}
+
+/* Mobile caret column wider than desktop (28px vs 10px) so the slotted
+   .mobile-collapse-caret pill (20px) fits with breathing room and
+   doesn't overlap the title text. Mirrors research-mfe iter-9. */
+.legend-mobile-sheet .legend-row-group{--lrg-caret-col:28px;}
+
+/* Collapsed state: title rows centered horizontally so the caret + "Legend"
+   text cluster sits in the middle of the footer, matching the research-map
+   collapsed footer pattern (qa: 2026-05-06 user feedback — title was left-
+   aligned by default subgrid). gap:8px keeps the caret pill clear of the
+   title. */
+.legend-mobile-sheet.collapsed .lrg-title-row{padding:0 16px !important;display:flex;align-items:center;justify-content:center;gap:8px;height:52px;min-height:0 !important;border-bottom:none !important;}
+.legend-mobile-sheet.collapsed .lrg-title{font-size:13px !important;letter-spacing:0.02em !important;line-height:1.4 !important;}
 
 /* ── Dark mode (class-based, driven by isDark prop) ── */
 .sheet-dark{background:#3b463d!important;box-shadow:0 -4px 20px rgba(0,0,0,0.5)!important;}
@@ -354,8 +371,8 @@ onBeforeUnmount(() => {
               @click.stop="handleCaretClick"
               :aria-label="t('aria.toggleLegend')"
             >
-              <svg width="8" height="8" viewBox="0 0 12 12" fill="none">
-                <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
           </template>
