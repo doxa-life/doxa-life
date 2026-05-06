@@ -254,8 +254,11 @@ onBeforeUnmount(unmountSlots)
           <img :src="data.featured_image" :alt="data.title">
         </div>
 
-        <!-- No <h1> — page.php doesn't render the title inside the
-             article; the document <title> is set via useHead() above. -->
+        <!-- Pages that live under a category render their title at
+             the top so visitors landing on a sub-page (e.g. /resources/
+             overview) get a clear heading. The document <title> is also
+             set via useHead() above. -->
+        <h1 v-if="data.menu_parent" class="page-title">{{ data.title }}</h1>
         <div v-if="!showChildGrid" class="page-body" v-html="data.body_html" />
 
         <div v-if="showChildGrid" class="grid">
