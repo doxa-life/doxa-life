@@ -122,6 +122,12 @@ useShadowStyles(`
   .dsm-dark .dg-meta { color:rgba(243,243,241,0.75)!important; }
   .dsm-dark .dg-field strong { color:#F3F3F1!important; }
 
+  /* When the geocoder is disabled (FEATURES.geocoder=false), the legend
+     reflows up to fill the freed top slot — matches the geocoder pill
+     position (top:10px) instead of clearing it (top:54px). qa: 2026-05-06. */
+  .dsm-root.dsm-no-geocoder .legend-container,
+  .dsm-root.dsm-no-geocoder .legend-container.collapsed { top: 10px !important; }
+
   /* ── Fullscreen ── */
   :host(:fullscreen) { width:100vw!important;height:100vh!important;display:block!important; }
   :host(:fullscreen) .dsm-root { position:fixed;inset:0; }
@@ -980,7 +986,7 @@ onBeforeUnmount(() => {
   <div
     ref="dsmRoot"
     class="dsm-root"
-    :class="{ 'dsm-dark': isDark, 'dsm-rtl': isRTL }"
+    :class="{ 'dsm-dark': isDark, 'dsm-rtl': isRTL, 'dsm-no-geocoder': !FEATURES.geocoder }"
     :dir="isRTL ? 'rtl' : 'ltr'"
   >
 

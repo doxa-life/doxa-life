@@ -25,7 +25,7 @@ import { PRAYER_COLORS, FULL_PRAYER_THRESHOLD, getPrayerColor } from '@/config/p
 // ── Engagement colors ─────────────────────────────────────────────────────────
 export const ENGAGEMENT_COLORS = {
     notEngaged: '#1a1a2e',     // Near-black
-    hasEngagement: '#39ff14'   // Neon green — high contrast against the dark not-engaged pins (UX request 2026-04-26)
+    hasEngagement: '#22c55e'   // Neon green — high contrast against the dark not-engaged pins (UX request 2026-04-26)
 }
 
 export const ENGAGEMENT_LABELS = {
