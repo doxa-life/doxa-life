@@ -197,6 +197,40 @@ td {
 .page-body > * + * {
   margin-top: var(--spacing-md);
 }
+.page-title {
+  margin-bottom: var(--spacing-xl);
+}
+.page-body > h1 + *,
+.page-body > h2 + * {
+  margin-top: var(--spacing-md);
+}
+.page-body > * + h1,
+.page-body > * + h2 {
+  margin-top: var(--spacing-2xl);
+}
+// CMS pages function more like documentation than marketing landing
+// pages, so subhead sizes step down modestly from the body font and
+// the display face is dropped (Bebas Neue is all-caps). Weights stay
+// light so headings anchor sections without shouting.
+.page-body :is(h2, h3, h4, h5, h6) {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-tight);
+}
+.page-body h2 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-medium);
+}
+.page-body h3 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
+}
+.page-body h4 {
+  font-size: var(--font-size-lg);
+}
+.page-body :is(h5, h6) {
+  font-size: var(--font-size-md);
+}
 
 .banner-title {
   font-size: var(--font-size-5xl);
