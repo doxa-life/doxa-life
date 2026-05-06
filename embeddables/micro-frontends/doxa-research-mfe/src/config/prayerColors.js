@@ -21,7 +21,7 @@ export const FULL_PRAYER_THRESHOLD = 144
 export const PRAYER_COLORS = {
   noPrayer:   '#e74c3c', // Red — Needs Prayer (default)
   hasPrayer:  '#f39c12', // Orange — Has Prayer (partial)
-  fullPrayer: '#27ae60'  // Green — Full Prayer Coverage
+  fullPrayer: '#22c55e'  // Green — Full Prayer Coverage
 }
 
 export const PRAYER_LABELS = {

@@ -21,7 +21,7 @@ export const FULL_PRAYER_THRESHOLD = 144
 export const PRAYER_COLORS = {
   noPrayer:   '#e74c3c', // Red — Needs Prayer (default)
   hasPrayer:  '#f39c12', // Orange — Has Prayer (partial)
-  fullPrayer: '#39ff14'  // Neon green — unified with engagement+adoption hasX
+  fullPrayer: '#22c55e'  // Neon green — unified with engagement+adoption hasX
                          // (qa: 2026-05-04 user feedback — same green across
                          // all three simple-map tabs' "green" rows)
 }
