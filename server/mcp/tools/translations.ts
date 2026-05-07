@@ -123,10 +123,14 @@ export const upsertPageTranslationTool = defineMcpTool({
 
     await applyTranslationInvalidations(result.pageSlug, result.categoryId, input.locale)
 
+    const warningCount = result.sanitizationWarnings.length
+    const warningSuffix = warningCount > 0
+      ? `; ${warningCount} formatting fix${warningCount === 1 ? '' : 'es'} applied`
+      : ''
     return {
       content: [{
         type: 'text',
-        text: `Saved translation "${result.translation.title}" (${result.translation.locale}, ${result.translation.status})`
+        text: `Saved translation "${result.translation.title}" (${result.translation.locale}, ${result.translation.status})${warningSuffix}`
       }],
       structuredContent: { translation: result.translation }
     }
