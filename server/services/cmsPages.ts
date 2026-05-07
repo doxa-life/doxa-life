@@ -1,11 +1,13 @@
-// Shared service for CMS page operations. Called by MCP tools today;
-// admin routes will follow under a separate service-extraction PR
-// (Phase P1/P4 in plans/mcp-project/mcp-project.md).
+// Shared service for CMS page operations. Called by MCP tools and admin
+// routes. Each operation owns: validation, DB writes (transactional
+// when more than one row changes), activity logging (post-commit unless
+// inside a transaction), and cache invalidation (always post-commit).
 //
-// Each operation is responsible for: validation, DB writes (in a
-// transaction when more than one row changes), activity logging
-// (post-commit unless inside a transaction), and cache invalidation
-// (always post-commit).
+// Slugs are leaves only — the public URL is derived from the page's
+// category chain at request time. Cache purges therefore work in terms
+// of *URLs* (`pageUrl`), not the raw `slug` column. Service callers get
+// the URL back in `slugsToPurge` (kept that name for compatibility with
+// the cache layer's API).
 
 import { sql } from 'kysely'
 import type { Kysely } from 'kysely'
@@ -15,6 +17,11 @@ import { purgeCmsPage, purgeCmsCategory } from '../utils/cmsCache'
 import { ENABLED_LANGUAGE_CODES } from '~~/config/languages'
 import type { Page, PageTranslation } from '../database/pages'
 import type { Database } from '../database/schema'
+import {
+  loadCategoryTree,
+  pageUrlPath,
+  categoryUrlPath
+} from '../database/categoryTree'
 
 export interface PageActor {
   userId: string
@@ -25,8 +32,10 @@ export interface PageActor {
 export interface PageListItem {
   id: string
   slug: string
+  url: string
   category_id: string | null
   category_slug: string | null
+  category_path: string | null
   theme: 'default' | 'green'
   menu_order: number
   translations: Array<{
@@ -138,9 +147,6 @@ export async function listCmsPages(opts: ListPagesOptions = {}): Promise<ListPag
 
   let translations = await tQuery.execute()
 
-  // Title substring match: requires a translation row to exist for
-  // the page (any locale). When a query is provided we also keep
-  // pages whose slug matched (already filtered above).
   if (opts.query) {
     const pattern = opts.query.toLowerCase()
     translations = translations.filter(t => t.title.toLowerCase().includes(pattern))
@@ -158,15 +164,21 @@ export async function listCmsPages(opts: ListPagesOptions = {}): Promise<ListPag
     tByPage.set(t.page_id, list)
   }
 
-  const out: PageListItem[] = pageRows.map(p => ({
-    id: p.id,
-    slug: p.slug,
-    category_id: p.category_id,
-    category_slug: p.category_slug ?? null,
-    theme: p.theme as 'default' | 'green',
-    menu_order: p.menu_order,
-    translations: tByPage.get(p.id) ?? []
-  }))
+  const tree = await loadCategoryTree()
+  const out: PageListItem[] = pageRows.map(p => {
+    const categoryPath = p.category_id ? categoryUrlPath(tree, p.category_id) : null
+    return {
+      id: p.id,
+      slug: p.slug,
+      url: pageUrlPath(tree, { slug: p.slug, category_id: p.category_id }),
+      category_id: p.category_id,
+      category_slug: p.category_slug ?? null,
+      category_path: categoryPath || null,
+      theme: p.theme as 'default' | 'green',
+      menu_order: p.menu_order,
+      translations: tByPage.get(p.id) ?? []
+    }
+  })
 
   return { pages: out, nextCursor }
 }
@@ -175,42 +187,56 @@ export interface FullPage {
   page: Page
   translations: PageTranslation[]
   category_slug: string | null
+  category_path: string | null
+  url: string
 }
 
-export async function getCmsPage(input: { id?: string; slug?: string }): Promise<FullPage | null> {
+export async function getCmsPage(input: { id?: string; slug?: string; category_id?: string | null }): Promise<FullPage | null> {
   let pageQuery = db.selectFrom('pages').selectAll()
-  if (input.id) pageQuery = pageQuery.where('id', '=', input.id)
-  else if (input.slug) pageQuery = pageQuery.where('slug', '=', input.slug)
-  else return null
+  if (input.id) {
+    pageQuery = pageQuery.where('id', '=', input.id)
+  } else if (input.slug) {
+    // Backwards-compatible by-slug lookup. Without a category id this
+    // can match more than one row across categories — pick the first
+    // deterministically (lowest menu_order, then created) so old MCP
+    // callers that pass a leaf slug don't crash.
+    pageQuery = pageQuery.where('slug', '=', input.slug)
+    if (input.category_id !== undefined) {
+      pageQuery = input.category_id === null
+        ? pageQuery.where('category_id', 'is', null)
+        : pageQuery.where('category_id', '=', input.category_id)
+    }
+  } else {
+    return null
+  }
 
-  const page = await pageQuery.executeTakeFirst()
+  const page = await pageQuery
+    .orderBy('menu_order', 'asc')
+    .orderBy('created', 'asc')
+    .executeTakeFirst()
   if (!page) return null
 
-  const [translations, category] = await Promise.all([
+  const [translations, tree] = await Promise.all([
     db
       .selectFrom('page_translations')
       .selectAll()
       .where('page_id', '=', page.id)
       .orderBy('locale', 'asc')
       .execute(),
-    page.category_id
-      ? db
-          .selectFrom('categories')
-          .select('slug')
-          .where('id', '=', page.category_id)
-          .executeTakeFirst()
-      : Promise.resolve(null)
+    loadCategoryTree()
   ])
 
+  const categoryPath = page.category_id ? categoryUrlPath(tree, page.category_id) : null
+  const categorySlug = page.category_id ? (tree.byId.get(page.category_id)?.slug ?? null) : null
   return {
     page,
     translations,
-    category_slug: category?.slug ?? null
+    category_slug: categorySlug,
+    category_path: categoryPath || null,
+    url: pageUrlPath(tree, page)
   }
 }
 
-// Validates a slug shape and uniqueness. Throws an H3-shaped error so
-// the MCP layer's mcpError mapper can translate to a clean response.
 function err(statusCode: number, message: string): H3Error {
   return Object.assign(new Error(message), {
     statusCode,
@@ -219,62 +245,53 @@ function err(statusCode: number, message: string): H3Error {
   }) as unknown as H3Error
 }
 
-// Normalize slug input: trim whitespace, strip leading/trailing
-// slashes. Single source of truth — admin routes and MCP tools both
-// pass raw input; services normalize before validating. Empty result
-// passes through; the regex check downstream rejects empty strings.
+// Normalize slug input: trim whitespace, strip any slashes (slugs are
+// leaves — slashes were valid only in the old prefix-as-slug model).
 export function normalizeSlugInput(raw: string | null | undefined): string {
-  return (raw ?? '').trim().replace(/^\/+|\/+$/g, '')
+  return (raw ?? '').trim().replace(/^\/+|\/+$/g, '').replace(/\/+/g, '-')
 }
 
-// Pass an `executor` (a Kysely transaction handle) when validation
-// is part of a larger atomic operation — the read-side category
-// existence/prefix check and the page-slug-uniqueness check then
-// run on the same connection as the subsequent insert/update, so
-// a concurrent category rename or page-slug change can't slip
-// between validation and write.
+// Validates a leaf slug: shape, no collision with a sibling category
+// at the same level (a category and a page can't share a leaf because
+// `/parent/leaf` would be ambiguous), and no collision with another
+// page in the same category.
 export async function validatePageSlug(
   slug: string,
   opts: { categoryId: string | null; excludePageId?: string },
   executor: Kysely<Database> = db
 ): Promise<void> {
-  if (!/^[a-z0-9][a-z0-9/-]*$/.test(slug)) {
-    throw err(400, 'slug must be lowercase letters, digits, dashes, and slashes')
-  }
-  if (slug.endsWith('/')) {
-    throw err(400, 'slug cannot end with /')
-  }
-  if (opts.categoryId) {
-    const category = await executor
-      .selectFrom('categories')
-      .select(['slug'])
-      .where('id', '=', opts.categoryId)
-      .executeTakeFirst()
-    if (!category) throw err(400, 'Category not found')
-    if (!slug.startsWith(`${category.slug}/`)) {
-      throw err(400, `Slug must start with "${category.slug}/"`)
-    }
-  } else {
-    const collidingCategory = await executor
-      .selectFrom('categories')
-      .select('id')
-      .where('slug', '=', slug)
-      .executeTakeFirst()
-    if (collidingCategory) {
-      throw err(409, `"${slug}" is already used by a category.`)
-    }
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
+    throw err(400, 'slug must be lowercase letters, digits, and dashes (no slashes)')
   }
 
+  // Sibling-category collision: a category whose `parent_id` matches
+  // this page's category would render at the same URL level.
+  let categoryQuery = executor
+    .selectFrom('categories')
+    .select('id')
+    .where('slug', '=', slug)
+  categoryQuery = opts.categoryId === null
+    ? categoryQuery.where('parent_id', 'is', null)
+    : categoryQuery.where('parent_id', '=', opts.categoryId)
+  const collidingCategory = await categoryQuery.executeTakeFirst()
+  if (collidingCategory) {
+    throw err(409, `"${slug}" is already used by a category at this level.`)
+  }
+
+  // Sibling-page collision in the same category.
   let pageQuery = executor
     .selectFrom('pages')
     .select('id')
     .where('slug', '=', slug)
+  pageQuery = opts.categoryId === null
+    ? pageQuery.where('category_id', 'is', null)
+    : pageQuery.where('category_id', '=', opts.categoryId)
   if (opts.excludePageId) {
     pageQuery = pageQuery.where('id', '!=', opts.excludePageId)
   }
   const collidingPage = await pageQuery.executeTakeFirst()
   if (collidingPage) {
-    throw err(409, 'A page with that slug already exists')
+    throw err(409, 'A page with that slug already exists in this category')
   }
 }
 
@@ -297,18 +314,8 @@ export interface CreatePageInput {
   }
 }
 
-// Creates a page (and optionally an inline initial translation) in a
-// single transaction. The audit hook receives the transaction's
-// executor; callers (admin routes, MCP tools) are expected to pass a
-// `throwOnError: true` to logEvent (or use mcpLog, which does this
-// automatically when an executor is provided) so an audit-insert
-// failure inside the transaction rolls back the page insert.
 export interface CreateCmsPageAuditContext {
   pageId: string
-  // The translation row id, set only when an inline translation was
-  // created in the same transaction. Lets callers emit a separate
-  // CREATE event on page_translations keyed by the actual row id so
-  // audit-log greps on `record_id` find the translation.
   translationId: string | null
 }
 
@@ -323,15 +330,17 @@ export async function createCmsPage(
       throw err(400, 'locale is not enabled')
     }
   }
-  // Use the normalized form everywhere downstream — input.slug never
-  // touches the DB after this point.
   input = { ...input, slug }
 
   const result = await db.transaction().execute(async (tx) => {
-    // Validate the slug inside the transaction so the category-prefix
-    // check and slug-uniqueness check run on the same connection as
-    // the insert. Without this a concurrent category rename could
-    // change the prefix between validation and write.
+    if (input.category_id) {
+      const cat = await tx
+        .selectFrom('categories')
+        .select('id')
+        .where('id', '=', input.category_id)
+        .executeTakeFirst()
+      if (!cat) throw err(400, 'Category not found')
+    }
     await validatePageSlug(slug, { categoryId: input.category_id ?? null }, tx)
 
     const page = await tx
@@ -372,7 +381,11 @@ export async function createCmsPage(
     return { page, translation }
   })
 
-  const slugsToPurge = [result.page.slug]
+  // Compute the full public URL so the cache layer purges by the same
+  // key the lookup endpoint writes (full path, hex-encoded).
+  const tree = await loadCategoryTree()
+  const url = pageUrlPath(tree, result.page)
+  const slugsToPurge = [url]
   const categoriesToPurge: string[] = []
   if (result.page.category_id) categoriesToPurge.push(result.page.category_id)
 
@@ -396,13 +409,6 @@ export interface UpdatePageResult {
 }
 
 export async function updateCmsPage(input: UpdatePageInput): Promise<UpdatePageResult> {
-  // Wrap reads + slug validation + UPDATE in one transaction so a
-  // concurrent rename of the source or target category — or a
-  // concurrent slug change on another page — can't slip between the
-  // category-prefix calculation and the row write. The bare-UPDATE
-  // version that lived here briefly had a race window where the
-  // page would commit with a stale prefix relative to the category's
-  // current slug.
   return await db.transaction().execute(async (tx) => {
     const existing = await tx
       .selectFrom('pages')
@@ -411,7 +417,12 @@ export async function updateCmsPage(input: UpdatePageInput): Promise<UpdatePageR
       .executeTakeFirst()
     if (!existing) throw err(404, 'Page not found')
 
-    const slugsToPurge = new Set<string>([existing.slug])
+    // Snapshot the page's current full URL before any changes so we
+    // can purge the old key after the update commits.
+    const treeBefore = await loadCategoryTree(tx)
+    const oldUrl = pageUrlPath(treeBefore, existing)
+
+    const slugsToPurge = new Set<string>([oldUrl])
     const categoriesToPurge = new Set<string>()
     const changes: Record<string, unknown> = {}
 
@@ -423,38 +434,28 @@ export async function updateCmsPage(input: UpdatePageInput): Promise<UpdatePageR
     let finalSlug = existing.slug
     if (input.slug !== undefined) {
       finalSlug = normalizeSlugInput(input.slug)
-    } else if (input.category_id !== undefined && finalCategoryId !== existing.category_id) {
-      // Category change without slug change: rewrite the prefix.
-      let leaf = existing.slug
-      if (existing.category_id) {
-        const oldCat = await tx
-          .selectFrom('categories')
-          .select('slug')
-          .where('id', '=', existing.category_id)
-          .executeTakeFirst()
-        if (oldCat && existing.slug.startsWith(`${oldCat.slug}/`)) {
-          leaf = existing.slug.slice(oldCat.slug.length + 1)
-        }
-      }
-      if (finalCategoryId) {
-        const newCat = await tx
-          .selectFrom('categories')
-          .select('slug')
-          .where('id', '=', finalCategoryId)
-          .executeTakeFirst()
-        if (!newCat) throw err(400, 'Category not found')
-        finalSlug = `${newCat.slug}/${leaf}`
-      } else {
-        finalSlug = leaf
-      }
     }
 
     if (finalSlug !== existing.slug) {
-      await validatePageSlug(finalSlug, { categoryId: finalCategoryId, excludePageId: input.id }, tx)
       changes.slug = finalSlug
     }
     if (finalCategoryId !== existing.category_id) {
       changes.category_id = finalCategoryId
+    }
+
+    // Validate the (slug, category) pair when either changed. Done in
+    // the same transaction so a concurrent rename can't slip between
+    // validation and write.
+    if (changes.slug !== undefined || changes.category_id !== undefined) {
+      if (finalCategoryId) {
+        const cat = await tx
+          .selectFrom('categories')
+          .select('id')
+          .where('id', '=', finalCategoryId)
+          .executeTakeFirst()
+        if (!cat) throw err(400, 'Category not found')
+      }
+      await validatePageSlug(finalSlug, { categoryId: finalCategoryId, excludePageId: input.id }, tx)
     }
 
     if (input.menu_order !== undefined && input.menu_order !== existing.menu_order) {
@@ -483,7 +484,8 @@ export async function updateCmsPage(input: UpdatePageInput): Promise<UpdatePageR
       .returningAll()
       .executeTakeFirstOrThrow()
 
-    slugsToPurge.add(updated.slug)
+    const treeAfter = await loadCategoryTree(tx)
+    slugsToPurge.add(pageUrlPath(treeAfter, updated))
     if (updated.slug !== existing.slug || updated.menu_order !== existing.menu_order || updated.category_id !== existing.category_id) {
       if (existing.category_id) categoriesToPurge.add(existing.category_id)
       if (updated.category_id) categoriesToPurge.add(updated.category_id)
@@ -498,7 +500,7 @@ export async function updateCmsPage(input: UpdatePageInput): Promise<UpdatePageR
   })
 }
 
-export async function deleteCmsPage(id: string): Promise<{ slug: string; categoryId: string | null }> {
+export async function deleteCmsPage(id: string): Promise<{ slug: string; url: string; categoryId: string | null }> {
   const existing = await db
     .selectFrom('pages')
     .select(['id', 'slug', 'category_id'])
@@ -506,14 +508,14 @@ export async function deleteCmsPage(id: string): Promise<{ slug: string; categor
     .executeTakeFirst()
   if (!existing) throw err(404, 'Page not found')
 
+  const tree = await loadCategoryTree()
+  const url = pageUrlPath(tree, existing)
+
   await db.deleteFrom('pages').where('id', '=', id).execute()
-  return { slug: existing.slug, categoryId: existing.category_id }
+  return { slug: existing.slug, url, categoryId: existing.category_id }
 }
 
 export async function applyPageInvalidations(slugs: string[], categoryIds: string[]): Promise<void> {
   await Promise.all(slugs.map(s => purgeCmsPage(s)))
-  // Skip the slugs we just purged from the category-sibling fan-out;
-  // otherwise purgeCmsCategory enumerates every member (including the
-  // page we already touched) and re-purges keys for no benefit.
   await Promise.all(categoryIds.map(id => purgeCmsCategory(id, slugs)))
 }

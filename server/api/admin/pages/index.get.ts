@@ -1,10 +1,11 @@
-// Admin: list all CMS pages with counts of published/draft translations
-// plus category slug + English name for the category column.
+// Admin: list all CMS pages with counts of published/draft translations,
+// the page's category (if any), and the computed full URL path.
 
 import { defineEventHandler } from 'h3'
 import { requirePermission } from '../../../utils/rbac'
 import { db } from '../../../utils/database'
 import { sql } from 'kysely'
+import { loadCategoryTree, pageUrlPath } from '../../../database/categoryTree'
 
 export default defineEventHandler(async (event) => {
   await requirePermission(event, 'pages.view')
@@ -43,5 +44,11 @@ export default defineEventHandler(async (event) => {
     .orderBy('pages.slug', 'asc')
     .execute()
 
-  return { rows }
+  const tree = await loadCategoryTree()
+  const decorated = rows.map(r => ({
+    ...r,
+    url: pageUrlPath(tree, { slug: r.slug, category_id: r.category_id })
+  }))
+
+  return { rows: decorated }
 })

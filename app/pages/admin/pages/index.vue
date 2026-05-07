@@ -11,6 +11,7 @@ definePageMeta({
 interface PageRow {
   id: string
   slug: string
+  url: string
   category_id: string | null
   category_slug: string | null
   category_name_en: string | null
@@ -24,6 +25,10 @@ interface PageRow {
 interface CategoryRow {
   id: string
   slug: string
+  url: string
+  parent_path: string | null
+  parent_label: string | null
+  parent_id: string | null
   menu_order: number
   translations: Array<{ locale: string; name: string }>
   page_count: number
@@ -45,8 +50,8 @@ const { data: categoriesData } = await useFetch<{ rows: CategoryRow[] }>(
 const categories = computed(() => categoriesData.value?.rows ?? [])
 
 function categoryLabel(cat: CategoryRow): string {
-  const en = cat.translations.find(t => t.locale === 'en')?.name
-  return en ?? cat.slug
+  const en = cat.translations.find(t => t.locale === 'en')?.name ?? cat.slug
+  return cat.parent_label ? `${cat.parent_label} / ${en}` : en
 }
 
 // Modal state for creating a new page
@@ -59,7 +64,7 @@ const creating = ref(false)
 const newCategoryPrefix = computed(() => {
   if (!newCategoryId.value) return ''
   const cat = categories.value.find(c => c.id === newCategoryId.value)
-  return cat ? `${cat.slug}/` : ''
+  return cat ? `${cat.url}/` : ''
 })
 
 const newFullSlug = computed(() => {
@@ -69,7 +74,9 @@ const newFullSlug = computed(() => {
 
 const categoryItems = computed(() => [
   { label: '— Uncategorized —', value: null as string | null },
-  ...categories.value.map(c => ({ label: categoryLabel(c), value: c.id as string | null }))
+  ...[...categories.value]
+    .sort((a, b) => a.url.localeCompare(b.url))
+    .map(c => ({ label: categoryLabel(c), value: c.id as string | null }))
 ])
 
 function resetCreateForm() {
@@ -81,8 +88,8 @@ function resetCreateForm() {
 async function createPage() {
   creating.value = true
   try {
-    const slug = newFullSlug.value
-    if (!slug) {
+    const leaf = newSlugLeaf.value.trim().replace(/^\/+|\/+$/g, '')
+    if (!leaf) {
       toast.add({ title: 'Slug is required', color: 'error' })
       creating.value = false
       return
@@ -90,7 +97,7 @@ async function createPage() {
     const page = await $fetch<{ id: string }>('/api/admin/pages', {
       method: 'POST',
       body: {
-        slug,
+        slug: leaf,
         category_id: newCategoryId.value,
         menu_order: newMenuOrder.value || 0
       }
@@ -228,7 +235,7 @@ const filteredRows = computed<PageRow[]>(() => {
               <span v-if="row.title_en">{{ row.title_en }}</span>
               <em v-else class="text-(--ui-text-muted)">Untitled</em>
             </td>
-            <td class="px-3 py-2 font-mono">{{ row.slug }}</td>
+            <td class="px-3 py-2 font-mono text-xs">{{ row.url }}</td>
             <td class="px-3 py-2">
               <span v-if="row.category_slug">{{ row.category_name_en || row.category_slug }}</span>
               <em v-else class="text-(--ui-text-muted)">—</em>
@@ -266,12 +273,12 @@ const filteredRows = computed<PageRow[]>(() => {
               class="w-full"
             />
           </UFormField>
-          <UFormField label="Slug" required :description="newCategoryPrefix ? `Full URL will be /${newFullSlug}` : 'e.g. privacy, contact'">
-            <UInput v-model="newSlugLeaf" :placeholder="newCategoryId ? 'vision' : 'privacy'">
-              <template v-if="newCategoryPrefix" #leading>
-                <span class="text-(--ui-text-muted) font-mono text-sm">{{ newCategoryPrefix }}</span>
-              </template>
-            </UInput>
+          <UFormField label="Slug" required :description="newSlugLeaf ? `Full URL will be /${newFullSlug}` : 'Leaf segment only — lowercase letters, digits, dashes.'">
+            <div v-if="newCategoryPrefix" class="flex items-center gap-1 min-w-0">
+              <span class="shrink-0 text-(--ui-text-muted) font-mono text-sm truncate">{{ newCategoryPrefix }}</span>
+              <UInput v-model="newSlugLeaf" :placeholder="newCategoryId ? 'vision' : 'privacy'" class="flex-1 min-w-0" />
+            </div>
+            <UInput v-else v-model="newSlugLeaf" :placeholder="newCategoryId ? 'vision' : 'privacy'" class="w-full" />
           </UFormField>
           <UFormField label="Menu order" description="Sort order within the category sidebar.">
             <UInput v-model.number="newMenuOrder" type="number" />

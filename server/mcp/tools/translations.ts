@@ -121,7 +121,7 @@ export const upsertPageTranslationTool = defineMcpTool({
       })
     }
 
-    await applyTranslationInvalidations(result.pageSlug, result.categoryId, input.locale)
+    await applyTranslationInvalidations(result.pageUrl, result.categoryId, input.locale)
 
     return {
       content: [{
@@ -149,7 +149,7 @@ export const publishTranslationTool = defineMcpTool({
       to: 'published',
       locale: input.locale
     })
-    await applyTranslationInvalidations(result.pageSlug, result.categoryId, input.locale)
+    await applyTranslationInvalidations(result.pageUrl, result.categoryId, input.locale)
     return {
       content: [{ type: 'text', text: `Published ${result.translation.locale} translation` }],
       structuredContent: { translation: result.translation }
@@ -173,7 +173,7 @@ export const unpublishTranslationTool = defineMcpTool({
       to: 'draft',
       locale: input.locale
     })
-    await applyTranslationInvalidations(result.pageSlug, result.categoryId, input.locale)
+    await applyTranslationInvalidations(result.pageUrl, result.categoryId, input.locale)
     return {
       content: [{ type: 'text', text: `Unpublished ${result.translation.locale} translation` }],
       structuredContent: { translation: result.translation }

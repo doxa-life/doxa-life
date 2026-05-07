@@ -28,6 +28,10 @@ interface Page {
 interface CategoryRow {
   id: string
   slug: string
+  url: string
+  parent_path: string | null
+  parent_label: string | null
+  parent_id: string | null
   menu_order: number
   translations: Array<{ locale: string; name: string }>
   page_count: number
@@ -51,6 +55,8 @@ interface Translation {
 interface PageDetail {
   page: Page
   translations: Translation[]
+  url: string
+  category_path: string | null
 }
 
 const route = useRoute()
@@ -59,16 +65,16 @@ const toast = useToast()
 
 const pageId = computed(() => String(route.params.id))
 
-// Live public URL for the "View page" link in the Publish card. Uses the
-// committed slug (data) not the in-flight slug ref, so the link always
-// points to an existing route even if the author is editing the slug.
-// English is the default locale, so `prefix_except_default` means no prefix.
+// Live public URL for the "View page" link in the Publish card. Uses
+// the server-computed full URL (data.url) so it stays correct as the
+// page moves between categories. English is the default locale, so
+// `prefix_except_default` means no prefix.
 const publicUrl = computed(() => {
-  const committedSlug = data.value?.page.slug
-  if (!committedSlug) return null
+  const committedUrl = data.value?.url
+  if (!committedUrl) return null
   return activeLocale.value === 'en'
-    ? `/${committedSlug}`
-    : `/${activeLocale.value}/${committedSlug}`
+    ? `/${committedUrl}`
+    : `/${activeLocale.value}/${committedUrl}`
 })
 
 const EMPTY_DOC = { type: 'doc', content: [{ type: 'paragraph' }] }
@@ -82,13 +88,15 @@ const { data: categoriesData } = await useFetch<{ rows: CategoryRow[] }>(
 const categories = computed(() => categoriesData.value?.rows ?? [])
 
 function categoryLabel(cat: CategoryRow): string {
-  const en = cat.translations.find(t => t.locale === 'en')?.name
-  return en ?? cat.slug
+  const en = cat.translations.find(t => t.locale === 'en')?.name ?? cat.slug
+  return cat.parent_label ? `${cat.parent_label} / ${en}` : en
 }
 
 const categoryItems = computed(() => [
   { label: '— Uncategorized —', value: null as string | null },
-  ...categories.value.map(c => ({ label: categoryLabel(c), value: c.id as string | null }))
+  ...[...categories.value]
+    .sort((a, b) => a.url.localeCompare(b.url))
+    .map(c => ({ label: categoryLabel(c), value: c.id as string | null }))
 ])
 
 // Metadata editable in the top bar
@@ -116,6 +124,16 @@ const selectedCategory = computed(() =>
 )
 
 const isCategoryChanged = computed(() => categoryId.value !== originalCategoryId.value)
+
+// Live preview of the full URL — re-derived from the (in-flight) leaf
+// slug + selected category so the editor sees the new URL before they
+// save. Used in the Slug field's helper text.
+const previewFullUrl = computed(() => {
+  const leaf = slug.value.trim().replace(/^\/+|\/+$/g, '')
+  if (!leaf) return ''
+  const prefix = selectedCategory.value?.url
+  return prefix ? `${prefix}/${leaf}` : leaf
+})
 
 const THEME_OPTIONS: Array<{ label: string; value: PageTheme }> = [
   { label: 'Default', value: 'default' },
@@ -638,7 +656,7 @@ function formatVersionTime(iso: string): string {
             <div class="space-y-4">
               <UFormField
                 label="Category"
-                :description="isCategoryChanged ? 'Changing the category rewrites the slug prefix — the old URL will 404.' : 'Group this page under a category.'"
+                :description="isCategoryChanged ? 'Moving to a different category will change this page’s URL — the old URL will 404.' : 'Group this page under a category.'"
               >
                 <USelect
                   v-model="categoryId"
@@ -649,9 +667,13 @@ function formatVersionTime(iso: string): string {
               </UFormField>
               <UFormField
                 label="Slug"
-                :description="selectedCategory ? `Full URL: /${slug}. Must start with ${selectedCategory.slug}/` : 'URL path (e.g. privacy)'"
+                :description="previewFullUrl ? `Full URL: /${previewFullUrl}` : 'Leaf segment only — lowercase letters, digits, dashes.'"
               >
-                <UInput v-model="slug" />
+                <div v-if="selectedCategory" class="flex items-center gap-1 min-w-0">
+                  <span class="shrink-0 text-(--ui-text-muted) font-mono text-sm truncate">{{ selectedCategory.url }}/</span>
+                  <UInput v-model="slug" class="flex-1 min-w-0" />
+                </div>
+                <UInput v-else v-model="slug" class="w-full" />
               </UFormField>
               <UFormField label="Menu order" description="Position within the category sidebar.">
                 <UInput v-model.number="menuOrder" type="number" />

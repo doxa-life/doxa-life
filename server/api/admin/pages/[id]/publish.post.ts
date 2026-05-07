@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
         source: 'admin-ui'
       }
     })
-    await applyTranslationInvalidations(result.pageSlug, result.categoryId, locale)
+    await applyTranslationInvalidations(result.pageUrl, result.categoryId, locale)
     return { ok: true }
   } catch (e: any) {
     if (e?.statusCode) {

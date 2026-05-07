@@ -17,22 +17,45 @@ definePageMeta({
 interface CategoryPage {
   id: string
   slug: string
+  url: string
   menu_order: number
   title_en: string | null
   published_count: number
   translation_count: number
 }
 
+interface ChildCategory {
+  id: string
+  slug: string
+  url: string
+  menu_order: number
+}
+
 interface CategoryDetail {
   category: {
     id: string
     slug: string
+    parent_id: string | null
     menu_order: number
     created: string
     updated: string
   }
+  url: string
+  parent_path: string | null
+  parent_label: string | null
   translations: Array<{ locale: string; name: string; updated: string }>
   pages: CategoryPage[]
+  child_categories: ChildCategory[]
+}
+
+interface CategoryRow {
+  id: string
+  slug: string
+  url: string
+  parent_id: string | null
+  parent_path: string | null
+  parent_label: string | null
+  translations: Array<{ locale: string; name: string }>
 }
 
 const route = useRoute()
@@ -46,6 +69,8 @@ const { data, pending, refresh } = await useFetch<CategoryDetail>(
 
 const slug = ref('')
 const originalSlug = ref('')
+const parentId = ref<string | null>(null)
+const originalParentId = ref<string | null>(null)
 const names = reactive<Record<string, string>>({})
 for (const l of ENABLED_LANGUAGES) names[l.code] = ''
 
@@ -59,6 +84,8 @@ watch(data, (value) => {
   if (!value) return
   slug.value = value.category.slug
   originalSlug.value = value.category.slug
+  parentId.value = value.category.parent_id
+  originalParentId.value = value.category.parent_id
   for (const l of ENABLED_LANGUAGES) {
     const t = value.translations.find(x => x.locale === l.code)
     names[l.code] = t?.name ?? ''
@@ -71,7 +98,51 @@ const activeLocale = ref<string>('en')
 const saving = ref(false)
 const savingOrder = ref(false)
 
+const { data: allCategoriesData } = await useFetch<{ rows: CategoryRow[] }>(
+  '/api/admin/categories',
+  { default: () => ({ rows: [] }) }
+)
+
+function categoryLabel(cat: CategoryRow): string {
+  const en = cat.translations.find(t => t.locale === 'en')?.name ?? cat.slug
+  return cat.parent_label ? `${cat.parent_label} / ${en}` : en
+}
+
+// Block self/descendants from the parent picker so the user can't
+// accidentally request a cycle (the server would reject anyway, but
+// not surfacing the option avoids a confusing failure).
+const descendantIds = computed(() => {
+  const all = allCategoriesData.value?.rows ?? []
+  const childrenByParent = new Map<string | null, CategoryRow[]>()
+  for (const c of all) {
+    const key = c.parent_id ?? null
+    const list = childrenByParent.get(key) ?? []
+    list.push(c)
+    childrenByParent.set(key, list)
+  }
+  const out = new Set<string>([categoryId.value])
+  const stack = [categoryId.value]
+  while (stack.length) {
+    const id = stack.pop()!
+    for (const c of childrenByParent.get(id) ?? []) {
+      out.add(c.id)
+      stack.push(c.id)
+    }
+  }
+  return out
+})
+
+const parentItems = computed(() => [
+  { label: '— Top level —', value: null as string | null },
+  ...[...(allCategoriesData.value?.rows ?? [])]
+    .filter(c => !descendantIds.value.has(c.id))
+    .sort((a, b) => a.url.localeCompare(b.url))
+    .map(c => ({ label: categoryLabel(c), value: c.id as string | null }))
+])
+
 const slugWillRename = computed(() => slug.value.trim() !== originalSlug.value)
+const parentWillChange = computed(() => parentId.value !== originalParentId.value)
+const willChangeUrls = computed(() => slugWillRename.value || parentWillChange.value)
 
 async function saveDetails() {
   const slugValue = slug.value.trim().replace(/^\/+|\/+$/g, '')
@@ -92,7 +163,7 @@ async function saveDetails() {
     }))
     await $fetch(`/api/admin/categories/${categoryId.value}`, {
       method: 'PATCH',
-      body: { slug: slugValue, translations }
+      body: { slug: slugValue, parent_id: parentId.value, translations }
     })
     toast.add({ title: 'Category saved', color: 'success' })
     await refresh()
@@ -169,8 +240,10 @@ async function deleteCategory() {
         variant="outline"
         color="error"
         icon="i-lucide-trash-2"
-        :disabled="(data?.pages.length ?? 0) > 0"
-        :title="(data?.pages.length ?? 0) > 0 ? 'Move or delete member pages first' : 'Delete category'"
+        :disabled="(data?.pages.length ?? 0) > 0 || (data?.child_categories.length ?? 0) > 0"
+        :title="(data?.pages.length ?? 0) > 0
+          ? 'Move or delete member pages first'
+          : ((data?.child_categories.length ?? 0) > 0 ? 'Move or delete child categories first' : 'Delete category')"
         @click="deleteModalOpen = true"
       >
         Delete
@@ -189,8 +262,19 @@ async function deleteCategory() {
 
         <div class="space-y-4">
           <UFormField
+            label="Parent category"
+            :description="parentWillChange ? 'Moving this category to a different parent will change every URL beneath it. Old URLs will 404.' : 'Leave as Top level for a root category.'"
+          >
+            <USelect
+              v-model="parentId"
+              :items="parentItems"
+              value-key="value"
+              class="w-full"
+            />
+          </UFormField>
+          <UFormField
             label="Slug"
-            :description="slugWillRename ? 'Changing the slug will rewrite every member page URL. Old URLs will 404.' : 'URL prefix for member pages.'"
+            :description="willChangeUrls ? 'Saving will rewrite every URL beneath this category. Old URLs will 404.' : `Current URL: /${data.url}`"
           >
             <UInput v-model="slug" />
           </UFormField>
@@ -228,6 +312,32 @@ async function deleteCategory() {
             <UButton color="primary" :loading="saving" @click="saveDetails">Save details</UButton>
           </div>
         </div>
+      </UCard>
+
+      <UCard v-if="data.child_categories?.length">
+        <template #header>
+          <span class="text-sm font-semibold">Child categories ({{ data.child_categories.length }})</span>
+        </template>
+        <ul class="divide-y divide-(--ui-border)">
+          <li
+            v-for="child in data.child_categories"
+            :key="child.id"
+            class="flex items-center gap-3 py-2 px-2"
+          >
+            <div class="flex-1 min-w-0">
+              <div class="text-sm truncate">{{ child.slug }}</div>
+              <div class="text-xs text-(--ui-text-muted) font-mono truncate">/{{ child.url }}</div>
+            </div>
+            <UButton
+              size="xs"
+              variant="outline"
+              icon="i-lucide-pencil"
+              :to="`/admin/pages/categories/${child.id}`"
+            >
+              Edit
+            </UButton>
+          </li>
+        </ul>
       </UCard>
 
       <UCard>
@@ -272,10 +382,10 @@ async function deleteCategory() {
                 <div class="text-sm truncate">
                   {{ page.title_en || 'Untitled' }}
                   <UBadge v-if="idx === 0" size="xs" variant="subtle" color="info" class="ml-2">
-                    Default for /{{ data.category.slug }}
+                    Default for /{{ data.url }}
                   </UBadge>
                 </div>
-                <div class="text-xs text-(--ui-text-muted) font-mono truncate">{{ page.slug }}</div>
+                <div class="text-xs text-(--ui-text-muted) font-mono truncate">/{{ page.url }}</div>
               </div>
               <UBadge
                 size="xs"

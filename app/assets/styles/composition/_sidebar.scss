@@ -34,4 +34,23 @@
     .current-link {
         color: var(--color-brand-primary);
     }
+
+    // Recursive nav (categories + pages). Each row carries its own
+    // depth class so we indent visually without manual nested <ul>s.
+    // Depth 0 = the root category heading; depth 1+ are children.
+    .nav-tree {
+        .nav-row {
+            margin-block: var(--spacing-3xs);
+        }
+        .nav-depth-1 { padding-inline-start: var(--spacing-md); }
+        .nav-depth-2 { padding-inline-start: calc(var(--spacing-md) * 2); }
+        .nav-depth-3 { padding-inline-start: calc(var(--spacing-md) * 3); }
+        .nav-depth-4 { padding-inline-start: calc(var(--spacing-md) * 4); }
+
+        // Sub-category headings (depth ≥ 1) get a slightly heavier
+        // weight to visually separate them from page links underneath.
+        .nav-category .category-link {
+            font-weight: 600;
+        }
+    }
 }

@@ -12,18 +12,45 @@
 
 interface ChildPage {
   slug: string
+  url: string
   title: string
   excerpt: string | null
   featured_image: string | null
   menu_order: number
 }
 
+interface ChildCategory {
+  slug: string
+  url: string
+  title: string
+  excerpt: string | null
+  featured_image: string | null
+  menu_order: number
+}
+
+interface NavPageNode {
+  kind: 'page'
+  url: string
+  title: string
+  menu_order: number
+}
+interface NavCategoryNode {
+  kind: 'category'
+  url: string
+  title: string
+  menu_order: number
+  items: Array<NavPageNode | NavCategoryNode>
+}
+type NavNode = NavPageNode | NavCategoryNode
+
 type PageTheme = 'default' | 'green'
 
 interface PageResponse {
+  url: string
   slug: string
   category_id: string | null
   category_slug: string | null
+  category_url: string | null
   menu_order: number
   theme: PageTheme
   custom_css: string | null
@@ -37,8 +64,11 @@ interface PageResponse {
   og_image: string | null
   body_html: string
   body_is_empty: boolean
-  menu_parent: { slug: string; title: string } | null
+  is_category_landing: boolean
+  menu_parent: { slug: string; url: string; title: string } | null
   children: ChildPage[]
+  child_categories: ChildCategory[]
+  nav_tree: NavCategoryNode | null
 }
 
 import { h, render, getCurrentInstance } from 'vue'
@@ -102,7 +132,7 @@ useHead(() => {
     // cascade regardless of where main.scss ends up in <head>.
     style: data.value.custom_css
       ? [{
-          key: `page-custom-css-${data.value.slug}`,
+          key: `page-custom-css-${data.value.url}`,
           tagPosition: 'bodyClose' as const,
           innerHTML: data.value.custom_css
         }]
@@ -110,19 +140,47 @@ useHead(() => {
   }
 })
 
-const hasSidebar = computed(() => (data.value?.children.length ?? 0) > 0)
-// A page renders its children as cards (instead of sidebar + body) when
-// it's the category's default landing AND its own body is empty. Useful
-// for pure index pages like /resources.
-const isCategoryDefault = computed(() =>
-  Boolean(data.value && data.value.category_slug && data.value.menu_order === 0)
-)
+// Flatten the recursive nav tree into a list of rows for the sidebar.
+// Each row has a `depth` for visual indent. The root category itself
+// renders as a bold heading; everything below indents one step further.
+interface NavRow {
+  depth: number
+  kind: 'page' | 'category'
+  url: string
+  title: string
+}
+
+function flattenNav(node: NavCategoryNode, depth: number, out: NavRow[]) {
+  out.push({ depth, kind: 'category', url: node.url, title: node.title })
+  for (const item of node.items) {
+    if (item.kind === 'page') {
+      out.push({ depth: depth + 1, kind: 'page', url: item.url, title: item.title })
+    } else {
+      flattenNav(item, depth + 1, out)
+    }
+  }
+}
+
+const navRows = computed<NavRow[]>(() => {
+  const tree = data.value?.nav_tree
+  if (!tree) return []
+  const out: NavRow[] = []
+  flattenNav(tree, 0, out)
+  return out
+})
+
+const hasSidebar = computed(() => navRows.value.length > 0 || (data.value?.children.length ?? 0) > 0)
+// Render a card grid (instead of body) on archive landing pages —
+// either when there are sub-categories to surface, or when this is a
+// category default with no body and only sibling pages.
+const showCategoryGrid = computed(() => (data.value?.child_categories.length ?? 0) > 0)
 const showChildGrid = computed(() =>
   Boolean(
     data.value
-      && isCategoryDefault.value
+      && data.value.is_category_landing
       && data.value.body_is_empty
       && data.value.children.length > 0
+      && !showCategoryGrid.value
   )
 )
 
@@ -226,18 +284,46 @@ onBeforeUnmount(unmountSlots)
   <div v-if="data" class="container page-content">
     <div :class="hasSidebar ? 'with-sidebar' : ''">
       <aside v-if="hasSidebar" class="sidebar">
-        <nav class="stack" aria-label="Child pages navigation">
+        <nav class="stack" aria-label="Section navigation">
           <div>
-            <ul class="stack | max-width-xs" role="list">
+            <!-- Recursive nav (categories + pages). Falls back to the
+                 flat siblings list when no tree is available (e.g.
+                 uncategorized pages). -->
+            <ul v-if="navRows.length" class="stack | max-width-xs nav-tree" role="list">
+              <li
+                v-for="row in navRows"
+                :key="`${row.kind}-${row.url}`"
+                :class="['nav-row', `nav-depth-${row.depth}`, `nav-${row.kind}`]"
+              >
+                <span v-if="row.kind === 'category' && row.depth === 0" class="font-size-lg category-heading">
+                  {{ row.title }}
+                </span>
+                <NuxtLink
+                  v-else-if="row.kind === 'category'"
+                  :class="['category-link', { 'current-link': data.url === row.url }]"
+                  :to="localePath(`/${row.url}`)"
+                >
+                  {{ row.title }}
+                </NuxtLink>
+                <NuxtLink
+                  v-else
+                  :class="{ 'current-link': data.url === row.url }"
+                  :to="localePath(`/${row.url}`)"
+                >
+                  {{ row.title }}
+                </NuxtLink>
+              </li>
+            </ul>
+            <ul v-else class="stack | max-width-xs" role="list">
               <li v-if="data.menu_parent">
                 <span class="font-size-lg category-heading">
                   {{ data.menu_parent.title }}
                 </span>
               </li>
-              <li v-for="child in data.children" :key="child.slug">
+              <li v-for="child in data.children" :key="child.url">
                 <NuxtLink
-                  :class="{ 'current-link': data.slug === child.slug }"
-                  :to="localePath(`/${child.slug}`)"
+                  :class="{ 'current-link': data.url === child.url }"
+                  :to="localePath(`/${child.url}`)"
                 >
                   {{ child.title }}
                 </NuxtLink>
@@ -247,7 +333,7 @@ onBeforeUnmount(unmountSlots)
         </nav>
       </aside>
 
-      <article :id="`page-${data.slug}`" class="page">
+      <article :id="`page-${data.slug || data.category_slug}`" class="page">
         <!-- WP page.php emits `page-featured-image` only when a
              post_thumbnail is explicitly set. Matches live behavior. -->
         <div v-if="data.featured_image" class="page-featured-image">
@@ -258,19 +344,42 @@ onBeforeUnmount(unmountSlots)
              the top so visitors landing on a sub-page (e.g. /resources/
              overview) get a clear heading. The document <title> is also
              set via useHead() above. -->
-        <h1 v-if="data.menu_parent" class="page-title">{{ data.title }}</h1>
-        <div v-if="!showChildGrid" class="page-body" v-html="data.body_html" />
+        <h1 v-if="data.menu_parent && data.title" class="page-title">{{ data.title }}</h1>
+        <div v-if="!showChildGrid && !showCategoryGrid" class="page-body" v-html="data.body_html" />
 
-        <div v-if="showChildGrid" class="grid">
-          <div v-for="child in data.children" :key="child.slug" class="card" data-variant="secondary">
+        <div v-if="showCategoryGrid" class="grid">
+          <div
+            v-for="cat in data.child_categories"
+            :key="cat.url"
+            class="card"
+            data-variant="secondary"
+          >
+            <div v-if="cat.featured_image" class="child-thumbnail">
+              <NuxtLink :to="localePath(`/${cat.url}`)">
+                <img :src="cat.featured_image" :alt="cat.title">
+              </NuxtLink>
+            </div>
+            <div class="stack">
+              <h3>
+                <NuxtLink class="color-white" :to="localePath(`/${cat.url}`)">
+                  {{ cat.title }}
+                </NuxtLink>
+              </h3>
+              <div v-if="cat.excerpt" class="child-excerpt" v-html="cat.excerpt" />
+            </div>
+          </div>
+        </div>
+
+        <div v-else-if="showChildGrid" class="grid">
+          <div v-for="child in data.children" :key="child.url" class="card" data-variant="secondary">
             <div v-if="child.featured_image" class="child-thumbnail">
-              <NuxtLink :to="localePath(`/${child.slug}`)">
+              <NuxtLink :to="localePath(`/${child.url}`)">
                 <img :src="child.featured_image" :alt="child.title">
               </NuxtLink>
             </div>
             <div class="stack">
               <h3>
-                <NuxtLink class="color-white" :to="localePath(`/${child.slug}`)">
+                <NuxtLink class="color-white" :to="localePath(`/${child.url}`)">
                   {{ child.title }}
                 </NuxtLink>
               </h3>
