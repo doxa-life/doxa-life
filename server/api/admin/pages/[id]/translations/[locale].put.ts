@@ -65,7 +65,10 @@ export default defineEventHandler(async (event) => {
     })
 
     await applyTranslationInvalidations(result.pageSlug, result.categoryId, locale)
-    return result.translation
+    return {
+      ...result.translation,
+      sanitization_warnings: result.sanitizationWarnings
+    }
   } catch (e: any) {
     if (e?.statusCode) {
       throw createError({ statusCode: e.statusCode, statusMessage: e.statusMessage || e.message })
