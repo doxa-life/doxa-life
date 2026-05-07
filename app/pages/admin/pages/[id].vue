@@ -234,10 +234,10 @@ async function saveAll(statusOverride?: 'draft' | 'published', localeOverride?: 
     }
     if (statusOverride) body.status = statusOverride
 
-    await $fetch(`/api/admin/pages/${pageId.value}/translations/${locale}`, {
-      method: 'PUT',
-      body
-    })
+    const saveResponse = await $fetch<{ sanitization_warnings?: { path: string; reason: string }[] }>(
+      `/api/admin/pages/${pageId.value}/translations/${locale}`,
+      { method: 'PUT', body }
+    )
     if (statusOverride) f.status = statusOverride
     f.loaded = true
     f.dirty = false
@@ -248,6 +248,17 @@ async function saveAll(statusOverride?: 'draft' | 'published', localeOverride?: 
         ? 'Unpublished'
         : 'Saved'
     toast.add({ title: `${verb} ${locale}`, color: 'success' })
+
+    const warnings = saveResponse?.sanitization_warnings ?? []
+    if (warnings.length > 0) {
+      const example = warnings[0]?.reason ?? ''
+      toast.add({
+        title: 'Some formatting was simplified',
+        description: `${warnings.length} change${warnings.length === 1 ? '' : 's'} on save${example ? ` — e.g. ${example}` : ''}`,
+        color: 'warning'
+      })
+    }
+
     await refresh()
     return true
   } catch (e: any) {

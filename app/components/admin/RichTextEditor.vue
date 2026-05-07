@@ -11,8 +11,52 @@
 
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import type { Editor, JSONContent } from '@tiptap/core'
+import { Fragment, Slice } from '@tiptap/pm/model'
+import type { Node as PmNode, Mark as PmMark } from '@tiptap/pm/model'
 import { buildTiptapExtensions } from '~/utils/tiptapExtensions'
 import { uploadImage } from '~/composables/useImageUpload'
+
+// Best-effort paste cleanup. The server-side sanitizer in
+// tiptapValidate is the authoritative line of defense; this just
+// keeps the most common paste sources (Google Docs, Word, Evernote)
+// from triggering "formatting was simplified" toasts on every paste.
+function cleanFragment(frag: Fragment): Fragment {
+  const out: PmNode[] = []
+  frag.forEach((child) => {
+    const cleaned = cleanNode(child)
+    if (cleaned) out.push(cleaned)
+  })
+  return Fragment.from(out)
+}
+
+function cleanNode(node: PmNode): PmNode | null {
+  // Drop inline image pastes (data:/blob:) — server would drop them anyway.
+  if (node.type.name === 'image') {
+    const src = node.attrs?.src
+    if (typeof src === 'string' && /^(data|blob):/i.test(src.trim())) return null
+  }
+
+  // Strip fontFamily from textStyle marks (Word paste noise; we don't
+  // render arbitrary fonts on the public site). If the mark has no
+  // remaining meaningful attrs after the strip, drop the whole mark.
+  const cleanedMarks: PmMark[] = []
+  for (const mark of node.marks) {
+    if (mark.type.name === 'textStyle' && mark.attrs?.fontFamily) {
+      const next = { ...mark.attrs, fontFamily: null }
+      const stillMeaningful = Object.entries(next).some(([k, v]) => k !== 'fontFamily' && v !== null && v !== undefined)
+      if (!stillMeaningful) continue
+      cleanedMarks.push(mark.type.create(next))
+    } else {
+      cleanedMarks.push(mark)
+    }
+  }
+
+  const cleanedContent = node.content && node.content.size > 0
+    ? cleanFragment(node.content)
+    : node.content
+
+  return node.copy(cleanedContent).mark(cleanedMarks)
+}
 
 const props = withDefaults(defineProps<{
   modelValue: JSONContent
@@ -34,6 +78,12 @@ const linkOpenInNewTab = ref(false)
 const editor = useEditor({
   content: props.modelValue,
   extensions: buildTiptapExtensions(),
+  editorProps: {
+    transformPasted(slice) {
+      const cleaned = cleanFragment(slice.content)
+      return new Slice(cleaned, slice.openStart, slice.openEnd)
+    }
+  },
   onUpdate({ editor: e }) {
     emit('update:modelValue', e.getJSON())
   }
