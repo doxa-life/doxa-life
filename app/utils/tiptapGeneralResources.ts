@@ -63,7 +63,7 @@ export const GeneralResourcesNode = Node.create({
       const paintFrom = (n: typeof node) => {
         const attrs: Record<string, any> = n.attrs
         const parts: string[] = []
-        parts.push(attrs.useDocuments ? 'documents list' : 'general resources list')
+        parts.push(attrs.useDocuments ? 'documents list' : 'adoption resources list')
         if (attrs.layout && attrs.layout !== 'on-sidebar-page') parts.push(`layout: ${attrs.layout}`)
         const detail = parts.join(' · ')
 
