@@ -78,6 +78,12 @@ useTextHighlight()
       <DoxaMapSlot map-id="home-map" :profile-config="homeMapConfig" class="rounded-xlg">
         <FeedbackWidgetSlot :profile-config="homeFeedbackConfig" />
       </DoxaMapSlot>
+      <NuxtLink
+        :to="localePath('/research')"
+        class="research-map-link"
+      >
+        Explore the advanced research map →
+      </NuxtLink>
     </section>
 
     <section class="stack stack--md | surface-brand-light">
@@ -269,3 +275,18 @@ useTextHighlight()
     />
   </div>
 </template>
+
+<style scoped>
+.research-map-link {
+  display: block;
+  margin-top: 0.75rem;
+  text-align: right;
+  font-size: 0.95rem;
+  color: var(--color-brand-primary, #3b463d);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.research-map-link:hover {
+  color: var(--color-brand-primary-darker, #1f2328);
+}
+</style>
