@@ -389,6 +389,19 @@ function preloadPeopleGroupImages(groups) {
 // ─── Map controls ─────────────────────────────────────────────────────────────
 const isDark = computed(() => uiStore.theme === 'dark')
 
+// Theme-aware data-pin outline (qa: 2026-05-06 user feedback — Joshua Project
+// uses a thin near-black outline that's barely visible; reverse-engineered).
+// In dark mode the outline goes white so pins stay visible against dark
+// basemaps. Boot style is light-v11, so the initial circle-stroke-color
+// in addLanguageFamilyLayer is already 'rgba(0,0,0,0.45)' — this watcher
+// just flips it on theme toggle.
+watch(isDark, (dark) => {
+  const m = map.value
+  if (!m || !m.getLayer('language-family-pins')) return
+  m.setPaintProperty('language-family-pins', 'circle-stroke-color',
+    dark ? '#ffffff' : 'rgba(0,0,0,0.45)')
+}, { immediate: false })
+
 /** Called by MapToolbar when the theme toggle button is clicked. */
 function handleToggleTheme() {
   if (!map.value) return

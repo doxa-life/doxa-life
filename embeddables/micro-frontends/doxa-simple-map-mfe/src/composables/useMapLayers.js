@@ -151,7 +151,7 @@ export function useMapLayers(options = {}) {
                 'circle-radius': getCircleRadiusInterpolation('standard'),
                 'circle-color': colorExpression,
                 'circle-stroke-width': getCircleStrokeWidthInterpolation('standard'),
-                'circle-stroke-color': '#ffffff',
+                'circle-stroke-color': 'rgba(0,0,0,0.45)',  // Light-mode default; thin near-black outline like Joshua Project. Dark-mode flips this to '#ffffff' via app-profile theme watcher.
                 'circle-opacity': 0.9
             }
         });

@@ -59,8 +59,7 @@ function createGoMarkerElement(color = GO_ORANGE) {
       <stop offset="100%" stop-color="#000"     stop-opacity="0.85"/>
     </linearGradient>
   </defs>
-  <g transform="rotate(-5 14 35)">
-    <path
+      <path
       d="M14 1 C6.8 1 1 6.8 1 14 C1 24 14 35 14 35 C14 35 27 24 27 14 C27 6.8 21.2 1 14 1 Z"
       fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"
     />
@@ -68,7 +67,6 @@ function createGoMarkerElement(color = GO_ORANGE) {
       d="M14 1 C6.8 1 1 6.8 1 14 C1 24 14 35 14 35 C14 35 27 24 27 14 C27 6.8 21.2 1 14 1 Z"
       fill="url(#${gradId})"
     />
-  </g>
 </svg>
 `;
 
