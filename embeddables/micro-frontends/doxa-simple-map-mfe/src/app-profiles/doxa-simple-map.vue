@@ -713,8 +713,11 @@ function getBaseColorExpr() {
 }
 
 function getFilterStrokeColor(filterType, filterKey) {
-  if (!filterKey) return getStrokeColor()
-  return DARK_PIN_KEYS.has(filterKey) ? '#ffffff' : getStrokeColor()
+  // After round 5 the 'notEngaged' / 'notAdopted' pins are red (#e74c3c),
+  // not near-black, so the DARK_PIN_KEYS exception that forced a white
+  // outline for those keys no longer matches its original intent. All
+  // filtered ACTIVE_LAYER overlays now use the same theme-aware stroke.
+  return getStrokeColor()
 }
 
 /**
@@ -723,8 +726,12 @@ function getFilterStrokeColor(filterType, filterKey) {
  * white — the pin stays visible without needing a dark ring in light mode.
  */
 function getStrokeColor() {
-  if (!FEATURES.darkPinBorder) return '#ffffff'
-  return isDark.value ? '#ffffff' : '#111111'
+  // Joshua-Project-inspired thin near-black outline in light mode; white in
+  // dark so pins stay visible against dark basemaps (qa: 2026-05-06 user
+  // feedback iter-9 — old code gated this behind FEATURES.darkPinBorder=false
+  // and always returned white, which left the ACTIVE_LAYER overlay with the
+  // bright white halo even after round 8 fixed the base pins).
+  return isDark.value ? '#ffffff' : 'rgba(0,0,0,0.45)'
 }
 
 /** Build the Mapbox filter expression for a given filter type + key */
