@@ -23,41 +23,52 @@ const HIGHLIGHT_LAYER_ID = 'selected-pin-highlight';
 function createGoMarkerElement(color = GO_ORANGE) {
     const el = document.createElement('div');
     el.className = 'doxa-go-pin-wrapper';
+    const gradId = `pinGrad-${Math.random().toString(36).slice(2, 8)}`;
 
     el.innerHTML = `
 <style>
-/* Simple black pin: no glow halo, no shimmer animation, no "GO" text.
-   Just a black teardrop with a white outline so it stays visible on any
-   basemap (qa: 2026-05-04 — user wants a simple black indicator). */
+/* Angled, brush-style pin (qa: 2026-05-06 user feedback — wanted a more
+   hand-drawn / painterly feel like the reference image they shared).
+   Slight tilt + diagonal gradient + a stronger drop-shadow gives the pin
+   a "set down on the map" look without rendering raster art. */
 .doxa-go-pin-wrapper {
   position: relative;
-  width: 28px;
-  height: 36px;
+  width: 32px;
+  height: 40px;
   pointer-events: none;
   overflow: visible;
 }
 .doxa-go-pin__svg {
   position: relative;
-  width: 28px;
-  height: 36px;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.35));
+  width: 32px;
+  height: 40px;
+  filter: drop-shadow(2px 4px 3px rgba(0,0,0,0.4));
 }
 </style>
 
 <svg
   class="doxa-go-pin__svg"
-  viewBox="0 0 28 36"
+  viewBox="-2 -2 32 40"
   xmlns="http://www.w3.org/2000/svg"
   aria-label="Selected people group"
 >
-  <path
-    d="M14 1 C6.8 1 1 6.8 1 14 C1 24 14 35 14 35 C14 35 27 24 27 14 C27 6.8 21.2 1 14 1 Z"
-    fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"
-  />
-  <path
-    d="M14 1 C6.8 1 1 6.8 1 14 C1 24 14 35 14 35 C14 35 27 24 27 14 C27 6.8 21.2 1 14 1 Z"
-    fill=""
-  />
+  <defs>
+    <linearGradient id="${gradId}" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="${color}" stop-opacity="0.92"/>
+      <stop offset="55%"  stop-color="${color}" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#000"     stop-opacity="0.85"/>
+    </linearGradient>
+  </defs>
+  <g transform="rotate(-5 14 35)">
+    <path
+      d="M14 1 C6.8 1 1 6.8 1 14 C1 24 14 35 14 35 C14 35 27 24 27 14 C27 6.8 21.2 1 14 1 Z"
+      fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"
+    />
+    <path
+      d="M14 1 C6.8 1 1 6.8 1 14 C1 24 14 35 14 35 C14 35 27 24 27 14 C27 6.8 21.2 1 14 1 Z"
+      fill="url(#${gradId})"
+    />
+  </g>
 </svg>
 `;
 
