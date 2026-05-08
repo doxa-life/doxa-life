@@ -95,7 +95,7 @@ useTextHighlight()
         :to="localePath('/research')"
         class="research-map-link"
       >
-        Explore the advanced research map →
+        Explore our research maps →
       </NuxtLink>
     </section>
 
@@ -224,7 +224,7 @@ useTextHighlight()
   display: block;
   margin-top: 0.75rem;
   text-align: right;
-  font-size: 0.95rem;
+  font-size: 1.2rem;
   color: var(--color-brand-primary, #3b463d);
   text-decoration: underline;
   text-underline-offset: 3px;
