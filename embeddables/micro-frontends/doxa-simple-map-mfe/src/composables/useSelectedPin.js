@@ -20,7 +20,7 @@ const HIGHLIGHT_LAYER_ID = 'selected-pin-highlight';
  * Create the custom HTML element for the "GO" map pin marker.
  * Self-contained inline <style> so it works inside Mapbox's marker DOM.
  */
-function createGoMarkerElement() {
+function createGoMarkerElement(color = GO_ORANGE) {
     const el = document.createElement('div');
     el.className = 'doxa-go-pin-wrapper';
 
@@ -56,7 +56,7 @@ function createGoMarkerElement() {
   />
   <path
     d="M14 1 C6.8 1 1 6.8 1 14 C1 24 14 35 14 35 C14 35 27 24 27 14 C27 6.8 21.2 1 14 1 Z"
-    fill="${GO_ORANGE}"
+    fill=""
   />
 </svg>
 `;
@@ -77,6 +77,14 @@ export function useSelectedPin(options = {}) {
     let _markerEl  = null;
     let _marker    = null;
 
+    // Dynamic pin color (qa: 2026-05-06 — pin matches the active tab's
+    // dot color so a click on a green dot shows a green pin, red shows red,
+    // etc.). Falls back to the literal GO_ORANGE constant if the parent
+    // profile didn't provide a resolver.
+    const getActivePinColor = inject("getActivePinColor", null);
+    let _currentColor = GO_ORANGE;
+    let _builtForColor = null;
+
     function _addHighlightLayer() {
         const map = getMap();
         if (!map) return;
@@ -92,7 +100,7 @@ export function useSelectedPin(options = {}) {
                     'interpolate', ['linear'], ['zoom'],
                     0, 3, 2, 3.5, 4, 4, 5, 5, 6, 6.5, 7, 8, 8, 10, 10, 14, 12, 18, 14, 22
                 ],
-                'circle-color'         : GO_ORANGE,
+                'circle-color'         : _currentColor,
                 'circle-opacity'       : 1,
                 'circle-stroke-width'  : 2,
                 'circle-stroke-color'  : '#FFFFFF',
@@ -104,8 +112,9 @@ export function useSelectedPin(options = {}) {
     }
 
     function _ensureMarkerEl() {
-        if (!_markerEl) {
-            _markerEl = createGoMarkerElement();
+        if (!_markerEl || _builtForColor !== _currentColor) {
+            _markerEl = createGoMarkerElement(_currentColor);
+            _builtForColor = _currentColor;
         }
     }
 
@@ -142,6 +151,15 @@ export function useSelectedPin(options = {}) {
         const map = getMap();
         if (!map) return;
 
+        // Resolve the pin color from the active tab strategy each call.
+        // When the user switches tabs and re-selects, color follows the dot.
+        const newColor = getActivePinColor?.(feature?.properties) ?? GO_ORANGE;
+        if (newColor !== _currentColor) {
+            _currentColor = newColor;
+            if (map.getLayer(HIGHLIGHT_LAYER_ID)) {
+                map.setPaintProperty(HIGHLIGHT_LAYER_ID, "circle-color", _currentColor);
+            }
+        }
         _addHighlightLayer();
 
         if (!feature) {

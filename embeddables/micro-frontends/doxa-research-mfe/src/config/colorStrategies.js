@@ -24,7 +24,7 @@ import { PRAYER_COLORS, FULL_PRAYER_THRESHOLD, getPrayerColor } from '@/config/p
 
 // ── Engagement colors ─────────────────────────────────────────────────────────
 export const ENGAGEMENT_COLORS = {
-    notEngaged: '#1a1a2e',     // Near-black
+    notEngaged: '#e74c3c',     // Near-black
     hasEngagement: '#22c55e'   // Neon green — high contrast against the dark not-engaged pins (UX request 2026-04-26)
 }
 
@@ -35,7 +35,7 @@ export const ENGAGEMENT_LABELS = {
 
 // ── Adoption colors ───────────────────────────────────────────────────────────
 export const ADOPTION_COLORS = {
-    notAdopted: '#1a1a2e',  // Near-black (matches engagement "not" color)
+    notAdopted: '#e74c3c',  // Near-black (matches engagement "not" color)
     hasAdoption: '#22c55e'  // Bright green — easier to see on the adoption map (feedback 2026-04-20)
 }
 

@@ -343,7 +343,7 @@ const ALL_TABS = [
   { id: 'adoption',          label: 'Adoption',          colorStrategy: 'adoption',       legend: 'adoption',          popup: 'adopt', feature: null            },
   { id: 'engagement',        label: 'Engagement',        colorStrategy: 'engagement',     legend: 'engagement',        popup: 'pray',  feature: null            },
   { id: 'doxa-regions',      label: 'Doxa Regions',      colorStrategy: 'doxaRegion',     legend: 'doxa-regions',      popup: 'pray',  feature: 'doxaRegions'   },
-  { id: 'language-families', label: 'Language Families', colorStrategy: 'languageFamily', legend: 'language-family',   popup: 'pray',  feature: null            }
+  { id: 'language-families', label: 'Languages', colorStrategy: 'languageFamily', legend: 'language-family',   popup: 'pray',  feature: null            }
 ]
 const TABS = ALL_TABS.filter(t => !t.feature || FEATURES[t.feature])
 const tabs       = computed(() => TABS)
@@ -573,6 +573,14 @@ function _findNodeInTree(nodes, predicate) {
 // and never reached mapStore.selectFamily → applyDimFilter, so the
 // dim-on-select / restore-on-deselect path never ran (qa: 2026-05-03 iter-18).
 provide('onSemanticTreeSelect', (node) => onSemanticTreeSelect(node))
+// Resolves the active tab's strategy → color for a given feature, used by
+// useSelectedPin.js so the selection-pin matches the underlying dot color
+// (qa: 2026-05-06 user feedback). research-mfe tab strategyKeys already
+// match COLOR_MODES values directly, so no mapping needed.
+provide('getActivePinColor', (properties) => {
+  const strat = getColorStrategy(activeTab.value?.colorStrategy ?? 'languageFamily')
+  return strat?.getColor?.(properties) ?? '#1a1a1a'
+})
 function onSemanticTreeSelect(node) {
   const m = map.value
   if (!node) {
@@ -1462,7 +1470,7 @@ onBeforeUnmount(() => {
           v-else-if="appReady"
           :nodes="langTree"
           :tabs="LANG_TABS"
-          title="Language Families"
+          title="Languages"
           @select="onSemanticTreeSelect"
         />
       </div>

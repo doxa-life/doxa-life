@@ -29,7 +29,7 @@ import { PRAYER_COLORS, FULL_PRAYER_THRESHOLD, getPrayerColor } from './prayerCo
 // color and legend row color same green, not different greens between
 // engagement and adoption"). #22c55e matches research-mfe's engagement neon.
 export const ENGAGEMENT_COLORS = {
-    notEngaged: '#1a1a2e',     // Near-black
+    notEngaged: '#e74c3c',     // Red — unified with PRAYER_COLORS.noPrayer for cross-tab consistency (qa: 2026-05-06)
     hasEngagement: '#22c55e'   // Neon green — unified across simple-map adoption + engagement
 }
 
@@ -40,7 +40,7 @@ export const ENGAGEMENT_LABELS = {
 
 // ── Adoption colors ───────────────────────────────────────────────────────────
 export const ADOPTION_COLORS = {
-    notAdopted: '#1a1a2e',  // Near-black (matches engagement "not" color)
+    notAdopted: '#e74c3c',  // Red — unified with PRAYER_COLORS.noPrayer (qa: 2026-05-06)
     hasAdoption: '#22c55e'  // Neon green — same as engagement (user feedback 2026-05-03)
 }
 
