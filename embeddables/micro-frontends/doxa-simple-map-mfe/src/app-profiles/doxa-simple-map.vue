@@ -17,7 +17,7 @@ import { useSelectedPin } from '../composables/useSelectedPin.js'
 import { useShadowStyles } from '../composables/useShadowStyles.js'
 import { DataSourceManager } from '../utils/DataSourceManager.js'
 import { getLanguageFamilyColor, COLOR_MODES } from '../config/colors.js'
-import { buildColorExpression } from '../config/colorStrategies.js'
+import { buildColorExpression, getColorStrategy } from '../config/colorStrategies.js'
 import { FULL_PRAYER_THRESHOLD } from '../config/prayerColors.js'
 import { mapDefaults } from '../config/mapConfig.js'
 import LegendDesktop   from '../components/LegendDesktop.vue'
@@ -237,6 +237,17 @@ const injectedInstanceId = inject('instanceId', null)
 const mapId = (injectedInstanceId?.value || injectedInstanceId) || ('doxa-simple-map-' + Math.random().toString(36).slice(2, 7))
 // Re-provide mapId so children (LegendComponent, etc.) can inject it for window event scoping
 provide('mapId', mapId)
+// Resolves the active tab's strategy → color for a given feature, used by
+// useSelectedPin.js so the selection-pin matches the underlying dot color
+// (qa: 2026-05-06 user feedback). simple-map tab strategyKeys are 'engagement',
+// 'adoption', 'prayer' — mapping to COLOR_MODES below.
+provide('getActivePinColor', (properties) => {
+  const sk = activeTab.value?.colorStrategy
+  const mode = sk === 'engagement' ? COLOR_MODES.ENGAGEMENT
+            : sk === 'adoption'   ? COLOR_MODES.ADOPTION
+            : COLOR_MODES.PRAYER_PROGRESS
+  return getColorStrategy(mode)?.getColor?.(properties) ?? '#1a1a1a'
+})
 const mapContainer = ref(null)
 const dsmRoot = ref(null)
 

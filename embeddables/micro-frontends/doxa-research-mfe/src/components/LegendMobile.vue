@@ -517,7 +517,7 @@ onBeforeUnmount(() => {
           v-else-if="legendType === 'language-family'"
           :nodes="langTreeForMobile"
           :tabs="LANG_TABS_MOBILE"
-          :title="legendTitle || 'Language Families'"
+          :title="legendTitle || 'Languages'"
           :columns="['count', 'pop']"
           @select="onSemanticTreeSelect"
         >
