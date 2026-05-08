@@ -203,6 +203,10 @@ const FEATURES = {
   // pages on home/pray/adopt should NOT show search). Flip to true to
   // restore. Wraps the <GeocoderComponent v-if> in the template.
   geocoder:      false,
+  // Disabled: no thicker stroke / enlarged radius / pulse animation when a
+  // legend row is selected. Matched pins stay at base-layer style; non-
+  // matched pins dim via 'case' opacity (qa: 2026-05-06 user feedback).
+  activeOverlayEmphasis: false,
 }
 
 // ─── Config from ProfileLoader ────────────────────────────────────────────────
@@ -776,6 +780,7 @@ function initPulseLayer() {
 
 /** Add the active (selected-on-top) overlay layer; must be called after pins source exists */
 function initActiveLayer() {
+  if (!FEATURES.activeOverlayEmphasis) return
   const m = map.value
   if (!m) return
   // Source and base layer must exist before we add layers referencing them
@@ -868,44 +873,42 @@ function applyLegendFilter(filterType, filterKey) {
     _currentFilter = { type: null, key: null }
     m.setPaintProperty('language-family-pins', 'circle-color', getBaseColorExpr())
     m.setPaintProperty('language-family-pins', 'circle-opacity', 0.9)
+    m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', 1)
     clearActiveLayer()
     return
   }
 
   _currentFilter = { type: filterType, key: filterKey }
 
-  // Base-layer de-emphasis behavior.
-  //
-  // With overlapDensity ON (future profiles): fade to 0.08 opacity — stacking
-  //   overlaps build a "heat" indicator (deliberately). May create false-density
-  //   bleed that can wash out certain pin colors — that's why it's feature-flagged.
-  //
-  // With overlapDensity OFF (this profile — default): recolor non-matched pins
-  //   to a solid muted gray and keep full opacity. This gives clear matched/
-  //   unmatched visual distinction WITHOUT any transparency-stacking artifact.
-  //   The ACTIVE_LAYER on top renders matched pins in the tab's full color.
+  // FEATURES.activeOverlayEmphasis OFF (default): dim non-matched pins on
+  // the base layer via a 'case' expression — no overlay, no pulse, no
+  // thicker stroke. Matched pins stay at the same style as unfiltered.
+  if (!FEATURES.activeOverlayEmphasis) {
+    m.setPaintProperty('language-family-pins', 'circle-color', getBaseColorExpr())
+    m.setPaintProperty('language-family-pins', 'circle-opacity',
+      ['case', matchExpr, 0.9, 0.15])
+    m.setPaintProperty('language-family-pins', 'circle-stroke-opacity',
+      ['case', matchExpr, 1, 0.15])
+    return
+  }
+
+  // Legacy overlay-based emphasis path (kept behind the flag).
   if (FEATURES.overlapDensity) {
     m.setPaintProperty('language-family-pins', 'circle-opacity', 0.08)
     m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', 0.05)
   } else {
     m.setPaintProperty('language-family-pins', 'circle-color', mutedGray())
     m.setPaintProperty('language-family-pins', 'circle-opacity', 0.85)
-    // Drop the stroke on dim pins. The base stroke is white which glows on
-    // the dark basemap and makes dim pins LOUDER than the matched ones.
-    // Stroke stays at full opacity on the ACTIVE_LAYER highlighting matched pins.
     m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', 0)
   }
 
-  // Active layer: matched pins on top — smart stroke: white for dark pins, theme for others
   if (m.getLayer(ACTIVE_LAYER)) {
     m.setFilter(ACTIVE_LAYER, matchExpr)
     m.setPaintProperty(ACTIVE_LAYER, 'circle-stroke-color', getFilterStrokeColor(filterType, filterKey))
   }
 
-  // Pulse ring: tier-tinted gentle breathing behind all dots
   const pulseColor = PULSE_COLORS[filterType]?.[filterKey] ?? '#888888'
   startPulse(matchExpr, pulseColor)
-
 }
 
 // Resync stroke + muted-gray dim when user toggles dark/light mode
