@@ -8,7 +8,7 @@
 // Below the UupgsList we embed the 5-tab `research-map` IIFE built from
 // Map-Framework/apps/DOXA-MAPS/doxa-research-mfe — exposes Engagement / Prayer
 // / Adoption (clones of doxa-simple-map) plus Language Families. The
-// research-mfe vite build auto-publishes its IIFE to public/js/research-map.iife.js
+// 1040-maps build now publishes /js/doxa-research-map.js (canonical name).
 // via the publishToDoxaLife() plugin.
 
 import { buildUupgListTranslations } from '~/utils/uupgListTranslations'
@@ -48,7 +48,7 @@ useTextHighlight()
     <h1 class="text-center highlight" data-highlight-last>{{ t('Find a UUPG') }}</h1>
 
     <!-- Research map embed — sits directly under the H1, above the UUPG
-         search bar. Loads /js/research-map.iife.js (auto-published from
+         search bar. Loads /js/doxa-research-map.js (auto-published from
          Map-Framework on every research-mfe build). -->
     <DoxaMapSlot
       map-id="research-page-map"
