@@ -31,20 +31,32 @@ useShadowStyles(`
    clicks a pin and the detail panel swaps in over the language-family legend
    (qa: 2026-05-02). */
 .legend-container{position:absolute;top:60px;left:8px;width:var(--map-legend-width,380px);max-height:calc(100vh - 80px);background:#fff;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.12),0 1px 3px rgba(0,0,0,0.08);z-index:1000;overflow:hidden;display:flex;flex-direction:column;transition:width 200ms cubic-bezier(0.2,0,0,1),max-height 200ms cubic-bezier(0.2,0,0,1),min-width 200ms cubic-bezier(0.2,0,0,1),border-radius 200ms linear,box-shadow 200ms linear;will-change:width,max-height;}
-/* Collapsed: card matches geocoder shape — 36px tall pill with 20px radius.
-   Name track auto-sizes to fit "Legend" text (no empty slack on the right).
-   .lrg-items padding cleared so the single title row centers inside 36px. */
-.legend-container.collapsed{width:auto;min-width:0;max-height:36px;height:36px;top:54px;border-radius:20px;overflow:hidden;}
+/* Collapsed: pill imitates SemanticTreeLegend's .stl-reopen —
+   rounded pill (999px radius), dark background, subtle border,
+   floating shadow, uppercase monospace font. Hover lifts + glows.
+   Name track auto-sizes to fit title text. */
+.legend-container.collapsed{width:auto;min-width:0;max-height:36px;height:36px;top:60px;border-radius:999px;overflow:hidden;background:#0d1117;border:1px solid #30363d;box-shadow:0 4px 14px rgba(0,0,0,0.25);transition:color 0.12s,background 0.12s,border-color 0.12s,transform 0.12s,box-shadow 0.12s;}
+.legend-container.collapsed:hover{background:#1c2333;border-color:#73A17F;box-shadow:0 6px 20px rgba(59,70,61,0.25);transform:translateY(-1px);}
 .legend-container.collapsed .lrg-items{grid-template-columns:var(--lrg-caret-col) auto var(--lrg-caret-col) !important;padding:0 !important;align-content:center;}
-.legend-container.collapsed .lrg-title-row{padding:0 !important;}
+.legend-container.collapsed .lrg-title-row{padding:0 4px 0 0 !important;}
+.legend-container.collapsed .lrg-title{color:#c9d1d9;font:600 12px system-ui,sans-serif;letter-spacing:0;text-transform:none;}
+/* Collapsed pill light mode — mirrors STL's .stl-reopen[data-theme="light"] */
+.legend-container.collapsed:not(.legend-dark){background:#ffffff;border-color:#d0d7de;box-shadow:0 4px 16px rgba(31,35,40,0.18);}
+.legend-container.collapsed:not(.legend-dark):hover{background:#f6f8fa;border-color:#3b463d;box-shadow:0 6px 20px rgba(59,70,61,0.2);}
+.legend-container.collapsed:not(.legend-dark) .lrg-title{color:#1f2328;}
 
 /* Card-level collapse caret — rendered into the #title-caret slot of
-   LegendRows. It sits inside the grid's caret column (col 1), centered,
-   with zero padding per spec. Rotation flips on collapse. */
-.legend-collapse-caret{width:10px;height:10px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:#888;padding:0;transition:transform 180ms cubic-bezier(0.2,0,0,1),color 120ms linear;outline:none;-webkit-tap-highlight-color:transparent;will-change:transform;}
+   LegendRows. Matches SemanticTreeLegend's .stl-collapse-btn look:
+   22x20px, rounded-rect, subtle dark bg + border, right-chevron SVG
+   that rotates 180deg when expanded. */
+.legend-collapse-caret{background:rgba(110,118,129,0.15);border:1px solid #30363d;border-radius:5px;color:#8b949e;cursor:pointer;width:22px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:color 0.1s,background 0.1s,transform 0.18s;outline:none;-webkit-tap-highlight-color:transparent;padding:0;}
 .legend-collapse-caret:focus{outline:none;}
-.legend-collapse-caret.rotated{transform:rotate(-90deg);}
-.legend-collapse-caret:hover{color:#333;}
+.legend-collapse-caret:hover{color:#c9d1d9;background:rgba(59,70,61,0.18);border-color:#73A17F;}
+.legend-collapse-caret svg{transition:transform 0.18s;transform:rotate(180deg);}
+.legend-collapse-caret.rotated svg{transform:rotate(0deg);}
+/* Light mode caret — mirrors STL's [data-theme="light"] .stl-collapse-btn */
+.legend-container:not(.legend-dark) .legend-collapse-caret{background:rgba(208,215,222,0.4);border-color:#d0d7de;color:#57606a;}
+.legend-container:not(.legend-dark) .legend-collapse-caret:hover{background:rgba(59,70,61,0.12);border-color:#3b463d;color:#3b463d;}
 
 /* Detail-mode close button — top-right of the card */
 .detail-close-btn{position:absolute;top:10px;right:10px;background:none;border:none;padding:4px;cursor:pointer;color:#888;display:flex;align-items:center;justify-content:center;z-index:2;transition:color 0.2s ease;}
@@ -134,8 +146,10 @@ useShadowStyles(`
 /* ── Dark mode ── */
 .legend-dark{background:#3b463d!important;border:1px solid rgba(255,255,255,0.10)!important;box-shadow:0 4px 16px rgba(0,0,0,0.5)!important;}
 .legend-dark .legend-content{background:#3b463d;}
-.legend-dark .legend-collapse-caret{color:rgba(243,243,241,0.75);}
-.legend-dark .legend-collapse-caret:hover{color:#F3F3F1;}
+/* Dark mode caret already matches STL defaults (dark bg + light text).
+   Override only the hover glow to use the kingdom green accent. */
+.legend-dark .legend-collapse-caret{background:rgba(110,118,129,0.15);border-color:#30363d;color:#8b949e;}
+.legend-dark .legend-collapse-caret:hover{color:#c9d1d9;background:rgba(59,70,61,0.18);border-color:#73A17F;}
 .legend-dark .detail-close-btn{color:rgba(243,243,241,0.75)!important;}
 .legend-dark .detail-close-btn:hover{color:#F3F3F1!important;}
 .legend-dark .legend-stats-header{background:#2a332a!important;color:rgba(243,243,241,0.65)!important;border-bottom-color:rgba(255,255,255,0.1)!important;}
@@ -381,8 +395,9 @@ onBeforeUnmount(() => {
             @click.stop="toggleCollapse"
             :aria-label="t('aria.toggleLegend')"
           >
-            <svg width="8" height="8" viewBox="0 0 20 20" fill="none">
-              <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
+              <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
         </template>
