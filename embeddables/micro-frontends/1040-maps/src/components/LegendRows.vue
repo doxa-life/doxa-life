@@ -103,7 +103,7 @@ useShadowStyles(`
    column (doubles as the legend's left padding); last col is a matching
    trailing track (right padding). Both are --lrg-caret-col wide so the
    legend is visually symmetric without any outer left/right padding. ── */
-.legend-row-group{--lrg-caret-col:10px;display:flex;flex-direction:column;height:100%;min-height:0;}
+.legend-row-group{--lrg-caret-col:30px;display:flex;flex-direction:column;height:100%;min-height:0;}
 
 /* The grid + scroll container. Tracks:
    [caret --lrg-caret-col] [name 1fr] [UPGS auto] [POPULATION auto] [trailing --lrg-caret-col].

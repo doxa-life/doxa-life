@@ -41,11 +41,13 @@ useShadowStyles(`
    SemanticTreeLegend .stl-tb-caret-slot). Vertical alignment with the
    title text comes from the slot's align-items:center, so no absolute
    positioning or padding offsets are needed (qa: 2026-05-02 iter-9). */
-.mobile-collapse-caret{width:20px;height:20px;display:flex;align-items:center;justify-content:center;background:rgba(208,215,222,0.5);border:1px solid #afb8c1;border-radius:5px;cursor:pointer;color:#3b463d;padding:0;transition:transform 0.3s ease-out,color 0.12s,background 0.12s,border-color 0.12s;transform-origin:center;outline:none;-webkit-tap-highlight-color:transparent;box-shadow:0 1px 2px rgba(0,0,0,0.05);flex-shrink:0;}
+/* Collapse caret — matches STL's .stl-collapse-btn exactly (22x20px,
+   same bg/border/radius/hover as the desktop SemanticTreeLegend caret). */
+.mobile-collapse-caret{width:22px;height:20px;display:flex;align-items:center;justify-content:center;background:rgba(208,215,222,0.4);border:1px solid #d0d7de;border-radius:5px;cursor:pointer;color:#57606a;padding:0;transition:transform 0.3s ease-out,color 0.1s,background 0.1s,border-color 0.1s;transform-origin:center;outline:none;-webkit-tap-highlight-color:transparent;flex-shrink:0;}
 .mobile-collapse-caret:focus{outline:none;}
-.mobile-collapse-caret:hover{color:#1f2328;background:#eaeef2;border-color:#3b463d;}
-.legend-mobile-sheet.sheet-dark .mobile-collapse-caret{background:rgba(110,118,129,0.22);border-color:#30363d;color:#c9d1d9;box-shadow:none;}
-.legend-mobile-sheet.sheet-dark .mobile-collapse-caret:hover{color:#fff;background:rgba(59,70,61,0.32);border-color:#73A17F;}
+.mobile-collapse-caret:hover{color:#3b463d;background:rgba(59,70,61,0.12);border-color:#3b463d;}
+.legend-mobile-sheet.sheet-dark .mobile-collapse-caret{background:rgba(110,118,129,0.15);border-color:#30363d;color:#8b949e;box-shadow:none;}
+.legend-mobile-sheet.sheet-dark .mobile-collapse-caret:hover{color:#c9d1d9;background:rgba(59,70,61,0.18);border-color:#73A17F;}
 
 /* Detail-mode close X — top-right corner */
 .detail-close-btn{position:absolute;top:10px;right:12px;background:none;border:none;padding:4px;cursor:pointer;color:#666;display:flex;align-items:center;justify-content:center;z-index:3;transition:color 0.2s ease;}
@@ -196,8 +198,10 @@ useShadowStyles(`
 
 /* ── Dark mode (class-based, driven by isDark prop) ── */
 .sheet-dark{background:#3b463d!important;box-shadow:0 -4px 20px rgba(0,0,0,0.5)!important;}
-.sheet-dark .mobile-collapse-caret{color:rgba(243,243,241,0.75)!important;}
-.sheet-dark .mobile-collapse-caret:hover{color:#F3F3F1!important;}
+/* Dark-mode caret — unified with STL palette (redundant with more-
+   specific selectors above, but kept for cascade safety). */
+.sheet-dark .mobile-collapse-caret{background:rgba(110,118,129,0.15)!important;border-color:#30363d!important;color:#8b949e!important;}
+.sheet-dark .mobile-collapse-caret:hover{color:#c9d1d9!important;background:rgba(59,70,61,0.18)!important;border-color:#73A17F!important;}
 .sheet-dark .detail-close-btn{color:rgba(243,243,241,0.75)!important;}
 .sheet-dark .detail-close-btn:hover{color:#F3F3F1!important;}
 .sheet-dark .pull-tab-handle{background:rgba(243,243,241,0.3)!important;}
@@ -516,8 +520,8 @@ onBeforeUnmount(() => {
           :aria-label="t('aria.toggleLegend')"
           tabindex="-1"
         >
-          <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-            <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
+            <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
         <span class="collapsed-detail-title">{{ legendTitle }}</span>
@@ -558,8 +562,8 @@ onBeforeUnmount(() => {
               :style="{ transform: `rotate(${caretRotation}deg)` }"
               @click.stop="handleCaretClick"
               :aria-label="t('aria.toggleLegend')">
-              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
+                <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
           </template>
@@ -589,8 +593,8 @@ onBeforeUnmount(() => {
               :style="{ transform: `rotate(${caretRotation}deg)` }"
               @click.stop="handleCaretClick"
               :aria-label="t('aria.toggleLegend')">
-              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
+                <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
           </template>
