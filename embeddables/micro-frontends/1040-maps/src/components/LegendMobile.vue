@@ -8,6 +8,7 @@ import LegendRows from './LegendRows.vue'
 import SemanticTreeLegend from './SemanticTreeLegend.vue'
 import { useLanguageFamilyLegendData } from '../composables/useLanguageFamilyLegendData.js'
 import { useAffinityBlockLegendData } from '../composables/useAffinityBlockLegendData.js'
+import { useWagfRegionsLegendData }   from '../composables/useWagfRegionsLegendData.js'
 import PeopleGroupDetail from './PeopleGroupDetail.vue'
 
 const { t } = useI18n()
@@ -268,6 +269,7 @@ const peopleGroupsForFamilyTree = computed(() => {
 const _pgRefMobile = { get value() { return peopleGroupsForFamilyTree.value } }
 const { langTree: langTreeForMobile } = useLanguageFamilyLegendData(_pgRefMobile)
 const { affinityTree: affinityTreeForMobile } = useAffinityBlockLegendData(_pgRefMobile)
+const { regionsTree: regionsTreeForMobile }   = useWagfRegionsLegendData(_pgRefMobile)
 const LANG_TABS_MOBILE = [
   { id: 'family',   label: 'Lang Family', info: 'A language family is a group of languages descended from a common ancestor.' },
   { id: 'language', label: 'Language',    info: 'A language is a system of communication used by a people.' },
@@ -279,10 +281,27 @@ const AFFINITY_TABS_MOBILE = [
   { id: 'group',   label: 'PG',      info: 'People Group (imb_reg_of_people_25, ROP 2.5) — abstract identity. 1,736 PGs.' },
   { id: 'pgic',    label: 'PGIC',    info: 'PG in Country (imb_reg_of_people_3 + country_code) — one row per PG-country pair. 2,106 rows.' },
 ]
+const REGIONS_TABS_MOBILE = [
+  { id: 'region',  label: 'Region',  info: 'WAGF macro-region (e.g. "Asia", "Africa"). Color-coded on the map.' },
+  { id: 'block',   label: 'Block',   info: 'WAGF block — organizational sub-grouping within each region (e.g. "South East Asia").' },
+  { id: 'country', label: 'Country', info: 'Individual countries, listed by unreached-population size within their block.' },
+]
 // Mobile-side tier swap — same SemanticTreeLegend, different tree per legend type.
-const treeForMobile     = computed(() => props.legendType === 'affinity-block' ? affinityTreeForMobile.value : langTreeForMobile.value)
-const tabsForMobile     = computed(() => props.legendType === 'affinity-block' ? AFFINITY_TABS_MOBILE      : LANG_TABS_MOBILE)
-const treeTitleForMobile = computed(() => props.legendType === 'affinity-block' ? 'Affinity Blocks'         : 'Languages')
+const treeForMobile = computed(() => {
+  if (props.legendType === 'affinity-block') return affinityTreeForMobile.value
+  if (props.legendType === 'doxa-regions')   return regionsTreeForMobile.value
+  return langTreeForMobile.value
+})
+const tabsForMobile = computed(() => {
+  if (props.legendType === 'affinity-block') return AFFINITY_TABS_MOBILE
+  if (props.legendType === 'doxa-regions')   return REGIONS_TABS_MOBILE
+  return LANG_TABS_MOBILE
+})
+const treeTitleForMobile = computed(() => {
+  if (props.legendType === 'affinity-block') return 'People Groups'
+  if (props.legendType === 'doxa-regions')   return 'WAGF Regions'
+  return 'Languages'
+})
 
 // Touch gesture state
 const touchStartY = ref(0)
@@ -522,11 +541,12 @@ onBeforeUnmount(() => {
           />
         </template>
 
-        <!-- Language-family tab: SemanticTreeLegend (PPLR-ported, R4).
-             Caret injected via #title-caret slot so it sits in column 1 of
-             the .stl-titlebar, vertically aligned with the title text. -->
+        <!-- Semantic-tree tabs (Languages, People Groups, WAGF Regions):
+             SemanticTreeLegend (PPLR-ported, R4). Caret injected via
+             #title-caret slot so it sits in column 1 of the .stl-titlebar,
+             vertically aligned with the title text. -->
         <SemanticTreeLegend
-          v-else-if="legendType === 'language-family' || legendType === 'affinity-block'"
+          v-else-if="legendType === 'language-family' || legendType === 'affinity-block' || legendType === 'doxa-regions'"
           :nodes="treeForMobile"
           :tabs="tabsForMobile"
           :title="legendTitle || treeTitleForMobile"
