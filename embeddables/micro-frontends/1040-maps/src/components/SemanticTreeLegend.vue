@@ -95,7 +95,8 @@ const selectedNode = computed({
 const selectedId = computed(() => selectedNode.value?.id || null)
 
 watch(() => props.nodes, () => {
-  activeTab.value = 0
+  const ext = instance?.activeTab.value
+  activeTab.value = (typeof ext === 'number' && ext >= 0) ? ext : 0
   expandedIds.value = new Set()
   selectedNode.value = null
   emit('select', null)
@@ -260,8 +261,17 @@ function selectNode(node) {
 function toggleExpand(id, e) {
   e?.stopPropagation()
   const s = new Set(expandedIds.value)
-  s.has(id) ? s.delete(id) : s.add(id)
+  const collapsing = s.has(id)
+  collapsing ? s.delete(id) : s.add(id)
   expandedIds.value = s
+  if (collapsing && selectedNode.value) {
+    const chain = findAncestorChain(props.nodes, selectedNode.value.id)
+    if (chain && chain.some(a => a.id === id)) {
+      _lastInternalId = null
+      selectedNode.value = null
+      emit('select', null)
+    }
+  }
 }
 function switchTab(idx) {
   if (activeTab.value === idx) {
@@ -543,7 +553,8 @@ useShadowStyles(`
 .stl-name {
   flex: 1; min-width: 0;
   font: 11.5px system-ui, sans-serif; color: #e6edf3;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  white-space: normal; word-wrap: break-word; overflow-wrap: break-word;
+  line-height: 1.3;
 }
 /* Center-aligned numeric data — paired with center-aligned header above. */
 .stl-num {

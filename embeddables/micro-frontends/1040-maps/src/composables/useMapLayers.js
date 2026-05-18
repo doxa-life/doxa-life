@@ -238,7 +238,7 @@ export function useMapLayers(options = {}) {
                 'circle-radius': getCircleRadiusInterpolation('standard'),
                 'circle-color': colorExpression,
                 'circle-stroke-width': getCircleStrokeWidthInterpolation('standard'),
-                'circle-stroke-color': 'rgba(255,255,255,0.9)',  // Light-mode default; white stroke for contrast on colored fills (Apple Maps pattern). Dark-mode flips this to '#ffffff' via app-profile theme watcher.
+                'circle-stroke-color': 'rgba(0,0,0,0.2)',
                 'circle-opacity': 1,
                 'circle-stroke-opacity': 1,
                 'circle-opacity-transition': { duration: 250 }

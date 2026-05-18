@@ -268,9 +268,10 @@ useShadowStyles(`
     padding-inline-end:16px;
     scroll-padding-inline:16px;
     gap:var(--spacing-3xl,28px);
-    z-index:10;overflow-x:auto;scrollbar-width:thin;
+    z-index:10;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;
     font-family:'Poppins',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
   }
+  .rm-tab-bar::-webkit-scrollbar{display:none;width:0;height:0;}
   .rm-dark .rm-tab-bar { background:#2a332a;border-bottom-color:rgba(255,255,255,0.10); }
   .rm-tab {
     background:none;border:none;padding:0;height:100%;
@@ -312,12 +313,9 @@ useShadowStyles(`
     .rm-legend-mobile-slot { display:block; }
     .rm-legend-desktop-slot { display:none; }
   }
-  .map-scroll-edge { position:absolute;top:0;bottom:0;width:40px;z-index:2;touch-action:pan-y;pointer-events:none;background:transparent; }
+  .map-scroll-edge { position:absolute;top:0;bottom:0;width:40px;z-index:2;touch-action:pan-y;pointer-events:auto;background:transparent; }
   .map-scroll-edge--left { left:0; }
   .map-scroll-edge--right { right:0; }
-  @media(max-width:768px){
-    .map-scroll-edge { pointer-events:auto; }
-  }
 `, 'research-map')
 
 // ─── Config from ProfileLoader (provide/inject — never direct imports) ──────
@@ -373,7 +371,7 @@ const ALL_TABS = [
   { id: 'adoption',          label: 'Adoption',          colorStrategy: 'adoption',       legend: 'adoption',          popup: 'adopt', feature: null            },
   { id: 'engagement',        label: 'Engagement',        colorStrategy: 'engagement',     legend: 'engagement',        popup: 'pray',  feature: null,           sepAfter: true },
   { id: 'affinity-blocks',   label: 'People Groups',     colorStrategy: 'affinityBlock',  legend: 'affinity-block',    popup: 'pray',  feature: null            },
-  { id: 'doxa-regions',      label: 'WAGF Regions',      colorStrategy: 'doxaRegion',     legend: 'doxa-regions',      popup: 'pray',  feature: 'doxaRegions'   },
+  { id: 'doxa-regions',      label: 'Regions',            colorStrategy: 'doxaRegion',     legend: 'doxa-regions',      popup: 'pray',  feature: 'doxaRegions'   },
   { id: 'language-families', label: 'Languages',         colorStrategy: 'languageFamily', legend: 'language-family',   popup: 'pray',  feature: null            },
   { id: 'religion',          label: 'Religions',         colorStrategy: 'religion',       legend: 'religion',          popup: 'pray',  feature: null            }
 ]
@@ -385,6 +383,8 @@ const activeTabId = ref(null)
 const activeTab   = computed(() => tabs.value.find(t => t.id === activeTabId.value) ?? tabs.value[0])
 const activeLegendType = computed(() => activeTab.value?.legend ?? 'default')
 const activePopupAction = computed(() => activeTab.value?.popup ?? 'pray')
+const _isSemanticTab = computed(() => ['language-family', 'affinity-block', 'doxa-regions'].includes(activeLegendType.value))
+const _showFlatLegend = computed(() => !_isSemanticTab.value || (uiStore.legendMode === 'detail' && uiStore.selectedPeopleGroup))
 
 // Per-tab geocoder placeholder. The Language Families tab makes the search
 // scope explicit ("Search language family, language, dialect/variety") so users
@@ -427,7 +427,7 @@ watch(() => activeTabId?.value, async (newTabId, oldTabId) => {
     // Save outgoing tab's current state under the OLD tab id.
     if (oldTabId) _tabLegendState.set(oldTabId, uiStore.legendState)
     // Restore incoming tab's state (collapsed default for first visit).
-    const restored = _tabLegendState.get(newTabId) || 'collapsed'
+    const restored = _tabLegendState.get(newTabId) || uiStore.legendState || 'open'
     if (restored === 'fullyOpen')   uiStore.fullyOpenLegend?.()
     else if (restored === 'open')   uiStore.openLegend?.()
     else                             uiStore.collapseLegend?.()
@@ -678,6 +678,9 @@ function onSemanticTreeSelect(node) {
       _syncHitboxFilter(m, null)
       m.setPaintProperty('language-family-pins', 'circle-opacity', 1)
       m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', 1)
+      if (m.getLayer('language-family-pins-shadow')) {
+        m.setPaintProperty('language-family-pins-shadow', 'circle-opacity', 1)
+      }
     }
     // Reset region polygon highlight when deselecting on the WAGF Regions tab.
     if (m && m.getLayer('regions-fill')) {
@@ -718,11 +721,16 @@ function onSemanticTreeSelect(node) {
       // Dim via case expression — matched pins at 1.0, others at 0.06 (matches research-map's
       // applyDimFilter values).
       m.setPaintProperty('language-family-pins', 'circle-opacity', [
-        'case', node.filter, 1, 0.06
+        'case', node.filter, 1, 0
       ])
       m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', [
-        'case', node.filter, 1, 0.06
+        'case', node.filter, 1, 0
       ])
+      if (m.getLayer('language-family-pins-shadow')) {
+        m.setPaintProperty('language-family-pins-shadow', 'circle-opacity', [
+          'case', node.filter, 1, 0
+        ])
+      }
     }
   }
   // WAGF Regions tab — filter pins to the selected region/block/country and highlight
@@ -746,7 +754,7 @@ function onSemanticTreeSelect(node) {
       if (isoCodes.length) {
         const isoArr = ['literal', isoCodes]
         m.setPaintProperty('regions-fill', 'fill-opacity', [
-          'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], 0.30, 0.06
+          'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], 0.30, 0.02
         ])
         m.setPaintProperty('regions-border', 'line-color', [
           'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], '#111827', 'rgba(60,60,80,0.15)'
@@ -857,12 +865,16 @@ const isDark = computed(() => uiStore.theme === 'dark')
 // basemaps. Boot style is light-v11, so the initial circle-stroke-color
 // in addLanguageFamilyLayer is already 'rgba(0,0,0,0.45)' — this watcher
 // just flips it on theme toggle.
-watch(isDark, (dark) => {
+function _updatePinStroke() {
   const m = map.value
   if (!m || !m.getLayer('language-family-pins')) return
-  m.setPaintProperty('language-family-pins', 'circle-stroke-color',
-    dark ? '#ffffff' : 'rgba(255,255,255,0.9)')
-}, { immediate: false })
+  const regionsActive = activeTab.value?.id === 'doxa-regions'
+  const dark = isDark.value
+  const color = dark ? '#ffffff' : regionsActive ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.2)'
+  m.setPaintProperty('language-family-pins', 'circle-stroke-color', color)
+}
+watch(isDark, _updatePinStroke, { immediate: false })
+watch(() => activeTab.value?.id, _updatePinStroke)
 function handleToggleTheme() {
   if (!map.value) return
   uiStore.toggleTheme()
@@ -1020,6 +1032,9 @@ const _lastHL = { family: null, language: null, dialect: null, region: null, pra
 function clearAllHighlights(m) {
   m.setPaintProperty('language-family-pins', 'circle-opacity', 1)
   m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', 1)
+  if (m.getLayer('language-family-pins-shadow')) {
+    m.setPaintProperty('language-family-pins-shadow', 'circle-opacity', 1)
+  }
   // CRITICAL: clear any source-filter applied by the regions-tab path.
   // Without this, switching from Doxa Regions (where a region row is selected
   // and a Mapbox setFilter is active) to any other tab leaves the filter in
@@ -1141,7 +1156,7 @@ function applyDimFilter(detail) {
       if (isoCodes.length) {
         const isoArr = ['literal', isoCodes]
         m.setPaintProperty('regions-fill', 'fill-opacity', [
-          'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], 0.30, 0.06
+          'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], 0.30, 0.02
         ])
         m.setPaintProperty('regions-border', 'line-color', [
           'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], '#111827', 'rgba(60,60,80,0.15)'
@@ -1226,11 +1241,16 @@ function applyDimFilter(detail) {
     }
 
     m.setPaintProperty('language-family-pins', 'circle-opacity', [
-      'case', matchExpr, 1, 0.06
+      'case', matchExpr, 1, 0
     ])
     m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', [
-      'case', matchExpr, 1, 0.06
+      'case', matchExpr, 1, 0
     ])
+    if (m.getLayer('language-family-pins-shadow')) {
+      m.setPaintProperty('language-family-pins-shadow', 'circle-opacity', [
+        'case', matchExpr, 1, 0
+      ])
+    }
     if (m.getLayer('regions-fill')) {
       m.setPaintProperty('regions-fill', 'fill-opacity', 0.20)
       m.setPaintProperty('regions-border', 'line-color', 'rgba(60,60,80,0.35)')
@@ -1735,14 +1755,15 @@ onBeforeUnmount(() => {
            when a pin is clicked there (qa: 2026-05-02). -->
       <div class="rm-legend-desktop-slot">
         <LegendDesktop
-          v-if="appReady && ((activeLegendType !== 'language-family' && activeLegendType !== 'affinity-block' && activeLegendType !== 'doxa-regions') || (uiStore.legendMode === 'detail' && uiStore.selectedPeopleGroup))"
+          v-if="appReady && _showFlatLegend"
           :legend-type="activeLegendType"
           :popup-action="activePopupAction"
           :initially-collapsed="false"
           :is-dark="isDark"
         />
         <SemanticTreeLegend
-          v-else-if="appReady"
+          v-if="appReady && _isSemanticTab"
+          v-show="!_showFlatLegend"
           :nodes="legendNodes"
           :tabs="legendInnerTabs"
           :title="legendTitle"

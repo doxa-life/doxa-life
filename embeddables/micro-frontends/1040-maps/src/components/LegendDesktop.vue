@@ -35,15 +35,18 @@ useShadowStyles(`
    rounded pill (999px radius), dark background, subtle border,
    floating shadow, uppercase monospace font. Hover lifts + glows.
    Name track auto-sizes to fit title text. */
-.legend-container.collapsed{width:auto;min-width:0;max-height:36px;height:36px;top:60px;border-radius:999px;overflow:hidden;background:#0d1117;border:1px solid #30363d;box-shadow:0 4px 14px rgba(0,0,0,0.25);transition:color 0.12s,background 0.12s,border-color 0.12s,transform 0.12s,box-shadow 0.12s;}
-.legend-container.collapsed:hover{background:#1c2333;border-color:#73A17F;box-shadow:0 6px 20px rgba(59,70,61,0.25);transform:translateY(-1px);}
-.legend-container.collapsed .lrg-items{grid-template-columns:var(--lrg-caret-col) auto var(--lrg-caret-col) !important;padding:0 !important;align-content:center;}
-.legend-container.collapsed .lrg-title-row{padding:0 4px 0 0 !important;}
-.legend-container.collapsed .lrg-title{color:#c9d1d9;font:600 12px system-ui,sans-serif;letter-spacing:0;text-transform:none;}
+/* ── Reopen pill (collapsed state) — mirrors STL .stl-reopen ── */
+.legend-reopen{position:absolute;left:8px;top:60px;z-index:1000;display:inline-flex;align-items:center;gap:8px;background:#0d1117;border:1px solid #30363d;border-radius:999px;color:#c9d1d9;cursor:pointer;height:36px;padding:0 14px 0 12px;box-shadow:0 4px 14px rgba(0,0,0,0.25);font:600 11px ui-monospace,monospace;text-transform:uppercase;letter-spacing:0.06em;max-width:320px;transition:color 0.12s,background 0.12s,border-color 0.12s,transform 0.12s,box-shadow 0.12s;}
+.legend-reopen:hover{color:#fff;background:#1c2333;border-color:#73A17F;box-shadow:0 6px 20px rgba(59,70,61,0.25);transform:translateY(-1px);}
+.legend-reopen-icon{color:#73A17F;flex-shrink:0;}
+.legend-reopen-label{display:inline-flex;align-items:center;gap:6px;min-width:0;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none;letter-spacing:0;font:600 12px system-ui,sans-serif;}
+.legend-reopen-caret{color:#6e7681;flex-shrink:0;}
+.legend-reopen:hover .legend-reopen-caret{color:#c9d1d9;}
+.legend-reopen-light{background:#ffffff;border-color:#d0d7de;color:#1f2328;box-shadow:0 4px 16px rgba(31,35,40,0.18);}
+.legend-reopen-light:hover{background:#f6f8fa;border-color:#3b463d;color:#3b463d;box-shadow:0 6px 20px rgba(59,70,61,0.2);}
+.legend-reopen-light .legend-reopen-icon{color:#3b463d;}
+.legend-reopen-light .legend-reopen-caret{color:#57606a;}
 /* Collapsed pill light mode — mirrors STL's .stl-reopen[data-theme="light"] */
-.legend-container.collapsed:not(.legend-dark){background:#ffffff;border-color:#d0d7de;box-shadow:0 4px 16px rgba(31,35,40,0.18);}
-.legend-container.collapsed:not(.legend-dark):hover{background:#f6f8fa;border-color:#3b463d;box-shadow:0 6px 20px rgba(59,70,61,0.2);}
-.legend-container.collapsed:not(.legend-dark) .lrg-title{color:#1f2328;}
 
 /* Card-level collapse caret — rendered into the #title-caret slot of
    LegendRows. Matches SemanticTreeLegend's .stl-collapse-btn look:
@@ -73,31 +76,17 @@ useShadowStyles(`
 /* When collapsed, hide everything EXCEPT the title inside LegendRows.
    The title row stays visible; column labels (UPGS/POPULATION) are hidden
    so the collapsed state shows only "Legend" — feedback 2026-04-21. */
-.legend-container.collapsed .lrg-row,
-.legend-container.collapsed .lrg-footer,
-.legend-container.collapsed .lrg-header-col,
-.legend-container.collapsed .lft-row,
-.legend-container.collapsed .lft-row-child,
-.legend-container.collapsed .lft-header-col{display:none!important;}
 /* Tab-4 lang-fam tree height parity with tabs 1-3 (qa.md R6 + R8 A2).
    Clamp to the same 36px pill when collapsed, hide column headers like
    LegendRows does, AND disable position:sticky on the title row — sticky
    creates its own stacking context that breaks the parent .legend-container's
    border-radius clip, leaving the collapsed pill with a sharp-cut right edge. */
-.legend-container.collapsed .lft-items{padding:0!important;align-content:center;overflow:visible!important;}
-.legend-container.collapsed .lft-title-row{padding:0!important;position:static!important;background:transparent!important;}
-.legend-container.collapsed .lrg-title-row{position:static!important;background:transparent!important;}
 
 /* SemanticTreeLegend (PPLR-ported) collapse parity — preserve the rounded-pill
    collapse-to-circle aesthetic from before. Hide everything below the titlebar
    so only the title (containing our caret + "Legend"/breadcrumb) shows.
    The .stl-inner border + box-shadow is also removed in collapsed state so the
    inner doesn't double up on the .legend-container's pill chrome. */
-.legend-container.collapsed .semantic-tree-legend .stl-tabs-wrap,
-.legend-container.collapsed .semantic-tree-legend .stl-col-hdr,
-.legend-container.collapsed .semantic-tree-legend .stl-rows{display:none!important;}
-.legend-container.collapsed .semantic-tree-legend .stl-inner{background:transparent!important;border:none!important;box-shadow:none!important;border-radius:0!important;}
-.legend-container.collapsed .semantic-tree-legend .stl-titlebar{padding:0 12px!important;border-bottom:none!important;min-height:36px!important;}
 .legend-section-label{padding:8px 12px 4px;font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:0.5px;text-transform:uppercase;}
 .legend-dark .legend-section-label{color:rgba(243,243,241,0.55);}
 
@@ -336,8 +325,22 @@ onBeforeUnmount(() => {
        it lives in the grid's caret column (col 1) — aligned with the title
        row, and using the same padding track as all row-level carets.
        See docs/legend-spec.md. -->
-  <div v-else :class="['legend-container', { collapsed: isCollapsed, 'legend-dark': isDark }]">
-    <!-- Detail-mode close button (only when a people group is selected) -->
+  <!-- Collapsed pill — identical to STL's .stl-reopen -->
+  <button v-else-if="isCollapsed"
+    :class="['legend-reopen', { 'legend-reopen-light': !isDark }]"
+    title="Expand legend"
+    @click="isCollapsed = false">
+    <svg class="legend-reopen-icon" width="11" height="11" viewBox="0 0 12 12" fill="none">
+      <path d="M2 4h8M2 6h8M2 8h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    </svg>
+    <span class="legend-reopen-label">{{ legendDataTitle }}</span>
+    <svg class="legend-reopen-caret" width="8" height="8" viewBox="0 0 12 12" fill="none">
+      <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <!-- Expanded legend card -->
+  <div v-else :class="['legend-container', { 'legend-dark': isDark }]">
     <button
       v-if="legendMode === 'detail'"
       class="detail-close-btn"
@@ -349,13 +352,7 @@ onBeforeUnmount(() => {
       </svg>
     </button>
 
-    <!-- Content (equal padding all sides). Always rendered so the title row
-         stays visible when collapsed; data rows are hidden via .collapsed class.
-         The Fly + Clusters toolbar that used to live here moved to LegendTools.vue
-         (mounted as a sibling of LegendDesktop in research-map.vue) per UX
-         2026-04-27. -->
     <div class="legend-content" :class="{ 'no-padding': legendColumns.length > 0 }">
-      <!-- People Group Detail mode (pin was clicked) -->
       <PeopleGroupDetail
         v-if="legendMode === 'detail' && selectedPeopleGroup"
         :peopleGroup="selectedPeopleGroup"
@@ -363,15 +360,7 @@ onBeforeUnmount(() => {
         :dark="isDark"
         :action="popupAction"
       />
-
-      <!-- Language-family tab is now handled by <SemanticTreeLegend> mounted
-           directly in research-map.vue as a standalone sibling. LegendDesktop
-           is hidden for that tab via parent v-if. No branch here. -->
       <template v-else-if="legendType === 'language-family'"></template>
-
-      <!-- Universal data-driven legend rows.
-           The title comes from here — rendered as the first row of the table,
-           NOT as a separate header bar. -->
       <LegendRows
         v-else
         :title="legendTitle"
@@ -389,21 +378,17 @@ onBeforeUnmount(() => {
         @filter-click="handleRowFilterClick"
       >
         <template #title-caret>
-          <button
-            class="legend-collapse-caret"
-            :class="{ rotated: isCollapsed }"
-            @click.stop="toggleCollapse"
-            :aria-label="t('aria.toggleLegend')"
-          >
+          <button class="legend-collapse-caret" @click.stop="toggleCollapse" :aria-label="t('aria.toggleLegend')">
             <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
               <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.8"
-                stroke-linecap="round" stroke-linejoin="round"/>
+                stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(180deg);transform-origin:center"/>
             </svg>
           </button>
         </template>
       </LegendRows>
     </div>
-  </div> <!-- end desktop legend -->
+  </div>
+
 </template>
 
 <style scoped>

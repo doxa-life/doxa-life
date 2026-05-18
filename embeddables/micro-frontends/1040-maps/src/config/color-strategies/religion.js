@@ -57,7 +57,7 @@ export const PALETTE = {
   'J': '#a855f7', // Judaism — purple
   'S': '#ec4899', // Sikhism — pink / magenta
   'N': '#71717a', // Unaffiliated — neutral gray
-  'O': '#d97706', // Other — burnt orange
+  'O': '#ff6b2b', // Other — vivid orange
   'U': '#94a3b8', // Unknown — slate gray
 }
 
