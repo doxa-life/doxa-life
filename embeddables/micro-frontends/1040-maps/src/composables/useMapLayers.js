@@ -77,6 +77,10 @@ export function useMapLayers(options = {}) {
         familyConnections: false
     });
 
+    // Populated by addRegionsLayer — maps WAGF region label → Set of ISO alpha-2 codes.
+    // Used by applyDimFilter to build the Mapbox match expression for polygon highlight.
+    const regionIsoMap = ref({});
+
     /**
      * Add language family pins layer
      * Shows people groups as colored circles based on language family
@@ -130,6 +134,9 @@ export function useMapLayers(options = {}) {
                 // Reading `_normalized` first would pin the GeoJSON property to
                 // the lowercase value form and break Mapbox setFilter matches.
                 doxaRegion: pg.doxaRegion || pg._normalized?.doxaRegion || 'Unknown',
+                wagfBlock: pg.wagfBlock || pg._normalized?.wagfBlock || '',
+                wagfBlockLabel: pg.wagfBlockLabel || pg._normalized?.wagfBlockLabel || '',
+                wagfRegionLabel: pg.wagfRegionLabel || pg._normalized?.wagfRegionLabel || '',
                 // Country fields — `countryName` is the unified decoded display label
                 country:         pg.country,
                 countryIso:      pg.countryIso,
@@ -169,6 +176,29 @@ export function useMapLayers(options = {}) {
             !isNaN(f.geometry.coordinates[1])
         );
 
+        // Offset co-located pins so they fan out in a circle instead of stacking.
+        // Radius is ~0.04 degrees (~4 km) — visible at zoom ≥ 5, invisible at world view.
+        const OFFSET_RADIUS_DEG = 0.04;
+        const coordKey = (f) => `${f.geometry.coordinates[0]},${f.geometry.coordinates[1]}`;
+        const groups = new Map();
+        for (const f of features) {
+            const k = coordKey(f);
+            if (!groups.has(k)) groups.set(k, []);
+            groups.get(k).push(f);
+        }
+        for (const bucket of groups.values()) {
+            if (bucket.length < 2) continue;
+            const [cx, cy] = bucket[0].geometry.coordinates;
+            const n = bucket.length;
+            for (let i = 0; i < n; i++) {
+                const angle = (2 * Math.PI * i) / n;
+                bucket[i].geometry.coordinates = [
+                    cx + OFFSET_RADIUS_DEG * Math.cos(angle),
+                    cy + OFFSET_RADIUS_DEG * Math.sin(angle)
+                ];
+            }
+        }
+
         const geojson = {
             type: 'FeatureCollection',
             features: features
@@ -182,6 +212,22 @@ export function useMapLayers(options = {}) {
             promoteId: 'uniqueId'
         });
 
+        // Shadow layer — rendered BEFORE pins for a subtle drop-shadow effect.
+        // Uses circle-blur + circle-translate to simulate depth with zero DOM overhead.
+        map.addLayer({
+            id: 'language-family-pins-shadow',
+            type: 'circle',
+            source: 'language-families',
+            paint: {
+                'circle-radius': getCircleRadiusInterpolation('standard'),
+                'circle-color': 'rgba(0,0,0,0.12)',
+                'circle-blur': 0.8,
+                'circle-translate': [0, 1],
+                'circle-stroke-width': 0,
+                'circle-opacity': 1
+            }
+        });
+
         // Add the pins layer. Pins render fully opaque so they read clearly
         // on top of the doxa-regions polygon fill (which is semi-transparent).
         map.addLayer({
@@ -192,9 +238,24 @@ export function useMapLayers(options = {}) {
                 'circle-radius': getCircleRadiusInterpolation('standard'),
                 'circle-color': colorExpression,
                 'circle-stroke-width': getCircleStrokeWidthInterpolation('standard'),
-                'circle-stroke-color': 'rgba(0,0,0,0.45)',  // Light-mode default; thin near-black outline like Joshua Project. Dark-mode flips this to '#ffffff' via app-profile theme watcher.
+                'circle-stroke-color': 'rgba(255,255,255,0.9)',  // Light-mode default; white stroke for contrast on colored fills (Apple Maps pattern). Dark-mode flips this to '#ffffff' via app-profile theme watcher.
                 'circle-opacity': 1,
-                'circle-stroke-opacity': 1
+                'circle-stroke-opacity': 1,
+                'circle-opacity-transition': { duration: 250 }
+            }
+        });
+
+        // Invisible hitbox layer — larger transparent circles on top of pins
+        // for easier touch/click targeting (especially on mobile).
+        map.addLayer({
+            id: 'language-family-pins-hitbox',
+            type: 'circle',
+            source: 'language-families',
+            paint: {
+                'circle-radius': getCircleRadiusInterpolation('large'),
+                'circle-color': 'rgba(0,0,0,0)',
+                'circle-stroke-width': 0,
+                'circle-opacity': 0
             }
         });
 
@@ -206,76 +267,77 @@ export function useMapLayers(options = {}) {
     }
 
     /**
-     * Add regions polygon layer
-     * Shows regions as colored fill polygons
+     * Add regions polygon layer using Mapbox's built-in country boundaries
+     * vector tileset (mapbox.country-boundaries-v1). No external fetch —
+     * same CDN as the base map, vector tiles load only the visible viewport.
      *
-     * @param {Object} regionsData - GeoJSON regions data
-     * @param {string} colorScheme - Color scheme ('doxa-regions', 'affinity-blocs', 'none')
+     * @param {Object} regionsData - { isoToRegion: { 'AF': 'Asia', … } }
+     * @param {string} colorScheme - 'doxa-regions' | 'none'
      */
     function addRegionsLayer(regionsData, colorScheme = 'doxa-regions') {
         const map = getMap();
-        if (!map || !regionsData) {
-            return;
-        }
+        if (!map) return;
 
-        // Determine which color palette to use
-        let getColor;
-        if (colorScheme === 'doxa-regions') {
-            getColor = (country, region) => getRegionColor(region.name) || '#cccccc';
-        } else if (colorScheme === 'affinity-blocs') {
-            getColor = () => '#e0e0e0'; // Placeholder
-        } else {
-            getColor = () => 'rgba(200, 200, 200, 0.3)';
-        }
+        // If layers already exist (e.g. after a style reload) remove them first.
+        if (map.getLayer('regions-fill'))   map.removeLayer('regions-fill');
+        if (map.getLayer('regions-border')) map.removeLayer('regions-border');
+        if (map.getSource('regions'))       map.removeSource('regions');
 
-        // Create GeoJSON FeatureCollection from regions data
-        const features = [];
-
-        regionsData.regions.forEach(region => {
-            region.subRegions.forEach(subRegion => {
-                subRegion.countries.forEach(country => {
-                    if (country.geometry && country.geometry.type) {
-                        features.push({
-                            type: 'Feature',
-                            properties: {
-                                name: country.name,
-                                geoName: country.geoName,
-                                region: region.name,
-                                subRegion: subRegion.name,
-                                uupgCount: country.uupgCount,
-                                hasWAGFMember: country.hasWAGFMember,
-                                color: getColor(country, region)
-                            },
-                            geometry: country.geometry
-                        });
-                    }
-                });
-            });
-        });
-
-        const geojson = {
-            type: 'FeatureCollection',
-            features: features
+        const REGION_COLORS = {
+            'Africa':                                 '#e74c3c',
+            'Asia':                                   '#3498db',
+            'Europe':                                 '#2ecc71',
+            'Latin America & Caribbean':              '#f39c12',
+            'Middle East':                            '#9b59b6',
+            'North America & Non-Spanish Caribbean':  '#1abc9c',
+            'Oceania':                                '#e67e22',
         };
+        const DEFAULT_COLOR = '#cccccc';
 
+        // Build a Mapbox `match` expression on iso_3166_1_alpha_3 (alpha-3).
+        // The mapbox.country-boundaries-v1 tileset exposes both iso_3166_1 (alpha-2)
+        // AND iso_3166_1_alpha_3 (alpha-3). The API gives us country_code as alpha-3
+        // (e.g. 'MYS', 'SDN') so we match on the alpha-3 property to avoid a lookup table.
+        const isoToRegion = (regionsData && regionsData.isoToRegion) ? regionsData.isoToRegion : {};
+        const matchPairs = [];
+        // Build regionIsoMap: region label → array of ISO alpha-3 codes for that region.
+        const _regionIsoMap = {};
+        for (const [iso, region] of Object.entries(isoToRegion)) {
+            const color = REGION_COLORS[region];
+            if (color) matchPairs.push(iso, color);
+            if (!_regionIsoMap[region]) _regionIsoMap[region] = [];
+            _regionIsoMap[region].push(iso);
+        }
+        regionIsoMap.value = _regionIsoMap;
 
-        // Add source
+        // If no mapping available fall back to a flat grey — map still renders.
+        const fillColorExpr = matchPairs.length
+            ? ['match', ['get', 'iso_3166_1_alpha_3'], ...matchPairs, DEFAULT_COLOR]
+            : DEFAULT_COLOR;
+
+        // Insert regions UNDER the pins (and shadow) layer so pins stay on top + clickable.
+        // Prefer inserting before the shadow layer so z-order is: regions → shadow → pins → hitbox.
+        const beforeId = map.getLayer('language-family-pins-shadow')
+            ? 'language-family-pins-shadow'
+            : map.getLayer('language-family-pins')
+                ? 'language-family-pins'
+                : undefined;
+
         map.addSource('regions', {
-            type: 'geojson',
-            data: geojson
+            type: 'vector',
+            url: 'mapbox://mapbox.country-boundaries-v1'
         });
-
-        // Insert regions UNDER the pins layer so pins stay on top + clickable.
-        // Mapbox addLayer(layer, beforeId) inserts beneath beforeId.
-        const beforeId = map.getLayer('language-family-pins') ? 'language-family-pins' : undefined;
 
         map.addLayer({
             id: 'regions-fill',
             type: 'fill',
             source: 'regions',
+            'source-layer': 'country_boundaries',
             paint: {
-                'fill-color': ['get', 'color'],
-                'fill-opacity': colorScheme === 'none' ? 0.2 : 0.35
+                'fill-color': fillColorExpr,
+                'fill-opacity': colorScheme === 'none' ? 0.1 : 0.20,
+                'fill-antialias': true,
+                'fill-opacity-transition': { duration: 300 }
             }
         }, beforeId);
 
@@ -283,17 +345,16 @@ export function useMapLayers(options = {}) {
             id: 'regions-border',
             type: 'line',
             source: 'regions',
+            'source-layer': 'country_boundaries',
             paint: {
-                'line-color': '#ffffff',
-                'line-width': 1
+                'line-color': 'rgba(60,60,80,0.35)',
+                'line-width': 0.6
             }
         }, beforeId);
 
         layersAdded.value.regions = true;
 
-        // Attach event handlers (click for popup, cursor change on hover)
         mapEvents.attachRegionEvents();
-
     }
 
     /**
@@ -458,6 +519,7 @@ export function useMapLayers(options = {}) {
     return {
         // State
         layersAdded,
+        regionIsoMap,
 
         // Layer creation (includes event handler attachment)
         addLanguageFamilyLayer,

@@ -18,13 +18,14 @@
  * Tabs are NOT configurable from outside this profile — they're baked in.
  * To change them, edit the TABS constant in this file.
  *
- * BAKED-IN TABS (mirrors the OLD doxa-map-app-widget research map exactly,
- * source: DOXA/doxa-map-app-widget/src/config/mapConfig.js:434, tabOrder):
+ * BAKED-IN TABS (updated 2026-05-09 — new 7-tab layout):
  *   1. Prayer Progress     (prayerProgress / prayer)
- *   2. Doxa Regions        (doxaRegion / doxa-regions)
- *   3. Affinity Blocks     (affinityBlock / affinity-blocs)
- *   4. Language Families   (languageFamily / language-families)
- *   5. Gospel Resources    (resource / gospel-resources)
+ *   2. Adoption            (adoption / adoption)
+ *   3. Engagement          (engagement / engagement)           [separator after]
+ *   4. People Groups       (affinityBlock / affinity-block)    [was "Affinity Blocks"]
+ *   5. WAGF Regions        (doxaRegion / doxa-regions)
+ *   6. Languages           (languageFamily / language-families)
+ *   7. Religions           (religion / religion)
  */
 
 import { inject, provide, ref, computed, onMounted, onBeforeUnmount, watch, markRaw, nextTick, defineAsyncComponent } from 'vue'
@@ -76,6 +77,13 @@ function _clearGeocoderProgrammatic() {
     try { input.dispatchEvent(new Event('input', { bubbles: true })) } catch (_) {}
   }
   _geoBeingCleared = false
+}
+
+// Mirror setFilter to the invisible hitbox layer so click targets stay in sync.
+function _syncHitboxFilter(m, filter) {
+  if (m?.getLayer('language-family-pins-hitbox')) {
+    try { m.setFilter('language-family-pins-hitbox', filter) } catch (_) {}
+  }
 }
 
 // Tells the legend to collapse other expanded families and scroll the newly
@@ -156,6 +164,7 @@ import { useLanguageFamilyLegendData } from '@map/composables/useLanguageFamilyL
 // shape from rop1 (affinity bloc) + imb_reg_of_people_2 (cluster) + people group, so the SAME
 // SemanticTreeLegend instance can render either depending on activeLegendType.
 import { useAffinityBlockLegendData } from '@map/composables/useAffinityBlockLegendData.js'
+import { useWagfRegionsLegendData }   from '@map/composables/useWagfRegionsLegendData.js'
 
 // PERF: PosterDialog only renders when the user opens the poster export
 // flow. Async-import it so the dialog's deps don't load on every map boot.
@@ -342,7 +351,7 @@ const uiStore   = inject('uiStore')
 // feature-flagged OFF per UX request 2026-04-27 (kept in code so the wiring
 // stays warm; flip `doxaRegions: true` to bring it back).
 const FEATURES = {
-  doxaRegions:    false,
+  doxaRegions:    true,
   hamburgerMenu:  false,  // canonical default — emit/listen mismatch + drawer surplus
   // Per QA building-round-1 R3 A4: clear the geocoder text on tab switch by
   // default; flip to true to preserve the previous tab's query when returning.
@@ -464,7 +473,8 @@ const mapLayers = useMapLayers({
 const mapEvents = useMapEvents({
   getMap: () => map.value,
   mapId,
-  getLanguageFamilyColor: () => '#7c8cf8'
+  getLanguageFamilyColor: () => '#7c8cf8',
+  getNormalizedPeopleGroups: () => mapData.normalizedPeopleGroups.value || []
 })
 
 // ─── Fly composable ──────────────────────────────────────────────────────────
@@ -597,11 +607,36 @@ const AFFINITY_TABS = [
     info: 'PGIC = People Group In Country (field: imb_reg_of_people_3 + country_code) — one row per (people group, country) pair. Suffix "(PGIC)" on each row. 2,106 rows total. Example: "Abai Sungai, Malaysia (PGIC)" is the Abai Sungai PG specifically as it exists in Malaysia.' },
 ]
 
+// WAGF Regions tab — Region → Block → Country (3-tier). Each region has a unique color;
+// selecting a region, block, or country dims/filters pins to that geographic scope and
+// highlights the matching country polygons on the map.
+const { regionsTree } = useWagfRegionsLegendData(_langPgRef)
+const REGIONS_TABS = [
+  { id: 'region',  label: 'WAGF Region',
+    info: 'WAGF macro-region (e.g. "Asia", "Africa"). Color-coded on the map.' },
+  { id: 'block',   label: 'WAGF Block',
+    info: 'WAGF block — the organizational sub-grouping within each region (e.g. "South East Asia", "West Africa").' },
+  { id: 'country', label: 'Country',
+    info: 'Individual countries, listed by unreached-population size within their block.' },
+]
+
 // Computed bindings the template feeds into the single <SemanticTreeLegend> below.
 // Keeps the component instance singular — no duplicate tree legends.
-const legendNodes = computed(() => activeLegendType.value === 'affinity-block' ? affinityTree.value : langTree.value)
-const legendInnerTabs = computed(() => activeLegendType.value === 'affinity-block' ? AFFINITY_TABS : LANG_TABS)
-const legendTitle = computed(() => activeLegendType.value === 'affinity-block' ? 'People Groups' : 'Languages')
+const legendNodes = computed(() => {
+  if (activeLegendType.value === 'affinity-block') return affinityTree.value
+  if (activeLegendType.value === 'doxa-regions')   return regionsTree.value
+  return langTree.value
+})
+const legendInnerTabs = computed(() => {
+  if (activeLegendType.value === 'affinity-block') return AFFINITY_TABS
+  if (activeLegendType.value === 'doxa-regions')   return REGIONS_TABS
+  return LANG_TABS
+})
+const legendTitle = computed(() => {
+  if (activeLegendType.value === 'affinity-block') return 'People Groups'
+  if (activeLegendType.value === 'doxa-regions')   return 'WAGF Regions'
+  return 'Languages'
+})
 function _findNodeInTree(nodes, predicate) {
   for (const n of nodes) {
     if (predicate(n)) return n
@@ -634,17 +669,26 @@ function onSemanticTreeSelect(node) {
   if (!node) {
     if (m && m.getLayer('language-family-pins')) {
       try { m.setFilter('language-family-pins', null) } catch (_) {}
+      _syncHitboxFilter(m, null)
       m.setPaintProperty('language-family-pins', 'circle-opacity', 1)
       m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', 1)
+    }
+    // Reset region polygon highlight when deselecting on the WAGF Regions tab.
+    if (m && m.getLayer('regions-fill')) {
+      m.setPaintProperty('regions-fill', 'fill-opacity', 0.20)
+      m.setPaintProperty('regions-border', 'line-color', 'rgba(60,60,80,0.35)')
+      m.setPaintProperty('regions-border', 'line-width', 0.6)
     }
     if (mapStore.selectedFamily)   mapStore.selectFamily(null)
     if (mapStore.selectedLanguage) mapStore.selectLanguage(null)
     if (mapStore.selectedDialect)  mapStore.selectDialect?.(null)
+    if (mapStore.selectedRegion)   mapStore.selectRegion?.(null)
     _clearGeocoderProgrammatic()
     return
   }
   if (m && m.getLayer('language-family-pins') && node.filter) {
     try { m.setFilter('language-family-pins', node.filter) } catch (_) {}
+    _syncHitboxFilter(m, node.filter)
     m.setPaintProperty('language-family-pins', 'circle-opacity', 1)
     m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', 1)
   }
@@ -664,6 +708,7 @@ function onSemanticTreeSelect(node) {
     if (m && m.getLayer('language-family-pins') && node.filter) {
       // Drop any prior setFilter from a previous tab interaction so all pins render.
       try { m.setFilter('language-family-pins', null) } catch (_) {}
+      _syncHitboxFilter(m, null)
       // Dim via case expression — matched pins at 1.0, others at 0.06 (matches research-map's
       // applyDimFilter values).
       m.setPaintProperty('language-family-pins', 'circle-opacity', [
@@ -672,6 +717,42 @@ function onSemanticTreeSelect(node) {
       m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', [
         'case', node.filter, 1, 0.06
       ])
+    }
+  }
+  // WAGF Regions tab — filter pins to the selected region/block/country and highlight
+  // matching country polygons. node.filter is one of:
+  //   region:  ['==', ['get', 'doxaRegion'], regionSlug]
+  //   block:   ['==', ['get', 'wagfBlock'],  blockSlug]
+  //   country: ['==', ['get', 'countryIso'], isoAlpha3]
+  // node.isoCodes carries alpha-3 ISOs; polygon highlight uses iso_3166_1_alpha_3 property.
+  else if (id.startsWith('region:') || id.startsWith('block:') || id.startsWith('country:')) {
+    if (m && m.getLayer('language-family-pins') && node.filter) {
+      try { m.setFilter('language-family-pins', node.filter) } catch (_) {}
+      _syncHitboxFilter(m, node.filter)
+      m.setPaintProperty('language-family-pins', 'circle-opacity', 1)
+      m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', 1)
+    }
+    // Mirror region selection into mapStore (for geocoder / external sync).
+    if (id.startsWith('region:')) mapStore.selectRegion?.(id.slice(7))
+    // Highlight matching polygons using isoCodes (alpha-3) on iso_3166_1_alpha_3.
+    if (m && m.getLayer('regions-fill')) {
+      const isoCodes = node.isoCodes || []
+      if (isoCodes.length) {
+        const isoArr = ['literal', isoCodes]
+        m.setPaintProperty('regions-fill', 'fill-opacity', [
+          'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], 0.30, 0.06
+        ])
+        m.setPaintProperty('regions-border', 'line-color', [
+          'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], '#111827', 'rgba(60,60,80,0.15)'
+        ])
+        m.setPaintProperty('regions-border', 'line-width', [
+          'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], 2.5, 0.3
+        ])
+      } else {
+        m.setPaintProperty('regions-fill', 'fill-opacity', 0.20)
+        m.setPaintProperty('regions-border', 'line-color', 'rgba(60,60,80,0.35)')
+        m.setPaintProperty('regions-border', 'line-width', 0.6)
+      }
     }
   }
 }
@@ -733,6 +814,14 @@ watch(() => mapStore.selectedDialect, (dialect) => {
   const node = _findNodeInTree(langTree.value, n => n.id === fullId)
   if (node) _bridgeSelection('dial', { ...node, depth: 2 })
 })
+// WAGF Regions — bridge mapStore.selectedRegion → SemanticTreeLegend.
+// regionKey is the wagf_region VALUE (e.g. 'south_asia'), which matches the
+// 'region:south_asia' node id in regionsTree.
+watch(() => mapStore.selectedRegion, (key) => {
+  if (!key) return _bridgeSelection('region', null)
+  const node = _findNodeInTree(regionsTree.value, n => n.id === `region:${key}`)
+  if (node) _bridgeSelection('region', { ...node, depth: 0 })
+})
 
 // ─── Poster composable (lazy) ────────────────────────────────────────────────
 // Instantiated only when the user opens the poster dialog. The composable +
@@ -766,7 +855,7 @@ watch(isDark, (dark) => {
   const m = map.value
   if (!m || !m.getLayer('language-family-pins')) return
   m.setPaintProperty('language-family-pins', 'circle-stroke-color',
-    dark ? '#ffffff' : 'rgba(0,0,0,0.45)')
+    dark ? '#ffffff' : 'rgba(255,255,255,0.9)')
 }, { immediate: false })
 function handleToggleTheme() {
   if (!map.value) return
@@ -930,13 +1019,14 @@ function clearAllHighlights(m) {
   // and a Mapbox setFilter is active) to any other tab leaves the filter in
   // place — and pins outside the previously-selected region disappear.
   m.setFilter('language-family-pins', null)
+  _syncHitboxFilter(m, null)
   if (m.getLayer('regions-fill')) {
-    m.setPaintProperty('regions-fill', 'fill-opacity', 0.35)
+    m.setPaintProperty('regions-fill', 'fill-opacity', 0.20)
     m.setPaintProperty('regions-fill', 'fill-outline-color', null)
   }
   if (m.getLayer('regions-border')) {
-    m.setPaintProperty('regions-border', 'line-color', '#ffffff')
-    m.setPaintProperty('regions-border', 'line-width', 1)
+    m.setPaintProperty('regions-border', 'line-color', 'rgba(60,60,80,0.35)')
+    m.setPaintProperty('regions-border', 'line-width', 0.6)
   }
   _lastHL.family = _lastHL.language = _lastHL.dialect = _lastHL.region = null
   _lastHL.prayer = _lastHL.engagement = _lastHL.adoption = null
@@ -1025,23 +1115,45 @@ function applyDimFilter(detail) {
     // fully opaque + on top of polygons. This matches the API-style "fetch
     // only pins within that region" UX request (2026-04-26).
     m.setFilter('language-family-pins', ['==', ['get', 'doxaRegion'], expectedValue])
+    _syncHitboxFilter(m, ['==', ['get', 'doxaRegion'], expectedValue])
     m.setPaintProperty('language-family-pins', 'circle-opacity', 1)
     m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', 1)
     if (m.getLayer('regions-fill')) {
-      m.setPaintProperty('regions-fill', 'fill-opacity', [
-        'case', ['==', ['get', 'region'], expectedValue], 0.7, 0.1
-      ])
-      m.setPaintProperty('regions-border', 'line-color', [
-        'case', ['==', ['get', 'region'], expectedValue], '#111827', '#ffffff'
-      ])
-      m.setPaintProperty('regions-border', 'line-width', [
-        'case', ['==', ['get', 'region'], expectedValue], 2.5, 0.6
-      ])
+      // Build a match expression on iso_3166_1_alpha_3 (vector tile property) to
+      // highlight only the countries belonging to the selected WAGF region.
+      // regionIsoMap keys are labels ('Asia'); expectedValue is a slug ('asia').
+      // Normalize both sides to lowercase-alpha for reliable matching.
+      const rMap = mapLayers.regionIsoMap?.value || {}
+      const norm = (s) => String(s).toLowerCase().replace(/[^a-z]/g, '')
+      const ev = norm(expectedValue)
+      let isoCodes = rMap[expectedValue] || []
+      if (!isoCodes.length) {
+        for (const [k, v] of Object.entries(rMap)) {
+          if (norm(k) === ev) { isoCodes = v; break }
+        }
+      }
+      if (isoCodes.length) {
+        const isoArr = ['literal', isoCodes]
+        m.setPaintProperty('regions-fill', 'fill-opacity', [
+          'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], 0.30, 0.06
+        ])
+        m.setPaintProperty('regions-border', 'line-color', [
+          'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], '#111827', 'rgba(60,60,80,0.15)'
+        ])
+        m.setPaintProperty('regions-border', 'line-width', [
+          'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], 2.5, 0.3
+        ])
+      } else {
+        m.setPaintProperty('regions-fill', 'fill-opacity', 0.20)
+        m.setPaintProperty('regions-border', 'line-color', 'rgba(60,60,80,0.35)')
+        m.setPaintProperty('regions-border', 'line-width', 0.6)
+      }
     }
   } else {
     // Family / language / prayer / engagement / adoption: keep all pins
     // rendered (no source-filter) but dim the non-matching ones.
     m.setFilter('language-family-pins', null)
+    _syncHitboxFilter(m, null)
 
     // Build the per-kind match expression. Prayer compares against a numeric
     // bucket (noPrayer=0 / hasPrayer=(0,FULL_PRAYER_THRESHOLD) / fullPrayer
@@ -1114,9 +1226,9 @@ function applyDimFilter(detail) {
       'case', matchExpr, 1, 0.06
     ])
     if (m.getLayer('regions-fill')) {
-      m.setPaintProperty('regions-fill', 'fill-opacity', 0.35)
-      m.setPaintProperty('regions-border', 'line-color', '#ffffff')
-      m.setPaintProperty('regions-border', 'line-width', 1)
+      m.setPaintProperty('regions-fill', 'fill-opacity', 0.20)
+      m.setPaintProperty('regions-border', 'line-color', 'rgba(60,60,80,0.35)')
+      m.setPaintProperty('regions-border', 'line-width', 0.6)
     }
   }
 }
@@ -1615,7 +1727,7 @@ onBeforeUnmount(() => {
            when a pin is clicked there (qa: 2026-05-02). -->
       <div class="rm-legend-desktop-slot">
         <LegendDesktop
-          v-if="appReady && ((activeLegendType !== 'language-family' && activeLegendType !== 'affinity-block') || (uiStore.legendMode === 'detail' && uiStore.selectedPeopleGroup))"
+          v-if="appReady && ((activeLegendType !== 'language-family' && activeLegendType !== 'affinity-block' && activeLegendType !== 'doxa-regions') || (uiStore.legendMode === 'detail' && uiStore.selectedPeopleGroup))"
           :legend-type="activeLegendType"
           :popup-action="activePopupAction"
           :initially-collapsed="false"
