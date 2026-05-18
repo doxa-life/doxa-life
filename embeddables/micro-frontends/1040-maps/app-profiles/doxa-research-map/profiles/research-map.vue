@@ -312,6 +312,12 @@ useShadowStyles(`
     .rm-legend-mobile-slot { display:block; }
     .rm-legend-desktop-slot { display:none; }
   }
+  .map-scroll-edge { position:absolute;top:0;bottom:0;width:40px;z-index:2;touch-action:pan-y;pointer-events:none;background:transparent; }
+  .map-scroll-edge--left { left:0; }
+  .map-scroll-edge--right { right:0; }
+  @media(max-width:768px){
+    .map-scroll-edge { pointer-events:auto; }
+  }
 `, 'research-map')
 
 // ─── Config from ProfileLoader (provide/inject — never direct imports) ──────
@@ -1658,6 +1664,8 @@ onBeforeUnmount(() => {
     <div class="rm-map-area">
       <div v-if="!appReady" class="rm-loading">Research map loading…</div>
       <div ref="mapContainer" class="rm-map-canvas" />
+      <div class="map-scroll-edge map-scroll-edge--left" />
+      <div class="map-scroll-edge map-scroll-edge--right" />
 
       <!-- "RESEARCH" corner badge removed per qa.md R5 status flag (2026-04-27).
            Style class .rm-badge kept in shadow CSS in case future tabs want it. -->
