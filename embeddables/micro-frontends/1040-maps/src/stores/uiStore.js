@@ -537,23 +537,14 @@ export const useUIStore = defineStore('ui', {
         selectPeopleGroup(peopleGroup) {
             this.selectedPeopleGroup = peopleGroup;
 
-            // Mode-aware height reset (qa: 2026-05-03 user feedback iter-15).
-            // The free-drag legend introduced in iter-14 lets the user park the
-            // sheet at any height (e.g. 50%). Without resetting on pin click,
-            // entering detail mode would inherit that custom height and the
-            // PeopleGroupDetail's "default 30% open + floating image" view
-            // would never render — the image is positioned at calc(30% + 16px)
-            // above the bottom edge, so a 50%-tall sheet hides it. Snap back
-            // to the canonical 'open' 30% so the photo floats above.
-            // Same on close: restore the legend to its default 30% so the
-            // user lands on a clean state, not whatever the detail panel
-            // happened to be sized at.
-            this.legendState = 'open';
-            this._customLegendHeight = null;
-
             if (peopleGroup) {
+                this._legendStateBeforeDetail = this.legendState;
+                this.legendState = 'open';
+                this._customLegendHeight = null;
                 this.setLegendMode('detail');
             } else {
+                this.legendState = this._legendStateBeforeDetail || 'open';
+                this._customLegendHeight = null;
                 this.setLegendMode('prayer');
             }
         },

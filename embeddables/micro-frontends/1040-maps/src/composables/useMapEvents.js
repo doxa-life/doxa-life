@@ -19,7 +19,8 @@ export function useMapEvents(options = {}) {
     const {
         getMap = () => null,
         mapId = 'unknown',
-        getLanguageFamilyColor = () => '#999999'
+        getLanguageFamilyColor = () => '#999999',
+        getNormalizedPeopleGroups = () => []
     } = options;
 
     // ── CRITICAL: capture store reference NOW, during Vue setup context ──────
@@ -153,25 +154,31 @@ export function useMapEvents(options = {}) {
      * @param {Object} properties - Feature properties
      * @returns {string} HTML content
      */
-    function generateRegionPopupContent(properties) {
+    function generateRegionPopupContent(tileProps) {
+        const iso3 = tileProps.iso_3166_1_alpha_3 || ''
+        const countryName = tileProps.name_en || tileProps.name || iso3
+        const pgs = getNormalizedPeopleGroups()
+        const matching = pgs.filter(pg => (pg.countryIso || '').toUpperCase() === iso3.toUpperCase())
+        const uupgCount = matching.length
+        const wagfRegion = matching[0]?.wagfRegionLabel || matching[0]?.doxaRegion || '—'
+        const wagfBlock = matching[0]?.wagfBlockLabel || matching[0]?.wagfBlock || '—'
         return `
             <div style="padding: 8px; min-width: 220px;">
                 <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: #333;">
-                    ${properties.name}
+                    ${countryName}
                 </h3>
                 <p style="margin: 4px 0; font-size: 14px;">
-                    <strong>Region:</strong> ${properties.region}
+                    <strong>WAGF Region:</strong> ${wagfRegion}
                 </p>
                 <p style="margin: 4px 0; font-size: 14px;">
-                    <strong>Sub-Region:</strong> ${properties.subRegion}
+                    <strong>WAGF Block:</strong> ${wagfBlock}
                 </p>
                 <p style="margin: 4px 0; font-size: 14px;">
-                    <strong>UUPG Count:</strong> ${properties.uupgCount || 0}
+                    <strong>Country:</strong> ${countryName} (${iso3})
                 </p>
-                ${properties.hasWAGFMember ?
-                    '<p style="margin: 4px 0; font-size: 12px; color: #2ecc71;">✓ Has WAGF Member</p>' :
-                    ''
-                }
+                <p style="margin: 4px 0; font-size: 14px;">
+                    <strong>UUPG Count:</strong> ${uupgCount}
+                </p>
             </div>
         `;
     }
@@ -180,11 +187,11 @@ export function useMapEvents(options = {}) {
      * Attach click handler for language family pins
      * Shows popup with people group details
      */
-    function attachPinClickHandler() {
+    function attachPinClickHandler(overrideLayerId) {
         const map = getMap();
         if (!map) return;
 
-        const layerId = 'language-family-pins';
+        const layerId = overrideLayerId || 'language-family-pins';
         if (!map.getLayer(layerId)) {
             return;
         }
@@ -248,7 +255,7 @@ export function useMapEvents(options = {}) {
 
         const handler = (e) => {
             // Check if we clicked on a people group pin - if so, don't show country popup
-            const pinLayers = ['language-family-pins', 'people-groups-pins'];
+            const pinLayers = ['language-family-pins', 'language-family-pins-hitbox', 'people-groups-pins'];
             for (const pinLayer of pinLayers) {
                 if (map.getLayer(pinLayer)) {
                     const pinFeatures = map.queryRenderedFeatures(e.point, { layers: [pinLayer] });
@@ -337,6 +344,8 @@ export function useMapEvents(options = {}) {
     function attachLanguageFamilyEvents() {
         attachPinClickHandler();
         attachCursorHandlers('language-family-pins');
+        attachPinClickHandler('language-family-pins-hitbox');
+        attachCursorHandlers('language-family-pins-hitbox');
         attachClusterClickHandler();
         attachCursorHandlers('clusters');
     }

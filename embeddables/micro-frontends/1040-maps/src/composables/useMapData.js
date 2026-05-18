@@ -6,7 +6,7 @@
 import { ref, computed } from 'vue';
 // Static lookup: language label (e.g. "Telugu") → language family ("Dravidian").
 // Used to derive `languageFamily` for pray-tools rows where the upstream returns
-// null for `imb_language_family` (true for ALL rows as of 2026-04-25).
+// null for `imb_language_family` (true fo
 import langFamilyByLanguage from '../data/langFamilyByLanguage.json';
 import { DOXA_REGION_COLORS, canonicalFamilyName } from '../config/colors.js';
 
@@ -446,22 +446,37 @@ export function useMapData(options) {
     }
 
     /**
-     * Load region polygon data (GeoJSON) for map display
+     * Build the country→wagfRegion lookup from already-loaded people-group data.
+     * Returns a plain object: { 'AF': 'Asia', 'NG': 'Africa', … }
      *
-     * @returns {Promise<Object>} GeoJSON regions data
+     * Uses `mapbox.country-boundaries-v1` vector tileset for polygons — no fetch
+     * needed here. This function just derives the ISO alpha-2 → region label map
+     * that addRegionsLayer feeds into the Mapbox match expression.
+     *
+     * @returns {Object} countryIso → wagfRegion label
      */
     async function loadRegionsData() {
         try {
-            const baseUrl = window.MAP_APP_BASE_URL || './';
-            // TODO: domain-specific path. Override or pass via options if your
-            // app stores its region polygons elsewhere.
-            const response = await fetch(baseUrl + 'assets/data/doxa-regions-with-geo.json');
-            regionsData.value = await response.json();
-            return regionsData.value;
+            // Build iso→region from the people groups that are already in memory.
+            // countryIso = country_code alpha-3 (e.g. 'MYS').
+            // addRegionsLayer matches against iso_3166_1_alpha_3 on the Mapbox tileset.
+            const isoToRegion = {}
+            const pgs = normalizedPeopleGroups.value || []
+            for (const pg of pgs) {
+                const iso = pg.countryIso || pg._raw?.country_code?.value || ''
+                const _rawRegion = pg._raw?.wagf_region
+                const region = pg.wagfRegionLabel || pg.doxaRegionLabel ||
+                               (_rawRegion && typeof _rawRegion === 'object' ? _rawRegion.label : '') ||
+                               pg.doxaRegion || pg.wagfRegion || ''
+                if (iso && region && !isoToRegion[iso]) isoToRegion[iso] = region
+            }
+            // Wrap in the shape addRegionsLayer expects.
+            regionsData.value = { isoToRegion }
+            return regionsData.value
         } catch (err) {
-            console.error(`Error loading regions data for map "${mapId}":`, err);
-            error.value = err.message || 'Failed to load regions';
-            throw err;
+            console.error(`Error building regions data for map "${mapId}":`, err)
+            error.value = err.message || 'Failed to build regions'
+            throw err
         }
     }
 
