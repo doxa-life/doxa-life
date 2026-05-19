@@ -1,0 +1,369 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <!-- Glows -->
+    <radialGradient id="greenGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#22c55e" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="blueGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#60a5fa" stop-opacity="0"/>
+    </radialGradient>
+
+    <style>
+      /* Base timing: 10s loop */
+      @keyframes fadeInCenter {
+        0%, 5% { opacity: 0; }
+        10%, 100% { opacity: 1; }
+      }
+      @keyframes shareAppear {
+        0%, 19% { opacity: 0; transform: scale(0.5); }
+        25% { opacity: 1; transform: scale(1); }
+        38% { opacity: 1; transform: scale(1); }
+        42% { opacity: 0; transform: scale(0.5); }
+        100% { opacity: 0; }
+      }
+      @keyframes sharePulse {
+        0%, 19% { r: 0; opacity: 0; }
+        20% { r: 0; opacity: 0.5; }
+        35% { r: 25; opacity: 0; }
+        100% { r: 25; opacity: 0; }
+      }
+      @keyframes linkEmerge {
+        0%, 22% { opacity: 0; transform: translateY(0); }
+        28% { opacity: 1; transform: translateY(0); }
+        38% { opacity: 1; transform: translateY(0); }
+        42% { opacity: 0; transform: translateY(10px); }
+        100% { opacity: 0; }
+      }
+
+      /* Partner windows stagger */
+      @keyframes partnerTL {
+        0%, 39% { opacity: 0; transform: translate(0, 10px) scale(0.92); }
+        46% { opacity: 1; transform: translate(0, 0) scale(1); }
+        100% { opacity: 1; transform: translate(0, 0) scale(1); }
+      }
+      @keyframes partnerTR {
+        0%, 44% { opacity: 0; transform: translate(0, 10px) scale(0.92); }
+        51% { opacity: 1; transform: translate(0, 0) scale(1); }
+        100% { opacity: 1; transform: translate(0, 0) scale(1); }
+      }
+      @keyframes partnerBL {
+        0%, 49% { opacity: 0; transform: translate(0, 10px) scale(0.92); }
+        56% { opacity: 1; transform: translate(0, 0) scale(1); }
+        100% { opacity: 1; transform: translate(0, 0) scale(1); }
+      }
+      @keyframes partnerBR {
+        0%, 54% { opacity: 0; transform: translate(0, 10px) scale(0.92); }
+        61% { opacity: 1; transform: translate(0, 0) scale(1); }
+        100% { opacity: 1; transform: translate(0, 0) scale(1); }
+      }
+
+      /* Flow lines from center to partners */
+      @keyframes flowTL {
+        0%, 39% { stroke-dashoffset: 200; opacity: 0; }
+        40% { opacity: 0.7; }
+        48% { stroke-dashoffset: 0; opacity: 0.7; }
+        55% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      @keyframes flowTR {
+        0%, 44% { stroke-dashoffset: 200; opacity: 0; }
+        45% { opacity: 0.7; }
+        53% { stroke-dashoffset: 0; opacity: 0.7; }
+        60% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      @keyframes flowBL {
+        0%, 49% { stroke-dashoffset: 200; opacity: 0; }
+        50% { opacity: 0.7; }
+        58% { stroke-dashoffset: 0; opacity: 0.7; }
+        65% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      @keyframes flowBR {
+        0%, 54% { stroke-dashoffset: 200; opacity: 0; }
+        55% { opacity: 0.7; }
+        63% { stroke-dashoffset: 0; opacity: 0.7; }
+        70% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+
+      /* Green glow on partner activation */
+      @keyframes glowTL {
+        0%, 44% { opacity: 0; }
+        48%, 90% { opacity: 1; }
+        96% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      @keyframes glowTR {
+        0%, 49% { opacity: 0; }
+        53%, 90% { opacity: 1; }
+        96% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      @keyframes glowBL {
+        0%, 54% { opacity: 0; }
+        58%, 90% { opacity: 1; }
+        96% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      @keyframes glowBR {
+        0%, 59% { opacity: 0; }
+        63%, 90% { opacity: 1; }
+        96% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+
+      /* Final ripple burst from all maps */
+      @keyframes finalRipple {
+        0%, 68% { r: 30; opacity: 0; }
+        70% { r: 30; opacity: 0.3; }
+        85% { r: 80; opacity: 0; }
+        100% { r: 80; opacity: 0; }
+      }
+      @keyframes finalRipple2 {
+        0%, 73% { r: 30; opacity: 0; }
+        75% { r: 30; opacity: 0.2; }
+        90% { r: 90; opacity: 0; }
+        100% { r: 90; opacity: 0; }
+      }
+
+      /* Counter label */
+      @keyframes counterAppear {
+        0%, 64% { opacity: 0; }
+        70%, 90% { opacity: 1; }
+        96% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+
+      /* Multiplier text */
+      @keyframes multiplierText {
+        0%, 66% { opacity: 0; transform: scale(0.8); }
+        72% { opacity: 1; transform: scale(1); }
+        90% { opacity: 1; transform: scale(1); }
+        96% { opacity: 0; transform: scale(0.8); }
+        100% { opacity: 0; }
+      }
+
+      /* Full scene reset fade */
+      @keyframes sceneReset {
+        0%, 92% { opacity: 1; }
+        97% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+
+      .center-win { animation: fadeInCenter 10s ease-in-out infinite; }
+      .share-icon { animation: shareAppear 10s ease-in-out infinite; transform-origin: 400px 197px; }
+      .share-pulse { animation: sharePulse 10s ease-in-out infinite; }
+      .link-block { animation: linkEmerge 10s ease-in-out infinite; }
+
+      .partner-tl { animation: partnerTL 10s ease-in-out infinite; }
+      .partner-tr { animation: partnerTR 10s ease-in-out infinite; }
+      .partner-bl { animation: partnerBL 10s ease-in-out infinite; }
+      .partner-br { animation: partnerBR 10s ease-in-out infinite; }
+
+      .flow-tl { animation: flowTL 10s ease-in-out infinite; stroke-dasharray: 200; }
+      .flow-tr { animation: flowTR 10s ease-in-out infinite; stroke-dasharray: 200; }
+      .flow-bl { animation: flowBL 10s ease-in-out infinite; stroke-dasharray: 200; }
+      .flow-br { animation: flowBR 10s ease-in-out infinite; stroke-dasharray: 200; }
+
+      .glow-tl { animation: glowTL 10s ease-in-out infinite; }
+      .glow-tr { animation: glowTR 10s ease-in-out infinite; }
+      .glow-bl { animation: glowBL 10s ease-in-out infinite; }
+      .glow-br { animation: glowBR 10s ease-in-out infinite; }
+
+      .ripple-final { animation: finalRipple 10s ease-out infinite; }
+      .ripple-final2 { animation: finalRipple2 10s ease-out infinite; }
+      .counter { animation: counterAppear 10s ease-in-out infinite; }
+      .multiplier { animation: multiplierText 10s ease-in-out infinite; transform-origin: 400px 460px; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="500" fill="#0b0f14" rx="0"/>
+
+  <!-- Flow lines -->
+  <line x1="310" y1="190" x2="102" y2="92" stroke="#22c55e" stroke-width="1.5" class="flow-tl" stroke-linecap="round"/>
+  <line x1="490" y1="190" x2="698" y2="92" stroke="#22c55e" stroke-width="1.5" class="flow-tr" stroke-linecap="round"/>
+  <line x1="310" y1="250" x2="102" y2="372" stroke="#22c55e" stroke-width="1.5" class="flow-bl" stroke-linecap="round"/>
+  <line x1="490" y1="250" x2="698" y2="372" stroke="#22c55e" stroke-width="1.5" class="flow-br" stroke-linecap="round"/>
+
+  <!-- Center window -->
+  <g class="center-win">
+    <!-- Window frame -->
+    <rect x="270" y="105" width="260" height="175" rx="8" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+    <!-- Title bar -->
+    <rect x="270" y="105" width="260" height="26" rx="8" fill="#161b22"/>
+    <rect x="270" y="120" width="260" height="11" fill="#161b22"/>
+    <!-- Dots -->
+    <circle cx="286" cy="118" r="4" fill="#f85149" opacity="0.8"/>
+    <circle cx="298" cy="118" r="4" fill="#f0b72f" opacity="0.8"/>
+    <circle cx="310" cy="118" r="4" fill="#3fb950" opacity="0.8"/>
+    <!-- URL -->
+    <text x="400" y="122" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#8b949e" font-weight="500">doxa.life</text>
+
+    <!-- Map -->
+    <rect x="280" y="136" width="240" height="135" rx="3" fill="#0b1016"/>
+    <!-- Coastline -->
+    <path d="M290,200 Q310,185 340,192 Q360,178 380,188 Q400,175 420,182 Q440,178 460,186 Q480,180 500,190 L510,195 Q505,210 490,218 Q470,225 450,215 Q430,222 410,215 Q390,225 370,218 Q350,228 330,220 Q310,228 295,215 Z" fill="#132218" opacity="0.5"/>
+    <!-- Dots -->
+    <circle cx="320" cy="180" r="2.5" fill="#22c55e" opacity="0.9"/>
+    <circle cx="345" cy="172" r="2" fill="#22c55e" opacity="0.7"/>
+    <circle cx="360" cy="185" r="3" fill="#22c55e" opacity="0.85"/>
+    <circle cx="380" cy="175" r="2" fill="#22c55e" opacity="0.6"/>
+    <circle cx="395" cy="190" r="2.5" fill="#22c55e" opacity="0.8"/>
+    <circle cx="415" cy="178" r="2" fill="#22c55e" opacity="0.75"/>
+    <circle cx="430" cy="188" r="3" fill="#22c55e" opacity="0.9"/>
+    <circle cx="450" cy="175" r="2" fill="#22c55e" opacity="0.65"/>
+    <circle cx="470" cy="185" r="2.5" fill="#22c55e" opacity="0.8"/>
+    <circle cx="490" cy="195" r="2" fill="#22c55e" opacity="0.7"/>
+    <circle cx="335" cy="195" r="1.8" fill="#22c55e" opacity="0.55"/>
+    <circle cx="370" cy="200" r="2.2" fill="#22c55e" opacity="0.75"/>
+    <circle cx="405" cy="198" r="1.5" fill="#22c55e" opacity="0.5"/>
+    <circle cx="440" cy="195" r="2" fill="#22c55e" opacity="0.7"/>
+    <circle cx="460" cy="200" r="1.8" fill="#22c55e" opacity="0.6"/>
+    <circle cx="310" cy="210" r="2" fill="#22c55e" opacity="0.5"/>
+    <circle cx="380" cy="215" r="1.5" fill="#22c55e" opacity="0.45"/>
+    <circle cx="420" cy="210" r="2" fill="#22c55e" opacity="0.6"/>
+    <circle cx="480" cy="208" r="1.5" fill="#22c55e" opacity="0.5"/>
+  </g>
+
+  <!-- Share icon -->
+  <g class="share-icon">
+    <circle cx="400" cy="197" r="0" fill="url(#blueGlow)" class="share-pulse"/>
+    <!-- Arrow -->
+    <g transform="translate(388, 185)">
+      <rect x="0" y="8" width="24" height="16" rx="3" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+      <polyline points="12,14 12,0 6,6" fill="none" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="12,0 18,6" fill="none" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <!-- Embed link -->
+  <g class="link-block">
+    <rect x="365" y="290" width="70" height="20" rx="4" fill="#161b22" stroke="#60a5fa" stroke-width="1" opacity="0.8"/>
+    <text x="400" y="303" text-anchor="middle" font-family="monospace" font-size="8" fill="#60a5fa" opacity="0.9">&lt;embed/&gt;</text>
+  </g>
+
+  <!-- Partner TL -->
+  <g class="partner-tl">
+    <rect x="20" y="30" width="164" height="120" rx="6" fill="url(#greenGlow)" class="glow-tl"/>
+    <rect x="20" y="30" width="164" height="120" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+    <rect x="20" y="30" width="164" height="20" rx="6" fill="#161b22"/>
+    <rect x="20" y="44" width="164" height="6" fill="#161b22"/>
+    <circle cx="32" cy="40" r="3" fill="#f85149" opacity="0.7"/>
+    <circle cx="41" cy="40" r="3" fill="#f0b72f" opacity="0.7"/>
+    <circle cx="50" cy="40" r="3" fill="#3fb950" opacity="0.7"/>
+    <text x="120" y="44" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7.5" fill="#8b949e">partner-a.org</text>
+    <rect x="30" y="54" width="144" height="88" rx="2" fill="#0b1016"/>
+    <!-- Map -->
+    <path d="M40,95 Q55,88 70,92 Q85,85 100,90 Q115,86 130,91 Q145,87 160,94 L165,97 Q155,105 140,100 Q120,106 100,100 Q80,107 60,100 Q45,105 38,98 Z" fill="#132218" opacity="0.4"/>
+    <circle cx="55" cy="88" r="1.5" fill="#22c55e" opacity="0.8"/>
+    <circle cx="75" cy="85" r="1.2" fill="#22c55e" opacity="0.7"/>
+    <circle cx="90" cy="90" r="1.8" fill="#22c55e" opacity="0.85"/>
+    <circle cx="110" cy="86" r="1.3" fill="#22c55e" opacity="0.6"/>
+    <circle cx="130" cy="89" r="1.5" fill="#22c55e" opacity="0.75"/>
+    <circle cx="150" cy="92" r="1.2" fill="#22c55e" opacity="0.7"/>
+    <circle cx="65" cy="95" r="1" fill="#22c55e" opacity="0.5"/>
+    <circle cx="100" cy="98" r="1.3" fill="#22c55e" opacity="0.6"/>
+    <circle cx="140" cy="96" r="1" fill="#22c55e" opacity="0.55"/>
+  </g>
+
+  <!-- Partner TR -->
+  <g class="partner-tr">
+    <rect x="616" y="30" width="164" height="120" rx="6" fill="url(#greenGlow)" class="glow-tr"/>
+    <rect x="616" y="30" width="164" height="120" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+    <rect x="616" y="30" width="164" height="20" rx="6" fill="#161b22"/>
+    <rect x="616" y="44" width="164" height="6" fill="#161b22"/>
+    <circle cx="628" cy="40" r="3" fill="#f85149" opacity="0.7"/>
+    <circle cx="637" cy="40" r="3" fill="#f0b72f" opacity="0.7"/>
+    <circle cx="646" cy="40" r="3" fill="#3fb950" opacity="0.7"/>
+    <text x="716" y="44" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7.5" fill="#8b949e">church-b.com</text>
+    <rect x="626" y="54" width="144" height="88" rx="2" fill="#0b1016"/>
+    <path d="M636,95 Q651,88 666,92 Q681,85 696,90 Q711,86 726,91 Q741,87 756,94 L761,97 Q751,105 736,100 Q716,106 696,100 Q676,107 656,100 Q641,105 634,98 Z" fill="#132218" opacity="0.4"/>
+    <circle cx="651" cy="88" r="1.5" fill="#22c55e" opacity="0.8"/>
+    <circle cx="671" cy="85" r="1.2" fill="#22c55e" opacity="0.7"/>
+    <circle cx="686" cy="90" r="1.8" fill="#22c55e" opacity="0.85"/>
+    <circle cx="706" cy="86" r="1.3" fill="#22c55e" opacity="0.6"/>
+    <circle cx="726" cy="89" r="1.5" fill="#22c55e" opacity="0.75"/>
+    <circle cx="746" cy="92" r="1.2" fill="#22c55e" opacity="0.7"/>
+    <circle cx="661" cy="95" r="1" fill="#22c55e" opacity="0.5"/>
+    <circle cx="696" cy="98" r="1.3" fill="#22c55e" opacity="0.6"/>
+    <circle cx="736" cy="96" r="1" fill="#22c55e" opacity="0.55"/>
+  </g>
+
+  <!-- Partner BL -->
+  <g class="partner-bl">
+    <rect x="20" y="310" width="164" height="120" rx="6" fill="url(#greenGlow)" class="glow-bl"/>
+    <rect x="20" y="310" width="164" height="120" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+    <rect x="20" y="310" width="164" height="20" rx="6" fill="#161b22"/>
+    <rect x="20" y="324" width="164" height="6" fill="#161b22"/>
+    <circle cx="32" cy="320" r="3" fill="#f85149" opacity="0.7"/>
+    <circle cx="41" cy="320" r="3" fill="#f0b72f" opacity="0.7"/>
+    <circle cx="50" cy="320" r="3" fill="#3fb950" opacity="0.7"/>
+    <text x="120" y="324" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7.5" fill="#8b949e">missions-c.net</text>
+    <rect x="30" y="334" width="144" height="88" rx="2" fill="#0b1016"/>
+    <path d="M40,375 Q55,368 70,372 Q85,365 100,370 Q115,366 130,371 Q145,367 160,374 L165,377 Q155,385 140,380 Q120,386 100,380 Q80,387 60,380 Q45,385 38,378 Z" fill="#132218" opacity="0.4"/>
+    <circle cx="55" cy="368" r="1.5" fill="#22c55e" opacity="0.8"/>
+    <circle cx="75" cy="365" r="1.2" fill="#22c55e" opacity="0.7"/>
+    <circle cx="90" cy="370" r="1.8" fill="#22c55e" opacity="0.85"/>
+    <circle cx="110" cy="366" r="1.3" fill="#22c55e" opacity="0.6"/>
+    <circle cx="130" cy="369" r="1.5" fill="#22c55e" opacity="0.75"/>
+    <circle cx="150" cy="372" r="1.2" fill="#22c55e" opacity="0.7"/>
+    <circle cx="65" cy="375" r="1" fill="#22c55e" opacity="0.5"/>
+    <circle cx="100" cy="378" r="1.3" fill="#22c55e" opacity="0.6"/>
+    <circle cx="140" cy="376" r="1" fill="#22c55e" opacity="0.55"/>
+  </g>
+
+  <!-- Partner BR -->
+  <g class="partner-br">
+    <rect x="616" y="310" width="164" height="120" rx="6" fill="url(#greenGlow)" class="glow-br"/>
+    <rect x="616" y="310" width="164" height="120" rx="6" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+    <rect x="616" y="310" width="164" height="20" rx="6" fill="#161b22"/>
+    <rect x="616" y="324" width="164" height="6" fill="#161b22"/>
+    <circle cx="628" cy="320" r="3" fill="#f85149" opacity="0.7"/>
+    <circle cx="637" cy="320" r="3" fill="#f0b72f" opacity="0.7"/>
+    <circle cx="646" cy="320" r="3" fill="#3fb950" opacity="0.7"/>
+    <text x="716" y="324" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7.5" fill="#8b949e">pray-d.org</text>
+    <rect x="626" y="334" width="144" height="88" rx="2" fill="#0b1016"/>
+    <path d="M636,375 Q651,368 666,372 Q681,365 696,370 Q711,366 726,371 Q741,367 756,374 L761,377 Q751,385 736,380 Q716,386 696,380 Q676,387 656,380 Q641,385 634,378 Z" fill="#132218" opacity="0.4"/>
+    <circle cx="651" cy="368" r="1.5" fill="#22c55e" opacity="0.8"/>
+    <circle cx="671" cy="365" r="1.2" fill="#22c55e" opacity="0.7"/>
+    <circle cx="686" cy="370" r="1.8" fill="#22c55e" opacity="0.85"/>
+    <circle cx="706" cy="366" r="1.3" fill="#22c55e" opacity="0.6"/>
+    <circle cx="726" cy="369" r="1.5" fill="#22c55e" opacity="0.75"/>
+    <circle cx="746" cy="372" r="1.2" fill="#22c55e" opacity="0.7"/>
+    <circle cx="661" cy="375" r="1" fill="#22c55e" opacity="0.5"/>
+    <circle cx="696" cy="378" r="1.3" fill="#22c55e" opacity="0.6"/>
+    <circle cx="736" cy="376" r="1" fill="#22c55e" opacity="0.55"/>
+  </g>
+
+  <!-- Ripple bursts -->
+  <circle cx="400" cy="197" fill="none" stroke="#22c55e" stroke-width="1" class="ripple-final"/>
+  <circle cx="400" cy="197" fill="none" stroke="#22c55e" stroke-width="0.8" class="ripple-final2"/>
+  <circle cx="102" cy="92" fill="none" stroke="#22c55e" stroke-width="0.8" class="ripple-final"/>
+  <circle cx="102" cy="92" fill="none" stroke="#22c55e" stroke-width="0.6" class="ripple-final2"/>
+  <circle cx="698" cy="92" fill="none" stroke="#22c55e" stroke-width="0.8" class="ripple-final"/>
+  <circle cx="698" cy="92" fill="none" stroke="#22c55e" stroke-width="0.6" class="ripple-final2"/>
+  <circle cx="102" cy="372" fill="none" stroke="#22c55e" stroke-width="0.8" class="ripple-final"/>
+  <circle cx="102" cy="372" fill="none" stroke="#22c55e" stroke-width="0.6" class="ripple-final2"/>
+  <circle cx="698" cy="372" fill="none" stroke="#22c55e" stroke-width="0.8" class="ripple-final"/>
+  <circle cx="698" cy="372" fill="none" stroke="#22c55e" stroke-width="0.6" class="ripple-final2"/>
+
+  <!-- Multiplier label -->
+  <g class="multiplier">
+    <!-- "1" faded -->
+    <text x="370" y="468" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#8b949e" font-weight="300" opacity="0.5">1</text>
+    <!-- Arrow -->
+    <text x="393" y="466" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#30363d" opacity="0.7">&#8594;</text>
+    <!-- "5x" bold green -->
+    <text x="430" y="468" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#22c55e" font-weight="700">5x</text>
+  </g>
+
+  <!-- "prayer surfaces" subtitle -->
+  <g class="counter">
+    <text x="400" y="488" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#8b949e" font-weight="400" letter-spacing="0.5">prayer surfaces</text>
+  </g>
+</svg>
