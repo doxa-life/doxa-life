@@ -28,7 +28,7 @@
  *   7. Religions           (religion / religion)
  */
 
-import { inject, provide, ref, computed, onMounted, onBeforeUnmount, watch, markRaw, nextTick, defineAsyncComponent } from 'vue'
+import { inject, provide, ref, computed, onMounted, onBeforeUnmount, watch, markRaw, nextTick, defineAsyncComponent, toRef } from 'vue'
 
 // ─── Composables (framework) ─────────────────────────────────────────────────
 import { useMapInstance }  from '@map/composables/useMapInstance.js'
@@ -165,6 +165,8 @@ import { useLanguageFamilyLegendData } from '@map/composables/useLanguageFamilyL
 // SemanticTreeLegend instance can render either depending on activeLegendType.
 import { useAffinityBlockLegendData } from '@map/composables/useAffinityBlockLegendData.js'
 import { useWagfRegionsLegendData }   from '@map/composables/useWagfRegionsLegendData.js'
+import { useLegendData as useFlatLegendData } from '@map/composables/useLegendData.js'
+import { RESEARCH_LEGEND_OPTIONS } from '@map/composables/researchLegendOptions.js'
 
 // PERF: PosterDialog only renders when the user opens the poster export
 // flow. Async-import it so the dialog's deps don't load on every map boot.
@@ -383,8 +385,6 @@ const activeTabId = ref(null)
 const activeTab   = computed(() => tabs.value.find(t => t.id === activeTabId.value) ?? tabs.value[0])
 const activeLegendType = computed(() => activeTab.value?.legend ?? 'default')
 const activePopupAction = computed(() => activeTab.value?.popup ?? 'pray')
-const _isSemanticTab = computed(() => ['language-family', 'affinity-block', 'doxa-regions'].includes(activeLegendType.value))
-const _showFlatLegend = computed(() => !_isSemanticTab.value || (uiStore.legendMode === 'detail' && uiStore.selectedPeopleGroup))
 
 // Per-tab geocoder placeholder. The Language Families tab makes the search
 // scope explicit ("Search language family, language, dialect/variety") so users
@@ -427,7 +427,7 @@ watch(() => activeTabId?.value, async (newTabId, oldTabId) => {
     // Save outgoing tab's current state under the OLD tab id.
     if (oldTabId) _tabLegendState.set(oldTabId, uiStore.legendState)
     // Restore incoming tab's state (collapsed default for first visit).
-    const restored = _tabLegendState.get(newTabId) || uiStore.legendState || 'open'
+    const restored = _tabLegendState.get(newTabId) || (uiStore.isMobile ? 'collapsed' : 'open')
     if (restored === 'fullyOpen')   uiStore.fullyOpenLegend?.()
     else if (restored === 'open')   uiStore.openLegend?.()
     else                             uiStore.collapseLegend?.()
@@ -626,19 +626,61 @@ const REGIONS_TABS = [
     info: 'Individual countries, listed by unreached-population size within their block.' },
 ]
 
-// Computed bindings the template feeds into the single <SemanticTreeLegend> below.
-// Keeps the component instance singular — no duplicate tree legends.
+// Flat legend data for prayer/adoption/engagement/religion tabs — converted to
+// STL-compatible tree nodes so ALL tabs render through the same SemanticTreeLegend.
+const flatLegend = useFlatLegendData(toRef(() => activeLegendType.value), RESEARCH_LEGEND_OPTIONS)
+function _flatItemsToStlNodes(items) {
+  const out = []
+  for (const item of items) {
+    out.push({
+      id: item.key, label: item.label, color: item.color,
+      count: item.count ?? 0, pop: item.population ?? 0,
+      filter: item.filterKey ? ['==', ['get', '_flat_filter'], item.filterKey] : null,
+      children: [],
+    })
+    for (const c of (item.children || [])) {
+      out.push({
+        id: c.key, label: c.label, color: c.color,
+        count: c.count ?? 0, pop: c.population ?? 0,
+        filter: c.filterKey ? ['==', ['get', '_flat_filter'], c.filterKey] : null,
+        children: [],
+      })
+    }
+  }
+  return out
+}
+
+// Computed bindings the template feeds into the single <SemanticTreeLegend>.
+// ALL tabs (flat + semantic) now render through STL.
+const _isFlatTab = computed(() => ['prayer', 'engagement', 'adoption', 'religion'].includes(activeLegendType.value))
 const legendNodes = computed(() => {
+  if (_isFlatTab.value) return _flatItemsToStlNodes(flatLegend.items.value)
   if (activeLegendType.value === 'affinity-block') return affinityTree.value
   if (activeLegendType.value === 'doxa-regions')   return regionsTree.value
   return langTree.value
 })
 const legendInnerTabs = computed(() => {
+  if (_isFlatTab.value) return null
   if (activeLegendType.value === 'affinity-block') return AFFINITY_TABS
   if (activeLegendType.value === 'doxa-regions')   return REGIONS_TABS
   return LANG_TABS
 })
+const legendHideTabs = computed(() => _isFlatTab.value)
+const legendColumnLabel = computed(() => {
+  if (activeLegendType.value === 'religion') return 'World Religions'
+  if (activeLegendType.value === 'prayer') return 'Prayer Status'
+  if (activeLegendType.value === 'engagement') return 'Engagement Status'
+  if (activeLegendType.value === 'adoption') return 'Adoption Status'
+  if (_isFlatTab.value) return 'Status'
+  return ''
+})
+const _stlOpen = computed(() => uiStore.legendState !== 'collapsed')
+function _onStlOpenChange(open) {
+  if (open) uiStore.openLegend()
+  else uiStore.collapseLegend()
+}
 const legendTitle = computed(() => {
+  if (_isFlatTab.value) return 'Legend'
   if (activeLegendType.value === 'affinity-block') return 'People Groups'
   if (activeLegendType.value === 'doxa-regions')   return 'WAGF Regions'
   return 'Languages'
@@ -673,6 +715,14 @@ provide('getActivePinColor', (properties) => {
 function onSemanticTreeSelect(node) {
   const m = map.value
   if (!node) {
+    // Flat tabs: clear filter directly
+    if (_isFlatTab.value) {
+      const t = activeLegendType.value
+      if (t === 'prayer')     uiStore.setPrayerFilter(null)
+      else if (t === 'engagement') uiStore.setEngagementFilter(null)
+      else if (t === 'adoption')   uiStore.setAdoptionFilter(null)
+      else if (t === 'religion')   uiStore.setReligionFilter(null)
+    }
     if (m && m.getLayer('language-family-pins')) {
       try { m.setFilter('language-family-pins', null) } catch (_) {}
       _syncHitboxFilter(m, null)
@@ -681,6 +731,7 @@ function onSemanticTreeSelect(node) {
       if (m.getLayer('language-family-pins-shadow')) {
         m.setPaintProperty('language-family-pins-shadow', 'circle-opacity', 1)
       }
+      mapLayers.syncGlowFilter(null)
     }
     // Reset region polygon highlight when deselecting on the WAGF Regions tab.
     if (m && m.getLayer('regions-fill')) {
@@ -695,11 +746,23 @@ function onSemanticTreeSelect(node) {
     _clearGeocoderProgrammatic()
     return
   }
+  // Flat tabs (prayer/adoption/engagement/religion): directly set the uiStore
+  // filter (no toggle — STL already handles select/deselect internally).
+  // The existing watchers on uiStore.*Filter call applyDimFilter to dim pins.
+  if (_isFlatTab.value) {
+    const t = activeLegendType.value
+    if (t === 'prayer')     uiStore.setPrayerFilter(node.id)
+    else if (t === 'engagement') uiStore.setEngagementFilter(node.id)
+    else if (t === 'adoption')   uiStore.setAdoptionFilter(node.id)
+    else if (t === 'religion')   uiStore.setReligionFilter(node.id)
+    return
+  }
   if (m && m.getLayer('language-family-pins') && node.filter) {
     try { m.setFilter('language-family-pins', node.filter) } catch (_) {}
     _syncHitboxFilter(m, node.filter)
     m.setPaintProperty('language-family-pins', 'circle-opacity', 1)
     m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', 1)
+    mapLayers.syncGlowFilter(node.filter)
   }
   // Mirror selection into mapStore (loop-safe via legend's _lastInternalId).
   const id = String(node.id || '')
@@ -731,6 +794,7 @@ function onSemanticTreeSelect(node) {
           'case', node.filter, 1, 0
         ])
       }
+      mapLayers.syncGlowFilter(node.filter)
     }
   }
   // WAGF Regions tab — filter pins to the selected region/block/country and highlight
@@ -891,6 +955,7 @@ function handleToggleTheme() {
         map.value.setPaintProperty('language-family-pins', 'circle-color', '#a30000')
       }
     }
+    if (activeTab.value?.id === 'prayer') mapLayers.startPrayerGlow()
     // Re-load regions polygon (also wiped). It'll re-apply visibility per active tab.
     _regionsLoaded.value = false
     if (activeTab.value?.id === 'doxa-regions') void ensureRegionsLoaded()
@@ -961,6 +1026,9 @@ function switchTab(tabId) {
     const pinColor = tab.id === 'doxa-regions' ? '#a30000' : strat.buildColorExpression()
     map.value.setPaintProperty('language-family-pins', 'circle-color', pinColor)
     clearAllHighlights(map.value)
+    // Prayer glow: start on prayer tab, stop on all others
+    if (tab.id === 'prayer') mapLayers.startPrayerGlow()
+    else mapLayers.stopPrayerGlow()
     // Region polygons only belong on the Doxa Regions tab. On every other tab,
     // hide the fill + border outright so they don't bleed through and so the
     // pins remain the visual focus (UX request 2026-04-26).
@@ -1035,12 +1103,9 @@ function clearAllHighlights(m) {
   if (m.getLayer('language-family-pins-shadow')) {
     m.setPaintProperty('language-family-pins-shadow', 'circle-opacity', 1)
   }
-  // CRITICAL: clear any source-filter applied by the regions-tab path.
-  // Without this, switching from Doxa Regions (where a region row is selected
-  // and a Mapbox setFilter is active) to any other tab leaves the filter in
-  // place — and pins outside the previously-selected region disappear.
   m.setFilter('language-family-pins', null)
   _syncHitboxFilter(m, null)
+  mapLayers.syncGlowFilter(null)
   if (m.getLayer('regions-fill')) {
     m.setPaintProperty('regions-fill', 'fill-opacity', 0.20)
     m.setPaintProperty('regions-fill', 'fill-outline-color', null)
@@ -1051,6 +1116,10 @@ function clearAllHighlights(m) {
   }
   _lastHL.family = _lastHL.language = _lastHL.dialect = _lastHL.region = null
   _lastHL.prayer = _lastHL.engagement = _lastHL.adoption = null
+  if (uiStore.prayerFilter)     uiStore.setPrayerFilter(null)
+  if (uiStore.engagementFilter) uiStore.setEngagementFilter(null)
+  if (uiStore.adoptionFilter)   uiStore.setAdoptionFilter(null)
+  if (uiStore.religionFilter)   uiStore.setReligionFilter(null)
   // Highlights gone — clustering goes back to the full dataset on next pass.
   clustering.setSelectionFilter(null)
   // Clear mapStore legend selections so LegendFamilyTree removes the selected
@@ -1251,6 +1320,7 @@ function applyDimFilter(detail) {
         'case', matchExpr, 1, 0
       ])
     }
+    mapLayers.syncGlowFilter(matchExpr)
     if (m.getLayer('regions-fill')) {
       m.setPaintProperty('regions-fill', 'fill-opacity', 0.20)
       m.setPaintProperty('regions-border', 'line-color', 'rgba(60,60,80,0.35)')
@@ -1535,6 +1605,8 @@ async function onMapReady(normalizedPeopleGroups) {
     if (activeTab.value?.id === 'doxa-regions' && map.value?.getLayer('language-family-pins')) {
       map.value.setPaintProperty('language-family-pins', 'circle-color', '#4b5563')
     }
+    // Start prayer glow if landing on the prayer tab
+    if (activeTab.value?.id === 'prayer') mapLayers.startPrayerGlow()
     // Hand the same dataset to clustering so MST/network can rebuild on toggle
     clustering.setData?.(normalizedPeopleGroups)
     // Build the initial legend
@@ -1626,6 +1698,8 @@ onMounted(async () => {
   // but isMobile-driven branches don't. (qa: 2026-05-02 mobile audit.)
   uiStore.init?.()
   activeTabId.value = tabs.value[0]?.id ?? 'doxa-regions'
+  if (uiStore.isMobile) uiStore.collapseLegend?.()
+  else uiStore.openLegend?.()
   // Container-scale: set CSS vars now + observe future resizes.
   if (rmRoot.value) {
     applyContainerScale(rmRoot.value.getBoundingClientRect().width)
@@ -1660,6 +1734,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('legend:highlight', onLegendHighlight)
   if (_containerObserver) { _containerObserver.disconnect(); _containerObserver = null }
   poster.value?.cleanup?.()
+  mapLayers.stopPrayerGlow()
   clustering.cleanup?.()
   selectedPin.cleanup?.()
   mapStore.unregisterMap(mapId)
@@ -1744,30 +1819,29 @@ onBeforeUnmount(() => {
         <ResearchMapFilterPanel />
       </ResearchMapSideMenu>
 
-      <!-- Legend — desktop card + mobile bottom sheet, responsive.
-           For the language-family tab, SemanticTreeLegend mounts standalone
-           (its own .stl-panel chrome handles positioning, collapse-to-pill,
-           theme). Other tabs use the existing LegendDesktop card.
-           HOWEVER: pin click on the map writes to uiStore.legendMode='detail'
-           + selectedPeopleGroup, which LegendDesktop's PeopleGroupDetail-swap
-           renders. We re-mount LegendDesktop in detail mode even on the
-           language-family tab so the people-group detail panel still appears
-           when a pin is clicked there (qa: 2026-05-02). -->
+      <!-- Legend — ALL tabs render through SemanticTreeLegend. Flat tabs
+           (prayer/adoption/engagement/religion) pass hideTabs to suppress the
+           inner tab strip. LegendDesktop only renders for the people-group
+           detail panel (pin click → PeopleGroupDetail swap). -->
       <div class="rm-legend-desktop-slot">
         <LegendDesktop
-          v-if="appReady && _showFlatLegend"
+          v-if="appReady && uiStore.legendMode === 'detail' && uiStore.selectedPeopleGroup"
           :legend-type="activeLegendType"
           :popup-action="activePopupAction"
           :initially-collapsed="false"
           :is-dark="isDark"
         />
         <SemanticTreeLegend
-          v-if="appReady && _isSemanticTab"
-          v-show="!_showFlatLegend"
+          v-if="appReady"
+          v-show="!(uiStore.legendMode === 'detail' && uiStore.selectedPeopleGroup)"
           :nodes="legendNodes"
           :tabs="legendInnerTabs"
           :title="legendTitle"
+          :hideTabs="legendHideTabs"
+          :columnLabel="legendColumnLabel"
+          :open="_stlOpen"
           @select="onSemanticTreeSelect"
+          @update:open="_onStlOpenChange"
         />
       </div>
       <div class="rm-legend-mobile-slot">

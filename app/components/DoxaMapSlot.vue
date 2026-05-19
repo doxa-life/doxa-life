@@ -24,6 +24,7 @@ const tagName = props.bundle === 'research-map' ? 'doxa-research-map' : 'doxa-ma
 <template>
   <div class="doxa-map-slot">
     <component :is="tagName" :id="mapId" :profile-config="profileConfig" />
+    <div class="doxa-map-scroll-pad doxa-map-scroll-pad--top" />
     <slot />
   </div>
 </template>
@@ -65,6 +66,24 @@ const tagName = props.bundle === 'research-map' ? 'doxa-research-map' : 'doxa-ma
   border-radius: inherit;
   overflow: hidden;
   contain: paint;
+}
+
+.doxa-map-scroll-pad {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .doxa-map-scroll-pad {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 48px;
+    z-index: 1500;
+    touch-action: pan-y;
+    pointer-events: auto;
+  }
+  .doxa-map-scroll-pad--top { top: 0; }
 }
 
 .doxa-map-slot :deep(doxa-map:fullscreen),

@@ -7,7 +7,7 @@
  * Shadow DOM safe: all CSS via useShadowStyles, geocoder CSS injected at runtime.
  */
 
-import { inject, provide, ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { inject, provide, ref, computed, onMounted, onBeforeUnmount, watch, toRef, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RTL_LOCALES } from '@map/i18n/index.js'
 import { useMapInstance } from '@map/composables/useMapInstance.js'
@@ -21,6 +21,10 @@ import { buildColorExpression, getColorStrategy } from '@map/config/colorStrateg
 import { FULL_PRAYER_THRESHOLD } from '@map/config/prayerColors.js'
 import { mapDefaults } from '@map/config/mapConfig.js'
 import LegendDesktop   from '@map/components/LegendDesktop.vue'
+const LegendMobile = defineAsyncComponent(() => import('@map/components/LegendMobile.vue'))
+import SemanticTreeLegend from '@map/components/SemanticTreeLegend.vue'
+import { createPplrInstance, provideInstance } from '@map/composables/usePplrInstance.js'
+import { useLegendData as useFlatLegendData } from '@map/composables/useLegendData.js'
 import SideMenuDrawer    from '@map/components/SideMenuDrawer.vue'
 // ─── Map control components ───────────────────────────────────────────────────
 // Each button is imported individually so the profile can compose any subset
@@ -127,6 +131,20 @@ useShadowStyles(`
      position (top:10px) instead of clearing it (top:54px). qa: 2026-05-06. */
   .dsm-root.dsm-no-geocoder .legend-container,
   .dsm-root.dsm-no-geocoder .legend-container.collapsed { top: 10px !important; }
+  .dsm-root.dsm-no-geocoder .stl-panel { top: 10px !important; }
+  .dsm-root.dsm-no-geocoder .stl-reopen { top: 10px !important; }
+
+  /* Desktop/mobile legend slot toggle */
+  .dsm-legend-mobile-slot { display:none; }
+  @media(max-width:767px){
+    .dsm-legend-mobile-slot { display:block; }
+    .dsm-legend-desktop-slot { display:none; }
+  }
+  /* Left/right scroll edges for mobile — transparent strips that allow
+     page scrolling via touch-action:pan-y on the map edges. */
+  .map-scroll-edge { position:absolute;top:0;bottom:0;width:40px;z-index:2;touch-action:pan-y;pointer-events:auto;background:transparent; }
+  .map-scroll-edge--left { left:0; }
+  .map-scroll-edge--right { right:0; }
 
   /* ── Fullscreen ── */
   :host(:fullscreen) { width:100vw!important;height:100vh!important;display:block!important; }
@@ -252,6 +270,61 @@ provide('getActivePinColor', (properties) => {
             : COLOR_MODES.PRAYER_PROGRESS
   return getColorStrategy(mode)?.getColor?.(properties) ?? '#1a1a1a'
 })
+
+// ─── SemanticTreeLegend (STL) — shared panel for all flat tabs ─────────────
+const pplrInstance = createPplrInstance()
+provideInstance(pplrInstance)
+pplrInstance.theme.value = 'light'
+
+const flatLegend = useFlatLegendData(toRef(() => activeLegendType.value))
+function _flatItemsToStlNodes(items) {
+  const out = []
+  for (const item of items) {
+    out.push({
+      id: item.key, label: item.label, color: item.color,
+      count: item.count ?? 0, pop: item.population ?? 0,
+      filter: item.filterKey ? ['==', ['get', '_flat_filter'], item.filterKey] : null,
+      children: [],
+    })
+    for (const c of (item.children || [])) {
+      out.push({
+        id: c.key, label: c.label, color: c.color,
+        count: c.count ?? 0, pop: c.population ?? 0,
+        filter: c.filterKey ? ['==', ['get', '_flat_filter'], c.filterKey] : null,
+        children: [],
+      })
+    }
+  }
+  return out
+}
+const legendNodes = computed(() => _flatItemsToStlNodes(flatLegend.items.value))
+const legendTitle = computed(() => 'Legend')
+const legendColumnLabel = computed(() => {
+  const t = activeLegendType.value
+  if (t === 'prayer') return 'Prayer Status'
+  if (t === 'engagement') return 'Engagement Status'
+  if (t === 'adoption') return 'Adoption Status'
+  return 'Status'
+})
+const _stlOpen = computed(() => uiStore.legendState !== 'collapsed')
+function _onStlOpenChange(open) {
+  if (open) uiStore.openLegend()
+  else uiStore.collapseLegend()
+}
+function onSemanticTreeSelect(node) {
+  if (!node) {
+    const t = activeLegendType.value
+    if (t === 'prayer')     uiStore.setPrayerFilter(null)
+    else if (t === 'engagement') uiStore.setEngagementFilter(null)
+    else if (t === 'adoption')   uiStore.setAdoptionFilter(null)
+    return
+  }
+  const t = activeLegendType.value
+  if (t === 'prayer')     uiStore.setPrayerFilter(node.id)
+  else if (t === 'engagement') uiStore.setEngagementFilter(node.id)
+  else if (t === 'adoption')   uiStore.setAdoptionFilter(node.id)
+}
+
 const mapContainer = ref(null)
 const dsmRoot = ref(null)
 
@@ -392,6 +465,7 @@ function preloadPeopleGroupImages(groups) {
 
 // ─── Map controls ─────────────────────────────────────────────────────────────
 const isDark = computed(() => uiStore.theme === 'dark')
+watch(isDark, (dark) => { pplrInstance.theme.value = dark ? 'dark' : 'light' }, { immediate: true })
 
 // Theme-aware data-pin outline (qa: 2026-05-06 user feedback — Joshua Project
 // uses a thin near-black outline that's barely visible; reverse-engineered).
@@ -428,6 +502,9 @@ function handleToggleTheme() {
     initActiveLayer()
     // New style → its label layers are defaults ('name_en'). Re-apply locale.
     applyBasemapLocale(locale.value)
+    if (activeTab.value?.id === 'prayer' || activeTab.value?.colorStrategy === 'prayer') {
+      mapLayers.startPrayerGlow()
+    }
   })
 }
 
@@ -562,6 +639,8 @@ function _onBreakpointResize() {
 
 onMounted(() => {
   uiStore.updateBreakpoint(window.innerWidth)
+  if (uiStore.isMobile) uiStore.collapseLegend()
+  else uiStore.openLegend()
   window.addEventListener('resize', _onBreakpointResize)
   // Container-size observer — sets CSS vars for responsive button/font scaling
   if (dsmRoot.value) {
@@ -620,6 +699,8 @@ function switchTab(tabId) {
       }
     })
   }
+  if (tab.id === 'prayer' || tab.colorStrategy === 'prayer') mapLayers.startPrayerGlow()
+  else mapLayers.stopPrayerGlow()
 }
 
 // ─── Legend filter → dim/highlight pins ──────────────────────────────────────
@@ -859,11 +940,10 @@ function applyLegendFilter(filterType, filterKey) {
 
   if (!filterKey) {
     _currentFilter = { type: null, key: null }
-    // Restore the tab's full color palette on the base layer (in case a previous
-    // filter had painted it gray via the overlapDensity=false path).
     m.setPaintProperty('language-family-pins', 'circle-color', getBaseColorExpr())
     m.setPaintProperty('language-family-pins', 'circle-opacity', 0.9)
     m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', 1)
+    mapLayers.syncGlowFilter(null)
     clearActiveLayer()
     return
   }
@@ -874,6 +954,7 @@ function applyLegendFilter(filterType, filterKey) {
     m.setPaintProperty('language-family-pins', 'circle-color', getBaseColorExpr())
     m.setPaintProperty('language-family-pins', 'circle-opacity', 0.9)
     m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', 1)
+    mapLayers.syncGlowFilter(null)
     clearActiveLayer()
     return
   }
@@ -886,9 +967,10 @@ function applyLegendFilter(filterType, filterKey) {
   if (!FEATURES.activeOverlayEmphasis) {
     m.setPaintProperty('language-family-pins', 'circle-color', getBaseColorExpr())
     m.setPaintProperty('language-family-pins', 'circle-opacity',
-      ['case', matchExpr, 1, 0.06])    // Origin: aligned to research-map's dim depth (was 0.9 / 0.15)
+      ['case', matchExpr, 1, 0.06])
     m.setPaintProperty('language-family-pins', 'circle-stroke-opacity',
-      ['case', matchExpr, 1, 0.06])    // Origin: aligned to research-map's dim depth (was 1 / 0.15)
+      ['case', matchExpr, 1, 0.06])
+    mapLayers.syncGlowFilter(matchExpr)
     return
   }
 
@@ -968,6 +1050,11 @@ async function onMapReady(normalizedPeopleGroups) {
   // Mark app ready → v-if gates open, legend mounts
   mapStore.setMapReady(mapId)
   appReady.value = true
+
+  // Start prayer glow if initial tab is prayer
+  if (activeTab.value?.id === 'prayer' || activeTab.value?.colorStrategy === 'prayer') {
+    mapLayers.startPrayerGlow()
+  }
 }
 
 // Live-switch basemap labels if locale changes during the session
@@ -1009,6 +1096,7 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
+  mapLayers.stopPrayerGlow()
   clearActiveLayer()
   mapStore.unregisterMap(mapId)
   selectedPin.cleanup()
@@ -1078,14 +1166,41 @@ onBeforeUnmount(() => {
         @reload-map="handleReloadMap"
       />
 
-      <!-- Legend renders inside shadow root, gated on appReady -->
-      <LegendDesktop
-        v-if="appReady"
-        :legend-type="activeLegendType"
-        :popup-action="activePopupAction"
-        :initially-collapsed="false"
-        :is-dark="isDark"
-      />
+      <!-- Desktop legend: STL for list view, LegendDesktop only for detail mode -->
+      <div class="dsm-legend-desktop-slot">
+        <LegendDesktop
+          v-if="appReady && uiStore.legendMode === 'detail' && uiStore.selectedPeopleGroup"
+          :legend-type="activeLegendType"
+          :popup-action="activePopupAction"
+          :initially-collapsed="false"
+          :is-dark="isDark"
+        />
+        <SemanticTreeLegend
+          v-if="appReady"
+          v-show="!(uiStore.legendMode === 'detail' && uiStore.selectedPeopleGroup)"
+          :nodes="legendNodes"
+          :tabs="null"
+          :title="legendTitle"
+          :hideTabs="true"
+          :columnLabel="legendColumnLabel"
+          :open="_stlOpen"
+          @select="onSemanticTreeSelect"
+          @update:open="_onStlOpenChange"
+        />
+      </div>
+      <!-- Mobile legend: bottom-sheet with LegendMobile (matches research map) -->
+      <div class="dsm-legend-mobile-slot">
+        <LegendMobile
+          v-if="appReady"
+          :legend-type="activeLegendType"
+          :popup-action="activePopupAction"
+          :is-dark="isDark"
+        />
+      </div>
+
+      <!-- Left/right scroll edges for mobile page scrolling -->
+      <div class="map-scroll-edge map-scroll-edge--left" />
+      <div class="map-scroll-edge map-scroll-edge--right" />
 
       <!-- Map controls — each button is an explicit instance bound to THIS map.
            MapToolbar is a layout-only shell (positioned column + slot).

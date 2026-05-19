@@ -9,6 +9,7 @@ import { ref } from 'vue';
 import { buildColorExpression } from '../config/colorStrategies.js';
 import { getRegionColor, COLOR_MODES } from '../config/colors.js';
 import { getCircleRadiusInterpolation, getCircleStrokeWidthInterpolation } from '../config/zoom.js';
+import { FULL_PRAYER_THRESHOLD, PALETTE as PRAYER_PALETTE } from '../config/color-strategies/prayer-progress.js';
 import { useMapEvents } from './useMapEvents.js';
 import langFamilyByLanguage from '../data/langFamilyByLanguage.json';
 
@@ -516,6 +517,169 @@ export function useMapLayers(options = {}) {
         mapEvents.detachAllEventHandlers();
     }
 
+    // ── Prayer ripple animation (continuous WiFi-style waves) ─────────────────
+    // Solid colored disc behind pin + 4 ring layers in perpetual staggered
+    // expansion. Each ring is offset by 1/4 of the cycle so there is ALWAYS
+    // at least 2 rings visible — no gap, no pause. Rings emit continuously
+    // from the pin center and fade to transparent at max radius, like ripples
+    // on water or WiFi signal waves radiating outward.
+    //
+    // Pin radii: z0=3, z2=3.5, z4=4, z5=5, z6=6.5, z7=8, z8=10, z10=14, z12=18, z14=22
+    let _glowRafId = null;
+    let _glowActive = false;
+    const GLOW_BASE  = 'prayer-glow-base';
+    const RING_COUNT = 4;
+    const _RING_IDS = [];
+    for (let _ri = 0; _ri < RING_COUNT; _ri++) _RING_IDS.push('prayer-glow-ring-' + _ri);
+    const _GLOW_IDS  = [GLOW_BASE, ..._RING_IDS];
+    const CYCLE_SEC  = 6.0;
+    const MIN_SCALE  = 0.3;
+    const MAX_SCALE  = 2.5;
+
+    function _glowColorExpr() {
+        return [
+            'case',
+            ['>=', ['get', 'peoplePraying'], FULL_PRAYER_THRESHOLD],
+            '#15803d',
+            ['>', ['get', 'peoplePraying'], 0],
+            '#d97706',
+            'rgba(0,0,0,0)'
+        ];
+    }
+
+    const _BASE_R = [0,5, 2,6, 4,7, 5,9, 6,12, 7,14, 8,18, 10,25, 12,32, 14,40];
+
+    function _scaledRadius(base, scale) {
+        const out = ['interpolate', ['linear'], ['zoom']];
+        for (let i = 0; i < base.length; i += 2) {
+            out.push(base[i], base[i+1] * scale);
+        }
+        return out;
+    }
+
+    function addPrayerGlowLayers() {
+        const map = getMap();
+        if (!map || !map.getSource('language-families')) return;
+
+        const prayerFilter = ['>', ['get', 'peoplePraying'], 0];
+        const color = _glowColorExpr();
+
+        if (!map.getLayer(GLOW_BASE)) {
+            map.addLayer({
+                id: GLOW_BASE,
+                type: 'circle',
+                source: 'language-families',
+                filter: prayerFilter,
+                paint: {
+                    'circle-radius': _scaledRadius(_BASE_R, 1.0),
+                    'circle-color': color,
+                    'circle-blur': 0.3,
+                    'circle-opacity': 0.45,
+                    'circle-stroke-width': 0,
+                }
+            }, 'language-family-pins');
+        }
+
+        for (const ringId of _RING_IDS) {
+            if (!map.getLayer(ringId)) {
+                map.addLayer({
+                    id: ringId,
+                    type: 'circle',
+                    source: 'language-families',
+                    filter: prayerFilter,
+                    paint: {
+                        'circle-radius': _scaledRadius(_BASE_R, 1.0),
+                        'circle-color': 'rgba(0,0,0,0)',
+                        'circle-blur': 0,
+                        'circle-opacity': 1,
+                        'circle-stroke-width': 2,
+                        'circle-stroke-color': color,
+                        'circle-stroke-opacity': 0,
+                    }
+                }, 'language-family-pins');
+            }
+        }
+    }
+
+    function removePrayerGlowLayers() {
+        const map = getMap();
+        if (!map) return;
+        for (const id of _GLOW_IDS) {
+            if (map.getLayer(id)) map.removeLayer(id);
+        }
+    }
+
+    function syncGlowFilter(extraFilter) {
+        const map = getMap();
+        if (!map) return;
+        const base = ['>', ['get', 'peoplePraying'], 0];
+        const filter = extraFilter ? ['all', base, extraFilter] : base;
+        for (const id of _GLOW_IDS) {
+            if (map.getLayer(id)) {
+                try { map.setFilter(id, filter); } catch (_) {}
+            }
+        }
+    }
+
+    function startPrayerGlow() {
+        const map = getMap();
+        if (!map) return;
+        addPrayerGlowLayers();
+        if (_glowActive) return;
+        _glowActive = true;
+
+        if (map.getLayer('language-family-pins')) {
+            try {
+                map.setLayoutProperty('language-family-pins', 'circle-sort-key', [
+                    'case',
+                    ['>=', ['get', 'peoplePraying'], FULL_PRAYER_THRESHOLD], 1,
+                    ['>', ['get', 'peoplePraying'], 0], 1,
+                    3
+                ]);
+            } catch (_) {}
+        }
+
+        let t0 = performance.now();
+        function tick(now) {
+            if (!_glowActive) return;
+            _glowRafId = requestAnimationFrame(tick);
+            const m = getMap();
+            if (!m || !_GLOW_IDS.some(id => m.getLayer(id))) { _glowActive = false; return; }
+            const elapsed = (now - t0) / 1000;
+
+            for (let i = 0; i < RING_COUNT; i++) {
+                const ringId = _RING_IDS[i];
+                if (!m.getLayer(ringId)) continue;
+
+                const delay = i * (CYCLE_SEC / RING_COUNT);
+                const t = ((elapsed - delay) % CYCLE_SEC + CYCLE_SEC) % CYCLE_SEC;
+                const phase = t / CYCLE_SEC;
+                const radiusScale = MIN_SCALE + phase * (MAX_SCALE - MIN_SCALE);
+                const opacity = 0.5 * (1.0 - phase);
+
+                try {
+                    m.setPaintProperty(ringId, 'circle-radius', _scaledRadius(_BASE_R, radiusScale));
+                    m.setPaintProperty(ringId, 'circle-stroke-opacity', opacity);
+                    m.setPaintProperty(ringId, 'circle-stroke-width', 2.5);
+                    m.setPaintProperty(ringId, 'circle-blur', 0);
+                } catch (_) {}
+            }
+        }
+        _glowRafId = requestAnimationFrame(tick);
+    }
+
+    function stopPrayerGlow() {
+        _glowActive = false;
+        if (_glowRafId) { cancelAnimationFrame(_glowRafId); _glowRafId = null; }
+        try {
+            removePrayerGlowLayers();
+            const map = getMap();
+            if (map && map.getLayer('language-family-pins')) {
+                map.setLayoutProperty('language-family-pins', 'circle-sort-key', undefined);
+            }
+        } catch (_) {}
+    }
+
     return {
         // State
         layersAdded,
@@ -535,6 +699,11 @@ export function useMapLayers(options = {}) {
 
         // Event management (exposed for advanced usage)
         mapEvents,
+
+        // Prayer glow animation
+        startPrayerGlow,
+        stopPrayerGlow,
+        syncGlowFilter,
 
         // Cleanup
         cleanup
