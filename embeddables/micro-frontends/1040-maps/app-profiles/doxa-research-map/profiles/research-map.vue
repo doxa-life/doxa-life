@@ -1831,18 +1831,19 @@ onBeforeUnmount(() => {
           :initially-collapsed="false"
           :is-dark="isDark"
         />
-        <SemanticTreeLegend
-          v-if="appReady"
-          v-show="!(uiStore.legendMode === 'detail' && uiStore.selectedPeopleGroup)"
-          :nodes="legendNodes"
-          :tabs="legendInnerTabs"
-          :title="legendTitle"
-          :hideTabs="legendHideTabs"
-          :columnLabel="legendColumnLabel"
-          :open="_stlOpen"
-          @select="onSemanticTreeSelect"
-          @update:open="_onStlOpenChange"
-        />
+        <div v-show="!(uiStore.legendMode === 'detail' && uiStore.selectedPeopleGroup)">
+          <SemanticTreeLegend
+            v-if="appReady"
+            :nodes="legendNodes"
+            :tabs="legendInnerTabs"
+            :title="legendTitle"
+            :hideTabs="legendHideTabs"
+            :columnLabel="legendColumnLabel"
+            :open="_stlOpen"
+            @select="onSemanticTreeSelect"
+            @update:open="_onStlOpenChange"
+          />
+        </div>
       </div>
       <div class="rm-legend-mobile-slot">
         <LegendMobile
