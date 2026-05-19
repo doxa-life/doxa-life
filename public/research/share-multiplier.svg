@@ -1,319 +1,381 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
   <defs>
-    <radialGradient id="gG" cx="50%" cy="50%" r="50%">
+    <radialGradient id="greenGlow" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#22c55e" stop-opacity="0.3"/>
       <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="bG" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.45"/>
-      <stop offset="100%" stop-color="#60a5fa" stop-opacity="0"/>
+    <radialGradient id="blueGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#2563eb" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="dv" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#0b0f14"/>
-      <stop offset="20%" stop-color="#30363d"/>
-      <stop offset="50%" stop-color="#484f58"/>
-      <stop offset="80%" stop-color="#30363d"/>
-      <stop offset="100%" stop-color="#0b0f14"/>
-    </linearGradient>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="1" stdDeviation="3" flood-color="#94a3b8" flood-opacity="0.18"/>
+    </filter>
+    <filter id="shadowSm" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#94a3b8" flood-opacity="0.14"/>
+    </filter>
     <style>
-      @keyframes cIn{0%,2%{opacity:0;transform:translateY(8px)}8%,100%{opacity:1;transform:translateY(0)}}
-      @keyframes sPop{0%,18%{opacity:0;transform:scale(.5)}24%{opacity:1;transform:scale(1.15)}28%,38%{opacity:1;transform:scale(1)}44%{opacity:0;transform:scale(.8)}100%{opacity:0}}
-      @keyframes sRing{0%,18%{r:0;opacity:0}22%{r:4;opacity:.6}36%{r:28;opacity:0}100%{r:28;opacity:0}}
-      @keyframes eOut{0%,22%{opacity:0;transform:translateY(-4px)}28%{opacity:1;transform:translateY(0)}40%{opacity:1}46%{opacity:0;transform:translateY(6px)}100%{opacity:0}}
-      @keyframes fA{0%,36%{stroke-dashoffset:160;opacity:0}38%{opacity:.75}48%{stroke-dashoffset:0;opacity:.75}56%{opacity:0}100%{opacity:0}}
-      @keyframes fB{0%,40%{stroke-dashoffset:160;opacity:0}42%{opacity:.75}52%{stroke-dashoffset:0;opacity:.75}58%{opacity:0}100%{opacity:0}}
-      @keyframes fC{0%,44%{stroke-dashoffset:160;opacity:0}46%{opacity:.75}56%{stroke-dashoffset:0;opacity:.75}60%{opacity:0}100%{opacity:0}}
-      @keyframes fD{0%,48%{stroke-dashoffset:160;opacity:0}50%{opacity:.75}60%{stroke-dashoffset:0;opacity:.75}64%{opacity:0}100%{opacity:0}}
-      @keyframes fE{0%,52%{stroke-dashoffset:160;opacity:0}54%{opacity:.75}64%{stroke-dashoffset:0;opacity:.75}68%{opacity:0}100%{opacity:0}}
-      @keyframes pA{0%,38%{opacity:0;transform:scale(.88) translateY(6px)}46%{opacity:1;transform:scale(1) translateY(0)}100%{opacity:1;transform:scale(1) translateY(0)}}
-      @keyframes pB{0%,42%{opacity:0;transform:scale(.88) translateY(6px)}50%{opacity:1;transform:scale(1) translateY(0)}100%{opacity:1;transform:scale(1) translateY(0)}}
-      @keyframes pC{0%,46%{opacity:0;transform:scale(.88) translateY(6px)}54%{opacity:1;transform:scale(1) translateY(0)}100%{opacity:1;transform:scale(1) translateY(0)}}
-      @keyframes pD{0%,50%{opacity:0;transform:scale(.88) translateY(6px)}58%{opacity:1;transform:scale(1) translateY(0)}100%{opacity:1;transform:scale(1) translateY(0)}}
-      @keyframes pE{0%,54%{opacity:0;transform:scale(.88) translateY(6px)}62%{opacity:1;transform:scale(1) translateY(0)}100%{opacity:1;transform:scale(1) translateY(0)}}
-      @keyframes gA{0%,44%{opacity:0}48%,88%{opacity:1}94%,100%{opacity:0}}
-      @keyframes gB{0%,48%{opacity:0}52%,88%{opacity:1}94%,100%{opacity:0}}
-      @keyframes gC{0%,52%{opacity:0}56%,88%{opacity:1}94%,100%{opacity:0}}
-      @keyframes gD{0%,56%{opacity:0}60%,88%{opacity:1}94%,100%{opacity:0}}
-      @keyframes gE{0%,60%{opacity:0}64%,88%{opacity:1}94%,100%{opacity:0}}
-      @keyframes r1{0%,66%{r:20;opacity:0}68%{r:20;opacity:.25}82%{r:70;opacity:0}100%{opacity:0}}
-      @keyframes r2{0%,72%{r:20;opacity:0}74%{r:20;opacity:.18}88%{r:80;opacity:0}100%{opacity:0}}
-      @keyframes mIn{0%,62%{opacity:0;transform:scale(.7)}70%{opacity:1;transform:scale(1)}88%{opacity:1}94%{opacity:0;transform:scale(.9)}100%{opacity:0}}
-      @keyframes sIn{0%,66%{opacity:0}72%,88%{opacity:1}94%,100%{opacity:0}}
-      @keyframes tS{0%,4%{opacity:0;transform:translateY(6px)}10%,100%{opacity:.95;transform:translateY(0)}}
-      @keyframes aD{0%,6%{stroke-dashoffset:20}14%,100%{stroke-dashoffset:0}}
-      @keyframes dP{0%,30%{opacity:.3}50%{opacity:.7}70%,100%{opacity:.3}}
-      .cw{animation:cIn 10s ease-in-out infinite}
-      .si{animation:sPop 10s ease-in-out infinite;transform-origin:400px 175px}
-      .sr{animation:sRing 10s ease-in-out infinite}
-      .el{animation:eOut 10s ease-in-out infinite}
-      .fa{animation:fA 10s ease-in-out infinite;stroke-dasharray:160}
-      .fb{animation:fB 10s ease-in-out infinite;stroke-dasharray:160}
-      .fc{animation:fC 10s ease-in-out infinite;stroke-dasharray:160}
-      .fd{animation:fD 10s ease-in-out infinite;stroke-dasharray:160}
-      .fe{animation:fE 10s ease-in-out infinite;stroke-dasharray:160}
-      .pa{animation:pA 10s ease-in-out infinite}
-      .pb{animation:pB 10s ease-in-out infinite}
-      .pc{animation:pC 10s ease-in-out infinite}
-      .pd{animation:pD 10s ease-in-out infinite}
-      .pe{animation:pE 10s ease-in-out infinite}
-      .ga{animation:gA 10s ease-in-out infinite}
-      .gb{animation:gB 10s ease-in-out infinite}
-      .gc{animation:gC 10s ease-in-out infinite}
-      .gd{animation:gD 10s ease-in-out infinite}
-      .ge{animation:gE 10s ease-in-out infinite}
-      .r1{animation:r1 10s ease-out infinite}
-      .r2{animation:r2 10s ease-out infinite}
-      .mt{animation:mIn 10s ease-in-out infinite;transform-origin:400px 52px}
-      .st{animation:sIn 10s ease-in-out infinite}
-      .tc{animation:tS 10s ease-in-out infinite}
-      .ad{animation:aD 10s ease-in-out infinite;stroke-dasharray:20}
-      .dp{animation:dP 10s ease-in-out infinite}
+      /* ===== 10-second seamless loop ===== */
+      /* --- Phase 1: Main browser appears (0-8%) --- */
+      @keyframes mainAppear {
+        0% { opacity: 0; transform: translateY(8px); }
+        8% { opacity: 1; transform: translateY(0); }
+        92% { opacity: 1; transform: translateY(0); }
+        98% { opacity: 0; transform: translateY(8px); }
+        100% { opacity: 0; }
+      }
+      /* --- Phase 2: Share button pulses (15-32%) --- */
+      @keyframes sharePulse {
+        0%, 14% { transform: scale(1); }
+        18% { transform: scale(1.15); }
+        22% { transform: scale(1); }
+        26% { transform: scale(1.15); }
+        30% { transform: scale(1); }
+        100% { transform: scale(1); }
+      }
+      @keyframes shareRing {
+        0%, 14% { r: 14; opacity: 0; }
+        16% { r: 14; opacity: 0.5; }
+        28% { r: 32; opacity: 0; }
+        100% { r: 32; opacity: 0; }
+      }
+      @keyframes shareRing2 {
+        0%, 20% { r: 14; opacity: 0; }
+        22% { r: 14; opacity: 0.4; }
+        34% { r: 38; opacity: 0; }
+        100% { r: 38; opacity: 0; }
+      }
+      @keyframes shareLabelAppear {
+        0%, 5% { opacity: 0; }
+        12% { opacity: 1; }
+        90% { opacity: 1; }
+        96% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      /* --- Phase 3: Flow lines radiate (28-50%) --- */
+      @keyframes flowLine1 {
+        0%, 28% { stroke-dashoffset: 300; opacity: 0; }
+        30% { opacity: 0.8; }
+        42% { stroke-dashoffset: 0; opacity: 0.8; }
+        50% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      @keyframes flowLine2 {
+        0%, 33% { stroke-dashoffset: 300; opacity: 0; }
+        35% { opacity: 0.8; }
+        47% { stroke-dashoffset: 0; opacity: 0.8; }
+        55% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      @keyframes flowLine3 {
+        0%, 38% { stroke-dashoffset: 300; opacity: 0; }
+        40% { opacity: 0.8; }
+        52% { stroke-dashoffset: 0; opacity: 0.8; }
+        60% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      /* --- Phase 4: Partner windows appear (38-60%) --- */
+      @keyframes partner1 {
+        0%, 38% { opacity: 0; transform: translateY(12px) scale(0.93); }
+        46% { opacity: 1; transform: translateY(0) scale(1); }
+        90% { opacity: 1; transform: translateY(0) scale(1); }
+        96% { opacity: 0; transform: translateY(0) scale(0.97); }
+        100% { opacity: 0; }
+      }
+      @keyframes partner2 {
+        0%, 43% { opacity: 0; transform: translateY(12px) scale(0.93); }
+        51% { opacity: 1; transform: translateY(0) scale(1); }
+        90% { opacity: 1; transform: translateY(0) scale(1); }
+        96% { opacity: 0; transform: translateY(0) scale(0.97); }
+        100% { opacity: 0; }
+      }
+      @keyframes partner3 {
+        0%, 48% { opacity: 0; transform: translateY(12px) scale(0.93); }
+        56% { opacity: 1; transform: translateY(0) scale(1); }
+        90% { opacity: 1; transform: translateY(0) scale(1); }
+        96% { opacity: 0; transform: translateY(0) scale(0.97); }
+        100% { opacity: 0; }
+      }
+      /* --- Partner green glow on activation --- */
+      @keyframes glowP1 {
+        0%, 43% { opacity: 0; }
+        48%, 88% { opacity: 1; }
+        94% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      @keyframes glowP2 {
+        0%, 48% { opacity: 0; }
+        53%, 88% { opacity: 1; }
+        94% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      @keyframes glowP3 {
+        0%, 53% { opacity: 0; }
+        58%, 88% { opacity: 1; }
+        94% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      /* --- Phase 5: Celebration ripples (60-85%) --- */
+      @keyframes celebRipple {
+        0%, 62% { r: 20; opacity: 0; }
+        64% { r: 20; opacity: 0.25; }
+        78% { r: 60; opacity: 0; }
+        100% { r: 60; opacity: 0; }
+      }
+      @keyframes celebRipple2 {
+        0%, 67% { r: 20; opacity: 0; }
+        69% { r: 20; opacity: 0.18; }
+        83% { r: 70; opacity: 0; }
+        100% { r: 70; opacity: 0; }
+      }
+      /* --- Title text --- */
+      @keyframes titleAppear {
+        0%, 3% { opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        96% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      @keyframes subtitleAppear {
+        0%, 26% { opacity: 0; }
+        34% { opacity: 1; }
+        90% { opacity: 1; }
+        96% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      /* --- Multiplier counter (65-92%) --- */
+      @keyframes counterShow {
+        0%, 60% { opacity: 0; transform: scale(0.85); }
+        66% { opacity: 1; transform: scale(1); }
+        90% { opacity: 1; transform: scale(1); }
+        96% { opacity: 0; transform: scale(0.85); }
+        100% { opacity: 0; }
+      }
+      /* --- Developer section pipeline (staggered) --- */
+      @keyframes devBoxAppear {
+        0%, 4% { opacity: 0; }
+        12%, 90% { opacity: 1; }
+        96% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      @keyframes devArrowFlow {
+        0%, 10% { stroke-dashoffset: 20; opacity: 0; }
+        18%, 90% { stroke-dashoffset: 0; opacity: 0.6; }
+        96% { opacity: 0; }
+        100% { opacity: 0; }
+      }
+      /* Class assignments */
+      .main-browser { animation: mainAppear 10s ease-in-out infinite; }
+      .share-btn-group { animation: sharePulse 10s ease-in-out infinite; transform-origin: 478px 168px; }
+      .share-ring1 { animation: shareRing 10s ease-out infinite; }
+      .share-ring2 { animation: shareRing2 10s ease-out infinite; }
+      .share-label { animation: shareLabelAppear 10s ease-in-out infinite; }
+      .flow-1 { animation: flowLine1 10s ease-in-out infinite; stroke-dasharray: 300; }
+      .flow-2 { animation: flowLine2 10s ease-in-out infinite; stroke-dasharray: 300; }
+      .flow-3 { animation: flowLine3 10s ease-in-out infinite; stroke-dasharray: 300; }
+      .partner-1 { animation: partner1 10s ease-in-out infinite; }
+      .partner-2 { animation: partner2 10s ease-in-out infinite; }
+      .partner-3 { animation: partner3 10s ease-in-out infinite; }
+      .glow-p1 { animation: glowP1 10s ease-in-out infinite; }
+      .glow-p2 { animation: glowP2 10s ease-in-out infinite; }
+      .glow-p3 { animation: glowP3 10s ease-in-out infinite; }
+      .ripple-celeb { animation: celebRipple 10s ease-out infinite; }
+      .ripple-celeb2 { animation: celebRipple2 10s ease-out infinite; }
+      .title-text { animation: titleAppear 10s ease-in-out infinite; }
+      .subtitle-text { animation: subtitleAppear 10s ease-in-out infinite; }
+      .counter-group { animation: counterShow 10s ease-in-out infinite; transform-origin: 400px 370px; }
+      .dev-box { animation: devBoxAppear 10s ease-in-out infinite; }
+      .dev-arrow { animation: devArrowFlow 10s ease-in-out infinite; stroke-dasharray: 20; }
     </style>
   </defs>
-
-  <rect width="800" height="600" fill="#0b0f14"/>
-
-  <!-- Section label -->
-  <text x="400" y="28" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#484f58" letter-spacing="1.5" class="cw">FOR DOXA PARTNERS</text>
-
-  <!-- MULTIPLIED title -->
-  <g class="mt">
-    <text x="400" y="56" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="28" fill="#22c55e" font-weight="700" letter-spacing="4">MULTIPLIED</text>
-  </g>
-  <g class="st">
-    <text x="400" y="76" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="11" fill="#8b949e" letter-spacing="0.5">Share one map. Expand prayer across the internet.</text>
-  </g>
-
-  <!-- Flow lines -->
-  <line x1="340" y1="190" x2="80" y2="120" stroke="#22c55e" stroke-width="1.2" stroke-linecap="round" class="fa"/>
-  <line x1="340" y1="210" x2="80" y2="295" stroke="#22c55e" stroke-width="1.2" stroke-linecap="round" class="fb"/>
-  <line x1="460" y1="180" x2="620" y2="100" stroke="#22c55e" stroke-width="1.2" stroke-linecap="round" class="fc"/>
-  <line x1="460" y1="210" x2="620" y2="285" stroke="#22c55e" stroke-width="1.2" stroke-linecap="round" class="fd"/>
-  <line x1="400" y1="250" x2="400" y2="330" stroke="#22c55e" stroke-width="1.2" stroke-linecap="round" class="fe"/>
-
-  <!-- CENTER: doxa.life -->
-  <g class="cw">
-    <rect x="300" y="100" width="200" height="155" rx="7" fill="#0d1117" stroke="#30363d" stroke-width="1.2"/>
-    <rect x="300" y="100" width="200" height="22" rx="7" fill="#161b22"/>
-    <rect x="300" y="115" width="200" height="7" fill="#161b22"/>
-    <circle cx="313" cy="111" r="3.5" fill="#f85149" opacity=".75"/>
-    <circle cx="324" cy="111" r="3.5" fill="#f0b72f" opacity=".75"/>
-    <circle cx="335" cy="111" r="3.5" fill="#3fb950" opacity=".75"/>
-    <text x="420" y="115" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" fill="#c9d1d9" font-weight="600">doxa.life</text>
-    <rect x="308" y="127" width="184" height="120" rx="3" fill="#0b1016"/>
-    <path d="M318,185 Q335,172 358,178 Q375,168 392,175 Q410,166 428,174 Q445,168 462,177 Q478,172 485,180 L488,184 Q480,196 462,190 Q440,198 420,190 Q400,200 380,192 Q360,200 340,193 Q325,198 316,190 Z" fill="#132218" opacity=".5"/>
-    <circle cx="340" cy="172" r="2.2" fill="#22c55e" opacity=".85"/>
-    <circle cx="358" cy="166" r="1.8" fill="#22c55e" opacity=".7"/>
-    <circle cx="375" cy="175" r="2.8" fill="#22c55e" opacity=".9"/>
-    <circle cx="392" cy="168" r="1.6" fill="#22c55e" opacity=".6"/>
-    <circle cx="410" cy="178" r="2.4" fill="#22c55e" opacity=".8"/>
-    <circle cx="428" cy="170" r="1.8" fill="#22c55e" opacity=".7"/>
-    <circle cx="445" cy="176" r="2.6" fill="#22c55e" opacity=".85"/>
-    <circle cx="462" cy="172" r="1.5" fill="#22c55e" opacity=".6"/>
-    <circle cx="478" cy="180" r="2" fill="#22c55e" opacity=".75"/>
-    <circle cx="350" cy="185" r="1.5" fill="#22c55e" opacity=".5"/>
-    <circle cx="385" cy="190" r="1.8" fill="#22c55e" opacity=".6"/>
-    <circle cx="420" cy="188" r="1.4" fill="#22c55e" opacity=".45"/>
-    <circle cx="455" cy="185" r="1.6" fill="#22c55e" opacity=".55"/>
-    <circle cx="330" cy="195" r="1.3" fill="#22c55e" opacity=".4"/>
-    <circle cx="400" cy="198" r="1.5" fill="#22c55e" opacity=".5"/>
-    <circle cx="470" cy="192" r="1.2" fill="#22c55e" opacity=".45"/>
-  </g>
-
-  <!-- Share icon -->
-  <g class="si">
-    <circle cx="400" cy="175" r="0" fill="url(#bG)" class="sr"/>
-    <g transform="translate(388,163)">
-      <rect x="0" y="8" width="24" height="16" rx="3" fill="none" stroke="#60a5fa" stroke-width="1.6"/>
-      <polyline points="12,14 12,0 6,6" fill="none" stroke="#60a5fa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-      <polyline points="12,0 18,6" fill="none" stroke="#60a5fa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect width="800" height="600" fill="#ffffff" rx="0"/>
+  <text class="title-text" x="400" y="32" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="18" fill="#1a1a2e" font-weight="700" letter-spacing="0.5">MULTIPLY YOUR PRAYER MAP</text>
+  <text class="subtitle-text" x="400" y="52" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="12" fill="#64748b" font-weight="400">Embed anywhere with one click</text>
+  <path d="M 500,195 C 560,195 570,120 620,110" stroke="#60a5fa" stroke-width="2" fill="none" stroke-linecap="round" class="flow-1"/>
+  <path d="M 500,210 C 580,215 590,215 620,230" stroke="#60a5fa" stroke-width="2" fill="none" stroke-linecap="round" class="flow-2"/>
+  <path d="M 500,230 C 570,260 590,310 620,340" stroke="#60a5fa" stroke-width="2" fill="none" stroke-linecap="round" class="flow-3"/>
+  <g class="main-browser" filter="url(#shadow)">
+    <rect x="40" y="72" width="430" height="290" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <rect x="40" y="72" width="430" height="28" rx="8" fill="#f8fafc"/>
+    <rect x="40" y="92" width="430" height="8" fill="#f8fafc"/>
+    <circle cx="58" cy="86" r="4.5" fill="#f87171" opacity="0.9"/>
+    <circle cx="72" cy="86" r="4.5" fill="#fbbf24" opacity="0.9"/>
+    <circle cx="86" cy="86" r="4.5" fill="#4ade80" opacity="0.9"/>
+    <rect x="130" y="78" width="200" height="16" rx="4" fill="#f1f5f9"/>
+    <text x="230" y="90" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b" font-weight="500">doxa.life</text>
+    <rect x="50" y="105" width="410" height="248" rx="3" fill="#dbeafe" opacity="0.3"/>
+    <rect x="50" y="105" width="410" height="248" rx="3" fill="#e8f4f8"/>
+    <path d="M60,200 Q80,175 120,180 Q150,165 190,172 Q220,160 260,170 Q290,158 320,168 Q350,155 380,165 Q410,160 440,170 L450,175 Q445,200 430,210 Q405,225 375,215 Q345,228 315,218 Q285,230 255,220 Q225,232 195,222 Q165,234 135,224 Q105,232 75,218 Q62,210 58,200 Z" fill="#f5f0e8" stroke="#e2ddd0" stroke-width="0.5"/>
+    <path d="M100,250 Q130,240 160,245 Q190,238 210,242 L215,248 Q200,260 170,258 Q140,265 115,260 Q102,256 98,250 Z" fill="#f5f0e8" stroke="#e2ddd0" stroke-width="0.5"/>
+    <path d="M300,250 Q330,242 360,248 Q380,240 400,245 Q420,240 440,248 L445,255 Q430,268 400,262 Q370,270 340,263 Q315,268 302,258 Z" fill="#f5f0e8" stroke="#e2ddd0" stroke-width="0.5"/>
+    <circle cx="100" cy="190" r="3" fill="#22c55e" opacity="0.9"/>
+    <circle cx="135" cy="178" r="2.5" fill="#22c55e" opacity="0.75"/>
+    <circle cx="165" cy="185" r="3.5" fill="#22c55e" opacity="0.85"/>
+    <circle cx="200" cy="172" r="2.5" fill="#22c55e" opacity="0.7"/>
+    <circle cx="230" cy="180" r="3" fill="#22c55e" opacity="0.9"/>
+    <circle cx="260" cy="170" r="2" fill="#22c55e" opacity="0.65"/>
+    <circle cx="290" cy="178" r="3" fill="#22c55e" opacity="0.8"/>
+    <circle cx="320" cy="168" r="2.5" fill="#22c55e" opacity="0.75"/>
+    <circle cx="350" cy="175" r="3.5" fill="#22c55e" opacity="0.9"/>
+    <circle cx="380" cy="165" r="2" fill="#22c55e" opacity="0.7"/>
+    <circle cx="410" cy="172" r="2.5" fill="#22c55e" opacity="0.8"/>
+    <circle cx="125" cy="200" r="2" fill="#22c55e" opacity="0.6"/>
+    <circle cx="175" cy="208" r="2.5" fill="#22c55e" opacity="0.7"/>
+    <circle cx="220" cy="195" r="2" fill="#22c55e" opacity="0.55"/>
+    <circle cx="275" cy="205" r="2.5" fill="#22c55e" opacity="0.7"/>
+    <circle cx="340" cy="200" r="2" fill="#22c55e" opacity="0.6"/>
+    <circle cx="395" cy="195" r="2" fill="#22c55e" opacity="0.55"/>
+    <circle cx="430" cy="180" r="2" fill="#22c55e" opacity="0.65"/>
+    <circle cx="150" cy="248" r="2" fill="#22c55e" opacity="0.6"/>
+    <circle cx="330" cy="255" r="2" fill="#22c55e" opacity="0.55"/>
+    <circle cx="380" cy="250" r="2.5" fill="#22c55e" opacity="0.7"/>
+    <!-- ====== SHARE BUTTON (prominent, top-right of map) ====== -->
+    <g class="share-btn-group">
+      <rect x="432" y="112" width="20" height="20" rx="5" fill="#2563eb"/>
+      <rect x="436" y="120" width="12" height="9" rx="1.5" fill="none" stroke="#ffffff" stroke-width="1.4"/>
+      <line x1="442" y1="124" x2="442" y2="114" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round"/>
+      <polyline points="439,117 442,114 445,117" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
+    <circle cx="442" cy="122" fill="none" stroke="#2563eb" stroke-width="1.5" class="share-ring1"/>
+    <circle cx="442" cy="122" fill="none" stroke="#2563eb" stroke-width="1" class="share-ring2"/>
   </g>
-
-  <!-- Embed snippet -->
-  <g class="el">
-    <rect x="372" y="260" width="56" height="16" rx="3" fill="#161b22" stroke="#60a5fa" stroke-width=".8"/>
-    <text x="400" y="271" text-anchor="middle" font-family="monospace" font-size="7.5" fill="#60a5fa">&lt;embed/&gt;</text>
+  <g class="share-label">
+    <text x="430" y="152" text-anchor="end" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#2563eb" font-weight="600">Share</text>
+    <path d="M 434,148 C 440,143 444,138 444,134" stroke="#2563eb" stroke-width="1" fill="none" stroke-linecap="round" marker-end="none"/>
+    <polygon points="442,134 444,130 446,134" fill="#2563eb"/>
   </g>
-
-  <!-- Partner A: top-left -->
-  <g class="pa">
-    <rect x="16" y="88" width="130" height="95" rx="5" fill="url(#gG)" class="ga"/>
-    <rect x="16" y="88" width="130" height="95" rx="5" fill="#0d1117" stroke="#30363d" stroke-width=".8"/>
-    <rect x="16" y="88" width="130" height="17" rx="5" fill="#161b22"/>
-    <rect x="16" y="100" width="130" height="5" fill="#161b22"/>
-    <circle cx="26" cy="97" r="2.5" fill="#f85149" opacity=".6"/>
-    <circle cx="34" cy="97" r="2.5" fill="#f0b72f" opacity=".6"/>
-    <circle cx="42" cy="97" r="2.5" fill="#3fb950" opacity=".6"/>
-    <text x="100" y="100" text-anchor="middle" font-family="system-ui,sans-serif" font-size="6.5" fill="#8b949e">partner-a.org</text>
-    <rect x="23" y="108" width="116" height="68" rx="2" fill="#0b1016"/>
-    <path d="M30,142 Q42,136 55,139 Q65,134 76,137 Q86,133 97,136 Q107,133 118,137 Q128,134 133,138 L135,140 Q130,147 118,143 Q105,148 95,143 Q82,148 70,143 Q58,148 45,143 Q35,147 29,142 Z" fill="#132218" opacity=".4"/>
-    <circle cx="45" cy="135" r="1.4" fill="#22c55e" opacity=".8"/>
-    <circle cx="62" cy="132" r="1.1" fill="#22c55e" opacity=".65"/>
-    <circle cx="76" cy="136" r="1.6" fill="#22c55e" opacity=".85"/>
-    <circle cx="95" cy="133" r="1.2" fill="#22c55e" opacity=".6"/>
-    <circle cx="110" cy="136" r="1.4" fill="#22c55e" opacity=".7"/>
-    <circle cx="128" cy="138" r="1" fill="#22c55e" opacity=".55"/>
-    <circle cx="55" cy="142" r=".9" fill="#22c55e" opacity=".45"/>
-    <circle cx="85" cy="144" r="1.1" fill="#22c55e" opacity=".5"/>
+  <!-- ====== Partner window 1 (top-right) ====== -->
+  <g class="partner-1" filter="url(#shadowSm)">
+    <rect x="616" y="72" width="160" height="105" rx="6" fill="url(#greenGlow)" class="glow-p1"/>
+    <rect x="616" y="72" width="160" height="105" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+    <rect x="616" y="72" width="160" height="22" rx="6" fill="#f8fafc"/>
+    <rect x="616" y="88" width="160" height="6" fill="#f8fafc"/>
+    <circle cx="630" cy="83" r="3" fill="#f87171" opacity="0.7"/>
+    <circle cx="640" cy="83" r="3" fill="#fbbf24" opacity="0.7"/>
+    <circle cx="650" cy="83" r="3" fill="#4ade80" opacity="0.7"/>
+    <text x="715" y="87" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#94a3b8" font-weight="500">partner.org</text>
+    <rect x="622" y="98" width="148" height="73" rx="2" fill="#e8f4f8"/>
+    <path d="M628,130 Q642,122 660,126 Q678,118 696,124 Q714,119 732,126 Q748,121 762,128 L766,132 Q758,140 742,136 Q722,142 700,136 Q680,143 660,137 Q642,142 630,136 Z" fill="#f5f0e8" stroke="#e2ddd0" stroke-width="0.3"/>
+    <circle cx="648" cy="126" r="1.5" fill="#22c55e" opacity="0.8"/>
+    <circle cx="668" cy="122" r="1.2" fill="#22c55e" opacity="0.7"/>
+    <circle cx="688" cy="127" r="1.8" fill="#22c55e" opacity="0.85"/>
+    <circle cx="710" cy="121" r="1.3" fill="#22c55e" opacity="0.6"/>
+    <circle cx="730" cy="125" r="1.5" fill="#22c55e" opacity="0.75"/>
+    <circle cx="750" cy="128" r="1.2" fill="#22c55e" opacity="0.65"/>
+    <circle cx="660" cy="134" r="1" fill="#22c55e" opacity="0.5"/>
+    <circle cx="700" cy="136" r="1.2" fill="#22c55e" opacity="0.6"/>
+    <circle cx="740" cy="133" r="1" fill="#22c55e" opacity="0.5"/>
   </g>
-
-  <!-- Partner B: bottom-left -->
-  <g class="pb">
-    <rect x="16" y="258" width="130" height="95" rx="5" fill="url(#gG)" class="gb"/>
-    <rect x="16" y="258" width="130" height="95" rx="5" fill="#0d1117" stroke="#30363d" stroke-width=".8"/>
-    <rect x="16" y="258" width="130" height="17" rx="5" fill="#161b22"/>
-    <rect x="16" y="270" width="130" height="5" fill="#161b22"/>
-    <circle cx="26" cy="267" r="2.5" fill="#f85149" opacity=".6"/>
-    <circle cx="34" cy="267" r="2.5" fill="#f0b72f" opacity=".6"/>
-    <circle cx="42" cy="267" r="2.5" fill="#3fb950" opacity=".6"/>
-    <text x="100" y="270" text-anchor="middle" font-family="system-ui,sans-serif" font-size="6.5" fill="#8b949e">church-b.com</text>
-    <rect x="23" y="278" width="116" height="68" rx="2" fill="#0b1016"/>
-    <path d="M30,312 Q42,306 55,309 Q65,304 76,307 Q86,303 97,306 Q107,303 118,307 Q128,304 133,308 L135,310 Q130,317 118,313 Q105,318 95,313 Q82,318 70,313 Q58,318 45,313 Q35,317 29,312 Z" fill="#132218" opacity=".4"/>
-    <circle cx="45" cy="305" r="1.4" fill="#22c55e" opacity=".8"/>
-    <circle cx="62" cy="302" r="1.1" fill="#22c55e" opacity=".65"/>
-    <circle cx="76" cy="306" r="1.6" fill="#22c55e" opacity=".85"/>
-    <circle cx="95" cy="303" r="1.2" fill="#22c55e" opacity=".6"/>
-    <circle cx="110" cy="306" r="1.4" fill="#22c55e" opacity=".7"/>
-    <circle cx="128" cy="308" r="1" fill="#22c55e" opacity=".55"/>
-    <circle cx="55" cy="312" r=".9" fill="#22c55e" opacity=".45"/>
-    <circle cx="85" cy="314" r="1.1" fill="#22c55e" opacity=".5"/>
+  <!-- ====== Partner window 2 (mid-right) ====== -->
+  <g class="partner-2" filter="url(#shadowSm)">
+    <rect x="616" y="192" width="160" height="105" rx="6" fill="url(#greenGlow)" class="glow-p2"/>
+    <rect x="616" y="192" width="160" height="105" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+    <rect x="616" y="192" width="160" height="22" rx="6" fill="#f8fafc"/>
+    <rect x="616" y="208" width="160" height="6" fill="#f8fafc"/>
+    <circle cx="630" cy="203" r="3" fill="#f87171" opacity="0.7"/>
+    <circle cx="640" cy="203" r="3" fill="#fbbf24" opacity="0.7"/>
+    <circle cx="650" cy="203" r="3" fill="#4ade80" opacity="0.7"/>
+    <text x="715" y="207" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#94a3b8" font-weight="500">church.com</text>
+    <rect x="622" y="218" width="148" height="73" rx="2" fill="#e8f4f8"/>
+    <path d="M628,250 Q642,242 660,246 Q678,238 696,244 Q714,239 732,246 Q748,241 762,248 L766,252 Q758,260 742,256 Q722,262 700,256 Q680,263 660,257 Q642,262 630,256 Z" fill="#f5f0e8" stroke="#e2ddd0" stroke-width="0.3"/>
+    <circle cx="648" cy="246" r="1.5" fill="#22c55e" opacity="0.8"/>
+    <circle cx="668" cy="242" r="1.2" fill="#22c55e" opacity="0.7"/>
+    <circle cx="688" cy="247" r="1.8" fill="#22c55e" opacity="0.85"/>
+    <circle cx="710" cy="241" r="1.3" fill="#22c55e" opacity="0.6"/>
+    <circle cx="730" cy="245" r="1.5" fill="#22c55e" opacity="0.75"/>
+    <circle cx="750" cy="248" r="1.2" fill="#22c55e" opacity="0.65"/>
+    <circle cx="660" cy="254" r="1" fill="#22c55e" opacity="0.5"/>
+    <circle cx="700" cy="256" r="1.2" fill="#22c55e" opacity="0.6"/>
+    <circle cx="740" cy="253" r="1" fill="#22c55e" opacity="0.5"/>
   </g>
-
-  <!-- Partner C: top-right -->
-  <g class="pc">
-    <rect x="654" y="68" width="130" height="95" rx="5" fill="url(#gG)" class="gc"/>
-    <rect x="654" y="68" width="130" height="95" rx="5" fill="#0d1117" stroke="#30363d" stroke-width=".8"/>
-    <rect x="654" y="68" width="130" height="17" rx="5" fill="#161b22"/>
-    <rect x="654" y="80" width="130" height="5" fill="#161b22"/>
-    <circle cx="664" cy="77" r="2.5" fill="#f85149" opacity=".6"/>
-    <circle cx="672" cy="77" r="2.5" fill="#f0b72f" opacity=".6"/>
-    <circle cx="680" cy="77" r="2.5" fill="#3fb950" opacity=".6"/>
-    <text x="738" y="80" text-anchor="middle" font-family="system-ui,sans-serif" font-size="6.5" fill="#8b949e">missions-c.net</text>
-    <rect x="661" y="88" width="116" height="68" rx="2" fill="#0b1016"/>
-    <path d="M668,122 Q680,116 693,119 Q703,114 714,117 Q724,113 735,116 Q745,113 756,117 Q766,114 771,118 L773,120 Q768,127 756,123 Q743,128 733,123 Q720,128 708,123 Q696,128 683,123 Q673,127 667,122 Z" fill="#132218" opacity=".4"/>
-    <circle cx="683" cy="115" r="1.4" fill="#22c55e" opacity=".8"/>
-    <circle cx="700" cy="112" r="1.1" fill="#22c55e" opacity=".65"/>
-    <circle cx="714" cy="116" r="1.6" fill="#22c55e" opacity=".85"/>
-    <circle cx="733" cy="113" r="1.2" fill="#22c55e" opacity=".6"/>
-    <circle cx="748" cy="116" r="1.4" fill="#22c55e" opacity=".7"/>
-    <circle cx="766" cy="118" r="1" fill="#22c55e" opacity=".55"/>
-    <circle cx="693" cy="122" r=".9" fill="#22c55e" opacity=".45"/>
-    <circle cx="723" cy="124" r="1.1" fill="#22c55e" opacity=".5"/>
+  <!-- ====== Partner window 3 (bottom-right) ====== -->
+  <g class="partner-3" filter="url(#shadowSm)">
+    <rect x="616" y="312" width="160" height="70" rx="6" fill="url(#greenGlow)" class="glow-p3"/>
+    <rect x="616" y="312" width="160" height="70" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+    <rect x="616" y="312" width="160" height="22" rx="6" fill="#f8fafc"/>
+    <rect x="616" y="328" width="160" height="6" fill="#f8fafc"/>
+    <circle cx="630" cy="323" r="3" fill="#f87171" opacity="0.7"/>
+    <circle cx="640" cy="323" r="3" fill="#fbbf24" opacity="0.7"/>
+    <circle cx="650" cy="323" r="3" fill="#4ade80" opacity="0.7"/>
+    <text x="715" y="327" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#94a3b8" font-weight="500">missions.net</text>
+    <rect x="622" y="338" width="148" height="38" rx="2" fill="#e8f4f8"/>
+    <path d="M628,355 Q648,348 668,352 Q688,346 708,350 Q728,345 748,352 L762,356 Q752,362 732,358 Q710,363 688,358 Q668,364 648,360 Q632,362 628,358 Z" fill="#f5f0e8" stroke="#e2ddd0" stroke-width="0.3"/>
+    <circle cx="648" cy="352" r="1.2" fill="#22c55e" opacity="0.75"/>
+    <circle cx="678" cy="349" r="1.5" fill="#22c55e" opacity="0.85"/>
+    <circle cx="708" cy="351" r="1.3" fill="#22c55e" opacity="0.7"/>
+    <circle cx="738" cy="353" r="1.2" fill="#22c55e" opacity="0.65"/>
+    <circle cx="660" cy="357" r="1" fill="#22c55e" opacity="0.5"/>
+    <circle cx="720" cy="356" r="1" fill="#22c55e" opacity="0.55"/>
   </g>
-
-  <!-- Partner D: bottom-right -->
-  <g class="pd">
-    <rect x="654" y="248" width="130" height="95" rx="5" fill="url(#gG)" class="gd"/>
-    <rect x="654" y="248" width="130" height="95" rx="5" fill="#0d1117" stroke="#30363d" stroke-width=".8"/>
-    <rect x="654" y="248" width="130" height="17" rx="5" fill="#161b22"/>
-    <rect x="654" y="260" width="130" height="5" fill="#161b22"/>
-    <circle cx="664" cy="257" r="2.5" fill="#f85149" opacity=".6"/>
-    <circle cx="672" cy="257" r="2.5" fill="#f0b72f" opacity=".6"/>
-    <circle cx="680" cy="257" r="2.5" fill="#3fb950" opacity=".6"/>
-    <text x="738" y="260" text-anchor="middle" font-family="system-ui,sans-serif" font-size="6.5" fill="#8b949e">pray-d.org</text>
-    <rect x="661" y="268" width="116" height="68" rx="2" fill="#0b1016"/>
-    <path d="M668,302 Q680,296 693,299 Q703,294 714,297 Q724,293 735,296 Q745,293 756,297 Q766,294 771,298 L773,300 Q768,307 756,303 Q743,308 733,303 Q720,308 708,303 Q696,308 683,303 Q673,307 667,302 Z" fill="#132218" opacity=".4"/>
-    <circle cx="683" cy="295" r="1.4" fill="#22c55e" opacity=".8"/>
-    <circle cx="700" cy="292" r="1.1" fill="#22c55e" opacity=".65"/>
-    <circle cx="714" cy="296" r="1.6" fill="#22c55e" opacity=".85"/>
-    <circle cx="733" cy="293" r="1.2" fill="#22c55e" opacity=".6"/>
-    <circle cx="748" cy="296" r="1.4" fill="#22c55e" opacity=".7"/>
-    <circle cx="766" cy="298" r="1" fill="#22c55e" opacity=".55"/>
-    <circle cx="693" cy="302" r=".9" fill="#22c55e" opacity=".45"/>
-    <circle cx="723" cy="304" r="1.1" fill="#22c55e" opacity=".5"/>
+  <circle cx="696" cy="125" fill="none" stroke="#22c55e" stroke-width="0.8" class="ripple-celeb"/>
+  <circle cx="696" cy="125" fill="none" stroke="#22c55e" stroke-width="0.6" class="ripple-celeb2"/>
+  <circle cx="696" cy="245" fill="none" stroke="#22c55e" stroke-width="0.8" class="ripple-celeb"/>
+  <circle cx="696" cy="245" fill="none" stroke="#22c55e" stroke-width="0.6" class="ripple-celeb2"/>
+  <circle cx="696" cy="355" fill="none" stroke="#22c55e" stroke-width="0.8" class="ripple-celeb"/>
+  <circle cx="696" cy="355" fill="none" stroke="#22c55e" stroke-width="0.6" class="ripple-celeb2"/>
+  <g class="counter-group">
+    <text x="360" y="378" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#94a3b8" font-weight="300">1</text>
+    <text x="383" y="376" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#cbd5e1">&#8594;</text>
+    <text x="415" y="378" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#22c55e" font-weight="700">4x</text>
+    <text x="390" y="394" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#94a3b8" font-weight="400" letter-spacing="0.5">prayer surfaces</text>
   </g>
-
-  <!-- Partner E: bottom-center -->
-  <g class="pe">
-    <rect x="335" y="310" width="130" height="80" rx="5" fill="url(#gG)" class="ge"/>
-    <rect x="335" y="310" width="130" height="80" rx="5" fill="#0d1117" stroke="#30363d" stroke-width=".8"/>
-    <rect x="335" y="310" width="130" height="17" rx="5" fill="#161b22"/>
-    <rect x="335" y="322" width="130" height="5" fill="#161b22"/>
-    <circle cx="345" cy="319" r="2.5" fill="#f85149" opacity=".6"/>
-    <circle cx="353" cy="319" r="2.5" fill="#f0b72f" opacity=".6"/>
-    <circle cx="361" cy="319" r="2.5" fill="#3fb950" opacity=".6"/>
-    <text x="420" y="322" text-anchor="middle" font-family="system-ui,sans-serif" font-size="6.5" fill="#8b949e">network-e.org</text>
-    <rect x="342" y="330" width="116" height="53" rx="2" fill="#0b1016"/>
-    <path d="M349,358 Q361,352 374,355 Q384,350 395,353 Q405,349 416,352 Q426,349 437,353 Q447,350 452,354 L454,356 Q449,363 437,359 Q424,364 414,359 Q401,364 389,359 Q377,364 364,359 Q354,363 348,358 Z" fill="#132218" opacity=".4"/>
-    <circle cx="364" cy="351" r="1.4" fill="#22c55e" opacity=".8"/>
-    <circle cx="381" cy="348" r="1.1" fill="#22c55e" opacity=".65"/>
-    <circle cx="395" cy="352" r="1.6" fill="#22c55e" opacity=".85"/>
-    <circle cx="414" cy="349" r="1.2" fill="#22c55e" opacity=".6"/>
-    <circle cx="429" cy="352" r="1.4" fill="#22c55e" opacity=".7"/>
-    <circle cx="447" cy="354" r="1" fill="#22c55e" opacity=".55"/>
+  <line x1="60" y1="410" x2="740" y2="410" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="345" y="402" width="110" height="16" rx="4" fill="#ffffff"/>
+  <text x="400" y="414" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#94a3b8" font-weight="500" letter-spacing="0.8">How it works</text>
+  <rect x="0" y="425" width="800" height="175" fill="#f1f5f9"/>
+  <g class="dev-box">
+    <rect x="28" y="460" width="82" height="42" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="69" y="477" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8.5" fill="#334155" font-weight="600">Map</text>
+    <text x="69" y="489" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8.5" fill="#334155" font-weight="600">Components</text>
+    <text x="69" y="500" text-anchor="middle" font-family="'Courier New', monospace" font-size="7" fill="#64748b">&lt;Vue/&gt;</text>
   </g>
-
-  <!-- Ripple bursts -->
-  <circle cx="400" cy="185" fill="none" stroke="#22c55e" stroke-width="1" class="r1"/>
-  <circle cx="400" cy="185" fill="none" stroke="#22c55e" stroke-width=".7" class="r2"/>
-  <circle cx="81" cy="140" fill="none" stroke="#22c55e" stroke-width=".7" class="r1"/>
-  <circle cx="81" cy="310" fill="none" stroke="#22c55e" stroke-width=".7" class="r1"/>
-  <circle cx="719" cy="118" fill="none" stroke="#22c55e" stroke-width=".7" class="r1"/>
-  <circle cx="719" cy="298" fill="none" stroke="#22c55e" stroke-width=".7" class="r1"/>
-  <circle cx="400" cy="355" fill="none" stroke="#22c55e" stroke-width=".7" class="r1"/>
-  <circle cx="81" cy="140" fill="none" stroke="#22c55e" stroke-width=".5" class="r2"/>
-  <circle cx="81" cy="310" fill="none" stroke="#22c55e" stroke-width=".5" class="r2"/>
-  <circle cx="719" cy="118" fill="none" stroke="#22c55e" stroke-width=".5" class="r2"/>
-  <circle cx="719" cy="298" fill="none" stroke="#22c55e" stroke-width=".5" class="r2"/>
-  <circle cx="400" cy="355" fill="none" stroke="#22c55e" stroke-width=".5" class="r2"/>
-
-  <!-- Divider -->
-  <line x1="0" y1="420" x2="800" y2="420" stroke="url(#dv)" stroke-width="1"/>
-  <text x="400" y="416" text-anchor="middle" font-family="system-ui,sans-serif" font-size="8" fill="#484f58" letter-spacing="2">HOW IT WORKS</text>
-
-  <!-- BOTTOM: Architecture pipeline -->
-  <g class="tc">
-    <text x="400" y="445" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" fill="#484f58" letter-spacing="1">FOR DEVELOPERS</text>
-
-    <rect x="28" y="460" width="72" height="36" rx="4" fill="#161b22" stroke="#30363d" stroke-width=".8"/>
-    <text x="64" y="475" text-anchor="middle" font-family="monospace" font-size="7.5" fill="#3fb950">Vue</text>
-    <text x="64" y="486" text-anchor="middle" font-family="system-ui,sans-serif" font-size="6" fill="#8b949e">Source</text>
-    <line x1="104" y1="478" x2="128" y2="478" stroke="#30363d" stroke-width="1" class="ad dp"/>
-    <polygon points="128,474 136,478 128,482" fill="#30363d" class="dp"/>
-
-    <rect x="140" y="460" width="68" height="36" rx="4" fill="#161b22" stroke="#30363d" stroke-width=".8"/>
-    <text x="174" y="475" text-anchor="middle" font-family="monospace" font-size="7.5" fill="#60a5fa">Vite</text>
-    <text x="174" y="486" text-anchor="middle" font-family="system-ui,sans-serif" font-size="6" fill="#8b949e">Build</text>
-    <line x1="212" y1="478" x2="236" y2="478" stroke="#30363d" stroke-width="1" class="ad dp"/>
-    <polygon points="236,474 244,478 236,482" fill="#30363d" class="dp"/>
-
-    <rect x="248" y="460" width="82" height="36" rx="4" fill="#161b22" stroke="#30363d" stroke-width=".8"/>
-    <text x="289" y="475" text-anchor="middle" font-family="monospace" font-size="6.5" fill="#f0b72f">.js bundle</text>
-    <text x="289" y="486" text-anchor="middle" font-family="system-ui,sans-serif" font-size="6" fill="#8b949e">Bundle</text>
-    <line x1="334" y1="478" x2="358" y2="478" stroke="#30363d" stroke-width="1" class="ad dp"/>
-    <polygon points="358,474 366,478 358,482" fill="#30363d" class="dp"/>
-
-    <rect x="370" y="460" width="72" height="36" rx="4" fill="#161b22" stroke="#30363d" stroke-width=".8"/>
-    <text x="406" y="475" text-anchor="middle" font-family="monospace" font-size="7" fill="#c9d1d9">HTML</text>
-    <text x="406" y="486" text-anchor="middle" font-family="system-ui,sans-serif" font-size="6" fill="#8b949e">Embed Page</text>
-    <line x1="446" y1="478" x2="470" y2="478" stroke="#30363d" stroke-width="1" class="ad dp"/>
-    <polygon points="470,474 478,478 470,482" fill="#30363d" class="dp"/>
-
-    <rect x="482" y="460" width="72" height="36" rx="4" fill="#161b22" stroke="#30363d" stroke-width=".8"/>
-    <text x="518" y="475" text-anchor="middle" font-family="monospace" font-size="7" fill="#c9d1d9">/public</text>
-    <text x="518" y="486" text-anchor="middle" font-family="system-ui,sans-serif" font-size="6" fill="#8b949e">Nuxt Host</text>
-    <line x1="558" y1="478" x2="582" y2="478" stroke="#30363d" stroke-width="1" class="ad dp"/>
-    <polygon points="582,474 590,478 582,482" fill="#30363d" class="dp"/>
-
-    <rect x="594" y="460" width="60" height="36" rx="4" fill="#161b22" stroke="#60a5fa" stroke-width=".8"/>
-    <text x="624" y="475" text-anchor="middle" font-family="monospace" font-size="7" fill="#60a5fa">iframe</text>
-    <text x="624" y="486" text-anchor="middle" font-family="system-ui,sans-serif" font-size="6" fill="#8b949e">Snippet</text>
-    <line x1="658" y1="478" x2="682" y2="478" stroke="#22c55e" stroke-width="1" class="ad dp"/>
-    <polygon points="682,474 690,478 682,482" fill="#22c55e" class="dp"/>
-
-    <rect x="694" y="460" width="80" height="36" rx="4" fill="#161b22" stroke="#22c55e" stroke-width=".8"/>
-    <text x="734" y="475" text-anchor="middle" font-family="system-ui,sans-serif" font-size="7.5" fill="#22c55e" font-weight="600">Partners</text>
-    <text x="734" y="486" text-anchor="middle" font-family="system-ui,sans-serif" font-size="6" fill="#8b949e">5x surfaces</text>
-
-    <text x="64" y="510" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" fill="#30363d">components/</text>
-    <text x="174" y="510" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" fill="#30363d">vite build</text>
-    <text x="289" y="510" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" fill="#30363d">doxa-research-map.js</text>
-    <text x="406" y="510" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" fill="#30363d">doxa-research-map.html</text>
-    <text x="518" y="510" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" fill="#30363d">doxa.life/research/</text>
-    <text x="624" y="510" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" fill="#30363d">&lt;iframe src="..."&gt;</text>
-    <text x="734" y="510" text-anchor="middle" font-family="system-ui,sans-serif" font-size="5.5" fill="#30363d">partner-a.org ...</text>
-
-    <text x="400" y="535" text-anchor="middle" font-family="system-ui,sans-serif" font-size="7" fill="#21262d">embeddables/micro-frontends/1040-maps</text>
+  <line x1="114" y1="481" x2="140" y2="481" stroke="#94a3b8" stroke-width="1.2" class="dev-arrow" stroke-linecap="round"/>
+  <polygon points="138,478 143,481 138,484" fill="#94a3b8" class="dev-box"/>
+  <g class="dev-box">
+    <rect x="146" y="460" width="68" height="42" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="180" y="479" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8.5" fill="#334155" font-weight="600">Build</text>
+    <text x="180" y="492" text-anchor="middle" font-family="'Courier New', monospace" font-size="7" fill="#64748b">Vite</text>
   </g>
+  <line x1="218" y1="481" x2="244" y2="481" stroke="#94a3b8" stroke-width="1.2" class="dev-arrow" stroke-linecap="round"/>
+  <polygon points="242,478 247,481 242,484" fill="#94a3b8" class="dev-box"/>
+  <g class="dev-box">
+    <rect x="250" y="455" width="100" height="52" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="300" y="476" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8.5" fill="#334155" font-weight="600">JS Bundle</text>
+    <text x="300" y="490" text-anchor="middle" font-family="'Courier New', monospace" font-size="6.5" fill="#2563eb">doxa-research</text>
+    <text x="300" y="500" text-anchor="middle" font-family="'Courier New', monospace" font-size="6.5" fill="#2563eb">-map.js</text>
+  </g>
+  <line x1="354" y1="481" x2="380" y2="481" stroke="#94a3b8" stroke-width="1.2" class="dev-arrow" stroke-linecap="round"/>
+  <polygon points="378,478 383,481 378,484" fill="#94a3b8" class="dev-box"/>
+  <g class="dev-box">
+    <rect x="386" y="460" width="78" height="42" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="425" y="477" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8.5" fill="#334155" font-weight="600">Embed Page</text>
+    <text x="425" y="490" text-anchor="middle" font-family="'Courier New', monospace" font-size="7" fill="#64748b">.html</text>
+  </g>
+  <line x1="468" y1="481" x2="494" y2="481" stroke="#94a3b8" stroke-width="1.2" class="dev-arrow" stroke-linecap="round"/>
+  <polygon points="492,478 497,481 492,484" fill="#94a3b8" class="dev-box"/>
+  <g class="dev-box">
+    <rect x="500" y="460" width="82" height="42" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="541" y="477" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8.5" fill="#334155" font-weight="600">/public</text>
+    <text x="541" y="490" text-anchor="middle" font-family="'Courier New', monospace" font-size="7" fill="#64748b">Nuxt serves</text>
+  </g>
+  <line x1="586" y1="481" x2="612" y2="481" stroke="#94a3b8" stroke-width="1.2" class="dev-arrow" stroke-linecap="round"/>
+  <polygon points="610,478 615,481 610,484" fill="#94a3b8" class="dev-box"/>
+  <g class="dev-box">
+    <rect x="618" y="460" width="68" height="42" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="652" y="479" text-anchor="middle" font-family="'Courier New', monospace" font-size="8.5" fill="#2563eb" font-weight="600">&lt;iframe&gt;</text>
+    <text x="652" y="492" text-anchor="middle" font-family="system-ui, sans-serif" font-size="7" fill="#64748b">embed code</text>
+  </g>
+  <line x1="690" y1="481" x2="716" y2="481" stroke="#94a3b8" stroke-width="1.2" class="dev-arrow" stroke-linecap="round"/>
+  <polygon points="714,478 719,481 714,484" fill="#94a3b8" class="dev-box"/>
+  <g class="dev-box">
+    <rect x="722" y="455" width="60" height="52" rx="6" fill="#ffffff" stroke="#22c55e" stroke-width="1.5"/>
+    <text x="752" y="476" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#334155" font-weight="600">Partner</text>
+    <text x="752" y="488" text-anchor="middle" font-family="system-ui, sans-serif" font-size="8" fill="#334155" font-weight="600">Sites</text>
+    <rect x="738" y="493" width="8" height="6" rx="1" fill="none" stroke="#22c55e" stroke-width="0.8"/>
+    <rect x="749" y="493" width="8" height="6" rx="1" fill="none" stroke="#22c55e" stroke-width="0.8"/>
+    <rect x="760" y="493" width="8" height="6" rx="1" fill="none" stroke="#22c55e" stroke-width="0.8"/>
+  </g>
+  <text x="400" y="445" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b" font-weight="500" letter-spacing="0.3" class="dev-box">For Developers</text>
+  <text x="400" y="530" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" font-weight="400">Vue source &#8594; build &#8594; bundle &#8594; static page &#8594; served by Nuxt &#8594; embedded via iframe</text>
+  <text x="255" y="68" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" font-weight="400" letter-spacing="0.3" class="title-text">For DOXA Partners</text>
 </svg>
