@@ -290,21 +290,55 @@ const REGIONS_TABS_MOBILE = [
   { id: 'block',   label: 'Block',   info: 'WAGF block — organizational sub-grouping within each region (e.g. "South East Asia").' },
   { id: 'country', label: 'Country', info: 'Individual countries, listed by unreached-population size within their block.' },
 ]
-// Mobile-side tier swap — same SemanticTreeLegend, different tree per legend type.
+// Flat tabs (prayer/adoption/engagement/religion) → STL node conversion
+const _isFlatTabMobile = computed(() => ['prayer', 'engagement', 'adoption', 'religion'].includes(props.legendType))
+function _flatItemsToStlNodes(items) {
+  const out = []
+  for (const item of items) {
+    out.push({
+      id: item.key, label: item.label, color: item.color,
+      count: item.count ?? 0, pop: item.population ?? 0,
+      filter: item.filterKey ? ['==', ['get', '_flat_filter'], item.filterKey] : null,
+      children: [],
+    })
+    for (const c of (item.children || [])) {
+      out.push({
+        id: c.key, label: c.label, color: c.color,
+        count: c.count ?? 0, pop: c.population ?? 0,
+        filter: c.filterKey ? ['==', ['get', '_flat_filter'], c.filterKey] : null,
+        children: [],
+      })
+    }
+  }
+  return out
+}
+
+// Mobile-side tier swap — ALL tabs through SemanticTreeLegend.
 const treeForMobile = computed(() => {
+  if (_isFlatTabMobile.value) return _flatItemsToStlNodes(legendDataItems.value)
   if (props.legendType === 'affinity-block') return affinityTreeForMobile.value
   if (props.legendType === 'doxa-regions')   return regionsTreeForMobile.value
   return langTreeForMobile.value
 })
 const tabsForMobile = computed(() => {
+  if (_isFlatTabMobile.value) return null
   if (props.legendType === 'affinity-block') return AFFINITY_TABS_MOBILE
   if (props.legendType === 'doxa-regions')   return REGIONS_TABS_MOBILE
   return LANG_TABS_MOBILE
 })
 const treeTitleForMobile = computed(() => {
+  if (_isFlatTabMobile.value) return 'Legend'
   if (props.legendType === 'affinity-block') return 'People Groups'
   if (props.legendType === 'doxa-regions')   return 'WAGF Regions'
   return 'Languages'
+})
+const treeColumnLabelForMobile = computed(() => {
+  if (props.legendType === 'religion') return 'World Religions'
+  if (props.legendType === 'prayer') return 'Prayer Status'
+  if (props.legendType === 'engagement') return 'Engagement Status'
+  if (props.legendType === 'adoption') return 'Adoption Status'
+  if (_isFlatTabMobile.value) return 'Status'
+  return ''
 })
 
 // Touch gesture state
@@ -550,10 +584,12 @@ onBeforeUnmount(() => {
              #title-caret slot so it sits in column 1 of the .stl-titlebar,
              vertically aligned with the title text. -->
         <SemanticTreeLegend
-          v-else-if="legendType === 'language-family' || legendType === 'affinity-block' || legendType === 'doxa-regions'"
+          v-else-if="legendType !== 'default'"
           :nodes="treeForMobile"
           :tabs="tabsForMobile"
           :title="legendTitle || treeTitleForMobile"
+          :hideTabs="_isFlatTabMobile"
+          :columnLabel="treeColumnLabelForMobile"
           :columns="['count', 'pop']"
           @select="onSemanticTreeSelect"
         >

@@ -22,9 +22,12 @@ const props = defineProps({
   tabs:    { type: Array,  default: null },
   columns: { type: Array,  default: () => ['count', 'pop'] },
   title:   { type: String, default: 'Legend' },
+  hideTabs: { type: Boolean, default: false },
+  columnLabel: { type: String, default: '' },
+  open: { type: Boolean, default: null },
 })
 
-const emit = defineEmits(['select'])
+const emit = defineEmits(['select', 'update:open'])
 
 const instance = useInstance()
 
@@ -71,14 +74,18 @@ const tabList = computed(() => {
 const localActiveTab = ref(0)
 const expandedIds    = ref(new Set())
 const localSelected  = ref(null)
-const panelOpen      = ref(true)
+const panelOpen      = ref(props.open !== null ? props.open : true)
 const showInfoForTab = ref(null)
 const sortBy         = ref(null)   // null = default (pop desc), 'count' | 'pop'
 const sortDir        = ref('desc') // 'desc' | 'asc'
 
 const activeTab = computed({
-  get: () => instance ? instance.activeTab.value : localActiveTab.value,
+  get: () => {
+    if (props.hideTabs) return 0
+    return instance ? instance.activeTab.value : localActiveTab.value
+  },
   set: v => {
+    if (props.hideTabs) return
     if (instance) instance.activeTab.value = v
     else          localActiveTab.value = v
   },
@@ -93,6 +100,10 @@ const selectedNode = computed({
 })
 
 const selectedId = computed(() => selectedNode.value?.id || null)
+
+watch(() => props.open, (v) => {
+  if (v !== null) panelOpen.value = v
+})
 
 watch(() => props.nodes, () => {
   const ext = instance?.activeTab.value
@@ -336,6 +347,8 @@ useShadowStyles(`
   pointer-events: auto;
 }
 .stl-panel.closed { transform: translateX(-100%); opacity: 0; pointer-events: none; }
+.stl-panel.fit-content { bottom: auto; max-height: calc(100vh - 80px); }
+.stl-panel.fit-content .stl-rows { overflow-y: auto; }
 .stl-titlebar {
   display: flex; align-items: center; gap: 6px;
   padding: 8px 12px; flex-shrink: 0;
@@ -409,13 +422,13 @@ useShadowStyles(`
   padding: 0 var(--stl-pad-x);
 }
 .stl-col-hdr {
-  height: 22px; flex-shrink: 0;
+  height: 26px; flex-shrink: 0;
   background: #0d1117; border-bottom: 1px solid #21262d;
 }
 .stl-hdr-name {
   flex: 1; min-width: 0;
-  font: 600 9px ui-monospace, monospace;
-  color: #6e7681; text-transform: uppercase; letter-spacing: 0.05em;
+  font: 700 11px ui-monospace, monospace;
+  color: #8b949e; text-transform: uppercase; letter-spacing: 0.04em;
 }
 /* Center-aligned UPGs/Pop column header (qa: 2026-05-02 — user explicitly
    requested center over right-align so the header label sits on the same
@@ -564,14 +577,13 @@ useShadowStyles(`
 }
 .stl-row.selected .stl-num { color: #e6edf3; }
 .stl-x-chip {
-  background: #ef4444; border: none; border-radius: 50%;
-  color: #fff; cursor: pointer;
-  width: 18px; height: 18px;
+  background: rgba(110,118,129,0.12); border: none; border-radius: 50%;
+  color: #6e7681; cursor: pointer;
+  width: 16px; height: 16px;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 0 0 2px rgba(239,68,68,0.18);
-  transition: transform 0.12s, box-shadow 0.12s;
+  transition: color 0.12s, background 0.12s;
 }
-.stl-x-chip:hover { transform: scale(1.08); box-shadow: 0 0 0 3px rgba(239,68,68,0.3); }
+.stl-x-chip:hover { color: #c9d1d9; background: rgba(110,118,129,0.25); }
 .stl-collapse-btn {
   background: rgba(110,118,129,0.15); border: 1px solid #30363d; border-radius: 5px;
   color: #8b949e; cursor: pointer;
@@ -676,11 +688,13 @@ useShadowStyles(`
 }
 .stl-reopen[data-theme="light"] .stl-reopen-icon { color: #3b463d; }
 .stl-reopen[data-theme="light"] .stl-reopen-caret { color: #57606a; }
+.stl-panel[data-theme="light"] .stl-x-chip { color: #57606a; border-color: rgba(208,215,222,0.6); }
+.stl-panel[data-theme="light"] .stl-x-chip:hover { color: #1f2328; background: rgba(208,215,222,0.3); border-color: #afb8c1; }
 `, 'semantic-tree-legend')
 </script>
 
 <template>
-  <div class="stl-panel" :class="{ closed: !panelOpen }" :data-theme="instance?.theme.value || 'dark'">
+  <div class="stl-panel" :class="{ closed: !panelOpen, 'fit-content': hideTabs }" :data-theme="instance?.theme.value || 'dark'">
     <div class="stl-inner">
 
       <div class="stl-titlebar">
@@ -694,7 +708,7 @@ useShadowStyles(`
           class="stl-collapse-btn"
           :class="{ closed: !panelOpen }"
           :title="panelOpen ? 'Collapse legend' : 'Expand legend'"
-          @click="panelOpen = !panelOpen">
+          @click="panelOpen = !panelOpen; emit('update:open', panelOpen)">
           <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
             <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round"/>
@@ -711,7 +725,7 @@ useShadowStyles(`
         </template>
       </div>
 
-      <div class="stl-tabs-wrap">
+      <div v-if="!hideTabs" class="stl-tabs-wrap">
         <div class="stl-tabs">
           <div v-for="(tab, idx) in tabList" :key="tab.id"
             class="stl-tab-chip" :class="{ active: activeTab === idx }">
@@ -728,7 +742,7 @@ useShadowStyles(`
       <div class="stl-col-hdr">
         <span class="stl-caret-sp"></span>
         <span class="stl-dot-sp"></span>
-        <span class="stl-hdr-name">{{ tabList[activeTab]?.label || 'Name' }}</span>
+        <span class="stl-hdr-name">{{ columnLabel || (hideTabs ? title : (tabList[activeTab]?.label || 'Name')) }}</span>
         <button v-if="hasCount" class="stl-hdr-num"
           :class="{ active: sortBy === 'count' }"
           title="Sort by UPGs"
@@ -800,7 +814,7 @@ useShadowStyles(`
     class="stl-reopen"
     :data-theme="instance?.theme.value || 'dark'"
     title="Expand legend"
-    @click="panelOpen = true">
+    @click="panelOpen = true; emit('update:open', true)">
     <svg class="stl-reopen-icon" width="11" height="11" viewBox="0 0 12 12" fill="none">
       <path d="M2 4h8M2 6h8M2 8h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
     </svg>
