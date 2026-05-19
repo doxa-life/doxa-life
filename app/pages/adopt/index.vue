@@ -16,7 +16,14 @@ const adoptBase = computed(() => {
   return p.endsWith('/') ? p : `${p}/`
 })
 
-const { stats, adoptedPercent, reload } = usePrayerStatistics()
+const {
+  stats,
+  adoptedPercent,
+  totalPeopleGroups,
+  reload,
+  ensureLoaded
+} = usePrayerStatistics()
+await ensureLoaded()
 onMounted(() => reload())
 
 useTextHighlight()
@@ -39,7 +46,7 @@ useTextHighlight()
             <div>
               <h2 class="h3">{{ t('Current Status') }}</h2>
               <span class="font-size-4xl font-weight-bold font-button">
-                <span id="adopted-current-status">{{ stats.total_adopted }}</span> / 2085
+                <span id="adopted-current-status">{{ stats.total_adopted }}</span> / {{ totalPeopleGroups }}
               </span>
               <div class="stack stack--3xs">
                 <p class="subtext font-size-md">{{ t('people groups adopted') }}</p>
