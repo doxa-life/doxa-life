@@ -139,6 +139,7 @@ import FullscreenButton  from '@map/components/map-controls/FullscreenButton.vue
 import ThemeToggleButton from '@map/components/map-controls/ThemeToggleButton.vue'
 import HamburgerButton   from '@map/components/map-controls/HamburgerButton.vue'
 import GeocoderComponent from '@map/components/map-controls/GeocoderComponent.vue'
+import ShareButton       from '@map/components/map-controls/ShareButton.vue'
 
 // TODO(Wave 3): SideMenuDrawer ports from doxa-map-mfe.
 // PERF: SideMenuDrawer is unused in the current research-map template (the
@@ -1797,6 +1798,7 @@ onBeforeUnmount(() => {
         <LocationButton    :map="map"          :is-dark="isDark" />
         <FullscreenButton  :map-container="mapContainer" :is-dark="isDark" />
         <ThemeToggleButton :is-dark="isDark"    @toggle="handleToggleTheme" />
+        <ShareButton       :is-dark="isDark" />
       </MapToolbar>
 
       <!-- Fly + Clusters floating toolbar — sibling of the legend card, mounted
