@@ -470,7 +470,8 @@ const mapLayers = useMapLayers({
   getLanguageFamilyColor: (langFam) => {
     const strat = getColorStrategy(activeTab.value?.colorStrategy)
     return strat?.colors?.[langFam] ?? strat?.fallback ?? '#7c8cf8'
-  }
+  },
+  getNormalizedPeopleGroups: () => mapData.normalizedPeopleGroups.value || []
 })
 
 // ─── Events composable (click → detail, hover → cursor) ──────────────────────

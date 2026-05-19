@@ -396,7 +396,8 @@ const mapData = useMapData({
 const mapLayers = useMapLayers({
   getMap: () => map.value,
   mapId,
-  getLanguageFamilyColor
+  getLanguageFamilyColor,
+  getNormalizedPeopleGroups: () => mapData.normalizedPeopleGroups.value || []
 })
 
 // ─── GO marker (selected pin highlight) ───────────────────────────────────────

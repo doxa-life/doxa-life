@@ -158,10 +158,16 @@ export function useMapEvents(options = {}) {
         const iso3 = tileProps.iso_3166_1_alpha_3 || ''
         const countryName = tileProps.name_en || tileProps.name || iso3
         const pgs = getNormalizedPeopleGroups()
-        const matching = pgs.filter(pg => (pg.countryIso || '').toUpperCase() === iso3.toUpperCase())
+        // Match by countryIso (pray-tools) OR country (doxa-api uses `country` for ISO alpha-3)
+        const iso3Upper = iso3.toUpperCase()
+        const matching = pgs.filter(pg => {
+            const pgIso = (pg.countryIso || pg.country || '').toUpperCase()
+            return pgIso && pgIso === iso3Upper
+        })
         const uupgCount = matching.length
-        const wagfRegion = matching[0]?.wagfRegionLabel || matching[0]?.doxaRegion || '—'
-        const wagfBlock = matching[0]?.wagfBlockLabel || matching[0]?.wagfBlock || '—'
+        const first = matching[0]
+        const wagfRegion = first?.wagfRegionLabel || first?.doxaRegionLabel || first?.doxaRegion || first?.wagfRegion || '—'
+        const wagfBlock = first?.wagfBlockLabel || first?.wagfBlock || '—'
         return `
             <div style="padding: 8px; min-width: 220px;">
                 <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: #333;">

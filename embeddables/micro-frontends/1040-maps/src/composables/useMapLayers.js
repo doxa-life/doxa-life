@@ -57,6 +57,7 @@ function deriveFamilyFromLanguage(label) {
  * @param {Function} options.getMap - Function that returns the map instance
  * @param {string} options.mapId - Unique map identifier for logging
  * @param {Function} options.getLanguageFamilyColor - Color lookup function
+ * @param {Function} options.getNormalizedPeopleGroups - Returns normalized PG array for region popups
  *
  * @returns {Object} Layer management functions and state
  */
@@ -64,11 +65,12 @@ export function useMapLayers(options = {}) {
     const {
         getMap = () => null,
         mapId = 'unknown',
-        getLanguageFamilyColor = () => '#999999'
+        getLanguageFamilyColor = () => '#999999',
+        getNormalizedPeopleGroups = () => []
     } = options;
 
     // Initialize events composable for click handlers, popups, cursor changes
-    const mapEvents = useMapEvents({ getMap, mapId, getLanguageFamilyColor });
+    const mapEvents = useMapEvents({ getMap, mapId, getLanguageFamilyColor, getNormalizedPeopleGroups });
 
     // Track which layers have been added
     const layersAdded = ref({
