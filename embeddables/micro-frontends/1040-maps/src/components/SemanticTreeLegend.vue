@@ -343,12 +343,12 @@ useShadowStyles(`
 .stl-panel {
   position: absolute; left: 8px; top: 60px; width: 380px; z-index: 4;
   display: flex; flex-direction: column;
-  max-height: calc(100vh - 80px);
+  max-height: calc(100% - 72px);
   transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), opacity 0.2s;
   pointer-events: auto;
 }
 .stl-panel.closed { transform: translateX(-100%); opacity: 0; pointer-events: none; }
-.stl-panel.fit-content { max-height: calc(100vh - 80px); }
+.stl-panel.fit-content { max-height: calc(100% - 72px); }
 .stl-titlebar {
   display: flex; align-items: center; gap: 6px;
   padding: 8px 12px; flex-shrink: 0;
