@@ -19,12 +19,13 @@ useDoxaMap(props.bundle)
  * the "Profile not found" error that occurred when /research had loaded
  * its IIFE first and then the user navigated to /, /pray, or /adopt. */
 const tagName = props.bundle === 'research-map' ? 'doxa-research-map' : 'doxa-map'
+const isSimple = props.bundle === 'simple-map'
 </script>
 
 <template>
   <div class="doxa-map-slot">
     <component :is="tagName" :id="mapId" :profile-config="profileConfig" />
-    <div class="doxa-map-scroll-pad doxa-map-scroll-pad--top" />
+    <div v-if="isSimple" class="doxa-map-scroll-pad doxa-map-scroll-pad--top" />
     <slot />
   </div>
 </template>
