@@ -70,7 +70,7 @@
     }
 
     // ── Render the custom element ────────────────────────────────────────
-    const config = JSON.stringify({ profile: 'research-map', tk: token });
+    const config = JSON.stringify({ profile: 'research-map', tk: token, dataSource: 'pray-tools', instanceId: 'embed-research' });
     const el = document.createElement('doxa-research-map');
     el.setAttribute('profile-config', config);
     document.body.appendChild(el);
