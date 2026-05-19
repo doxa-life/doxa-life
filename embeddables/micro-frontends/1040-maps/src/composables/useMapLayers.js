@@ -247,13 +247,15 @@ export function useMapLayers(options = {}) {
         });
 
         // Invisible hitbox layer — larger transparent circles on top of pins
-        // for easier touch/click targeting (especially on mobile).
+        // for easier touch/click targeting (especially on mobile/tablet).
+        // Uses 'touchTarget' profile: 22px+ radius at zoom 4-8 for >=44px
+        // effective tap diameter (Apple HIG / Material minimum).
         map.addLayer({
             id: 'language-family-pins-hitbox',
             type: 'circle',
             source: 'language-families',
             paint: {
-                'circle-radius': getCircleRadiusInterpolation('large'),
+                'circle-radius': getCircleRadiusInterpolation('touchTarget'),
                 'circle-color': 'rgba(0,0,0,0)',
                 'circle-stroke-width': 0,
                 'circle-opacity': 0

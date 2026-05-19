@@ -149,6 +149,23 @@ export const ZOOM_INTERPOLATIONS = {
             4, 6,
             8, 14,
             12, 24
+        ],
+
+        // Touch target: invisible hitbox layer for mobile/tablet tap targeting.
+        // Minimum 22px radius (~44px diameter) at zoom 4-8 per Apple HIG.
+        // Visual pins stay at their normal size — only the transparent hit area grows.
+        touchTarget: [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 14,     // 28px diameter at world view
+            2, 18,     // 36px — growing toward minimum
+            4, 22,     // 44px — meets Apple HIG minimum
+            6, 24,     // 48px — meets Material minimum
+            8, 26,     // comfortable at medium zoom
+            10, 28,    // larger when zoomed in
+            12, 32,    // generous at close zoom
+            14, 40     // full size
         ]
     },
     
