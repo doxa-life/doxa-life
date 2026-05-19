@@ -326,12 +326,18 @@ export class DataSourceManager {
             }
 
             // {value,label} → extract .value, preserve label as `${field}Label`
+            // Plain strings → use as both value and label so popups always have a label to display
             const objectFields = ['doxaRegion', 'wagfRegion', 'wagfBlock', 'wagfMember', 'affinityBlock', 'cluster', 'peopleGroup', 'countryIso', 'religion', 'religionCode'];
             for (const field of objectFields) {
                 const val = normalized[field];
-                if (val && typeof val === 'object' && 'value' in val) {
+                if (val != null && typeof val === 'object' && 'value' in val) {
                     normalized[field + 'Label'] = val.label || val.value;
                     normalized[field] = val.value;
+                } else if (val != null && typeof val === 'string' && val !== '') {
+                    // Plain string — use as label too (no slug/label distinction available)
+                    if (!normalized[field + 'Label']) {
+                        normalized[field + 'Label'] = val;
+                    }
                 }
             }
 

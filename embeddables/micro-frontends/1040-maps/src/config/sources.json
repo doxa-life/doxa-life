@@ -107,6 +107,7 @@
         "slug": "slug",
         "description": "imb_people_description",
         "country": "imb_isoalpha3",
+        "countryIso": "imb_isoalpha3",
         "region": "doxa_wagf_region",
         "wagfRegion": "doxa_wagf_region",
         "doxaRegion": "doxa_wagf_region",
