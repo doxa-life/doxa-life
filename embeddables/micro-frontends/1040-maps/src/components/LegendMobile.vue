@@ -150,7 +150,7 @@ useShadowStyles(`
    inner tree rendering to fill the sheet's content area; the sheet
    already provides drag-strip + collapse caret + chrome. Override
    positioning, hide the desktop-only collapse affordances. */
-.legend-mobile-sheet .stl-panel{position:static!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;width:100%!important;z-index:auto!important;display:flex;flex-direction:column;min-height:0;}
+.legend-mobile-sheet .stl-panel{position:static!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;width:100%!important;z-index:auto!important;display:flex;flex-direction:column;min-height:0;max-height:none!important;}
 .legend-mobile-sheet .stl-panel.closed{transform:none!important;opacity:1!important;pointer-events:auto!important;}
 .legend-mobile-sheet .stl-inner{border:none!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;}
 /* Slim row height on mobile prayer/engagement/adoption tabs so they read
