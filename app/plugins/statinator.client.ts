@@ -66,7 +66,16 @@ export default defineNuxtPlugin(() => {
     injectScript().then(() => window.goStats?.pageview()).catch(() => {})
   }
 
-  if (!isExcluded(useRoute().path)) firePageview()
+  // Defer the initial pageview's script injection until the browser is idle so
+  // the analytics bundle stays off the initial load critical path. SPA route
+  // changes (below) still fire immediately — they happen after load.
+  if (!isExcluded(useRoute().path)) {
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => firePageview(), { timeout: 3000 })
+    } else {
+      setTimeout(firePageview, 2000)
+    }
+  }
 
   const router = useRouter()
   router.afterEach((to, from) => {
