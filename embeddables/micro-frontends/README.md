@@ -1,3 +1,38 @@
+---
+id: far-fast-tools/FARFAST1-HOP-POP-PLOT/DOXA/doxa-website-nuxt/doxa-life/embeddables/micro-frontends/README
+audience: trinitarian-believers
+audience-strict-66-book: true
+framework: farfast-1
+kingdom-kernel: false
+parent: micro-frontends
+path-tags:
+- far-fast-tools
+- FARFAST1-HOP-POP-PLOT
+- DOXA
+- doxa-website-nuxt
+- doxa-life
+- embeddables
+- micro-frontends
+size-class: short
+svg-candidate: false
+svg-candidate-reasons:
+- keyword:blueprint
+svg-candidate-score: 1
+svg-candidate-tagged-at: '2026-05-09T17:40:05.447660+00:00'
+svg-candidate-version: '0.2'
+tagged-at: '2026-05-09T05:49:36.273781+00:00'
+tagged-by: lk10x-tagger-v0.1.0
+tags:
+- vite-config
+- vue-micro-frontend
+- micro-frontend-imports
+- template-composables-components
+- npm-run-build
+- iife
+voice-memo-shape: false
+word-count: 236
+---
+
 # micro-frontends/
 
 Full-application-sized custom elements (Vue + Vite) that bundle into single IIFE files and register as custom elements. Not to be confused with `web-components/` (small/single-purpose things).

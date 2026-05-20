@@ -1,3 +1,42 @@
+---
+id: far-fast-tools/FARFAST1-HOP-POP-PLOT/DOXA/doxa-website-nuxt/doxa-life/embeddables/micro-frontends/1040-maps/src/components/map-controls/README
+audience: trinitarian-believers
+audience-strict-66-book: true
+framework: farfast-1
+kingdom-kernel: false
+parent: map-controls
+path-tags:
+- far-fast-tools
+- FARFAST1-HOP-POP-PLOT
+- DOXA
+- doxa-website-nuxt
+- doxa-life
+- embeddables
+- micro-frontends
+- 1040-maps
+- src
+- components
+- map-controls
+size-class: short
+svg-candidate: false
+svg-candidate-reasons: []
+svg-candidate-score: 0
+svg-candidate-tagged-at: '2026-05-09T17:40:05.452778+00:00'
+svg-candidate-version: '0.2'
+tagged-at: '2026-05-09T05:49:39.830805+00:00'
+tagged-by: lk10x-tagger-v0.1.0
+tags:
+- buttons-mapcontrolbutton-vue
+- vue-base-button
+- zoomin-zoomoutbutton-vue
+- vue-toggle-fullscreen
+- container-hamburgerbutton-vue
+- vue-file-role
+- toolbar-controls-file
+voice-memo-shape: false
+word-count: 214
+---
+
 # template/src/components/map-controls/
 
 > **Per-button toolbar controls.** Each file is a single, focused button or input that mounts inside the map's control area. Replaces the older monolithic `../MapControlsComponent.vue`.
