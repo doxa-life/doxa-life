@@ -1,3 +1,39 @@
+---
+id: far-fast-tools/FARFAST1-HOP-POP-PLOT/DOXA/doxa-website-nuxt/doxa-life/embeddables/micro-frontends/1040-maps/src/utils/README
+audience: trinitarian-believers
+audience-strict-66-book: true
+framework: farfast-1
+kingdom-kernel: false
+parent: utils
+path-tags:
+- far-fast-tools
+- FARFAST1-HOP-POP-PLOT
+- DOXA
+- doxa-website-nuxt
+- doxa-life
+- embeddables
+- micro-frontends
+- 1040-maps
+- src
+- utils
+size-class: short
+svg-candidate: false
+svg-candidate-reasons: []
+svg-candidate-score: 0
+svg-candidate-tagged-at: '2026-05-09T17:40:05.451195+00:00'
+svg-candidate-version: '0.2'
+tagged-at: '2026-05-09T05:49:38.753498+00:00'
+tagged-by: lk10x-tagger-v0.1.0
+tags:
+- geojson-helpers-clusterhelpers
+- javascript-helpers-vue
+- window-mapappapiurl-viteapibaseurl
+- js-resolves-api
+- networkclusteringutil-js
+voice-memo-shape: false
+word-count: 187
+---
+
 # template/src/utils/
 
 > **Pure JavaScript helpers.** No Vue, no Pinia, no Mapbox imports. Anything reactive is a composable; anything stateful is a store. See [`/docs/utils/`](../../../docs/utils/) and [`/docs/geo-math/`](../../../docs/geo-math/) for the full catalog.

@@ -1,3 +1,37 @@
+---
+id: far-fast-tools/FARFAST1-HOP-POP-PLOT/DOXA/doxa-website-nuxt/doxa-life/embeddables/web-components/README
+audience: trinitarian-believers
+audience-strict-66-book: true
+framework: farfast-1
+kingdom-kernel: false
+parent: web-components
+path-tags:
+- far-fast-tools
+- FARFAST1-HOP-POP-PLOT
+- DOXA
+- doxa-website-nuxt
+- doxa-life
+- embeddables
+- web-components
+size-class: short
+svg-candidate: false
+svg-candidate-reasons:
+- keyword:blueprint
+svg-candidate-score: 1
+svg-candidate-tagged-at: '2026-05-09T17:40:05.448388+00:00'
+svg-candidate-version: '0.2'
+tagged-at: '2026-05-09T05:49:36.736659+00:00'
+tagged-by: lk10x-tagger-v0.1.0
+tags:
+- micro-frontend-embedded
+- custom-elements-vue
+- distinction-granularity-size
+- js-destination-distinction
+- prefer-keeping-web
+voice-memo-shape: false
+word-count: 235
+---
+
 # web-components/
 
 Small, single-purpose custom elements (Vue + Vite) — smaller in scope than anything in `micro-frontends/`.
