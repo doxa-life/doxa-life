@@ -109,6 +109,11 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    // Content-hashed build assets never change under the same URL — cache forever.
+    '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
+    // Fonts/images use stable filenames, so avoid `immutable`: a 7-day cache
+    // still lets an overwritten asset propagate within a week.
+    '/assets/**': { headers: { 'cache-control': 'public, max-age=604800' } },
     '/': { prerender: true },
     '/adopt': { prerender: true },
     '/pray': { prerender: true },
@@ -132,6 +137,9 @@ export default defineNuxtConfig({
     // server crashes on boot. The bun preset builds the output for Bun's own
     // resolver. Run it with `bun run ./.output/server/index.mjs`.
     preset: 'bun',
+    // Precompress public assets (JS/CSS/HTML/SVG/JSON) to .br and .gz at build
+    // time; the server serves the compressed variant when the client supports it.
+    compressPublicAssets: { brotli: true, gzip: true },
     // Dev-only: use in-memory cache for the payload mount. The default fs
     // driver can't represent both a leaf route ("/fr") and children of that
     // route ("/fr/adopt") simultaneously — the first visit writes a file at
