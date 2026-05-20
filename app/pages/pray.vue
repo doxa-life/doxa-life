@@ -57,7 +57,7 @@ useTextHighlight()
           </div>
           <div
             class="grow-2 bg-image rounded-md"
-            style="background-image: url('/assets/images/pray-01-hero.jpg');"
+            style="background-image: url('/assets/images/pray-01-hero.jpg'); background-image: image-set(url('/assets/images/pray-01-hero.avif') type('image/avif'), url('/assets/images/pray-01-hero.webp') type('image/webp'), url('/assets/images/pray-01-hero.jpg') type('image/jpeg'));"
           />
         </div>
       </div>
@@ -109,11 +109,24 @@ useTextHighlight()
             </div>
           </div>
           <div>
-            <img
-              class="center"
-              src="/assets/images/pray-02-PrayerFUEL-Phone-graphic-2.png"
-              :alt="t('Your daily prayer guide')"
-            >
+            <picture>
+              <source
+                srcset="/assets/images/pray-02-PrayerFUEL-Phone-graphic-2.avif"
+                type="image/avif"
+              >
+              <source
+                srcset="/assets/images/pray-02-PrayerFUEL-Phone-graphic-2.webp"
+                type="image/webp"
+              >
+              <img
+                class="center"
+                src="/assets/images/pray-02-PrayerFUEL-Phone-graphic-2.png"
+                :alt="t('Your daily prayer guide')"
+                width="500"
+                height="872"
+                loading="lazy"
+              >
+            </picture>
           </div>
         </div>
       </div>
@@ -125,7 +138,23 @@ useTextHighlight()
           <h2>{{ t('Why prayer matters') }}</h2>
           <div class="switcher | gap-md" data-width="xl">
             <div class="switcher-item center grow-none">
-              <img src="/assets/images/Pray-04-Doxa.jpg" :alt="t('Adopt an unengaged people group')">
+              <picture>
+                <source
+                  srcset="/assets/images/Pray-04-Doxa.avif"
+                  type="image/avif"
+                >
+                <source
+                  srcset="/assets/images/Pray-04-Doxa.webp"
+                  type="image/webp"
+                >
+                <img
+                  src="/assets/images/Pray-04-Doxa.jpg"
+                  :alt="t('Adopt an unengaged people group')"
+                  width="150"
+                  height="179"
+                  loading="lazy"
+                >
+              </picture>
             </div>
             <div class="stack stack--lg | text-card | surface-brand-lightest justify-center">
               <h4 class="font-heading font-size-2xl">{{ t('They have no one praying for them') }}</h4>
@@ -134,7 +163,23 @@ useTextHighlight()
           </div>
           <div class="switcher | gap-md" data-width="xl">
             <div class="switcher-item center grow-none">
-              <img src="/assets/images/Pray-05-Doxa.jpg" :alt="t('Adopt an unengaged people group')">
+              <picture>
+                <source
+                  srcset="/assets/images/Pray-05-Doxa.avif"
+                  type="image/avif"
+                >
+                <source
+                  srcset="/assets/images/Pray-05-Doxa.webp"
+                  type="image/webp"
+                >
+                <img
+                  src="/assets/images/Pray-05-Doxa.jpg"
+                  :alt="t('Adopt an unengaged people group')"
+                  width="150"
+                  height="193"
+                  loading="lazy"
+                >
+              </picture>
             </div>
             <div class="stack stack--lg | text-card | surface-brand-lightest justify-center">
               <h4 class="font-heading font-size-2xl">{{ t('Prayer prepares the way for the gospel') }}</h4>
@@ -143,7 +188,23 @@ useTextHighlight()
           </div>
           <div class="switcher | gap-md" data-width="xl">
             <div class="switcher-item center grow-none">
-              <img src="/assets/images/Pray-06-Doxa.jpg" :alt="t('Adopt an unengaged people group')">
+              <picture>
+                <source
+                  srcset="/assets/images/Pray-06-Doxa.avif"
+                  type="image/avif"
+                >
+                <source
+                  srcset="/assets/images/Pray-06-Doxa.webp"
+                  type="image/webp"
+                >
+                <img
+                  src="/assets/images/Pray-06-Doxa.jpg"
+                  :alt="t('Adopt an unengaged people group')"
+                  width="150"
+                  height="191"
+                  loading="lazy"
+                >
+              </picture>
             </div>
             <div class="stack stack--lg | text-card | surface-brand-lightest justify-center">
               <h4 class="font-heading font-size-2xl">{{ t('Prayer unites the global church') }}</h4>
@@ -193,7 +254,23 @@ useTextHighlight()
           <figcaption>- {{ t('Jesus') }}</figcaption>
         </figure>
         <div>
-          <img src="/assets/images/pray-03-bottom-unsplash.jpg" :alt="t('Jesus')">
+          <picture>
+            <source
+              srcset="/assets/images/pray-03-bottom-unsplash.avif"
+              type="image/avif"
+            >
+            <source
+              srcset="/assets/images/pray-03-bottom-unsplash.webp"
+              type="image/webp"
+            >
+            <img
+              src="/assets/images/pray-03-bottom-unsplash.jpg"
+              :alt="t('Jesus')"
+              width="1200"
+              height="328"
+              loading="lazy"
+            >
+          </picture>
         </div>
       </div>
     </section>
