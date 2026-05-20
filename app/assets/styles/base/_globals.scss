@@ -84,6 +84,12 @@ img {
   object-fit: cover;
 }
 
+/* <picture> wraps <img> for AVIF/WebP fallback; display:contents removes its
+   box so the inner <img> stays the effective flex/layout child. */
+picture {
+  display: contents;
+}
+
 .bg-image {
   background-size: cover;
   background-position: center;
