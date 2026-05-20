@@ -127,6 +127,14 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    // DigitalOcean App Platform installs and runs with Bun (only bun.lock is
+    // committed). The default node-server preset traces external deps with
+    // node-file-trace and copies them into .output/server/node_modules, but
+    // under Bun's install layout that copy comes out incomplete (e.g. undici
+    // ships package.json without the index.js its `main` points at), so the
+    // server crashes on boot. The bun preset builds the output for Bun's own
+    // resolver. Run it with `bun run ./.output/server/index.mjs`.
+    preset: 'bun',
     // Dev-only: use in-memory cache for the payload mount. The default fs
     // driver can't represent both a leaf route ("/fr") and children of that
     // route ("/fr/adopt") simultaneously — the first visit writes a file at
