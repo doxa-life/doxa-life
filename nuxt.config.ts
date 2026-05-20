@@ -216,6 +216,10 @@ export default defineNuxtConfig({
     prayBaseUrl: process.env.NUXT_PRAY_BASE_URL || 'https://pray.doxa.life',
     deeplApiKey: process.env.DEEPL_API_KEY || '',
     deeplApiUrl: process.env.DEEPL_API_URL || 'https://api.deepl.com',
+    // Cloudflare cache purge on deploy (server/plugins/cloudflare-purge.ts).
+    // Token needs only Zone → Cache Purge for the doxa.life zone.
+    cfApiToken: process.env.CF_API_TOKEN || '',
+    cfZoneId: process.env.CF_ZONE_ID || '',
     public: {
       appName: process.env.APP_TITLE || 'My App',
       nodeEnv: process.env.NODE_ENV || '',
