@@ -21,6 +21,9 @@ useHead(() => ({
     dir: dir.value
   },
   link: [
+    // Preload the heading font (Bebas Neue) — it renders the above-the-fold
+    // h1/h2 (the LCP text), so fetching it early avoids a swap flash.
+    { rel: 'preload', as: 'font', type: 'font/woff2', href: '/assets/fonts/BebasNeue/BebasNeue-Regular.woff2', crossorigin: '' },
     { rel: 'stylesheet', href: '/assets/fonts/BebasNeue/stylesheet.css' },
     { rel: 'stylesheet', href: '/assets/fonts/Brandon_Grotesque/stylesheet.css' },
     { rel: 'stylesheet', href: '/assets/fonts/Poppins/stylesheet.css' }
