@@ -102,9 +102,6 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/png', sizes: '192x192', href: '/favicon/cropped-Favicon-light-doxa-01-192x192.png' },
         { rel: 'apple-touch-icon', href: '/favicon/cropped-Favicon-light-doxa-01-180x180.png' }
       ],
-      script: [
-        { src: 'https://support.gospelambition.org/js/feedback-web-component.iife.js', defer: true }
-      ],
       meta: [
         { name: 'msapplication-TileImage', content: '/favicon/cropped-Favicon-light-doxa-01-270x270.png' }
       ]
