@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { existsSync, readdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
-import { generateI18nLocales } from './config/languages'
+import { generateI18nLocales, ENABLED_LANGUAGE_CODES } from './config/languages'
 
 const LAYERS_DIR = '.layers'
 
@@ -19,6 +19,24 @@ function stripLayerTsconfigs() {
 }
 
 stripLayerTsconfigs()
+
+// Prerendered marketing pages are served as edge-cacheable HTML so first paint
+// comes from Cloudflare rather than the origin. `max-age=0` keeps browsers
+// revalidating (a deploy is visible immediately); `s-maxage` is the edge TTL;
+// `stale-while-revalidate` lets the edge serve instantly while it refreshes. The
+// deploy purge (server/plugins/cloudflare-purge.ts) evicts stale HTML so it can
+// never reference content-hashed /_nuxt assets the new build replaced.
+const MARKETING_HTML_CACHE = 'public, max-age=0, s-maxage=86400, stale-while-revalidate=86400'
+const MARKETING_PAGES = ['', '/adopt', '/pray', '/research', '/contact-us']
+const MARKETING_LOCALE_PREFIXES = ['', ...ENABLED_LANGUAGE_CODES.filter(code => code !== 'en').map(code => `/${code}`)]
+const marketingRouteRules = Object.fromEntries(
+  MARKETING_LOCALE_PREFIXES.flatMap(prefix =>
+    MARKETING_PAGES.map(page => [
+      `${prefix}${page}` || '/',
+      { prerender: true, headers: { 'cache-control': MARKETING_HTML_CACHE } }
+    ])
+  )
+)
 
 export default defineNuxtConfig({
   extends: [
@@ -114,11 +132,8 @@ export default defineNuxtConfig({
     // Fonts/images use stable filenames, so avoid `immutable`: a 7-day cache
     // still lets an overwritten asset propagate within a week.
     '/assets/**': { headers: { 'cache-control': 'public, max-age=604800' } },
-    '/': { prerender: true },
-    '/adopt': { prerender: true },
-    '/pray': { prerender: true },
-    '/research': { prerender: true },
-    '/contact-us': { prerender: true },
+    // Prerendered marketing pages (all enabled locales) — edge-cacheable HTML.
+    ...marketingRouteRules,
     '/login': { ssr: false, prerender: false },
     '/register': { ssr: false, prerender: false },
     '/reset-password': { ssr: false, prerender: false },
