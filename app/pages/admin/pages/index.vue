@@ -53,7 +53,6 @@ function categoryLabel(cat: CategoryRow): string {
 const createModalOpen = ref(false)
 const newSlugLeaf = ref('')
 const newCategoryId = ref<string | null>(null)
-const newMenuOrder = ref(0)
 const creating = ref(false)
 
 const newCategoryPrefix = computed(() => {
@@ -75,7 +74,6 @@ const categoryItems = computed(() => [
 function resetCreateForm() {
   newSlugLeaf.value = ''
   newCategoryId.value = null
-  newMenuOrder.value = 0
 }
 
 async function createPage() {
@@ -91,8 +89,7 @@ async function createPage() {
       method: 'POST',
       body: {
         slug,
-        category_id: newCategoryId.value,
-        menu_order: newMenuOrder.value || 0
+        category_id: newCategoryId.value
       }
     })
     toast.add({ title: 'Page created', color: 'success' })
@@ -273,9 +270,6 @@ const filteredRows = computed<PageRow[]>(() => {
                 <span class="text-(--ui-text-muted) font-mono text-sm">{{ newCategoryPrefix }}</span>
               </template>
             </UInput>
-          </UFormField>
-          <UFormField label="Menu order" description="Sort order within the category sidebar.">
-            <UInput v-model.number="newMenuOrder" type="number" />
           </UFormField>
         </div>
       </template>
