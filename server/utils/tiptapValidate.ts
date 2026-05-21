@@ -34,6 +34,7 @@ export const NODE_NAMES: ReadonlySet<string> = new Set([
   'text',
   'image',
   'youtube',
+  'vimeo',
   'div',
   'verse',
   'uupgsList',
@@ -92,6 +93,7 @@ const NODE_ATTRS: Readonly<Record<string, ReadonlyArray<string>>> = {
   text: [],
   image: ['src', 'alt', 'title', 'align', 'width', 'height'],
   youtube: ['src', 'width', 'height', 'start'],
+  vimeo: ['src', 'width', 'height'],
   div: ['class', 'style', ...PRESERVED_DATA_ATTRS],
   verse: ['reference'],
   uupgsList: [
@@ -140,6 +142,13 @@ function isSafeYoutubeUrl(value: unknown): boolean {
   } catch {
     return false
   }
+}
+
+// Vimeo embeds store only the numeric video id (see app/utils/tiptapVimeo.ts);
+// the renderer builds the player.vimeo.com URL from it, so a digits-only
+// check is sufficient — no URL can be smuggled through.
+function isSafeVimeoSrc(value: unknown): boolean {
+  return typeof value === 'string' && /^\d+$/.test(value)
 }
 
 // CSS color values that pass into a `color: <value>` declaration.
@@ -317,6 +326,13 @@ function walkNode(
     const src = node.attrs?.src
     if (typeof src !== 'string' || !isSafeYoutubeUrl(src)) {
       warnings.push({ path: `${path}.attrs.src`, reason: 'youtube.src is not a YouTube embed URL; node dropped' })
+      return 'remove'
+    }
+  }
+  if (type === 'vimeo') {
+    const src = node.attrs?.src
+    if (!isSafeVimeoSrc(src)) {
+      warnings.push({ path: `${path}.attrs.src`, reason: 'vimeo.src is not a valid Vimeo video id; node dropped' })
       return 'remove'
     }
   }
