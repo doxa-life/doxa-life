@@ -94,7 +94,6 @@ const categoryItems = computed(() => [
 // Metadata editable in the top bar
 const slug = ref('')
 const categoryId = ref<string | null>(null)
-const menuOrder = ref(0)
 const theme = ref<PageTheme>('default')
 const customCss = ref('')
 // Original category id at load time — used to detect moves that also
@@ -105,7 +104,6 @@ watchEffect(() => {
     slug.value = data.value.page.slug
     categoryId.value = data.value.page.category_id
     originalCategoryId.value = data.value.page.category_id
-    menuOrder.value = data.value.page.menu_order
     theme.value = data.value.page.theme ?? 'default'
     customCss.value = data.value.page.custom_css ?? ''
   }
@@ -217,7 +215,6 @@ async function saveAll(statusOverride?: 'draft' | 'published', localeOverride?: 
       body: {
         slug: slug.value,
         category_id: categoryId.value,
-        menu_order: menuOrder.value,
         theme: theme.value,
         custom_css: customCss.value.trim() ? customCss.value : null
       }
@@ -663,9 +660,6 @@ function formatVersionTime(iso: string): string {
                 :description="selectedCategory ? `Full URL: /${slug}. Must start with ${selectedCategory.slug}/` : 'URL path (e.g. privacy)'"
               >
                 <UInput v-model="slug" />
-              </UFormField>
-              <UFormField label="Menu order" description="Position within the category sidebar.">
-                <UInput v-model.number="menuOrder" type="number" />
               </UFormField>
               <UFormField label="Page theme" description="Applied to <body>.">
                 <USelect v-model="theme" :items="THEME_OPTIONS" class="w-full" />
