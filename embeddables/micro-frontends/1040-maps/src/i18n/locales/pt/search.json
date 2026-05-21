@@ -1,0 +1,9 @@
+{
+  "placeholder": "Povo, local, língua, religião",
+  "labels": {
+    "people": "Povo:",
+    "place": "Local:",
+    "language": "Língua:",
+    "religion": "Religião:"
+  }
+}
