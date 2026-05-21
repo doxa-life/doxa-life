@@ -184,8 +184,9 @@ export async function createCmsCategory(input: CreateCategoryInput): Promise<Cat
 
   await ensureNoSiblingCollision(slug, parentId)
 
+  let created: Category
   try {
-    return await dbCreateCategory({
+    created = await dbCreateCategory({
       slug,
       parent_id: parentId,
       menu_order: input.menu_order ?? 0,
@@ -197,6 +198,15 @@ export async function createCmsCategory(input: CreateCategoryInput): Promise<Cat
     }
     throw e
   }
+
+  // A new child appears in its parent's landing-page grid; bust the
+  // parent's cached landing so it shows up without waiting for the TTL.
+  if (created.parent_id) {
+    const tree = await loadCategoryTree()
+    const parentPath = categoryUrlPath(tree, created.parent_id)
+    if (parentPath) await applyCategoryInvalidations([parentPath])
+  }
+  return created
 }
 
 export interface UpdateCategoryInput {
@@ -267,7 +277,7 @@ export interface DeleteCategoryError {
 export async function deleteCmsCategory(id: string): Promise<{ ok: true; slug: string } | DeleteCategoryError> {
   const existing = await db
     .selectFrom('categories')
-    .select(['id', 'slug'])
+    .select(['id', 'slug', 'parent_id'])
     .where('id', '=', id)
     .executeTakeFirst()
   if (!existing) throw err(404, 'Category not found')
@@ -341,6 +351,15 @@ export async function deleteCmsCategory(id: string): Promise<{ ok: true; slug: s
       attached_page_count: result.attached_page_count,
       sample_slugs: result.sample_slugs
     }
+  }
+
+  // The deleted child drops out of its parent's landing-page grid; bust
+  // the parent's cached landing. (The parent still exists post-delete,
+  // so its path resolves.)
+  if (existing.parent_id) {
+    const tree = await loadCategoryTree()
+    const parentPath = categoryUrlPath(tree, existing.parent_id)
+    if (parentPath) await applyCategoryInvalidations([parentPath])
   }
   return { ok: true, slug: result.slug }
 }

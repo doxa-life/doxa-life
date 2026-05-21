@@ -11,6 +11,7 @@ import { ENABLED_LANGUAGE_CODES } from '~~/config/languages'
 import { db } from './database'
 import {
   loadCategoryTree,
+  categoryChain,
   descendantCategoryIds,
   pageUrlPath,
   categoryUrlPath
@@ -35,11 +36,16 @@ export async function purgeCmsPage(slug: string, locales?: string[]) {
   )
 }
 
-// Purge every page in a category subtree across all locales. Needed
-// whenever a field that leaks into a sibling's cached response changes
-// — titles, excerpts, featured images (all embedded in `children[]`)
-// and menu_order (alters sibling sort order). Walks descendants too,
-// so a rename at the top of `/resources` busts every page below it.
+// Purge every cached page across a category's whole top-level subtree,
+// in all locales. Needed whenever a field that leaks into another cached
+// response changes — titles, excerpts, featured images (embedded in
+// `children[]` and the landing grid), menu_order (sort order), or a
+// page's published state (whether a category appears in the menu/grid at
+// all). The sidebar nav tree and the landing-page grids span the entire
+// top-level subtree — every page under `/resources` shares one nav, and
+// ancestor landings list their descendants — so the invalidation has to
+// reach from the top-level ancestor down, not just this category's own
+// subtree.
 //
 // `excludeUrls` skips entries already purged by the caller (avoids
 // duplicate removeItem calls when `applyPageInvalidations` already
@@ -54,7 +60,9 @@ export async function purgeCmsCategory(
       : (typeof excludeUrls === 'string' ? [excludeUrls] : excludeUrls)
   )
   const tree = await loadCategoryTree()
-  const subtreeIds = descendantCategoryIds(tree, categoryId)
+  const chain = categoryChain(tree, categoryId)
+  const rootId = chain[0]?.id ?? categoryId
+  const subtreeIds = descendantCategoryIds(tree, rootId)
   if (subtreeIds.length === 0) return
   const rows = await db
     .selectFrom('pages')

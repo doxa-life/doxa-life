@@ -26,7 +26,7 @@ import {
   getCategoryDefaultPage,
   getCategoryName,
   getCategoryPageTranslations,
-  getChildCategories
+  categoryIdsWithPublishedPages
 } from '../../database/categories'
 import { renderTiptap } from '../../utils/renderTiptap'
 import { ENABLED_LANGUAGE_CODES } from '../../../config/languages'
@@ -34,10 +34,11 @@ import {
   loadCategoryTree,
   walkCategorySegments,
   pageUrlPath,
-  categoryUrlPath
+  categoryUrlPath,
+  descendantCategoryIds
 } from '../../database/categoryTree'
 import type { LocalizedPage } from '../../database/pages'
-import type { TreeCategory } from '../../database/categoryTree'
+import type { TreeCategory, CategoryTree } from '../../database/categoryTree'
 
 const ENABLED_LOCALES = new Set(ENABLED_LANGUAGE_CODES)
 
@@ -70,35 +71,51 @@ type NavNode = NavPageNode | NavCategoryNode
 // Builds the recursive sidebar tree rooted at `categoryId`. Each
 // category becomes a heading whose `items` are its direct pages plus
 // each child category's own subtree, ordered by menu_order then slug.
+// Returns null when the category has no pages anywhere in its subtree —
+// an empty heading isn't worth showing in the menu.
 async function buildNavTree(
   categoryId: string,
   locale: string,
   fallbackLocale: string,
-  tree: { byId: Map<string, { id: string; slug: string; menu_order: number; parent_id: string | null }>; childrenByParent: Map<string | null, Array<{ id: string; slug: string; menu_order: number; parent_id: string | null }>> }
-): Promise<NavCategoryNode> {
+  tree: CategoryTree,
+  visited: Set<string> = new Set()
+): Promise<NavCategoryNode | null> {
+  // Mark before any await so concurrent sibling recursions can't
+  // re-enter this node, and a back-edge in malformed data (a child
+  // re-parented onto an ancestor) is dropped instead of recursing
+  // forever.
+  visited.add(categoryId)
   const node = tree.byId.get(categoryId)
   const [name, pageRows] = await Promise.all([
     getCategoryName(categoryId, locale, fallbackLocale),
     getCategoryPageTranslations(categoryId, locale, fallbackLocale)
   ])
-  const url = categoryUrlPath(tree as never, categoryId)
+  const url = categoryUrlPath(tree, categoryId)
 
   const pageItems: NavPageNode[] = pageRows.map(({ page, translation }) => ({
     kind: 'page' as const,
-    url: pageUrlPath(tree as never, page),
+    url: pageUrlPath(tree, page),
     title: translation.title,
     menu_order: page.menu_order
   }))
 
-  const childCats = tree.childrenByParent.get(categoryId) ?? []
-  const childSections = await Promise.all(
-    childCats.map(c => buildNavTree(c.id, locale, fallbackLocale, tree))
-  )
+  const childCats = (tree.childrenByParent.get(categoryId) ?? []).filter(c => !visited.has(c.id))
+  const childSections = (await Promise.all(
+    childCats.map(c => buildNavTree(c.id, locale, fallbackLocale, tree, visited))
+  )).filter((s): s is NavCategoryNode => s !== null)
 
-  // Interleave pages and child categories by menu_order so authors
-  // can rank a "sub-section heading" between two pages if they want.
-  const items: NavNode[] = [...pageItems, ...childSections]
-    .sort((a, b) => a.menu_order - b.menu_order || a.title.localeCompare(b.title))
+  // Drop a category with no published pages of its own and no
+  // page-bearing descendants — it would render as an empty heading.
+  if (pageItems.length === 0 && childSections.length === 0) return null
+
+  // Subcategories first, then this category's own pages — each group
+  // ordered by menu_order (ties broken by title).
+  const byOrder = (a: NavNode, b: NavNode) =>
+    a.menu_order - b.menu_order || a.title.localeCompare(b.title)
+  const items: NavNode[] = [
+    ...childSections.sort(byOrder),
+    ...pageItems.sort(byOrder)
+  ]
 
   return {
     kind: 'category' as const,
@@ -247,20 +264,31 @@ export default defineCachedEventHandler(async (event) => {
       if (!ancestor?.parent_id) break
       navRootId = ancestor.parent_id
     }
-    navTree = await buildNavTree(navRootId, renderedLocale, fallbackLocale, tree as never)
+    navTree = await buildNavTree(navRootId, renderedLocale, fallbackLocale, tree)
   }
 
   // Child categories below this one — surfaced so archive landing
   // pages can render a card grid of subsections.
   let childCategories: ChildCategorySummary[] = []
-  const isCategoryLanding = Boolean(bareCategory) || (
-    Boolean(resolvedCategory) && result?.page.menu_order === 0
-  )
+  // The index/grid layout belongs to the bare category URL only
+  // (`/resources`), not to a page's own URL (`/resources/overview`) —
+  // even when that page is the category default (menu_order 0). This
+  // keeps every page reachable as an article when its card is clicked.
+  const isCategoryLanding = Boolean(bareCategory)
   if (isCategoryLanding && resolvedCategory) {
     const cats = tree.childrenByParent.get(resolvedCategory.id) ?? []
     if (cats.length > 0) {
-      const basePath = categoryUrlPath(tree, resolvedCategory.id)
-      childCategories = await summarizeChildCategories(cats, renderedLocale, fallbackLocale, basePath)
+      // Hide subcategories with no published pages anywhere in their
+      // subtree — matches the menu so empty categories aren't surfaced
+      // as dead-end cards.
+      const withPages = await categoryIdsWithPublishedPages(renderedLocale, fallbackLocale)
+      const nonEmpty = cats.filter(c =>
+        descendantCategoryIds(tree, c.id).some(id => withPages.has(id))
+      )
+      if (nonEmpty.length > 0) {
+        const basePath = categoryUrlPath(tree, resolvedCategory.id)
+        childCategories = await summarizeChildCategories(nonEmpty, renderedLocale, fallbackLocale, basePath)
+      }
     }
   }
 

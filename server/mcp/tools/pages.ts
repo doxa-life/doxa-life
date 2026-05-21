@@ -50,7 +50,7 @@ export const listPagesTool = defineMcpTool({
 
 export const getPageTool = defineMcpTool({
   name: 'get_page',
-  description: 'Fetch a single CMS page by id or slug, including all translations (any status). The `slug` lookup is by leaf only — pass the full URL path via the `url` of an earlier list/get response if you need disambiguation. Each translation includes body_json (Tiptap JSON), a Markdown rendering, and a body_is_lossy_in_markdown flag.',
+  description: 'Fetch a single CMS page by id or slug, including all translations (any status). The `slug` lookup takes the full URL path (e.g. "resources/overview", as returned in `url`); a bare leaf ("privacy") only matches an uncategorized page. Each translation includes body_json (Tiptap JSON), a Markdown rendering, and a body_is_lossy_in_markdown flag.',
   scope: 'pages.view',
   input: getPageInput,
   async handler(input) {

@@ -112,8 +112,14 @@ if (!data.value && !error.value) {
 // <head>
 useHead(() => {
   if (!data.value) return {}
+  // A category index represents the category itself, so title it by the
+  // category name (menu_parent is the active category on a landing)
+  // rather than the resolved default page's title.
+  const mp = data.value.menu_parent
   return {
-    title: data.value.meta_title || data.value.title,
+    title: mp && data.value.child_categories.length > 0
+      ? mp.title
+      : (data.value.meta_title || data.value.title),
     meta: [
       ...(data.value.meta_description ? [{ name: 'description', content: data.value.meta_description }] : []),
       ...(data.value.og_image ? [{ property: 'og:image', content: data.value.og_image }] : [])
@@ -170,9 +176,10 @@ const navRows = computed<NavRow[]>(() => {
 })
 
 const hasSidebar = computed(() => navRows.value.length > 0 || (data.value?.children.length ?? 0) > 0)
-// Render a card grid (instead of body) on archive landing pages —
-// either when there are sub-categories to surface, or when this is a
-// category default with no body and only sibling pages.
+// A category that has subcategories renders as an index: a card grid of
+// its subcategories followed by its own pages (set server-side only on
+// the bare category URL). Categories with just pages fall through to the
+// "open the first page" logic below.
 const showCategoryGrid = computed(() => (data.value?.child_categories.length ?? 0) > 0)
 const showChildGrid = computed(() =>
   Boolean(
@@ -344,10 +351,12 @@ onBeforeUnmount(unmountSlots)
              the top so visitors landing on a sub-page (e.g. /resources/
              overview) get a clear heading. The document <title> is also
              set via useHead() above. -->
-        <h1 v-if="data.menu_parent && data.title" class="page-title">{{ data.title }}</h1>
+        <h1 v-if="showCategoryGrid && data.menu_parent" class="page-title">{{ data.menu_parent.title }}</h1>
+        <h1 v-else-if="data.menu_parent && data.title" class="page-title">{{ data.title }}</h1>
         <div v-if="!showChildGrid && !showCategoryGrid" class="page-body" v-html="data.body_html" />
 
         <div v-if="showCategoryGrid" class="grid">
+          <!-- Subcategories first … -->
           <div
             v-for="cat in data.child_categories"
             :key="cat.url"
@@ -366,6 +375,28 @@ onBeforeUnmount(unmountSlots)
                 </NuxtLink>
               </h3>
               <div v-if="cat.excerpt" class="child-excerpt" v-html="cat.excerpt" />
+            </div>
+          </div>
+
+          <!-- … then this category's own pages. -->
+          <div
+            v-for="child in data.children"
+            :key="child.url"
+            class="card"
+            data-variant="secondary"
+          >
+            <div v-if="child.featured_image" class="child-thumbnail">
+              <NuxtLink :to="localePath(`/${child.url}`)">
+                <img :src="child.featured_image" :alt="child.title">
+              </NuxtLink>
+            </div>
+            <div class="stack">
+              <h3>
+                <NuxtLink class="color-white" :to="localePath(`/${child.url}`)">
+                  {{ child.title }}
+                </NuxtLink>
+              </h3>
+              <div v-if="child.excerpt" class="child-excerpt" v-html="child.excerpt" />
             </div>
           </div>
         </div>

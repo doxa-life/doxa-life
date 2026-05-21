@@ -176,6 +176,30 @@ export async function getCategoryPageTranslations(
 // Picks whichever page has the lowest menu_order (ties broken by leaf
 // slug) and has at least one published translation, so bare category
 // slugs never resolve to something the visitor can't read.
+// Set of category ids that directly hold at least one page with a
+// published translation in `locale` (or the fallback). Callers combine
+// it with `descendantCategoryIds` to decide whether a category subtree
+// has any visible pages — e.g. to hide empty categories from the menu
+// and the landing-page grid.
+export async function categoryIdsWithPublishedPages(
+  locale: string,
+  fallbackLocale = 'en'
+): Promise<Set<string>> {
+  const locales = locale === fallbackLocale ? [locale] : [locale, fallbackLocale]
+  const rows = await db
+    .selectFrom('pages')
+    .innerJoin('page_translations', 'page_translations.page_id', 'pages.id')
+    .select('pages.category_id')
+    .where('pages.category_id', 'is not', null)
+    .where('page_translations.status', '=', 'published')
+    .where('page_translations.locale', 'in', locales)
+    .distinct()
+    .execute()
+  const set = new Set<string>()
+  for (const r of rows) if (r.category_id) set.add(r.category_id)
+  return set
+}
+
 export async function getCategoryDefaultPage(
   categoryId: string,
   locale: string,
@@ -183,22 +207,6 @@ export async function getCategoryDefaultPage(
 ): Promise<{ page: Page; translation: PageTranslation } | null> {
   const translations = await getCategoryPageTranslations(categoryId, locale, fallbackLocale)
   return translations[0] ?? null
-}
-
-// Direct child categories of `parentId` (or top-level when parentId
-// is null), ordered by menu_order then slug. Used by the public lookup
-// endpoint to render a child-category card grid on archive landing
-// pages.
-export async function getChildCategories(parentId: string | null): Promise<Category[]> {
-  let q = db
-    .selectFrom('categories')
-    .selectAll()
-    .orderBy('menu_order', 'asc')
-    .orderBy('slug', 'asc')
-  q = parentId === null
-    ? q.where('parent_id', 'is', null)
-    : q.where('parent_id', '=', parentId)
-  return q.execute()
 }
 
 export interface CreateCategoryInput {
@@ -368,6 +376,23 @@ export async function updateCategory(
         for (const p of pages) {
           slugsToPurge.push(pageUrlPath(treeAfter, p))
         }
+      }
+    }
+
+    // The parent category's landing page renders a grid of its child
+    // categories (each child's url, title, and order). Any edit this
+    // grid reflects — slug, parent, menu_order, or name — leaves the
+    // old and new parents' landing pages stale, so purge them too. The
+    // parents' own paths are unaffected by this category's change, so a
+    // single post-change tree resolves both correctly.
+    const parentIdsToPurge = new Set<string>()
+    if (existing.parent_id) parentIdsToPurge.add(existing.parent_id)
+    if (input.parent_id) parentIdsToPurge.add(input.parent_id)
+    if (parentIdsToPurge.size > 0) {
+      const parentTree = await loadCategoryTree(trx)
+      for (const pid of parentIdsToPurge) {
+        const path = categoryUrlPath(parentTree, pid)
+        if (path) slugsToPurge.push(path)
       }
     }
 

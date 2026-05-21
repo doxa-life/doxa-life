@@ -16,9 +16,11 @@ import { db } from '../utils/database'
 import { purgeCmsPage, purgeCmsCategory } from '../utils/cmsCache'
 import { ENABLED_LANGUAGE_CODES } from '~~/config/languages'
 import type { Page, PageTranslation } from '../database/pages'
+import { findPageInCategory } from '../database/pages'
 import type { Database } from '../database/schema'
 import {
   loadCategoryTree,
+  walkCategorySegments,
   pageUrlPath,
   categoryUrlPath
 } from '../database/categoryTree'
@@ -191,40 +193,34 @@ export interface FullPage {
   url: string
 }
 
-export async function getCmsPage(input: { id?: string; slug?: string; category_id?: string | null }): Promise<FullPage | null> {
-  let pageQuery = db.selectFrom('pages').selectAll()
+export async function getCmsPage(input: { id?: string; slug?: string }): Promise<FullPage | null> {
+  const tree = await loadCategoryTree()
+
+  let page: Page | undefined
   if (input.id) {
-    pageQuery = pageQuery.where('id', '=', input.id)
+    page = await db.selectFrom('pages').selectAll().where('id', '=', input.id).executeTakeFirst()
   } else if (input.slug) {
-    // Backwards-compatible by-slug lookup. Without a category id this
-    // can match more than one row across categories — pick the first
-    // deterministically (lowest menu_order, then created) so old MCP
-    // callers that pass a leaf slug don't crash.
-    pageQuery = pageQuery.where('slug', '=', input.slug)
-    if (input.category_id !== undefined) {
-      pageQuery = input.category_id === null
-        ? pageQuery.where('category_id', 'is', null)
-        : pageQuery.where('category_id', '=', input.category_id)
-    }
+    // Resolve the slug as a full URL path ("resources/overview") against
+    // the category tree so a leaf that repeats across categories is
+    // unambiguous. A bare leaf ("privacy") resolves to an uncategorized
+    // page; a path that ends on a category (no trailing page) is not a
+    // page lookup and returns null.
+    const segments = input.slug.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean)
+    if (segments.length === 0) return null
+    const { category, remaining } = walkCategorySegments(tree, segments)
+    if (remaining.length !== 1) return null
+    page = (await findPageInCategory(category?.id ?? null, remaining[0]!)) ?? undefined
   } else {
     return null
   }
-
-  const page = await pageQuery
-    .orderBy('menu_order', 'asc')
-    .orderBy('created', 'asc')
-    .executeTakeFirst()
   if (!page) return null
 
-  const [translations, tree] = await Promise.all([
-    db
-      .selectFrom('page_translations')
-      .selectAll()
-      .where('page_id', '=', page.id)
-      .orderBy('locale', 'asc')
-      .execute(),
-    loadCategoryTree()
-  ])
+  const translations = await db
+    .selectFrom('page_translations')
+    .selectAll()
+    .where('page_id', '=', page.id)
+    .orderBy('locale', 'asc')
+    .execute()
 
   const categoryPath = page.category_id ? categoryUrlPath(tree, page.category_id) : null
   const categorySlug = page.category_id ? (tree.byId.get(page.category_id)?.slug ?? null) : null

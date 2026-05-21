@@ -124,9 +124,15 @@ export function descendantCategoryIds(
   rootId: string
 ): string[] {
   const out: string[] = []
+  // `seen` guards against a back-edge in malformed data (a descendant
+  // re-parented onto an ancestor). Without it the stack would cycle
+  // forever and grow `out` unbounded.
+  const seen = new Set<string>()
   const stack: string[] = [rootId]
   while (stack.length) {
     const id = stack.pop()!
+    if (seen.has(id)) continue
+    seen.add(id)
     out.push(id)
     const children = tree.childrenByParent.get(id) ?? []
     for (const c of children) stack.push(c.id)
