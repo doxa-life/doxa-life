@@ -31,6 +31,6 @@ export const SECONDARY_NAV: NavItem[] = [
   { key: 'Research', to: '/research' },
   { key: 'Pray', to: '/pray' },
   { key: 'Adopt', to: '/adopt' },
-  { key: 'Adoption Resources', to: '/resources' },
+  { key: 'Resources', to: '/resources' },
   { key: 'Give', href: 'https://giving.ag.org/donate/600001-6C2327?utm_source=direct_link' }
 ]
