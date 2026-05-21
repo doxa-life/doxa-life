@@ -14,16 +14,16 @@ export default defineEventHandler(async (event) => {
   if (!id) throw createError({ statusCode: 400, statusMessage: 'id is required' })
 
   try {
-    const { slug, categoryId } = await deleteCmsPage(id)
+    const { slug, url, categoryId } = await deleteCmsPage(id)
     logEvent({
       eventType: 'DELETE',
       tableName: 'pages',
       recordId: id,
       userId: authUser.userId,
       userAgent: getHeader(event, 'user-agent') || undefined,
-      metadata: { slug, source: 'admin-ui' }
+      metadata: { slug, url, source: 'admin-ui' }
     })
-    await applyPageInvalidations([slug], categoryId ? [categoryId] : [])
+    await applyPageInvalidations([url], categoryId ? [categoryId] : [])
     return { ok: true }
   } catch (e: any) {
     if (e?.statusCode) {

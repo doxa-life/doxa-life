@@ -12,6 +12,7 @@ import { ENABLED_LANGUAGE_CODES } from '../../../../config/languages'
 
 interface Body {
   slug?: string
+  parent_id?: string | null
   menu_order?: number
   translations?: Record<string, { name?: string }> | Array<{ locale: string; name: string }>
 }
@@ -45,6 +46,7 @@ export default defineEventHandler(async (event) => {
     const result = await updateCmsCategory({
       id,
       slug: body?.slug != null ? String(body.slug) : undefined,
+      parent_id: body?.parent_id === undefined ? undefined : (body.parent_id ? String(body.parent_id) : null),
       menu_order: body?.menu_order !== undefined ? (Number(body.menu_order) || 0) : undefined,
       translations
     })
@@ -56,7 +58,7 @@ export default defineEventHandler(async (event) => {
       userId: authUser.userId,
       userAgent: getHeader(event, 'user-agent') || undefined,
       metadata: {
-        changes: (['slug', 'menu_order', 'translations'] as const).filter(k => body?.[k] !== undefined),
+        changes: (['slug', 'parent_id', 'menu_order', 'translations'] as const).filter(k => body?.[k] !== undefined),
         slugsPurged: result.slugsToPurge.length,
         source: 'admin-ui'
       }
