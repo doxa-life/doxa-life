@@ -19,6 +19,24 @@ const adoptBase = computed(() => {
 const { stats, adoptedPercent, reload } = usePrayerStatistics()
 onMounted(() => reload())
 
+const config = useRuntimeConfig()
+const mapboxToken = config.public.mapboxToken as string
+
+const adoptMapConfig = JSON.stringify({
+  profile: 'doxa-simple-map',
+  dataSource: 'pray-tools',
+  tk: mapboxToken,
+  tabs: [{ id: 'adoption', colorStrategy: 'adoption', legend: 'adoption', popup: 'adoption' }]
+})
+
+const adoptFeedbackConfig = JSON.stringify({
+  profile: 'chat-bubble',
+  apiBase: 'https://support.gospelambition.org',
+  enabled: true,
+  instanceId: 'fb-adopt-map',
+  projectId: 'dd1d9144-3da9-4a3b-87e8-7c17d9e94af0'
+})
+
 useTextHighlight()
 </script>
 
@@ -59,6 +77,26 @@ useTextHighlight()
           />
         </div>
       </div>
+    </section>
+
+    <section class="stack stack--md container">
+      <div>
+        <h1
+          class="color-brand-light highlight"
+          data-highlight-index="1"
+          data-highlight-last
+          data-highlight-color="primary"
+        >{{ t('Adoption Progress') }}</h1>
+      </div>
+      <DoxaMapSlot map-id="adopt-map" :profile-config="adoptMapConfig" class="rounded-md">
+        <FeedbackWidgetSlot :profile-config="adoptFeedbackConfig" />
+      </DoxaMapSlot>
+      <NuxtLink
+        :to="localePath('/research')"
+        class="research-map-link"
+      >
+        Explore our research maps →
+      </NuxtLink>
     </section>
 
     <section class="surface-brand-light">
@@ -261,3 +299,18 @@ useTextHighlight()
     </section>
   </div>
 </template>
+
+<style scoped>
+.research-map-link {
+  display: block;
+  margin-top: 0.75rem;
+  text-align: right;
+  font-size: 1.2rem;
+  color: var(--color-brand-primary, #3b463d);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.research-map-link:hover {
+  color: var(--color-brand-primary-darker, #1f2328);
+}
+</style>

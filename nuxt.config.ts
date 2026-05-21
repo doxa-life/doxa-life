@@ -39,6 +39,10 @@ const marketingRouteRules = Object.fromEntries(
 )
 
 export default defineNuxtConfig({
+  // Embeddables (micro-frontends + web-components) have their own Vite builds —
+  // Nuxt must not watch or scan their source trees.
+  ignore: ['embeddables/**'],
+
   extends: [
     process.env.OAUTH_LAYER_PATH || ['github:corsacca/nuxt-blueprints/layers/oauth#master', {
       giget: { dir: `${LAYERS_DIR}/oauth`, forceClean: true }
@@ -229,6 +233,12 @@ export default defineNuxtConfig({
     s3PublicBaseUrl: process.env.S3_PUBLIC_BASE_URL || '',
     formApiKey: process.env.FORM_API_KEY || '',
     prayBaseUrl: process.env.NUXT_PRAY_BASE_URL || 'https://pray.doxa.life',
+    // Mapbox key — server-only. Can be a public key (pk.*) or a secret
+    // key (sk.*); the /api/maps/token endpoint passes pk.* through and
+    // mints temporary tk.* tokens from sk.* via Mapbox Tokens API. If
+    // unset, the endpoint falls back to public.mapboxToken below so
+    // existing setups keep working with no config change.
+    mapboxKey: process.env.NUXT_MAPBOX_KEY || '',
     deeplApiKey: process.env.DEEPL_API_KEY || '',
     deeplApiUrl: process.env.DEEPL_API_URL || 'https://api.deepl.com',
     // Cloudflare cache purge on deploy (server/plugins/cloudflare-purge.ts).
@@ -263,7 +273,7 @@ export default defineNuxtConfig({
 
   vue: {
     compilerOptions: {
-      isCustomElement: (tag: string) => ['feedback-web-component'].includes(tag)
+      isCustomElement: (tag: string) => ['doxa-map', 'doxa-research-map', 'feedback-web-component'].includes(tag)
     }
   },
 
@@ -273,6 +283,13 @@ export default defineNuxtConfig({
         '@vue/devtools-core',
         '@vue/devtools-kit'
       ]
+    },
+    vue: {
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag: string) => ['doxa-map', 'doxa-research-map', 'feedback-web-component'].includes(tag)
+        }
+      }
     }
   },
 

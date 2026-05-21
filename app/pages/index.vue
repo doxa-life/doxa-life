@@ -9,6 +9,7 @@ import { getVideoUrl } from '~/utils/videoUrls'
 
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
+const config = useRuntimeConfig()
 
 const videoModalRef = ref<{ open: () => void; close: () => void } | null>(null)
 const videoUrl = computed(() => getVideoUrl(locale.value))
@@ -16,6 +17,23 @@ const videoUrl = computed(() => getVideoUrl(locale.value))
 function openVideo() {
   videoModalRef.value?.open()
 }
+
+const mapboxToken = config.public.mapboxToken as string
+
+const homeMapConfig = JSON.stringify({
+  profile: 'doxa-simple-map',
+  dataSource: 'pray-tools',
+  tk: mapboxToken,
+  tabs: [{ id: 'engagement', colorStrategy: 'engagement', legend: 'engagement', popup: 'engagement' }]
+})
+
+const homeFeedbackConfig = JSON.stringify({
+  profile: 'chat-bubble',
+  apiBase: 'https://support.gospelambition.org',
+  enabled: true,
+  instanceId: 'fb-home-map',
+  projectId: '7bb8f5ba-eb45-4933-89de-bc93fcda09b2'
+})
 
 useTextHighlight()
 </script>
@@ -58,6 +76,27 @@ useTextHighlight()
       <p class="text-center color-primary uppercase font-button font-weight-medium">
         {{ t('The DOXA Vision: Click image to watch the video') }}
       </p>
+    </section>
+
+    <section class="stack stack--md container">
+      <div>
+        <h2 class="color-brand">{{ t('Where are they?') }}</h2>
+        <h1
+          class="color-brand-light highlight"
+          data-highlight-index="1"
+          data-highlight-last
+          data-highlight-color="primary"
+        >{{ t('Unengaged peoples around the world') }}</h1>
+      </div>
+      <DoxaMapSlot map-id="home-map" :profile-config="homeMapConfig" class="rounded-xlg">
+        <FeedbackWidgetSlot :profile-config="homeFeedbackConfig" />
+      </DoxaMapSlot>
+      <NuxtLink
+        :to="localePath('/research')"
+        class="research-map-link"
+      >
+        Explore our research maps →
+      </NuxtLink>
     </section>
 
     <section class="stack stack--md | surface-brand-light">
@@ -288,3 +327,18 @@ useTextHighlight()
     />
   </div>
 </template>
+
+<style scoped>
+.research-map-link {
+  display: block;
+  margin-top: 0.75rem;
+  text-align: right;
+  font-size: 1.2rem;
+  color: var(--color-brand-primary, #3b463d);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.research-map-link:hover {
+  color: var(--color-brand-primary-darker, #1f2328);
+}
+</style>

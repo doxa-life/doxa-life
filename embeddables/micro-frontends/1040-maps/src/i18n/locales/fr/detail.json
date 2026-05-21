@@ -1,0 +1,12 @@
+{
+  "labels": {
+    "country": "Pays :",
+    "population": "Population :",
+    "language": "Langue :",
+    "religion": "Religion :",
+    "languageFamily": "Famille de langues :"
+  },
+  "messages": {
+    "noDescription": "Aucune description disponible."
+  }
+}
