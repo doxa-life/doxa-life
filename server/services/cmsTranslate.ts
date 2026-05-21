@@ -214,7 +214,7 @@ export async function translatePage(input: TranslatePageInput): Promise<Translat
       // keeps the invalidation contract identical to admin's pre-
       // unification behavior — locales that errored or were skipped
       // never had their cache touched.
-      await applyTranslationInvalidations(upserted.pageSlug, upserted.categoryId, target)
+      await applyTranslationInvalidations(upserted.pageUrl, upserted.categoryId, target)
 
       results.push({ locale: target, ok: true })
     } catch (e: unknown) {

@@ -64,7 +64,7 @@ export default defineEventHandler(async (event) => {
       metadata: { page_id: id, locale, status: result.translation.status, source: 'admin-ui' }
     })
 
-    await applyTranslationInvalidations(result.pageSlug, result.categoryId, locale)
+    await applyTranslationInvalidations(result.pageUrl, result.categoryId, locale)
     return {
       ...result.translation,
       sanitization_warnings: result.sanitizationWarnings

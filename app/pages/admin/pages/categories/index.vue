@@ -11,6 +11,10 @@ definePageMeta({
 interface CategoryRow {
   id: string
   slug: string
+  url: string
+  parent_id: string | null
+  parent_path: string | null
+  parent_label: string | null
   menu_order: number
   translations: Array<{ locale: string; name: string; updated: string }>
   page_count: number
@@ -29,6 +33,35 @@ const { data, pending, error, refresh } = await useFetch<{ rows: CategoryRow[] }
 function englishName(row: CategoryRow): string {
   return row.translations.find(t => t.locale === 'en')?.name ?? row.slug
 }
+
+// Group categories by parent so the table renders a tree (root rows
+// followed by their children, indented). Walks from each root and
+// emits descendants depth-first.
+const sortedRows = computed<Array<CategoryRow & { depth: number }>>(() => {
+  const all = data.value?.rows ?? []
+  if (all.length === 0) return []
+  const byParent = new Map<string | null, CategoryRow[]>()
+  for (const row of all) {
+    const key = row.parent_id ?? null
+    const list = byParent.get(key) ?? []
+    list.push(row)
+    byParent.set(key, list)
+  }
+  for (const list of byParent.values()) {
+    list.sort((a, b) =>
+      a.menu_order - b.menu_order || a.slug.localeCompare(b.slug)
+    )
+  }
+  const out: Array<CategoryRow & { depth: number }> = []
+  function walk(parentId: string | null, depth: number) {
+    for (const row of byParent.get(parentId) ?? []) {
+      out.push({ ...row, depth })
+      walk(row.id, depth + 1)
+    }
+  }
+  walk(null, 0)
+  return out
+})
 
 // Delete flow — blocked server-side if any pages still belong to the
 // category, so we surface the 409 message directly.
@@ -93,7 +126,7 @@ async function confirmDelete() {
         <thead class="bg-(--ui-bg-elevated) text-(--ui-text-muted)">
           <tr>
             <th class="text-left px-3 py-2 font-medium">Name (EN)</th>
-            <th class="text-left px-3 py-2 font-medium">Slug</th>
+            <th class="text-left px-3 py-2 font-medium">URL</th>
             <th class="text-left px-3 py-2 font-medium">Translations</th>
             <th class="text-left px-3 py-2 font-medium">Pages</th>
             <th class="text-right px-3 py-2 font-medium">Actions</th>
@@ -101,13 +134,18 @@ async function confirmDelete() {
         </thead>
         <tbody>
           <tr
-            v-for="row in data.rows"
+            v-for="row in sortedRows"
             :key="row.id"
             class="border-t border-(--ui-border) hover:bg-(--ui-bg-elevated) cursor-pointer"
             @click="router.push(`/admin/pages/categories/${row.id}`)"
           >
-            <td class="px-3 py-2">{{ englishName(row) }}</td>
-            <td class="px-3 py-2 font-mono">{{ row.slug }}</td>
+            <td class="px-3 py-2">
+              <span :style="{ paddingLeft: `${row.depth * 1.25}rem` }">
+                <span v-if="row.depth > 0" class="text-(--ui-text-muted) mr-1">↳</span>
+                {{ englishName(row) }}
+              </span>
+            </td>
+            <td class="px-3 py-2 font-mono text-xs">/{{ row.url }}</td>
             <td class="px-3 py-2">
               <div class="flex flex-wrap gap-1">
                 <UBadge
