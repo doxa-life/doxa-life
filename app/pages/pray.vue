@@ -31,6 +31,7 @@ const prayFeedbackConfig = JSON.stringify({
   profile: 'chat-bubble',
   apiBase: 'https://support.gospelambition.org',
   enabled: true,
+  showByDefault: false,
   instanceId: 'fb-pray-map',
   projectId: '809ee16b-46e2-4bcd-a93d-b7ea0879d93d'
 })
