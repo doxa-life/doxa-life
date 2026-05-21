@@ -461,6 +461,44 @@ export async function reorderCategoryPages(
   })
 }
 
+// Bulk-reorder sibling categories under a shared parent (or the root
+// level when parentId is null). Enforces that every passed id is
+// actually a sibling at that level so a malformed client payload can't
+// reshuffle menu_order across the tree or smuggle in a child.
+export async function reorderCategories(
+  parentId: string | null,
+  categoryIds: string[]
+): Promise<void> {
+  if (categoryIds.length === 0) return
+
+  await db.transaction().execute(async trx => {
+    let q = trx
+      .selectFrom('categories')
+      .select('id')
+      .where('id', 'in', categoryIds)
+    q = parentId === null
+      ? q.where('parent_id', 'is', null)
+      : q.where('parent_id', '=', parentId)
+    const existing = await q.execute()
+    if (existing.length !== categoryIds.length) {
+      throw Object.assign(
+        new Error('Some category IDs are not siblings at this level'),
+        { statusCode: 400 }
+      )
+    }
+
+    for (let i = 0; i < categoryIds.length; i++) {
+      const categoryId = categoryIds[i]
+      if (!categoryId) continue
+      await trx
+        .updateTable('categories')
+        .set({ menu_order: i, updated: sql`now()` })
+        .where('id', '=', categoryId)
+        .execute()
+    }
+  })
+}
+
 // Convenience helper for mutation endpoints that may touch many slugs
 // at once (category rename cascades, bulk reorders, cross-category
 // moves). Dedupes and purges each slug across all enabled locales.
