@@ -102,7 +102,6 @@ const categoryItems = computed(() => [
 // Metadata editable in the top bar
 const slug = ref('')
 const categoryId = ref<string | null>(null)
-const menuOrder = ref(0)
 const theme = ref<PageTheme>('default')
 const customCss = ref('')
 // Original category id at load time — used to detect moves that also
@@ -113,7 +112,6 @@ watchEffect(() => {
     slug.value = data.value.page.slug
     categoryId.value = data.value.page.category_id
     originalCategoryId.value = data.value.page.category_id
-    menuOrder.value = data.value.page.menu_order
     theme.value = data.value.page.theme ?? 'default'
     customCss.value = data.value.page.custom_css ?? ''
   }
@@ -235,7 +233,6 @@ async function saveAll(statusOverride?: 'draft' | 'published', localeOverride?: 
       body: {
         slug: slug.value,
         category_id: categoryId.value,
-        menu_order: menuOrder.value,
         theme: theme.value,
         custom_css: customCss.value.trim() ? customCss.value : null
       }
@@ -252,10 +249,10 @@ async function saveAll(statusOverride?: 'draft' | 'published', localeOverride?: 
     }
     if (statusOverride) body.status = statusOverride
 
-    await $fetch(`/api/admin/pages/${pageId.value}/translations/${locale}`, {
-      method: 'PUT',
-      body
-    })
+    const saveResponse = await $fetch<{ sanitization_warnings?: { path: string; reason: string }[] }>(
+      `/api/admin/pages/${pageId.value}/translations/${locale}`,
+      { method: 'PUT', body }
+    )
     if (statusOverride) f.status = statusOverride
     f.loaded = true
     f.dirty = false
@@ -266,6 +263,17 @@ async function saveAll(statusOverride?: 'draft' | 'published', localeOverride?: 
         ? 'Unpublished'
         : 'Saved'
     toast.add({ title: `${verb} ${locale}`, color: 'success' })
+
+    const warnings = saveResponse?.sanitization_warnings ?? []
+    if (warnings.length > 0) {
+      const example = warnings[0]?.reason ?? ''
+      toast.add({
+        title: 'Some formatting was simplified',
+        description: `${warnings.length} change${warnings.length === 1 ? '' : 's'} on save${example ? ` — e.g. ${example}` : ''}`,
+        color: 'warning'
+      })
+    }
+
     await refresh()
     return true
   } catch (e: any) {
@@ -674,9 +682,6 @@ function formatVersionTime(iso: string): string {
                   <UInput v-model="slug" class="flex-1 min-w-0" />
                 </div>
                 <UInput v-else v-model="slug" class="w-full" />
-              </UFormField>
-              <UFormField label="Menu order" description="Position within the category sidebar.">
-                <UInput v-model.number="menuOrder" type="number" />
               </UFormField>
               <UFormField label="Page theme" description="Applied to <body>.">
                 <USelect v-model="theme" :items="THEME_OPTIONS" class="w-full" />

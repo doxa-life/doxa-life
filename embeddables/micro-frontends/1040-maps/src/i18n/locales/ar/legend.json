@@ -1,0 +1,35 @@
+{
+  "title": {
+    "prayer": "تقدم الصلاة",
+    "engagement": "تقدم الانخراط",
+    "adoption": "تقدم التبني",
+    "languageFamilies": "العائلات اللغوية",
+    "doxaRegions": "مناطق Doxa",
+    "affinityBlocs": "كتل القرابة",
+    "gospelResources": "موارد الإنجيل"
+  },
+  "header": {
+    "collapsed": "وسيلة الإيضاح",
+    "peopleGroupFallback": "مجموعة الشعب"
+  },
+  "prayer": {
+    "needsPrayer": "يحتاج إلى صلاة",
+    "hasPrayer": "لديه صلاة",
+    "fullPrayerCoverage": "تغطية صلاة كاملة"
+  },
+  "engagement": {
+    "needsEngagement": "يحتاج إلى انخراط",
+    "hasEngagement": "لديه انخراط"
+  },
+  "adoption": {
+    "needsAdoption": "يحتاج إلى تبني",
+    "hasAdoption": "لديه تبني"
+  },
+  "columns": {
+    "upgs": "UPGs",
+    "population": "السكان"
+  },
+  "footer": {
+    "total": "الإجمالي"
+  }
+}

@@ -9,7 +9,7 @@ import { ENABLED_LANGUAGE_CODES } from '~~/config/languages'
 import { purgeCmsPage, purgeCmsCategory } from '../utils/cmsCache'
 import type { PageTranslation } from '../database/pages'
 import { detectLossy } from '../utils/tiptapLossyDetector'
-import { tiptapValidate } from '../utils/tiptapValidate'
+import { tiptapValidate, type SanitizationWarning } from '../utils/tiptapValidate'
 import { markdownToTiptap } from '../utils/tiptapFromMarkdown'
 import { isSafeHttpUrl as isSafeUrl } from '../utils/urlValidation'
 import { loadCategoryTree, pageUrlPath } from '../database/categoryTree'
@@ -53,6 +53,9 @@ export interface UpsertTranslationResult {
   categoryId: string | null
   lossyOverwriteApplied: boolean
   droppedReasons: string[]
+  // Sanitizer notes from tiptapValidate — attrs/marks/nodes that were
+  // dropped from the body before storage. Empty when the input was clean.
+  sanitizationWarnings: SanitizationWarning[]
 }
 
 const URL_BEARING_FIELDS: ReadonlyArray<keyof UpsertTranslationInput> = [
@@ -89,10 +92,11 @@ export async function upsertCmsPageTranslation(input: UpsertTranslationInput): P
   let droppedReasons: string[] = []
   let lossyOverwriteApplied = false
   let body_json: Record<string, unknown>
+  const sanitizationWarnings: SanitizationWarning[] = []
 
   if (hasJson) {
     body_json = input.body_json as Record<string, unknown>
-    tiptapValidate(body_json)
+    sanitizationWarnings.push(...tiptapValidate(body_json).warnings)
   } else {
     // Markdown path — refuse to overwrite a lossy body unless the
     // operator acknowledges via allow_lossy_overwrite.
@@ -113,7 +117,7 @@ export async function upsertCmsPageTranslation(input: UpsertTranslationInput): P
       throw err(400, 'body_markdown must be ≤ 1 MB')
     }
     body_json = markdownToTiptap(input.body_markdown ?? '') as unknown as Record<string, unknown>
-    tiptapValidate(body_json)
+    sanitizationWarnings.push(...tiptapValidate(body_json).warnings)
   }
 
   // Field-size guards (post-validate so we don't leak sanitized
@@ -207,7 +211,8 @@ export async function upsertCmsPageTranslation(input: UpsertTranslationInput): P
     pageSlug: page.slug,
     categoryId: page.category_id,
     lossyOverwriteApplied,
-    droppedReasons
+    droppedReasons,
+    sanitizationWarnings
   }
 }
 

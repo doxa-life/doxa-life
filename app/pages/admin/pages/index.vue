@@ -58,7 +58,6 @@ function categoryLabel(cat: CategoryRow): string {
 const createModalOpen = ref(false)
 const newSlugLeaf = ref('')
 const newCategoryId = ref<string | null>(null)
-const newMenuOrder = ref(0)
 const creating = ref(false)
 
 const newCategoryPrefix = computed(() => {
@@ -82,7 +81,6 @@ const categoryItems = computed(() => [
 function resetCreateForm() {
   newSlugLeaf.value = ''
   newCategoryId.value = null
-  newMenuOrder.value = 0
 }
 
 async function createPage() {
@@ -98,8 +96,7 @@ async function createPage() {
       method: 'POST',
       body: {
         slug: leaf,
-        category_id: newCategoryId.value,
-        menu_order: newMenuOrder.value || 0
+        category_id: newCategoryId.value
       }
     })
     toast.add({ title: 'Page created', color: 'success' })
@@ -229,7 +226,8 @@ const filteredRows = computed<PageRow[]>(() => {
           <tr
             v-for="row in filteredRows"
             :key="row.id"
-            class="border-t border-(--ui-border) hover:bg-(--ui-bg-elevated)"
+            class="border-t border-(--ui-border) hover:bg-(--ui-bg-elevated) cursor-pointer"
+            @click="router.push(`/admin/pages/${row.id}`)"
           >
             <td class="px-3 py-2">
               <span v-if="row.title_en">{{ row.title_en }}</span>
@@ -246,7 +244,7 @@ const filteredRows = computed<PageRow[]>(() => {
               </UBadge>
             </td>
             <td class="px-3 py-2 text-(--ui-text-muted)">{{ formatDate(row.updated) }}</td>
-            <td class="px-3 py-2 text-right">
+            <td class="px-3 py-2 text-right" @click.stop>
               <UButton
                 size="xs"
                 variant="outline"
@@ -279,9 +277,6 @@ const filteredRows = computed<PageRow[]>(() => {
               <UInput v-model="newSlugLeaf" :placeholder="newCategoryId ? 'vision' : 'privacy'" class="flex-1 min-w-0" />
             </div>
             <UInput v-else v-model="newSlugLeaf" :placeholder="newCategoryId ? 'vision' : 'privacy'" class="w-full" />
-          </UFormField>
-          <UFormField label="Menu order" description="Sort order within the category sidebar.">
-            <UInput v-model.number="newMenuOrder" type="number" />
           </UFormField>
         </div>
       </template>

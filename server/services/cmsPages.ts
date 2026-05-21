@@ -339,12 +339,26 @@ export async function createCmsPage(
     }
     await validatePageSlug(slug, { categoryId: input.category_id ?? null }, tx)
 
+    // New pages append to the bottom of their category. When the caller
+    // does not pin a menu_order, take MAX(menu_order)+1 within the same
+    // scope (category_id, or NULL for uncategorized) so the page sorts
+    // last. coalesce(..., -1) makes the first page in an empty scope 0.
+    let menuOrder = input.menu_order
+    if (menuOrder === undefined) {
+      const maxRow = await (input.category_id
+        ? tx.selectFrom('pages').where('category_id', '=', input.category_id)
+        : tx.selectFrom('pages').where('category_id', 'is', null))
+        .select(sql<number>`coalesce(max(menu_order), -1)`.as('max'))
+        .executeTakeFirstOrThrow()
+      menuOrder = Number(maxRow.max) + 1
+    }
+
     const page = await tx
       .insertInto('pages')
       .values({
         slug: input.slug,
         category_id: input.category_id ?? null,
-        menu_order: input.menu_order ?? 0,
+        menu_order: menuOrder,
         ...(input.theme ? { theme: input.theme } : {}),
         ...(input.custom_css !== undefined ? { custom_css: input.custom_css } : {})
       })

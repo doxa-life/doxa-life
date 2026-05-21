@@ -108,6 +108,7 @@ export const createPageTool = defineMcpTool({
   input: createPageInput,
   async handler(input, ctx) {
     let inlineTranslation: Parameters<typeof createCmsPage>[0]['translation']
+    let inlineWarningCount = 0
     if (input.translation) {
       // Zod's inlineTranslationInput.refine() already enforces exactly
       // one of body_json / body_markdown, so we never reach this code
@@ -115,7 +116,8 @@ export const createPageTool = defineMcpTool({
       const body_json: Record<string, unknown> = input.translation.body_json
         ? (input.translation.body_json as Record<string, unknown>)
         : (markdownToTiptap(input.translation.body_markdown!) as unknown as Record<string, unknown>)
-      tiptapValidate(body_json)
+      const { warnings } = tiptapValidate(body_json)
+      inlineWarningCount = warnings.length
       inlineTranslation = {
         locale: input.translation.locale,
         title: input.translation.title,
@@ -155,8 +157,11 @@ export const createPageTool = defineMcpTool({
 
     await applyPageInvalidations(created.slugsToPurge, created.categoriesToPurge)
 
+    const warningSuffix = inlineWarningCount > 0
+      ? `; ${inlineWarningCount} formatting fix${inlineWarningCount === 1 ? '' : 'es'} applied`
+      : ''
     return {
-      content: [{ type: 'text', text: `Created page "${created.page.slug}"` }],
+      content: [{ type: 'text', text: `Created page "${created.page.slug}"${warningSuffix}` }],
       structuredContent: {
         page: created.page,
         translation: created.translation

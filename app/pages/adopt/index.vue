@@ -16,8 +16,34 @@ const adoptBase = computed(() => {
   return p.endsWith('/') ? p : `${p}/`
 })
 
-const { stats, adoptedPercent, reload } = usePrayerStatistics()
+const {
+  stats,
+  adoptedPercent,
+  totalPeopleGroups,
+  reload,
+  ensureLoaded
+} = usePrayerStatistics()
+await ensureLoaded()
 onMounted(() => reload())
+
+const config = useRuntimeConfig()
+const mapboxToken = config.public.mapboxToken as string
+
+const adoptMapConfig = JSON.stringify({
+  profile: 'doxa-simple-map',
+  dataSource: 'pray-tools',
+  tk: mapboxToken,
+  tabs: [{ id: 'adoption', colorStrategy: 'adoption', legend: 'adoption', popup: 'adoption' }]
+})
+
+const adoptFeedbackConfig = JSON.stringify({
+  profile: 'chat-bubble',
+  apiBase: 'https://support.gospelambition.org',
+  enabled: true,
+  showByDefault: false,
+  instanceId: 'fb-adopt-map',
+  projectId: 'dd1d9144-3da9-4a3b-87e8-7c17d9e94af0'
+})
 
 useTextHighlight()
 </script>
@@ -39,7 +65,7 @@ useTextHighlight()
             <div>
               <h2 class="h3">{{ t('Current Status') }}</h2>
               <span class="font-size-4xl font-weight-bold font-button">
-                <span id="adopted-current-status">{{ stats.total_adopted }}</span> / 2085
+                <span id="adopted-current-status">{{ stats.total_adopted }}</span> / {{ totalPeopleGroups }}
               </span>
               <div class="stack stack--3xs">
                 <p class="subtext font-size-md">{{ t('people groups adopted') }}</p>
@@ -55,10 +81,30 @@ useTextHighlight()
           </div>
           <div
             class="grow-2 bg-image rounded-md"
-            style="background-image: url('/assets/images/adopt-01-africa-4women.jpg');"
+            style="background-image: url('/assets/images/adopt-01-africa-4women.jpg'); background-image: image-set(url('/assets/images/adopt-01-africa-4women.avif') type('image/avif'), url('/assets/images/adopt-01-africa-4women.webp') type('image/webp'), url('/assets/images/adopt-01-africa-4women.jpg') type('image/jpeg'));"
           />
         </div>
       </div>
+    </section>
+
+    <section class="stack stack--md container">
+      <div>
+        <h1
+          class="color-brand-light highlight"
+          data-highlight-index="1"
+          data-highlight-last
+          data-highlight-color="primary"
+        >{{ t('Adoption Progress') }}</h1>
+      </div>
+      <DoxaMapSlot map-id="adopt-map" :profile-config="adoptMapConfig" class="rounded-md">
+        <FeedbackWidgetSlot :profile-config="adoptFeedbackConfig" />
+      </DoxaMapSlot>
+      <NuxtLink
+        :to="localePath('/research')"
+        class="research-map-link"
+      >
+        Explore our research maps →
+      </NuxtLink>
     </section>
 
     <section class="surface-brand-light">
@@ -106,7 +152,24 @@ useTextHighlight()
             </div>
           </div>
           <div>
-            <img class="center" src="/assets/images/adopt-02-ipad-mockup.png" :alt="t('Your daily prayer guide')">
+            <picture>
+              <source
+                srcset="/assets/images/adopt-02-ipad-mockup.avif"
+                type="image/avif"
+              >
+              <source
+                srcset="/assets/images/adopt-02-ipad-mockup.webp"
+                type="image/webp"
+              >
+              <img
+                class="center"
+                src="/assets/images/adopt-02-ipad-mockup.png"
+                :alt="t('Your daily prayer guide')"
+                width="500"
+                height="672"
+                loading="lazy"
+              >
+            </picture>
           </div>
         </div>
       </div>
@@ -118,7 +181,23 @@ useTextHighlight()
           <h2>{{ t('Why adoption matters') }}</h2>
           <div class="switcher | gap-md" data-width="xl">
             <div class="switcher-item center grow-none">
-              <img src="/assets/images/Adopt-03-DurbetInMongolia.jpg" :alt="t('Adopt an unengaged people group')">
+              <picture>
+                <source
+                  srcset="/assets/images/Adopt-03-DurbetInMongolia.avif"
+                  type="image/avif"
+                >
+                <source
+                  srcset="/assets/images/Adopt-03-DurbetInMongolia.webp"
+                  type="image/webp"
+                >
+                <img
+                  src="/assets/images/Adopt-03-DurbetInMongolia.jpg"
+                  :alt="t('Adopt an unengaged people group')"
+                  width="150"
+                  height="188"
+                  loading="lazy"
+                >
+              </picture>
             </div>
             <div class="stack stack--lg | text-card | surface-brand-lightest justify-center">
               <h4 class="font-heading font-size-2xl">{{ t('They have no gospel access') }}</h4>
@@ -127,7 +206,23 @@ useTextHighlight()
           </div>
           <div class="switcher | gap-md" data-width="xl">
             <div class="switcher-item center grow-none">
-              <img src="/assets/images/Adopt-04-Maha-Brahmin-in-India.jpg" :alt="t('Adopt an unengaged people group')">
+              <picture>
+                <source
+                  srcset="/assets/images/Adopt-04-Maha-Brahmin-in-India.avif"
+                  type="image/avif"
+                >
+                <source
+                  srcset="/assets/images/Adopt-04-Maha-Brahmin-in-India.webp"
+                  type="image/webp"
+                >
+                <img
+                  src="/assets/images/Adopt-04-Maha-Brahmin-in-India.jpg"
+                  :alt="t('Adopt an unengaged people group')"
+                  width="150"
+                  height="188"
+                  loading="lazy"
+                >
+              </picture>
             </div>
             <div class="stack stack--lg | text-card | surface-brand-lightest justify-center">
               <h4 class="font-heading font-size-2xl overflow-wrap-anywhere">{{ t('Prayer opens the door for engagement') }}</h4>
@@ -136,7 +231,23 @@ useTextHighlight()
           </div>
           <div class="switcher | gap-md" data-width="xl">
             <div class="switcher-item center grow-none">
-              <img src="/assets/images/Adopt-05-KamaraInGhana.jpg" :alt="t('Adopt an unengaged people group')">
+              <picture>
+                <source
+                  srcset="/assets/images/Adopt-05-KamaraInGhana.avif"
+                  type="image/avif"
+                >
+                <source
+                  srcset="/assets/images/Adopt-05-KamaraInGhana.webp"
+                  type="image/webp"
+                >
+                <img
+                  src="/assets/images/Adopt-05-KamaraInGhana.jpg"
+                  :alt="t('Adopt an unengaged people group')"
+                  width="150"
+                  height="188"
+                  loading="lazy"
+                >
+              </picture>
             </div>
             <div class="stack stack--lg | text-card | surface-brand-lightest justify-center">
               <h4 class="font-heading font-size-2xl">{{ t("Churches become active partners in God's mission") }}</h4>
@@ -174,9 +285,40 @@ useTextHighlight()
           <figcaption>- {{ t('Jesus') }}</figcaption>
         </figure>
         <div>
-          <img src="/assets/images/adopt-bottom-banner.jpg" :alt="t('Jesus')">
+          <picture>
+            <source
+              srcset="/assets/images/adopt-bottom-banner.avif"
+              type="image/avif"
+            >
+            <source
+              srcset="/assets/images/adopt-bottom-banner.webp"
+              type="image/webp"
+            >
+            <img
+              src="/assets/images/adopt-bottom-banner.jpg"
+              :alt="t('Jesus')"
+              width="1200"
+              height="341"
+              loading="lazy"
+            >
+          </picture>
         </div>
       </div>
     </section>
   </div>
 </template>
+
+<style scoped>
+.research-map-link {
+  display: block;
+  margin-top: 0.75rem;
+  text-align: right;
+  font-size: 1.2rem;
+  color: var(--color-brand-primary, #3b463d);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.research-map-link:hover {
+  color: var(--color-brand-primary-darker, #1f2328);
+}
+</style>
