@@ -19,6 +19,7 @@ interface CategoryRow {
 }
 
 const toast = useToast()
+const router = useRouter()
 
 const { data, pending, error, refresh } = await useFetch<{ rows: CategoryRow[] }>(
   '/api/admin/categories',
@@ -102,7 +103,8 @@ async function confirmDelete() {
           <tr
             v-for="row in data.rows"
             :key="row.id"
-            class="border-t border-(--ui-border) hover:bg-(--ui-bg-elevated)"
+            class="border-t border-(--ui-border) hover:bg-(--ui-bg-elevated) cursor-pointer"
+            @click="router.push(`/admin/pages/categories/${row.id}`)"
           >
             <td class="px-3 py-2">{{ englishName(row) }}</td>
             <td class="px-3 py-2 font-mono">{{ row.slug }}</td>
@@ -124,7 +126,7 @@ async function confirmDelete() {
                 {{ row.page_count }}
               </UBadge>
             </td>
-            <td class="px-3 py-2 text-right">
+            <td class="px-3 py-2 text-right" @click.stop>
               <div class="flex justify-end gap-1">
                 <UButton
                   size="xs"

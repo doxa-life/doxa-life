@@ -222,7 +222,8 @@ const filteredRows = computed<PageRow[]>(() => {
           <tr
             v-for="row in filteredRows"
             :key="row.id"
-            class="border-t border-(--ui-border) hover:bg-(--ui-bg-elevated)"
+            class="border-t border-(--ui-border) hover:bg-(--ui-bg-elevated) cursor-pointer"
+            @click="router.push(`/admin/pages/${row.id}`)"
           >
             <td class="px-3 py-2">
               <span v-if="row.title_en">{{ row.title_en }}</span>
@@ -239,7 +240,7 @@ const filteredRows = computed<PageRow[]>(() => {
               </UBadge>
             </td>
             <td class="px-3 py-2 text-(--ui-text-muted)">{{ formatDate(row.updated) }}</td>
-            <td class="px-3 py-2 text-right">
+            <td class="px-3 py-2 text-right" @click.stop>
               <UButton
                 size="xs"
                 variant="outline"
