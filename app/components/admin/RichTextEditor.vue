@@ -198,11 +198,48 @@ async function onFileChosen(e: Event) {
   }
 }
 
-function insertYoutube() {
-  const url = window.prompt('YouTube URL')
-  if (!url) return
-  editor.value?.commands.setYoutubeVideo({ src: url })
+// Video embeds (YouTube + Vimeo) share one modal. The user pastes a URL,
+// we detect the platform and dispatch to the matching insert command.
+const videoModalOpen = ref(false)
+const videoUrl = ref('')
+const videoError = ref('')
+
+function openVideoModal() {
+  videoUrl.value = ''
+  videoError.value = ''
+  videoModalOpen.value = true
 }
+
+function detectVideoPlatform(url: string): 'youtube' | 'vimeo' | null {
+  const u = url.toLowerCase()
+  if (u.includes('youtube.com') || u.includes('youtu.be') || u.includes('youtube-nocookie.com')) return 'youtube'
+  if (u.includes('vimeo.com')) return 'vimeo'
+  return null
+}
+
+function insertVideo() {
+  const url = videoUrl.value.trim()
+  const e = editor.value
+  if (!url || !e) return
+  const platform = detectVideoPlatform(url)
+  if (!platform) {
+    videoError.value = 'Enter a valid YouTube or Vimeo URL.'
+    return
+  }
+  const inserted = platform === 'youtube'
+    ? e.chain().focus().setYoutubeVideo({ src: url }).run()
+    : e.chain().focus().setVimeoVideo({ src: url }).run()
+  if (!inserted) {
+    videoError.value = `That doesn't look like a valid ${platform === 'youtube' ? 'YouTube' : 'Vimeo'} video URL.`
+    return
+  }
+  videoModalOpen.value = false
+}
+
+// Clear the inline error as soon as the user edits the URL again.
+watch(videoUrl, () => {
+  if (videoError.value) videoError.value = ''
+})
 
 function insertUupgsList() {
   editor.value?.chain().focus().insertContent({ type: 'uupgsList' }).run()
@@ -319,7 +356,7 @@ function onBodyClick(e: MouseEvent) {
         </template>
       </UPopover>
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-image" aria-label="Image" :loading="uploading" @click="insertImage" />
-      <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-youtube" aria-label="YouTube" @click="insertYoutube" />
+      <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-video" aria-label="Insert video" @click="openVideoModal" />
       <UDropdownMenu :items="customNodeMenuItems">
         <UButton
           size="xs"
@@ -376,6 +413,30 @@ function onBodyClick(e: MouseEvent) {
       class="hidden"
       @change="onFileChosen"
     >
+
+    <UModal v-model:open="videoModalOpen" title="Insert video">
+      <template #body>
+        <UFormField
+          label="Video URL"
+          description="Paste a YouTube or Vimeo link."
+          :error="videoError || undefined"
+        >
+          <UInput
+            v-model="videoUrl"
+            autofocus
+            class="w-full"
+            placeholder="https://www.youtube.com/watch?v=… or https://vimeo.com/…"
+            @keydown.enter.prevent="insertVideo"
+          />
+        </UFormField>
+      </template>
+      <template #footer>
+        <div class="flex justify-end gap-2">
+          <UButton color="neutral" variant="ghost" @click="videoModalOpen = false">Cancel</UButton>
+          <UButton color="primary" :disabled="!videoUrl.trim()" @click="insertVideo">Insert</UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
