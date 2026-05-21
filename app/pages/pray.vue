@@ -14,8 +14,15 @@ const selectUrl = computed(() =>
 
 const translations = computed(() => buildUupgListTranslations(t))
 
-const { stats, prayerCoveragePercent } = usePrayerStatistics()
-const { reload } = usePrayerStatistics()
+const {
+  stats,
+  prayerCoveragePercent,
+  totalPeopleGroups,
+  totalPeopleGroupsFormatted,
+  reload,
+  ensureLoaded
+} = usePrayerStatistics()
+await ensureLoaded()
 onMounted(() => reload())
 
 const mapboxToken = config.public.mapboxToken as string
@@ -54,12 +61,12 @@ useTextHighlight()
             <div class="stack stack--lg">
               <h2 class="h3">{{ t('Prayer Goal') }}</h2>
               <p class="subtext font-size-md">{{ t('24-Hour Prayer Coverage') }}</p>
-              <p class="subtext font-size-md">{{ t('Mobilize 144+ people praying 10 minutes a day for all 2,085 people groups') }}</p>
+              <p class="subtext font-size-md">{{ t('Mobilize 144+ people praying 10 minutes a day for all {0} people groups', [totalPeopleGroupsFormatted]) }}</p>
             </div>
             <div>
               <h2 class="h3">{{ t('Current Status') }}</h2>
               <span class="font-size-4xl font-weight-bold font-button">
-                <span id="prayer-current-status">{{ stats.total_with_full_prayer }}</span> / 2085
+                <span id="prayer-current-status">{{ stats.total_with_full_prayer }}</span> / {{ totalPeopleGroups }}
               </span>
               <div class="stack stack--3xs">
                 <p class="subtext font-size-md">{{ t('People groups with committed 24-hour prayer coverage') }}</p>
