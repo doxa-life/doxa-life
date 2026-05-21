@@ -6,6 +6,7 @@
 // Phase 2 components.
 
 import { getVideoUrl } from '~/utils/videoUrls'
+import { usesLatinHeadings } from '~~/config/languages'
 
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
@@ -19,6 +20,19 @@ function openVideo() {
 }
 
 const mapboxToken = config.public.mapboxToken as string
+
+// Preload the heading font (Bebas Neue) for the homepage hero h1 (the LCP text)
+// so it renders without a swap flash. Scoped to this page rather than the shared
+// layout because map-heavy pages (e.g. /research) don't paint Bebas in the
+// critical window and would log an "unused preload" warning. Skipped for
+// non-Latin scripts (config: latinHeadings: false), where the hero falls back to
+// a different font and Bebas wouldn't be used.
+const heroUsesBebas = usesLatinHeadings(locale.value)
+useHead({
+  link: heroUsesBebas
+    ? [{ rel: 'preload', as: 'font', type: 'font/woff2', href: '/assets/fonts/BebasNeue/BebasNeue-Regular.woff2', crossorigin: '' }]
+    : []
+})
 
 const homeMapConfig = JSON.stringify({
   profile: 'doxa-simple-map',
