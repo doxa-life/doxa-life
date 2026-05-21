@@ -93,7 +93,9 @@ export const upsertPageTranslationTool = defineMcpTool({
       meta_description: input.meta_description ?? null,
       og_image: input.og_image ?? null,
       status: input.status,
-      allow_lossy_overwrite: input.allow_lossy_overwrite
+      allow_lossy_overwrite: input.allow_lossy_overwrite,
+      actor_user_id: ctx.auth.userId ?? null,
+      source: 'mcp'
     })
 
     await mcpLog('UPDATE', 'page_translations', result.translation.id, ctx, {
@@ -121,10 +123,14 @@ export const upsertPageTranslationTool = defineMcpTool({
 
     await applyTranslationInvalidations(result.pageSlug, result.categoryId, input.locale)
 
+    const warningCount = result.sanitizationWarnings.length
+    const warningSuffix = warningCount > 0
+      ? `; ${warningCount} formatting fix${warningCount === 1 ? '' : 'es'} applied`
+      : ''
     return {
       content: [{
         type: 'text',
-        text: `Saved translation "${result.translation.title}" (${result.translation.locale}, ${result.translation.status})`
+        text: `Saved translation "${result.translation.title}" (${result.translation.locale}, ${result.translation.status})${warningSuffix}`
       }],
       structuredContent: { translation: result.translation }
     }

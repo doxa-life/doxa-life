@@ -54,11 +54,24 @@ useTextHighlight()
         <svg class="icon">
           <use href="/assets/icons/play-button.svg#play-button" />
         </svg>
-        <img
-          class="rounded-xlg"
-          src="/assets/images/home-01-hero.jpg"
-          :alt="t('Engage every people by 2033')"
-        >
+        <picture>
+          <source
+            srcset="/assets/images/home-01-hero.avif"
+            type="image/avif"
+          >
+          <source
+            srcset="/assets/images/home-01-hero.webp"
+            type="image/webp"
+          >
+          <img
+            class="rounded-xlg"
+            src="/assets/images/home-01-hero.jpg"
+            :alt="t('Engage every people by 2033')"
+            width="1200"
+            height="723"
+            fetchpriority="high"
+          >
+        </picture>
       </div>
       <p class="text-center color-primary uppercase font-button font-weight-medium">
         {{ t('The DOXA Vision: Click image to watch the video') }}
@@ -134,7 +147,7 @@ useTextHighlight()
 
     <section
       class="bg-image"
-      style="background-image: url('/assets/images/home-02-WhoAreTheUnreached-new.jpg');"
+      style="background-image: url('/assets/images/home-02-WhoAreTheUnreached-new.jpg'); background-image: image-set(url('/assets/images/home-02-WhoAreTheUnreached-new.avif') type('image/avif'), url('/assets/images/home-02-WhoAreTheUnreached-new.webp') type('image/webp'), url('/assets/images/home-02-WhoAreTheUnreached-new.jpg') type('image/jpeg'));"
     >
       <h2 class="text-center banner-title invisible-placeholder">{{ t('Who are the unengaged?') }}</h2>
     </section>
@@ -195,12 +208,25 @@ useTextHighlight()
         <div class="">
           <div class="switcher" data-width="xl">
             <div class="switcher-item center grow-none">
-              <img
-                class="center"
-                src="/assets/images/home-03-Vision-2033.jpg"
-                :alt="t('Vision 2033')"
-                style="width: clamp(150px, 25vw, 350px);"
-              >
+              <picture>
+                <source
+                  srcset="/assets/images/home-03-Vision-2033.avif"
+                  type="image/avif"
+                >
+                <source
+                  srcset="/assets/images/home-03-Vision-2033.webp"
+                  type="image/webp"
+                >
+                <img
+                  class="center"
+                  src="/assets/images/home-03-Vision-2033.jpg"
+                  :alt="t('Vision 2033')"
+                  width="366"
+                  height="679"
+                  loading="lazy"
+                  style="width: clamp(150px, 25vw, 350px);"
+                >
+              </picture>
             </div>
             <div class="switcher-item align-center justify-center">
               <div class="stack stack--xl">
@@ -230,10 +256,23 @@ useTextHighlight()
         <h2 class="highlight" data-highlight-last>{{ t('Engagement starts with prayer') }}</h2>
         <div class="switcher | align-center">
           <div class="switcher-item center grow-none">
-            <img
-              src="/assets/images/home-04-EngagementStartsWithPrayer.jpg"
-              :alt="t('Engagement starts with prayer')"
-            >
+            <picture>
+              <source
+                srcset="/assets/images/home-04-EngagementStartsWithPrayer.avif"
+                type="image/avif"
+              >
+              <source
+                srcset="/assets/images/home-04-EngagementStartsWithPrayer.webp"
+                type="image/webp"
+              >
+              <img
+                src="/assets/images/home-04-EngagementStartsWithPrayer.jpg"
+                :alt="t('Engagement starts with prayer')"
+                width="350"
+                height="344"
+                loading="lazy"
+              >
+            </picture>
           </div>
           <div>
             <div class="stack stack--3xl | align-center">
@@ -249,7 +288,7 @@ useTextHighlight()
       <div class="switcher container | gap-md" data-width="xl">
         <div
           class="switcher-item card | padding-clamp-2xl bg-image align-center"
-          style="background-image: url('/assets/images/home-doxa-background.jpg');"
+          style="background-image: url('/assets/images/home-doxa-background.jpg'); background-image: image-set(url('/assets/images/home-doxa-background.avif') type('image/avif'), url('/assets/images/home-doxa-background.webp') type('image/webp'), url('/assets/images/home-doxa-background.jpg') type('image/jpeg'));"
         >
           <div class="stack stack--md | text-center text-secondary">
             <h2>{{ t('What does "DOXA" mean?') }}</h2>
@@ -258,11 +297,24 @@ useTextHighlight()
           </div>
         </div>
         <div class="switcher-item center grow-none">
-          <img
-            class="rounded-xlg"
-            src="/assets/images/home-05-WhatDoesDoxaMean.jpg"
-            :alt="t('Engagement starts with prayer')"
-          >
+          <picture>
+            <source
+              srcset="/assets/images/home-05-WhatDoesDoxaMean.avif"
+              type="image/avif"
+            >
+            <source
+              srcset="/assets/images/home-05-WhatDoesDoxaMean.webp"
+              type="image/webp"
+            >
+            <img
+              class="rounded-xlg"
+              src="/assets/images/home-05-WhatDoesDoxaMean.jpg"
+              :alt="t('Engagement starts with prayer')"
+              width="300"
+              height="520"
+              loading="lazy"
+            >
+          </picture>
         </div>
       </div>
     </section>

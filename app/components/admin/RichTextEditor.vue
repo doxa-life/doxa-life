@@ -11,8 +11,52 @@
 
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import type { Editor, JSONContent } from '@tiptap/core'
+import { Fragment, Slice } from '@tiptap/pm/model'
+import type { Node as PmNode, Mark as PmMark } from '@tiptap/pm/model'
 import { buildTiptapExtensions } from '~/utils/tiptapExtensions'
 import { uploadImage } from '~/composables/useImageUpload'
+
+// Best-effort paste cleanup. The server-side sanitizer in
+// tiptapValidate is the authoritative line of defense; this just
+// keeps the most common paste sources (Google Docs, Word, Evernote)
+// from triggering "formatting was simplified" toasts on every paste.
+function cleanFragment(frag: Fragment): Fragment {
+  const out: PmNode[] = []
+  frag.forEach((child) => {
+    const cleaned = cleanNode(child)
+    if (cleaned) out.push(cleaned)
+  })
+  return Fragment.from(out)
+}
+
+function cleanNode(node: PmNode): PmNode | null {
+  // Drop inline image pastes (data:/blob:) — server would drop them anyway.
+  if (node.type.name === 'image') {
+    const src = node.attrs?.src
+    if (typeof src === 'string' && /^(data|blob):/i.test(src.trim())) return null
+  }
+
+  // Strip fontFamily from textStyle marks (Word paste noise; we don't
+  // render arbitrary fonts on the public site). If the mark has no
+  // remaining meaningful attrs after the strip, drop the whole mark.
+  const cleanedMarks: PmMark[] = []
+  for (const mark of node.marks) {
+    if (mark.type.name === 'textStyle' && mark.attrs?.fontFamily) {
+      const next = { ...mark.attrs, fontFamily: null }
+      const stillMeaningful = Object.entries(next).some(([k, v]) => k !== 'fontFamily' && v !== null && v !== undefined)
+      if (!stillMeaningful) continue
+      cleanedMarks.push(mark.type.create(next))
+    } else {
+      cleanedMarks.push(mark)
+    }
+  }
+
+  const cleanedContent = node.content && node.content.size > 0
+    ? cleanFragment(node.content)
+    : node.content
+
+  return node.copy(cleanedContent).mark(cleanedMarks)
+}
 
 const props = withDefaults(defineProps<{
   modelValue: JSONContent
@@ -34,6 +78,12 @@ const linkOpenInNewTab = ref(false)
 const editor = useEditor({
   content: props.modelValue,
   extensions: buildTiptapExtensions(),
+  editorProps: {
+    transformPasted(slice) {
+      const cleaned = cleanFragment(slice.content)
+      return new Slice(cleaned, slice.openStart, slice.openEnd)
+    }
+  },
   onUpdate({ editor: e }) {
     emit('update:modelValue', e.getJSON())
   }
@@ -165,6 +215,48 @@ function insertVerse() {
   }).run()
 }
 
+function insertGeneralResources() {
+  editor.value?.chain().focus().insertContent({
+    type: 'generalResources',
+    attrs: { useDocuments: false, layout: 'on-sidebar-page' }
+  }).run()
+}
+
+function toggleGeneralResourcesUseDocuments() {
+  const e = editor.value
+  if (!e) return
+  const current = e.getAttributes('generalResources')
+  e.chain().focus().updateAttributes('generalResources', {
+    useDocuments: !current.useDocuments
+  }).run()
+}
+
+function setGeneralResourcesLayout(layout: 'on-sidebar-page' | 'on-page') {
+  editor.value?.chain().focus().updateAttributes('generalResources', { layout }).run()
+}
+
+function generalResourcesAttr<K extends 'useDocuments' | 'layout'>(key: K): unknown {
+  return editor.value?.getAttributes('generalResources')?.[key]
+}
+
+const customNodeMenuItems = computed(() => [
+  {
+    label: 'UUPG list',
+    icon: 'i-lucide-globe',
+    onSelect: () => insertUupgsList()
+  },
+  {
+    label: 'Verse',
+    icon: 'i-lucide-book-open',
+    onSelect: () => insertVerse()
+  },
+  {
+    label: 'Adoption resources',
+    icon: 'i-lucide-library',
+    onSelect: () => insertGeneralResources()
+  }
+])
+
 // Clicks on the padding area around the ProseMirror content don't move
 // the cursor by default. Forward those clicks to the editor and focus
 // at end-of-doc so the click anywhere inside the body area starts editing.
@@ -228,8 +320,44 @@ function onBodyClick(e: MouseEvent) {
       </UPopover>
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-image" aria-label="Image" :loading="uploading" @click="insertImage" />
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-youtube" aria-label="YouTube" @click="insertYoutube" />
-      <UButton size="xs" variant="ghost" :color="isActive('uupgsList') ? 'primary' : 'neutral'" icon="i-lucide-globe" label="UUPG list" aria-label="Insert UUPG list" @click="insertUupgsList" />
-      <UButton size="xs" variant="ghost" :color="isActive('verse') ? 'primary' : 'neutral'" icon="i-lucide-book-open" label="Verse" aria-label="Insert verse" @click="insertVerse" />
+      <UDropdownMenu :items="customNodeMenuItems">
+        <UButton
+          size="xs"
+          variant="ghost"
+          :color="isActive('uupgsList') || isActive('verse') || isActive('generalResources') ? 'primary' : 'neutral'"
+          icon="i-lucide-plus"
+          label="Insert"
+          trailing-icon="i-lucide-chevron-down"
+          aria-label="Insert custom block"
+        />
+      </UDropdownMenu>
+      <template v-if="isActive('generalResources')">
+        <div class="w-px bg-(--ui-border) mx-1" />
+        <UButton
+          size="xs"
+          variant="ghost"
+          :color="generalResourcesAttr('useDocuments') ? 'primary' : 'neutral'"
+          :label="generalResourcesAttr('useDocuments') ? 'Documents list' : 'General resources'"
+          aria-label="Toggle list type"
+          @click="toggleGeneralResourcesUseDocuments"
+        />
+        <UButton
+          size="xs"
+          variant="ghost"
+          :color="generalResourcesAttr('layout') === 'on-sidebar-page' ? 'primary' : 'neutral'"
+          label="Sidebar"
+          aria-label="Layout: on a sidebar page"
+          @click="setGeneralResourcesLayout('on-sidebar-page')"
+        />
+        <UButton
+          size="xs"
+          variant="ghost"
+          :color="generalResourcesAttr('layout') === 'on-page' ? 'primary' : 'neutral'"
+          label="Full page"
+          aria-label="Layout: on a full page"
+          @click="setGeneralResourcesLayout('on-page')"
+        />
+      </template>
       <div class="w-px bg-(--ui-border) mx-1" />
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-undo-2" aria-label="Undo" @click="cmd(e => e.chain().focus().undo().run())" />
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-redo-2" aria-label="Redo" @click="cmd(e => e.chain().focus().redo().run())" />
@@ -265,7 +393,8 @@ function onBodyClick(e: MouseEvent) {
 .tiptap-body :deep(iframe) { max-width: 100%; }
 .tiptap-body :deep(.ProseMirror:focus) { outline: none; }
 
-.tiptap-body :deep(.doxa-uupgs-list-editor-chip) {
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip),
+.tiptap-body :deep(.doxa-general-resources-editor-chip) {
   display: block;
   margin: 0.75rem 0;
   padding: 0.75rem 1rem;
@@ -276,19 +405,23 @@ function onBodyClick(e: MouseEvent) {
   user-select: none;
   cursor: grab;
 }
-.tiptap-body :deep(.doxa-uupgs-list-editor-chip.is-selected) {
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip.is-selected),
+.tiptap-body :deep(.doxa-general-resources-editor-chip.is-selected) {
   outline: 2px solid var(--ui-primary);
   outline-offset: 1px;
 }
-.tiptap-body :deep(.doxa-uupgs-list-editor-chip__header) {
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip__header),
+.tiptap-body :deep(.doxa-general-resources-editor-chip__header) {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-weight: 600;
   font-size: 0.875rem;
 }
-.tiptap-body :deep(.doxa-uupgs-list-editor-chip__icon) { font-size: 1rem; }
-.tiptap-body :deep(.doxa-uupgs-list-editor-chip__detail) {
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip__icon),
+.tiptap-body :deep(.doxa-general-resources-editor-chip__icon) { font-size: 1rem; }
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip__detail),
+.tiptap-body :deep(.doxa-general-resources-editor-chip__detail) {
   margin-top: 0.25rem;
   font-size: 0.75rem;
   color: var(--ui-text-muted);

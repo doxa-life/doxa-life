@@ -20,7 +20,7 @@ export const PRIMARY_NAV: NavItem[] = [
 export const FOOTER_NAV: NavItem[] = [
   { key: 'Give', href: 'https://giving.ag.org/donate/600001-6C2327?utm_source=direct_link' },
   { key: 'Vision', to: '/about/vision' },
-  { key: 'Adoption Resources', to: '/resources' },
+  { key: 'Resources', to: '/resources' },
   { key: 'Privacy Policy', to: '/privacy-policy', rel: 'privacy-policy' }
 ]
 

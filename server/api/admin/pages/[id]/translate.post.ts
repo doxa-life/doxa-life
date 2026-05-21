@@ -34,7 +34,8 @@ export default defineEventHandler(async (event) => {
       source_locale: body?.sourceLocale,
       target_locales: body?.targetLocales ?? [],
       overwrite: body?.overwrite,
-      status: body?.status
+      status: body?.status,
+      actor_user_id: authUser.userId
     })
 
     logEvent({
