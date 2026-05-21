@@ -24,6 +24,7 @@ export const LOSSY_MARKS: ReadonlySet<string> = new Set([
 // Custom block nodes with no Markdown representation.
 export const LOSSY_NODES: ReadonlySet<string> = new Set([
   'youtube',
+  'vimeo',
   'div',
   'verse',
   'uupgsList',
@@ -48,6 +49,7 @@ const REASON_KEYS = {
   superscript: 'superscript',
   underline: 'underline',
   youtube: 'youtube_embed',
+  vimeo: 'vimeo_embed',
   div: 'div_wrapper',
   verse: 'verse_block',
   uupgsList: 'uupgs_list',
