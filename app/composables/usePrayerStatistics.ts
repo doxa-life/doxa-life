@@ -21,6 +21,8 @@ export interface PrayerStatistics {
 const FALLBACK_TOTAL = 2085
 
 export function usePrayerStatistics() {
+  const { locale } = useI18n()
+
   const stats = useState<PrayerStatistics>('prayer-stats', () => ({
     total: 0,
     total_with_prayer: 0,
@@ -67,8 +69,13 @@ export function usePrayerStatistics() {
   }
 
   const totalPeopleGroups = computed(() => stats.value.total || FALLBACK_TOTAL)
+  // Use the active locale's grouping separator (e.g. "2.085" in de, "2 085"
+  // in fr/ru) but force Latin digits via the `-u-nu-latn` numbering system so
+  // the count matches the Western digits used everywhere else on the page —
+  // the raw numerator counts and the numbers hardcoded in translated strings
+  // (e.g. "144", "202"). Without this, ar would render Eastern-Arabic digits.
   const totalPeopleGroupsFormatted = computed(() =>
-    totalPeopleGroups.value.toLocaleString('en-US')
+    totalPeopleGroups.value.toLocaleString(`${locale.value}-u-nu-latn`)
   )
 
   const prayerCoveragePercent = computed(
