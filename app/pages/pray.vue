@@ -25,6 +25,24 @@ const {
 await ensureLoaded()
 onMounted(() => reload())
 
+const mapboxToken = config.public.mapboxToken as string
+
+const prayMapConfig = JSON.stringify({
+  profile: 'doxa-simple-map',
+  dataSource: 'pray-tools',
+  tk: mapboxToken,
+  tabs: [{ id: 'prayer', colorStrategy: 'prayer', legend: 'prayer', popup: 'prayer' }]
+})
+
+const prayFeedbackConfig = JSON.stringify({
+  profile: 'chat-bubble',
+  apiBase: 'https://support.gospelambition.org',
+  enabled: true,
+  showByDefault: false,
+  instanceId: 'fb-pray-map',
+  projectId: '809ee16b-46e2-4bcd-a93d-b7ea0879d93d'
+})
+
 useTextHighlight()
 </script>
 
@@ -64,9 +82,24 @@ useTextHighlight()
           </div>
           <div
             class="grow-2 bg-image rounded-md"
-            style="background-image: url('/assets/images/pray-01-hero.jpg');"
+            style="background-image: url('/assets/images/pray-01-hero.jpg'); background-image: image-set(url('/assets/images/pray-01-hero.avif') type('image/avif'), url('/assets/images/pray-01-hero.webp') type('image/webp'), url('/assets/images/pray-01-hero.jpg') type('image/jpeg'));"
           />
         </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container stack stack--lg">
+        <h2>{{ t('Prayer Progress') }}</h2>
+        <DoxaMapSlot map-id="pray-map" :profile-config="prayMapConfig" class="rounded-md">
+          <FeedbackWidgetSlot :profile-config="prayFeedbackConfig" />
+        </DoxaMapSlot>
+      <NuxtLink
+        :to="localePath('/research')"
+        class="research-map-link"
+      >
+        Explore our research maps →
+      </NuxtLink>
       </div>
     </section>
 
@@ -116,11 +149,24 @@ useTextHighlight()
             </div>
           </div>
           <div>
-            <img
-              class="center"
-              src="/assets/images/pray-02-PrayerFUEL-Phone-graphic-2.png"
-              :alt="t('Your daily prayer guide')"
-            >
+            <picture>
+              <source
+                srcset="/assets/images/pray-02-PrayerFUEL-Phone-graphic-2.avif"
+                type="image/avif"
+              >
+              <source
+                srcset="/assets/images/pray-02-PrayerFUEL-Phone-graphic-2.webp"
+                type="image/webp"
+              >
+              <img
+                class="center"
+                src="/assets/images/pray-02-PrayerFUEL-Phone-graphic-2.png"
+                :alt="t('Your daily prayer guide')"
+                width="500"
+                height="872"
+                loading="lazy"
+              >
+            </picture>
           </div>
         </div>
       </div>
@@ -132,7 +178,23 @@ useTextHighlight()
           <h2>{{ t('Why prayer matters') }}</h2>
           <div class="switcher | gap-md" data-width="xl">
             <div class="switcher-item center grow-none">
-              <img src="/assets/images/Pray-04-Doxa.jpg" :alt="t('Adopt an unengaged people group')">
+              <picture>
+                <source
+                  srcset="/assets/images/Pray-04-Doxa.avif"
+                  type="image/avif"
+                >
+                <source
+                  srcset="/assets/images/Pray-04-Doxa.webp"
+                  type="image/webp"
+                >
+                <img
+                  src="/assets/images/Pray-04-Doxa.jpg"
+                  :alt="t('Adopt an unengaged people group')"
+                  width="150"
+                  height="179"
+                  loading="lazy"
+                >
+              </picture>
             </div>
             <div class="stack stack--lg | text-card | surface-brand-lightest justify-center">
               <h4 class="font-heading font-size-2xl">{{ t('They have no one praying for them') }}</h4>
@@ -141,7 +203,23 @@ useTextHighlight()
           </div>
           <div class="switcher | gap-md" data-width="xl">
             <div class="switcher-item center grow-none">
-              <img src="/assets/images/Pray-05-Doxa.jpg" :alt="t('Adopt an unengaged people group')">
+              <picture>
+                <source
+                  srcset="/assets/images/Pray-05-Doxa.avif"
+                  type="image/avif"
+                >
+                <source
+                  srcset="/assets/images/Pray-05-Doxa.webp"
+                  type="image/webp"
+                >
+                <img
+                  src="/assets/images/Pray-05-Doxa.jpg"
+                  :alt="t('Adopt an unengaged people group')"
+                  width="150"
+                  height="193"
+                  loading="lazy"
+                >
+              </picture>
             </div>
             <div class="stack stack--lg | text-card | surface-brand-lightest justify-center">
               <h4 class="font-heading font-size-2xl">{{ t('Prayer prepares the way for the gospel') }}</h4>
@@ -150,7 +228,23 @@ useTextHighlight()
           </div>
           <div class="switcher | gap-md" data-width="xl">
             <div class="switcher-item center grow-none">
-              <img src="/assets/images/Pray-06-Doxa.jpg" :alt="t('Adopt an unengaged people group')">
+              <picture>
+                <source
+                  srcset="/assets/images/Pray-06-Doxa.avif"
+                  type="image/avif"
+                >
+                <source
+                  srcset="/assets/images/Pray-06-Doxa.webp"
+                  type="image/webp"
+                >
+                <img
+                  src="/assets/images/Pray-06-Doxa.jpg"
+                  :alt="t('Adopt an unengaged people group')"
+                  width="150"
+                  height="191"
+                  loading="lazy"
+                >
+              </picture>
             </div>
             <div class="stack stack--lg | text-card | surface-brand-lightest justify-center">
               <h4 class="font-heading font-size-2xl">{{ t('Prayer unites the global church') }}</h4>
@@ -182,27 +276,46 @@ useTextHighlight()
     </section>
 
     <section>
-      <div class="container stack stack--lg">
-        <h2>{{ t('Prayer Progress') }}</h2>
-        <ClientOnly>
-          <PrayerMap
-            :research-url="localePath('/research') + '/'"
-            :language-code="locale"
-          />
-        </ClientOnly>
-      </div>
-    </section>
-
-    <section>
       <div class="container stack stack--5xl">
         <figure class="text-center font-size-5xl font-heading">
           <blockquote class="overflow-wrap-anywhere">{{ t('Pray earnestly to the Lord of the harvest ...that He would send laborers to the [Unengaged].') }}</blockquote>
           <figcaption>- {{ t('Jesus') }}</figcaption>
         </figure>
         <div>
-          <img src="/assets/images/pray-03-bottom-unsplash.jpg" :alt="t('Jesus')">
+          <picture>
+            <source
+              srcset="/assets/images/pray-03-bottom-unsplash.avif"
+              type="image/avif"
+            >
+            <source
+              srcset="/assets/images/pray-03-bottom-unsplash.webp"
+              type="image/webp"
+            >
+            <img
+              src="/assets/images/pray-03-bottom-unsplash.jpg"
+              :alt="t('Jesus')"
+              width="1200"
+              height="328"
+              loading="lazy"
+            >
+          </picture>
         </div>
       </div>
     </section>
   </div>
 </template>
+
+<style scoped>
+.research-map-link {
+  display: block;
+  margin-top: 0.75rem;
+  text-align: right;
+  font-size: 1.2rem;
+  color: var(--color-brand-primary, #3b463d);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.research-map-link:hover {
+  color: var(--color-brand-primary-darker, #1f2328);
+}
+</style>

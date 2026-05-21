@@ -1,0 +1,12 @@
+{
+  "labels": {
+    "country": "देश:",
+    "population": "जनसंख्या:",
+    "language": "भाषा:",
+    "religion": "धर्म:",
+    "languageFamily": "भाषा परिवार:"
+  },
+  "messages": {
+    "noDescription": "कोई विवरण उपलब्ध नहीं है।"
+  }
+}

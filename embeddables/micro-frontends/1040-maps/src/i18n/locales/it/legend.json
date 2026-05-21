@@ -1,0 +1,35 @@
+{
+  "title": {
+    "prayer": "Avanzamento della preghiera",
+    "engagement": "Avanzamento dell'impegno",
+    "adoption": "Avanzamento dell'adozione",
+    "languageFamilies": "Famiglie linguistiche",
+    "doxaRegions": "Regioni Doxa",
+    "affinityBlocs": "Blocchi di affinità",
+    "gospelResources": "Risorse del Vangelo"
+  },
+  "header": {
+    "collapsed": "Legenda",
+    "peopleGroupFallback": "Gruppo di persone"
+  },
+  "prayer": {
+    "needsPrayer": "Necessita preghiera",
+    "hasPrayer": "Ha preghiera",
+    "fullPrayerCoverage": "Copertura di preghiera completa"
+  },
+  "engagement": {
+    "needsEngagement": "Necessita impegno",
+    "hasEngagement": "Ha impegno"
+  },
+  "adoption": {
+    "needsAdoption": "Necessita adozione",
+    "hasAdoption": "Ha adozione"
+  },
+  "columns": {
+    "upgs": "UPGs",
+    "population": "Popolazione"
+  },
+  "footer": {
+    "total": "Totale"
+  }
+}

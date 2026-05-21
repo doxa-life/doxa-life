@@ -6,9 +6,11 @@
 // Phase 2 components.
 
 import { getVideoUrl } from '~/utils/videoUrls'
+import { usesLatinHeadings } from '~~/config/languages'
 
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
+const config = useRuntimeConfig()
 
 const videoModalRef = ref<{ open: () => void; close: () => void } | null>(null)
 const videoUrl = computed(() => getVideoUrl(locale.value))
@@ -19,6 +21,37 @@ function openVideo() {
 
 const { totalPeopleGroupsFormatted, ensureLoaded } = usePrayerStatistics()
 await ensureLoaded()
+
+const mapboxToken = config.public.mapboxToken as string
+
+// Preload the heading font (Bebas Neue) for the homepage hero h1 (the LCP text)
+// so it renders without a swap flash. Scoped to this page rather than the shared
+// layout because map-heavy pages (e.g. /research) don't paint Bebas in the
+// critical window and would log an "unused preload" warning. Skipped for
+// non-Latin scripts (config: latinHeadings: false), where the hero falls back to
+// a different font and Bebas wouldn't be used.
+const heroUsesBebas = usesLatinHeadings(locale.value)
+useHead({
+  link: heroUsesBebas
+    ? [{ rel: 'preload', as: 'font', type: 'font/woff2', href: '/assets/fonts/BebasNeue/BebasNeue-Regular.woff2', crossorigin: '' }]
+    : []
+})
+
+const homeMapConfig = JSON.stringify({
+  profile: 'doxa-simple-map',
+  dataSource: 'pray-tools',
+  tk: mapboxToken,
+  tabs: [{ id: 'engagement', colorStrategy: 'engagement', legend: 'engagement', popup: 'engagement' }]
+})
+
+const homeFeedbackConfig = JSON.stringify({
+  profile: 'chat-bubble',
+  apiBase: 'https://support.gospelambition.org',
+  enabled: true,
+  showByDefault: false,
+  instanceId: 'fb-home-map',
+  projectId: '7bb8f5ba-eb45-4933-89de-bc93fcda09b2'
+})
 
 useTextHighlight()
 </script>
@@ -39,15 +72,49 @@ useTextHighlight()
         <svg class="icon">
           <use href="/assets/icons/play-button.svg#play-button" />
         </svg>
-        <img
-          class="rounded-xlg"
-          src="/assets/images/home-01-hero.jpg"
-          :alt="t('Engage every people by 2033')"
-        >
+        <picture>
+          <source
+            srcset="/assets/images/home-01-hero.avif"
+            type="image/avif"
+          >
+          <source
+            srcset="/assets/images/home-01-hero.webp"
+            type="image/webp"
+          >
+          <img
+            class="rounded-xlg"
+            src="/assets/images/home-01-hero.jpg"
+            :alt="t('Engage every people by 2033')"
+            width="1200"
+            height="723"
+            fetchpriority="high"
+          >
+        </picture>
       </div>
       <p class="text-center color-primary uppercase font-button font-weight-medium">
         {{ t('The DOXA Vision: Click image to watch the video') }}
       </p>
+    </section>
+
+    <section class="stack stack--md container">
+      <div>
+        <h2 class="color-brand">{{ t('Where are they?') }}</h2>
+        <h1
+          class="color-brand-light highlight"
+          data-highlight-index="1"
+          data-highlight-last
+          data-highlight-color="primary"
+        >{{ t('Unengaged peoples around the world') }}</h1>
+      </div>
+      <DoxaMapSlot map-id="home-map" :profile-config="homeMapConfig" class="rounded-xlg">
+        <FeedbackWidgetSlot :profile-config="homeFeedbackConfig" />
+      </DoxaMapSlot>
+      <NuxtLink
+        :to="localePath('/research')"
+        class="research-map-link"
+      >
+        Explore our research maps →
+      </NuxtLink>
     </section>
 
     <section class="stack stack--md | surface-brand-light">
@@ -98,7 +165,7 @@ useTextHighlight()
 
     <section
       class="bg-image"
-      style="background-image: url('/assets/images/home-02-WhoAreTheUnreached-new.jpg');"
+      style="background-image: url('/assets/images/home-02-WhoAreTheUnreached-new.jpg'); background-image: image-set(url('/assets/images/home-02-WhoAreTheUnreached-new.avif') type('image/avif'), url('/assets/images/home-02-WhoAreTheUnreached-new.webp') type('image/webp'), url('/assets/images/home-02-WhoAreTheUnreached-new.jpg') type('image/jpeg'));"
     >
       <h2 class="text-center banner-title invisible-placeholder">{{ t('Who are the unengaged?') }}</h2>
     </section>
@@ -159,12 +226,25 @@ useTextHighlight()
         <div class="">
           <div class="switcher" data-width="xl">
             <div class="switcher-item center grow-none">
-              <img
-                class="center"
-                src="/assets/images/home-03-Vision-2033.jpg"
-                :alt="t('Vision 2033')"
-                style="width: clamp(150px, 25vw, 350px);"
-              >
+              <picture>
+                <source
+                  srcset="/assets/images/home-03-Vision-2033.avif"
+                  type="image/avif"
+                >
+                <source
+                  srcset="/assets/images/home-03-Vision-2033.webp"
+                  type="image/webp"
+                >
+                <img
+                  class="center"
+                  src="/assets/images/home-03-Vision-2033.jpg"
+                  :alt="t('Vision 2033')"
+                  width="366"
+                  height="679"
+                  loading="lazy"
+                  style="width: clamp(150px, 25vw, 350px);"
+                >
+              </picture>
             </div>
             <div class="switcher-item align-center justify-center">
               <div class="stack stack--xl">
@@ -194,10 +274,23 @@ useTextHighlight()
         <h2 class="highlight" data-highlight-last>{{ t('Engagement starts with prayer') }}</h2>
         <div class="switcher | align-center">
           <div class="switcher-item center grow-none">
-            <img
-              src="/assets/images/home-04-EngagementStartsWithPrayer.jpg"
-              :alt="t('Engagement starts with prayer')"
-            >
+            <picture>
+              <source
+                srcset="/assets/images/home-04-EngagementStartsWithPrayer.avif"
+                type="image/avif"
+              >
+              <source
+                srcset="/assets/images/home-04-EngagementStartsWithPrayer.webp"
+                type="image/webp"
+              >
+              <img
+                src="/assets/images/home-04-EngagementStartsWithPrayer.jpg"
+                :alt="t('Engagement starts with prayer')"
+                width="350"
+                height="344"
+                loading="lazy"
+              >
+            </picture>
           </div>
           <div>
             <div class="stack stack--3xl | align-center">
@@ -213,7 +306,7 @@ useTextHighlight()
       <div class="switcher container | gap-md" data-width="xl">
         <div
           class="switcher-item card | padding-clamp-2xl bg-image align-center"
-          style="background-image: url('/assets/images/home-doxa-background.jpg');"
+          style="background-image: url('/assets/images/home-doxa-background.jpg'); background-image: image-set(url('/assets/images/home-doxa-background.avif') type('image/avif'), url('/assets/images/home-doxa-background.webp') type('image/webp'), url('/assets/images/home-doxa-background.jpg') type('image/jpeg'));"
         >
           <div class="stack stack--md | text-center text-secondary">
             <h2>{{ t('What does "DOXA" mean?') }}</h2>
@@ -222,11 +315,24 @@ useTextHighlight()
           </div>
         </div>
         <div class="switcher-item center grow-none">
-          <img
-            class="rounded-xlg"
-            src="/assets/images/home-05-WhatDoesDoxaMean.jpg"
-            :alt="t('Engagement starts with prayer')"
-          >
+          <picture>
+            <source
+              srcset="/assets/images/home-05-WhatDoesDoxaMean.avif"
+              type="image/avif"
+            >
+            <source
+              srcset="/assets/images/home-05-WhatDoesDoxaMean.webp"
+              type="image/webp"
+            >
+            <img
+              class="rounded-xlg"
+              src="/assets/images/home-05-WhatDoesDoxaMean.jpg"
+              :alt="t('Engagement starts with prayer')"
+              width="300"
+              height="520"
+              loading="lazy"
+            >
+          </picture>
         </div>
       </div>
     </section>
@@ -239,3 +345,18 @@ useTextHighlight()
     />
   </div>
 </template>
+
+<style scoped>
+.research-map-link {
+  display: block;
+  margin-top: 0.75rem;
+  text-align: right;
+  font-size: 1.2rem;
+  color: var(--color-brand-primary, #3b463d);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.research-map-link:hover {
+  color: var(--color-brand-primary-darker, #1f2328);
+}
+</style>
