@@ -58,6 +58,7 @@ export interface PagesTable {
 export interface CategoriesTable {
   id: Generated<string>
   slug: string
+  parent_id: string | null
   menu_order: Generated<number>
   created: ColumnType<Date, Date | string | undefined, Date | string>
   updated: ColumnType<Date, Date | string | undefined, Date | string>

@@ -12,6 +12,7 @@ import { detectLossy } from '../utils/tiptapLossyDetector'
 import { tiptapValidate, type SanitizationWarning } from '../utils/tiptapValidate'
 import { markdownToTiptap } from '../utils/tiptapFromMarkdown'
 import { isSafeHttpUrl as isSafeUrl } from '../utils/urlValidation'
+import { loadCategoryTree, pageUrlPath } from '../database/categoryTree'
 
 function err(statusCode: number, message: string, extra?: Record<string, unknown>): H3Error {
   return Object.assign(new Error(message), {
@@ -44,11 +45,12 @@ export interface UpsertTranslationInput {
 
 export interface UpsertTranslationResult {
   translation: PageTranslation
+  // Full public URL path (no leading slash), e.g. "resources/adoption/overview".
+  // Cache purge keys are URL-based, so callers pass this through to
+  // `applyTranslationInvalidations` rather than the raw leaf slug.
+  pageUrl: string
   pageSlug: string
   categoryId: string | null
-  // True iff the input came in as Markdown and the existing body was
-  // lossy-in-markdown but allow_lossy_overwrite was set — the caller
-  // should log an mcp.lossy_overwrite event with the dropped reasons.
   lossyOverwriteApplied: boolean
   droppedReasons: string[]
   // Sanitizer notes from tiptapValidate — attrs/marks/nodes that were
@@ -202,8 +204,10 @@ export async function upsertCmsPageTranslation(input: UpsertTranslationInput): P
     })
   }
 
+  const tree = await loadCategoryTree()
   return {
     translation,
+    pageUrl: pageUrlPath(tree, page),
     pageSlug: page.slug,
     categoryId: page.category_id,
     lossyOverwriteApplied,
@@ -226,7 +230,7 @@ export async function setCmsTranslationStatus(input: {
   page_id: string
   locale: string
   status: 'draft' | 'published'
-}): Promise<{ translation: PageTranslation; pageSlug: string; categoryId: string | null }> {
+}): Promise<{ translation: PageTranslation; pageUrl: string; pageSlug: string; categoryId: string | null }> {
   if (!ENABLED_LANGUAGE_CODES.includes(input.locale)) {
     throw err(400, 'locale is not enabled')
   }
@@ -248,11 +252,14 @@ export async function setCmsTranslationStatus(input: {
 
   if (!updated) throw err(404, 'Translation not found')
 
-  return { translation: updated, pageSlug: page.slug, categoryId: page.category_id }
+  const tree = await loadCategoryTree()
+  return { translation: updated, pageUrl: pageUrlPath(tree, page), pageSlug: page.slug, categoryId: page.category_id }
 }
 
-export async function applyTranslationInvalidations(slug: string, categoryId: string | null, locale?: string): Promise<void> {
-  await purgeCmsPage(slug, locale ? [locale] : undefined)
-  if (categoryId) await purgeCmsCategory(categoryId, slug)
+// `url` is the full public URL path (no leading slash) — same string
+// the lookup endpoint uses as its cache key suffix.
+export async function applyTranslationInvalidations(url: string, categoryId: string | null, locale?: string): Promise<void> {
+  await purgeCmsPage(url, locale ? [locale] : undefined)
+  if (categoryId) await purgeCmsCategory(categoryId, url)
 }
 

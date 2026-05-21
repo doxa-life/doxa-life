@@ -167,6 +167,7 @@ export const listCategoriesInput = z.object({}).strict()
 export const createCategoryInput = z
   .object({
     slug: slugString,
+    parent_id: idString.nullish(),
     menu_order: z.number().int().min(0).optional(),
     translations: categoryTranslationsInput
   })
@@ -176,6 +177,7 @@ export const updateCategoryInput = z
   .object({
     id: idString,
     slug: slugString.optional(),
+    parent_id: idString.nullish(),
     menu_order: z.number().int().min(0).optional(),
     translations: categoryTranslationsInput.optional()
   })

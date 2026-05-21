@@ -1,8 +1,7 @@
 // Query helpers for the `categories` + `category_translations` tables.
-// Categories are a first-class replacement for the old
-// `pages.parent_slug` hierarchy: purely organizational groups that
-// expose a shared URL prefix, a translated sidebar heading, and a
-// drag-and-drop ordering for their member pages.
+// Categories form a tree (`parent_id`) and provide the URL prefix for
+// every page beneath them. Pages store only their own leaf slug; the
+// full URL is computed at request time by walking the chain.
 
 import { db } from '../utils/database'
 import type {
@@ -14,6 +13,12 @@ import type {
 import type { Selectable } from 'kysely'
 import { sql } from 'kysely'
 import { purgeCmsPage } from '../utils/cmsCache'
+import {
+  loadCategoryTree,
+  categoryUrlPath,
+  pageUrlPath,
+  descendantCategoryIds
+} from './categoryTree'
 
 export type Category = Selectable<CategoriesTable>
 export type CategoryTranslation = Selectable<CategoryTranslationsTable>
@@ -91,15 +96,6 @@ export async function getCategory(id: string): Promise<CategoryWithTranslations 
   return { category, translations }
 }
 
-export async function getCategoryBySlug(slug: string): Promise<Category | null> {
-  const row = await db
-    .selectFrom('categories')
-    .selectAll()
-    .where('slug', '=', slug)
-    .executeTakeFirst()
-  return row ?? null
-}
-
 export async function getCategoryName(
   categoryId: string,
   locale: string,
@@ -126,8 +122,7 @@ export async function getCategoryName(
 }
 
 // Sidebar siblings for a category: every page in the category,
-// ordered. Matches the old parent_slug-based sibling lookup but keyed
-// on category_id.
+// ordered by menu_order then leaf slug.
 export async function getCategoryPages(categoryId: string): Promise<Page[]> {
   return db
     .selectFrom('pages')
@@ -177,10 +172,34 @@ export async function getCategoryPageTranslations(
     .filter(entry => Boolean(entry.translation))
 }
 
-// Public URL resolution for `/about` → first page in About. Picks
-// whichever page has the lowest menu_order (ties broken by slug) and
-// has at least one published translation, so bare category slugs never
-// resolve to something the visitor can't read.
+// Public URL resolution for a bare category path (e.g. `/resources`).
+// Picks whichever page has the lowest menu_order (ties broken by leaf
+// slug) and has at least one published translation, so bare category
+// slugs never resolve to something the visitor can't read.
+// Set of category ids that directly hold at least one page with a
+// published translation in `locale` (or the fallback). Callers combine
+// it with `descendantCategoryIds` to decide whether a category subtree
+// has any visible pages — e.g. to hide empty categories from the menu
+// and the landing-page grid.
+export async function categoryIdsWithPublishedPages(
+  locale: string,
+  fallbackLocale = 'en'
+): Promise<Set<string>> {
+  const locales = locale === fallbackLocale ? [locale] : [locale, fallbackLocale]
+  const rows = await db
+    .selectFrom('pages')
+    .innerJoin('page_translations', 'page_translations.page_id', 'pages.id')
+    .select('pages.category_id')
+    .where('pages.category_id', 'is not', null)
+    .where('page_translations.status', '=', 'published')
+    .where('page_translations.locale', 'in', locales)
+    .distinct()
+    .execute()
+  const set = new Set<string>()
+  for (const r of rows) if (r.category_id) set.add(r.category_id)
+  return set
+}
+
 export async function getCategoryDefaultPage(
   categoryId: string,
   locale: string,
@@ -192,6 +211,7 @@ export async function getCategoryDefaultPage(
 
 export interface CreateCategoryInput {
   slug: string
+  parent_id?: string | null
   menu_order?: number
   translations: Array<{ locale: string; name: string }>
 }
@@ -202,6 +222,7 @@ export async function createCategory(input: CreateCategoryInput): Promise<Catego
       .insertInto('categories')
       .values({
         slug: input.slug,
+        parent_id: input.parent_id ?? null,
         menu_order: input.menu_order ?? 0
       })
       .returningAll()
@@ -225,12 +246,15 @@ export async function createCategory(input: CreateCategoryInput): Promise<Catego
 
 export interface UpdateCategoryInput {
   slug?: string
+  parent_id?: string | null
   menu_order?: number
   translations?: Array<{ locale: string; name: string }>
 }
 
-// Returns the set of slugs whose cached rendering needs busting (old
-// and new URLs for every renamed member page).
+// A slug or parent_id change rewrites the URL of every page in the
+// category subtree. We compute the *old* URL for each affected page
+// before committing, so cache-purge can invalidate the keys that
+// existed prior to the change.
 export async function updateCategory(
   id: string,
   input: UpdateCategoryInput
@@ -246,36 +270,44 @@ export async function updateCategory(
     }
 
     const slugsToPurge: string[] = []
+    const structureChanged =
+      (input.slug !== undefined && input.slug !== existing.slug) ||
+      (input.parent_id !== undefined && (input.parent_id ?? null) !== existing.parent_id)
 
-    // Slug rename cascades to every member page so their stored slugs
-    // stay `{category.slug}/...` — the app relies on that prefix for
-    // URL resolution.
-    if (input.slug && input.slug !== existing.slug) {
-      const newSlug = input.slug
-
-      const memberPages = await trx
+    // Snapshot the current full URL for every page beneath this
+    // category before we change anything. After commit the same pages
+    // will live at new URLs; the old keys still need to be purged.
+    if (structureChanged) {
+      const treeBefore = await loadCategoryTree(trx)
+      const subtreeIds = descendantCategoryIds(treeBefore, id)
+      const pages = await trx
         .selectFrom('pages')
-        .select(['id', 'slug'])
-        .where('category_id', '=', id)
+        .select(['slug', 'category_id'])
+        .where('category_id', 'in', subtreeIds)
         .execute()
-
-      for (const page of memberPages) {
-        const suffix = page.slug.startsWith(`${existing.slug}/`)
-          ? page.slug.slice(existing.slug.length + 1)
-          : page.slug
-        const updatedSlug = `${newSlug}/${suffix}`
-        slugsToPurge.push(page.slug)
-        slugsToPurge.push(updatedSlug)
-        await trx
-          .updateTable('pages')
-          .set({ slug: updatedSlug, updated: sql`now()` })
-          .where('id', '=', page.id)
-          .execute()
+      for (const p of pages) {
+        slugsToPurge.push(pageUrlPath(treeBefore, p))
       }
+      // Also bust the bare-category landing URL for every node in the
+      // subtree so /resources keeps working after a rename.
+      for (const cid of subtreeIds) {
+        const path = categoryUrlPath(treeBefore, cid)
+        if (path) slugsToPurge.push(path)
+      }
+    }
 
+    if (input.slug !== undefined && input.slug !== existing.slug) {
       await trx
         .updateTable('categories')
-        .set({ slug: newSlug, updated: sql`now()` })
+        .set({ slug: input.slug, updated: sql`now()` })
+        .where('id', '=', id)
+        .execute()
+    }
+
+    if (input.parent_id !== undefined && (input.parent_id ?? null) !== existing.parent_id) {
+      await trx
+        .updateTable('categories')
+        .set({ parent_id: input.parent_id ?? null, updated: sql`now()` })
         .where('id', '=', id)
         .execute()
     }
@@ -329,17 +361,38 @@ export async function updateCategory(
       }
 
       // Every member page's cached response embeds the category's name
-      // as its `menu_parent.title`. When the category name changes in
-      // any locale, purge every member so readers see the new label.
+      // as its `menu_parent.title`. When the name changes in any
+      // locale, purge every member so readers see the new label.
+      // Use the post-change tree since the slug/parent (if changed)
+      // already settled above.
       if (translationsChanged) {
-        const memberSlugs = await trx
+        const treeAfter = await loadCategoryTree(trx)
+        const subtreeIds = descendantCategoryIds(treeAfter, id)
+        const pages = await trx
           .selectFrom('pages')
-          .select('slug')
-          .where('category_id', '=', id)
+          .select(['slug', 'category_id'])
+          .where('category_id', 'in', subtreeIds)
           .execute()
-        for (const { slug } of memberSlugs) {
-          slugsToPurge.push(slug)
+        for (const p of pages) {
+          slugsToPurge.push(pageUrlPath(treeAfter, p))
         }
+      }
+    }
+
+    // The parent category's landing page renders a grid of its child
+    // categories (each child's url, title, and order). Any edit this
+    // grid reflects — slug, parent, menu_order, or name — leaves the
+    // old and new parents' landing pages stale, so purge them too. The
+    // parents' own paths are unaffected by this category's change, so a
+    // single post-change tree resolves both correctly.
+    const parentIdsToPurge = new Set<string>()
+    if (existing.parent_id) parentIdsToPurge.add(existing.parent_id)
+    if (input.parent_id) parentIdsToPurge.add(input.parent_id)
+    if (parentIdsToPurge.size > 0) {
+      const parentTree = await loadCategoryTree(trx)
+      for (const pid of parentIdsToPurge) {
+        const path = categoryUrlPath(parentTree, pid)
+        if (path) slugsToPurge.push(path)
       }
     }
 
@@ -361,6 +414,14 @@ export async function deleteCategory(id: string): Promise<void> {
     .executeTakeFirstOrThrow()
   if (pageCount.count > 0) {
     throw Object.assign(new Error('Category still has pages'), { statusCode: 409 })
+  }
+  const childCount = await db
+    .selectFrom('categories')
+    .select(sql<number>`COUNT(*)::int`.as('count'))
+    .where('parent_id', '=', id)
+    .executeTakeFirstOrThrow()
+  if (childCount.count > 0) {
+    throw Object.assign(new Error('Category still has child categories'), { statusCode: 409 })
   }
   await db.deleteFrom('categories').where('id', '=', id).execute()
 }

@@ -22,7 +22,7 @@ import {
 
 export const listCategoriesTool = defineMcpTool({
   name: 'list_categories',
-  description: 'List all CMS categories with their per-locale names, menu_order, and the number of pages currently attached.',
+  description: 'List all CMS categories with their per-locale names, menu_order, parent_id, computed URL path, and the number of pages currently attached.',
   scope: 'pages.view',
   input: listCategoriesInput,
   async handler() {
@@ -33,6 +33,8 @@ export const listCategoriesTool = defineMcpTool({
         categories: rows.map(row => ({
           id: row.id,
           slug: row.slug,
+          parent_id: row.parent_id,
+          url: row.url,
           menu_order: row.menu_order,
           page_count: row.page_count,
           translations: row.translations.map(t => ({
@@ -47,17 +49,19 @@ export const listCategoriesTool = defineMcpTool({
 
 export const createCategoryTool = defineMcpTool({
   name: 'create_category',
-  description: 'Create a new CMS category. Slug must be lowercase letters/digits/dashes (no slashes). Requires at least an English (locale "en") translation entry.',
+  description: 'Create a new CMS category. Slug must be lowercase letters/digits/dashes (no slashes). Pass `parent_id` to nest under another category (omit/null for top level). Requires at least an English (locale "en") translation entry.',
   scope: 'pages.write',
   input: createCategoryInput,
   async handler(input, ctx) {
     const category = await createCmsCategory({
       slug: input.slug,
+      parent_id: input.parent_id ?? null,
       menu_order: input.menu_order,
       translations: input.translations
     })
     await mcpLog('CREATE', 'categories', category.id, ctx, {
       slug: input.slug,
+      parent_id: category.parent_id,
       translation_count: input.translations.length
     })
     return {
@@ -69,13 +73,14 @@ export const createCategoryTool = defineMcpTool({
 
 export const updateCategoryTool = defineMcpTool({
   name: 'update_category',
-  description: 'Update a CMS category — slug, menu_order, or per-locale translations. Slug renames cascade to every member page and bust the affected cache entries.',
+  description: 'Update a CMS category — slug, parent_id, menu_order, or per-locale translations. A slug or parent change cascades to every URL in the subtree and busts the affected cache entries.',
   scope: 'pages.write',
   input: updateCategoryInput,
   async handler(input, ctx) {
     const result = await updateCmsCategory({
       id: input.id,
       slug: input.slug,
+      parent_id: input.parent_id === undefined ? undefined : (input.parent_id ?? null),
       menu_order: input.menu_order,
       translations: input.translations
     })

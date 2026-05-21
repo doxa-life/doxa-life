@@ -1,8 +1,5 @@
-// Category service. List/get reuse existing helpers; the writes
-// implement the validation + cache-purge contract MCP and admin both
-// rely on. Delete encodes the "refuse if pages still attached" rule
-// from plans/mcp-project/mcp-project.md (count + sample-slugs surface
-// on the structuredContent the tool returns).
+// Category service. Categories form a tree (`parent_id`); a slug or
+// parent change cascades to every URL beneath the affected node.
 
 import type { H3Error } from 'h3'
 import { sql } from 'kysely'
@@ -16,6 +13,11 @@ import {
   purgeSlugs
 } from '../database/categories'
 import type { Category, CategoryTranslation } from '../database/categories'
+import {
+  loadCategoryTree,
+  categoryUrlPath,
+  wouldCreateCycle
+} from '../database/categoryTree'
 
 function err(statusCode: number, message: string, extra?: Record<string, unknown>): H3Error {
   return Object.assign(new Error(message), {
@@ -28,14 +30,79 @@ function err(statusCode: number, message: string, extra?: Record<string, unknown
 export interface CategoryListItem extends Category {
   translations: CategoryTranslation[]
   page_count: number
+  url: string
+  // Slug-joined ancestor URL (e.g. "resources" — usable in href).
+  parent_path: string | null
+  // Human-readable ancestor chain using each ancestor's English name
+  // (e.g. "Resources" — for labels and dropdowns). Falls back to the
+  // slug for any ancestor missing an EN translation.
+  parent_label: string | null
+}
+
+// Joins a category's ancestor chain (root → immediate parent) using
+// each ancestor's English translation, falling back to the slug.
+function ancestorLabel(
+  tree: Awaited<ReturnType<typeof loadCategoryTree>>,
+  parentId: string | null,
+  enNameByCategory: Map<string, string>
+): string | null {
+  if (!parentId) return null
+  const labels: string[] = []
+  let id: string | null = parentId
+  for (let i = 0; i < 32 && id; i++) {
+    const node = tree.byId.get(id)
+    if (!node) break
+    labels.unshift(enNameByCategory.get(id) ?? node.slug)
+    id = node.parent_id
+  }
+  return labels.length ? labels.join(' / ') : null
 }
 
 export async function listCmsCategories(): Promise<CategoryListItem[]> {
-  return dbListCategoriesWithTranslations()
+  const rows = await dbListCategoriesWithTranslations()
+  if (rows.length === 0) return []
+  const tree = await loadCategoryTree()
+  const enByCategory = new Map<string, string>()
+  for (const row of rows) {
+    const en = row.translations.find(t => t.locale === 'en')?.name
+    if (en) enByCategory.set(row.id, en)
+  }
+  return rows.map(row => ({
+    ...row,
+    url: categoryUrlPath(tree, row.id),
+    parent_path: row.parent_id ? categoryUrlPath(tree, row.parent_id) : null,
+    parent_label: ancestorLabel(tree, row.parent_id, enByCategory)
+  }))
 }
 
 export async function getCmsCategory(id: string) {
-  return dbGetCategory(id)
+  const record = await dbGetCategory(id)
+  if (!record) return null
+  const tree = await loadCategoryTree()
+  // Walk every ancestor's EN translation in one bulk query so the
+  // label chain doesn't fan out into per-ancestor SELECTs.
+  const ancestorIds: string[] = []
+  let cursor: string | null = record.category.parent_id
+  for (let i = 0; i < 32 && cursor; i++) {
+    ancestorIds.push(cursor)
+    cursor = tree.byId.get(cursor)?.parent_id ?? null
+  }
+  const enByCategory = new Map<string, string>()
+  if (ancestorIds.length > 0) {
+    const rows = await db
+      .selectFrom('category_translations')
+      .select(['category_id', 'name'])
+      .where('category_id', 'in', ancestorIds)
+      .where('locale', '=', 'en')
+      .execute()
+    for (const r of rows) enByCategory.set(r.category_id, r.name)
+  }
+  return {
+    ...record,
+    url: categoryUrlPath(tree, id),
+    parent_path: record.category.parent_id ? categoryUrlPath(tree, record.category.parent_id) : null,
+    parent_label: ancestorLabel(tree, record.category.parent_id, enByCategory)
+  }
 }
 
 function validateCategorySlug(slug: string): string {
@@ -57,8 +124,43 @@ function normalizeTranslations(
     .map(t => ({ locale: t.locale, name: t.name.trim() }))
 }
 
+// Sibling-collision check shared by create + update. A category and a
+// page at the same level can't share a leaf slug (the URL would be
+// ambiguous), nor can two sibling categories.
+async function ensureNoSiblingCollision(
+  slug: string,
+  parentId: string | null,
+  excludeCategoryId?: string
+): Promise<void> {
+  let catQ = db
+    .selectFrom('categories')
+    .select('id')
+    .where('slug', '=', slug)
+  catQ = parentId === null
+    ? catQ.where('parent_id', 'is', null)
+    : catQ.where('parent_id', '=', parentId)
+  if (excludeCategoryId) catQ = catQ.where('id', '!=', excludeCategoryId)
+  const collidingCat = await catQ.executeTakeFirst()
+  if (collidingCat) {
+    throw err(409, 'A category with that slug already exists at this level')
+  }
+
+  let pageQ = db
+    .selectFrom('pages')
+    .select('id')
+    .where('slug', '=', slug)
+  pageQ = parentId === null
+    ? pageQ.where('category_id', 'is', null)
+    : pageQ.where('category_id', '=', parentId)
+  const collidingPage = await pageQ.executeTakeFirst()
+  if (collidingPage) {
+    throw err(409, `A page already uses the slug "${slug}" at this level. Pick a different slug or move that page.`)
+  }
+}
+
 export interface CreateCategoryInput {
   slug: string
+  parent_id?: string | null
   menu_order?: number
   translations: Array<{ locale: string; name: string }>
 }
@@ -70,52 +172,86 @@ export async function createCmsCategory(input: CreateCategoryInput): Promise<Cat
     throw err(400, 'An English name is required')
   }
 
-  // Block collision with an uncategorized page
-  const collidingPage = await db
-    .selectFrom('pages')
-    .select('id')
-    .where('slug', '=', slug)
-    .where('category_id', 'is', null)
-    .executeTakeFirst()
-  if (collidingPage) {
-    throw err(409, `A page already uses the slug "${slug}". Pick a different category slug or reassign that page.`)
+  const parentId = input.parent_id ?? null
+  if (parentId) {
+    const parent = await db
+      .selectFrom('categories')
+      .select('id')
+      .where('id', '=', parentId)
+      .executeTakeFirst()
+    if (!parent) throw err(400, 'Parent category not found')
   }
 
+  await ensureNoSiblingCollision(slug, parentId)
+
+  let created: Category
   try {
-    return await dbCreateCategory({
+    created = await dbCreateCategory({
       slug,
+      parent_id: parentId,
       menu_order: input.menu_order ?? 0,
       translations
     })
   } catch (e: unknown) {
     if ((e as { code?: string })?.code === '23505') {
-      throw err(409, 'A category with that slug already exists')
+      throw err(409, 'A category with that slug already exists at this level')
     }
     throw e
   }
+
+  // A new child appears in its parent's landing-page grid; bust the
+  // parent's cached landing so it shows up without waiting for the TTL.
+  if (created.parent_id) {
+    const tree = await loadCategoryTree()
+    const parentPath = categoryUrlPath(tree, created.parent_id)
+    if (parentPath) await applyCategoryInvalidations([parentPath])
+  }
+  return created
 }
 
 export interface UpdateCategoryInput {
   id: string
   slug?: string
+  parent_id?: string | null
   menu_order?: number
   translations?: Array<{ locale: string; name: string }>
 }
 
 export async function updateCmsCategory(input: UpdateCategoryInput): Promise<{ category: Category; slugsToPurge: string[] }> {
+  const existing = await db
+    .selectFrom('categories')
+    .selectAll()
+    .where('id', '=', input.id)
+    .executeTakeFirst()
+  if (!existing) throw err(404, 'Category not found')
+
   const args: Parameters<typeof dbUpdateCategory>[1] = {}
+  let nextSlug = existing.slug
+  let nextParentId: string | null = existing.parent_id
+
   if (input.slug !== undefined) {
-    const slug = validateCategorySlug(input.slug)
-    const collidingPage = await db
-      .selectFrom('pages')
-      .select('id')
-      .where('slug', '=', slug)
-      .where('category_id', 'is', null)
-      .executeTakeFirst()
-    if (collidingPage) {
-      throw err(409, `A page already uses the slug "${slug}".`)
+    nextSlug = validateCategorySlug(input.slug)
+    args.slug = nextSlug
+  }
+  if (input.parent_id !== undefined) {
+    nextParentId = input.parent_id ?? null
+    if (nextParentId) {
+      const tree = await loadCategoryTree()
+      if (wouldCreateCycle(tree, input.id, nextParentId)) {
+        throw err(400, 'Parent must not be the category itself or one of its descendants')
+      }
+      const parent = await db
+        .selectFrom('categories')
+        .select('id')
+        .where('id', '=', nextParentId)
+        .executeTakeFirst()
+      if (!parent) throw err(400, 'Parent category not found')
     }
-    args.slug = slug
+    args.parent_id = nextParentId
+  }
+  if ((args.slug !== undefined && nextSlug !== existing.slug) ||
+      (args.parent_id !== undefined && nextParentId !== existing.parent_id)) {
+    await ensureNoSiblingCollision(nextSlug, nextParentId, input.id)
   }
   if (input.menu_order !== undefined) args.menu_order = input.menu_order
   if (input.translations !== undefined) args.translations = normalizeTranslations(input.translations)
@@ -124,30 +260,48 @@ export async function updateCmsCategory(input: UpdateCategoryInput): Promise<{ c
     return await dbUpdateCategory(input.id, args)
   } catch (e: unknown) {
     if ((e as { code?: string })?.code === '23505') {
-      throw err(409, 'A category with that slug already exists')
+      throw err(409, 'A category with that slug already exists at this level')
     }
     throw e
   }
 }
 
 export interface DeleteCategoryError {
-  error: 'attached_pages_present'
+  error: 'attached_pages_present' | 'child_categories_present'
   attached_page_count: number
   sample_slugs: string[]
 }
 
-// Returns null on success, or a structured error payload when pages
-// are still attached. Uses the FK constraint to handle the rare race
-// between count and delete (see plans/mcp-project/mcp-project.md).
+// Returns null on success, or a structured error payload when the
+// category still has pages or child categories.
 export async function deleteCmsCategory(id: string): Promise<{ ok: true; slug: string } | DeleteCategoryError> {
   const existing = await db
     .selectFrom('categories')
-    .select(['id', 'slug'])
+    .select(['id', 'slug', 'parent_id'])
     .where('id', '=', id)
     .executeTakeFirst()
   if (!existing) throw err(404, 'Category not found')
 
   const result = await db.transaction().execute(async (tx) => {
+    const childCountRow = await tx
+      .selectFrom('categories')
+      .select(sql<number>`COUNT(*)::int`.as('count'))
+      .where('parent_id', '=', id)
+      .executeTakeFirstOrThrow()
+    if (Number(childCountRow.count) > 0) {
+      const sample = await tx
+        .selectFrom('categories')
+        .select('slug')
+        .where('parent_id', '=', id)
+        .limit(5)
+        .execute()
+      return {
+        kind: 'children' as const,
+        attached_page_count: Number(childCountRow.count),
+        sample_slugs: sample.map(s => s.slug)
+      }
+    }
+
     const countRow = await tx
       .selectFrom('pages')
       .select(sql<number>`COUNT(*)::int`.as('count'))
@@ -174,7 +328,6 @@ export async function deleteCmsCategory(id: string): Promise<{ ok: true; slug: s
       return { kind: 'deleted' as const, slug: existing.slug }
     } catch (e: unknown) {
       if ((e as { code?: string })?.code === '23503') {
-        // FK violation: race window — a page was just attached.
         return {
           kind: 'attached' as const,
           attached_page_count: 1,
@@ -191,6 +344,22 @@ export async function deleteCmsCategory(id: string): Promise<{ ok: true; slug: s
       attached_page_count: result.attached_page_count,
       sample_slugs: result.sample_slugs
     }
+  }
+  if (result.kind === 'children') {
+    return {
+      error: 'child_categories_present',
+      attached_page_count: result.attached_page_count,
+      sample_slugs: result.sample_slugs
+    }
+  }
+
+  // The deleted child drops out of its parent's landing-page grid; bust
+  // the parent's cached landing. (The parent still exists post-delete,
+  // so its path resolves.)
+  if (existing.parent_id) {
+    const tree = await loadCategoryTree()
+    const parentPath = categoryUrlPath(tree, existing.parent_id)
+    if (parentPath) await applyCategoryInvalidations([parentPath])
   }
   return { ok: true, slug: result.slug }
 }

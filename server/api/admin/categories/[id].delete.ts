@@ -14,10 +14,14 @@ export default defineEventHandler(async (event) => {
   try {
     const result = await deleteCmsCategory(id)
     if ('error' in result) {
+      const message = result.error === 'child_categories_present'
+        ? 'This category still has child categories. Move or delete them first.'
+        : 'This category still has pages. Move or delete them first.'
       throw createError({
         statusCode: 409,
-        statusMessage: 'This category still has pages. Move or delete them first.',
+        statusMessage: message,
         data: {
+          error: result.error,
           attached_page_count: result.attached_page_count,
           sample_slugs: result.sample_slugs
         }

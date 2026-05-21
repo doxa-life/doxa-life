@@ -9,6 +9,13 @@
 
 import { ENABLED_LANGUAGE_CODES } from '~~/config/languages'
 import { db } from './database'
+import {
+  loadCategoryTree,
+  categoryChain,
+  descendantCategoryIds,
+  pageUrlPath,
+  categoryUrlPath
+} from '../database/categoryTree'
 
 // Key format matches what defineCachedEventHandler writes in
 // server/api/pages/[...slug].get.ts. Nitro composes
@@ -29,30 +36,49 @@ export async function purgeCmsPage(slug: string, locales?: string[]) {
   )
 }
 
-// Purge every page in a category across all locales. Needed whenever a
-// field that leaks into a sibling's cached response changes — titles,
-// excerpts, featured images (all embedded in `children[]`) and
-// menu_order (alters sibling sort order). `excludeSlugs` lets the
-// caller skip pages whose entries were already purged independently
-// (avoids duplicate removeItem calls + lets `applyPageInvalidations`
-// pass the page-being-modified's slug — and its old slug, on a
-// category move — through).
+// Purge every cached page across a category's whole top-level subtree,
+// in all locales. Needed whenever a field that leaks into another cached
+// response changes — titles, excerpts, featured images (embedded in
+// `children[]` and the landing grid), menu_order (sort order), or a
+// page's published state (whether a category appears in the menu/grid at
+// all). The sidebar nav tree and the landing-page grids span the entire
+// top-level subtree — every page under `/resources` shares one nav, and
+// ancestor landings list their descendants — so the invalidation has to
+// reach from the top-level ancestor down, not just this category's own
+// subtree.
+//
+// `excludeUrls` skips entries already purged by the caller (avoids
+// duplicate removeItem calls when `applyPageInvalidations` already
+// handled the page-being-modified's old + new URL).
 export async function purgeCmsCategory(
   categoryId: string,
-  excludeSlugs?: string | ReadonlyArray<string>
+  excludeUrls?: string | ReadonlyArray<string>
 ): Promise<void> {
   const skip = new Set<string>(
-    excludeSlugs === undefined
+    excludeUrls === undefined
       ? []
-      : (typeof excludeSlugs === 'string' ? [excludeSlugs] : excludeSlugs)
+      : (typeof excludeUrls === 'string' ? [excludeUrls] : excludeUrls)
   )
+  const tree = await loadCategoryTree()
+  const chain = categoryChain(tree, categoryId)
+  const rootId = chain[0]?.id ?? categoryId
+  const subtreeIds = descendantCategoryIds(tree, rootId)
+  if (subtreeIds.length === 0) return
   const rows = await db
     .selectFrom('pages')
-    .select('slug')
-    .where('category_id', '=', categoryId)
+    .select(['slug', 'category_id'])
+    .where('category_id', 'in', subtreeIds)
     .execute()
-  const slugs = rows.map(r => r.slug).filter(s => !skip.has(s))
-  await Promise.all(slugs.map(s => purgeCmsPage(s)))
+  const urls = new Set<string>()
+  for (const r of rows) urls.add(pageUrlPath(tree, r))
+  // Bare-category landings cache too (e.g. `/resources` resolves
+  // through getCategoryDefaultPage); purge them along with the pages.
+  for (const cid of subtreeIds) {
+    const path = categoryUrlPath(tree, cid)
+    if (path) urls.add(path)
+  }
+  const targets = [...urls].filter(u => !skip.has(u))
+  await Promise.all(targets.map(u => purgeCmsPage(u)))
 }
 
 // Wipe every cached CMS page response. Used by the admin "Flush Cache"

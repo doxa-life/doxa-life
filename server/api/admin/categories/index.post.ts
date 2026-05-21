@@ -10,6 +10,7 @@ import { logEvent } from '../../../utils/activity-logger'
 
 interface Body {
   slug?: string
+  parent_id?: string | null
   menu_order?: number
   translations?: Record<string, { name?: string }> | Array<{ locale: string; name: string }>
 }
@@ -42,6 +43,7 @@ export default defineEventHandler(async (event) => {
   try {
     const category = await createCmsCategory({
       slug: body?.slug ?? '',
+      parent_id: body?.parent_id ? String(body.parent_id) : null,
       menu_order: Number.isFinite(body?.menu_order) ? Number(body.menu_order) : 0,
       translations
     })
@@ -51,7 +53,12 @@ export default defineEventHandler(async (event) => {
       recordId: category.id,
       userId: authUser.userId,
       userAgent: getHeader(event, 'user-agent') || undefined,
-      metadata: { slug: category.slug, translations: translations.length, source: 'admin-ui' }
+      metadata: {
+        slug: category.slug,
+        parent_id: category.parent_id,
+        translations: translations.length,
+        source: 'admin-ui'
+      }
     })
     return category
   } catch (e: any) {
