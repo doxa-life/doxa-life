@@ -45,6 +45,7 @@ const homeFeedbackConfig = JSON.stringify({
   profile: 'chat-bubble',
   apiBase: 'https://support.gospelambition.org',
   enabled: true,
+  showByDefault: false,
   instanceId: 'fb-home-map',
   projectId: '7bb8f5ba-eb45-4933-89de-bc93fcda09b2'
 })

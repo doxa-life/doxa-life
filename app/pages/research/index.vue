@@ -36,6 +36,7 @@ const researchFeedbackConfig = JSON.stringify({
   profile: 'chat-bubble',
   apiBase: 'https://support.gospelambition.org',
   enabled: true,
+  showByDefault: false,
   instanceId: 'fb-research-map',
   projectId: '1be56abd-60fd-4366-ad4f-178dddef657d'
 })
