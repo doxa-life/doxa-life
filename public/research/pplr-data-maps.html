@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PPLR data maps — Doxa.life</title>
+  <link rel="icon" href="/favicon.ico">
+
+  <!--
+    Static showcase of port-kingdom/Map-Framework/05-apps/PPLR-MAPS/PPLR-validate-data-mfe.
+
+    Mapbox token: fetched at runtime from /api/maps/token (Nuxt server endpoint).
+    The endpoint returns either a public key (pk.*) directly OR mints a
+    1-hour read-only temporary token (tk.*) from a secret key (sk.*) via
+    Mapbox Tokens API. Pattern ported from dt-geo-steward PHP plugin.
+    Token NEVER lands in this file — secret-scanning safe.
+
+    base href="/" so the bundle's `fetch('assets/data/...')` resolves
+    against site root, not /research/.
+  -->
+  <base href="/">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: #0b0f14; color: #e5e7eb; min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .hero { position: relative; padding: 28px 16px 18px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+    .hero h1 { font-size: 22px; font-weight: 500; color: #60a5fa; letter-spacing: 0.02em; }
+    .hero p  { font-size: 12px; color: #94a3b8; max-width: 720px; line-height: 1.6; }
+
+    .topbar { position: sticky; top: 0; z-index: 100; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 16px; background: #111827; border-bottom: 1px solid #1f2937; }
+    .topbar .spacer { flex: 1; }
+    .profile-tab, .overview-btn { padding: 8px 14px; background: transparent; border: 1px solid #334155; color: #94a3b8; font: 700 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: border-color .15s, color .15s, background .15s; }
+    .profile-tab:hover, .overview-btn:hover { border-color: #64748b; color: #e5e7eb; }
+    .profile-tab.active, .overview-btn.active { border-color: #60a5fa; color: #60a5fa; background: rgba(96,165,250,.08); }
+
+    #showcase { display: flex; flex-direction: column; gap: 24px; padding: 20px; max-width: 1500px; margin: 0 auto; }
+
+    .gem-frame { --fw: 14px; --gem: #39ff80; --gem-rgb: 57, 255, 128; position: relative; padding: var(--fw); background: #1a2420; border: 2px solid var(--gem); box-shadow: 0 0 20px rgba(var(--gem-rgb), .12), inset 0 0 20px rgba(var(--gem-rgb), .04); transition: box-shadow .3s, transform .4s cubic-bezier(.22, 1, .36, 1); isolation: isolate; }
+    .gem-frame:hover { box-shadow: 0 0 35px rgba(var(--gem-rgb), .2), inset 0 0 30px rgba(var(--gem-rgb), .06); }
+    .gem-frame-content { border: 2px solid var(--gem); overflow: hidden; background: #142118; }
+    .gem-bevel-svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; overflow: visible; }
+    .gem-bevel-svg line { stroke: var(--gem); stroke-width: 1.5; opacity: .7; }
+    .gem-frame:hover .gem-bevel-svg line { opacity: 1; }
+    .gem-header { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: rgba(var(--gem-rgb), .04); border-bottom: 2px solid var(--gem); }
+    .gem-header .label { font: 800 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace; text-transform: uppercase; letter-spacing: .08em; color: #fff; }
+    .gem-tag { display: inline-block; padding: 2px 8px; font: 10px/1 ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--gem); background: rgba(var(--gem-rgb), .08); border: 1px solid var(--gem); border-radius: 999px; }
+    .gem-index { margin-left: auto; font: 10px/1 ui-monospace, monospace; color: #64748b; letter-spacing: .1em; }
+    .gem-fs-btn { background: transparent; border: 1px solid #30363d; border-radius: 6px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; color: #8b949e; cursor: pointer; margin-left: 8px; transition: color .12s, border-color .12s, background .12s; }
+    .gem-fs-btn:hover { color: #c9d1d9; border-color: #73A17F; background: rgba(115,161,127,0.08); }
+    .gem-fs-btn svg { display: block; }
+    .gem-slot { position: relative; width: 100%; aspect-ratio: 16 / 9; }
+    .gem-frame:fullscreen, .gem-frame:-webkit-full-screen { width: 100vw; height: 100vh; background: #0d1117; padding: 0; border: none; }
+    .gem-frame:fullscreen .gem-frame-content, .gem-frame:-webkit-full-screen .gem-frame-content { width: 100%; height: 100%; display: flex; flex-direction: column; }
+    .gem-frame:fullscreen .gem-slot, .gem-frame:-webkit-full-screen .gem-slot { aspect-ratio: auto; flex: 1; min-height: 0; }
+    .gem-frame:fullscreen .gem-bevel-svg, .gem-frame:-webkit-full-screen .gem-bevel-svg { display: none; }
+    @media (max-width: 768px) { .gem-slot { aspect-ratio: 9 / 19.5; min-height: 70vh; } }
+    doxa-map { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
+    doxa-map:fullscreen, doxa-map:-webkit-full-screen { position: fixed; inset: 0; width: 100vw; height: 100vh; }
+
+    body.zoom-out-all #showcase { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    body.zoom-out-all .gem-slot { aspect-ratio: 1 / 1; }
+    body.zoom-out-all .gem-frame { --fw: 10px; }
+    body.zoom-out-all .gem-header { padding: 5px 8px; }
+    body.zoom-out-all .gem-header .label { font-size: 10px; letter-spacing: .06em; }
+    body.zoom-out-all .gem-tag { font-size: 9px; padding: 1px 6px; }
+
+    #showcase.more-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+    #showcase.more-grid .gem-slot { aspect-ratio: 16 / 9; }
+
+    .reload-bridge { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; width: 100%; min-height: 60vh; color: #c9d1d9; font: 600 12px ui-monospace, monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+    .reload-globe { width: 64px; height: 64px; animation: reload-spin 1.6s linear infinite; filter: drop-shadow(0 4px 14px rgba(115,161,127,0.35)); }
+    @keyframes reload-spin { to { transform: rotate(360deg); } }
+    .reload-text { color: #73A17F; opacity: 0.85; }
+
+    .token-error { padding: 20px; max-width: 600px; margin: 40px auto; background: #2a1014; border: 1px solid #ff5e5e; color: #ffc9c9; font: 13px/1.5 ui-monospace, monospace; border-radius: 4px; }
+    .token-error code { background: #1a0a0d; padding: 1px 5px; border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>PPLR data maps</h1>
+  <p>Many small displays — each one answers one validation question about the PPLR people-group data.
+     Source: 6 parquets from the PPLR ArcGIS FeatureServer · 48,174 PG records · 17 locales.</p>
+</div>
+
+<header class="topbar" id="topbar">
+  <div class="spacer"></div>
+  <button class="overview-btn" id="zoomOutBtn" onclick="toggleZoomOut()"
+          title="Zoom out so every slot is visible at once">Overview</button>
+</header>
+
+<div id="showcase"></div>
+
+<script>
+  // ───────────────────────────────────────────────────────────────────────
+  // Slot config — each entry becomes one gem-framed <doxa-map>. First 5
+  // are primary tabs; the rest live under "More ▾". `fixed: true` pins
+  // a tab to the right side. Add a profile by appending an entry here.
+  // ───────────────────────────────────────────────────────────────────────
+  window.PPLR_SLOTS = [
+    { profile: 'pplr-religion', label: 'Religion', gem: 'tourmaline',
+      config: { instanceId: 'pplr-rel-1' } },
+    { profile: 'pplr-rop-tree', label: 'ROP Tree', gem: 'citrine',
+      config: { instanceId: 'pplr-tree-1' } },
+    { profile: 'pplr-language-families', label: 'Language Families', gem: 'aquamarine',
+      config: { instanceId: 'pplr-lf-1' } },
+    { profile: 'pplr-semantic-trees', label: 'Semantic Trees', gem: 'amethyst',
+      config: { instanceId: 'pplr-sem-1' } },
+    { profile: 'pplr-translations', label: 'PG Name Locales', gem: 'sapphire',
+      config: { instanceId: 'pplr-trans-1' } },
+    { profile: 'pplr-d3-tree', label: 'ROP Sunburst (D3)', gem: 'onyx',
+      config: { instanceId: 'pplr-d3-1' } },
+    { profile: 'pplr-pins', label: 'All PG-in-country pins', gem: 'emerald',
+      config: { instanceId: 'pplr-pins-1' } },
+    { profile: 'pplr-rosetta-cards', label: 'Cross-system ID Rosetta', gem: 'topaz',
+      config: { instanceId: 'pplr-rosetta-1' } },
+    { profile: 'pplr-coverage', label: 'Translation coverage matrix', gem: 'amethyst',
+      config: { instanceId: 'pplr-cov-1' } },
+    { profile: 'pplr-index', label: 'Index', gem: 'sapphire',
+      config: { instanceId: 'pplr-index-1' }, fixed: true },
+  ];
+
+  // ───────────────────────────────────────────────────────────────────────
+  // Token bootstrap: fetch from /api/maps/token, then init the showcase
+  // and load the iife bundle. Token NEVER appears in this file.
+  // ───────────────────────────────────────────────────────────────────────
+  (async function init() {
+    try {
+      const res = await fetch('/api/maps/token');
+      if (!res.ok) throw new Error('Token endpoint returned ' + res.status);
+      const { token, type } = await res.json();
+      if (!token) throw new Error('Token endpoint returned empty token');
+      console.log('[PPLR] Got Mapbox', type, 'token');
+      window.PPLR_TOKEN = token;
+    } catch (err) {
+      console.error('[PPLR] Failed to fetch Mapbox token:', err);
+      document.getElementById('showcase').innerHTML = `
+        <div class="token-error">
+          <strong>Could not load Mapbox token from <code>/api/maps/token</code>.</strong><br><br>
+          Check that <code>NUXT_MAPBOX_KEY</code> or <code>NUXT_PUBLIC_MAPBOX_TOKEN</code>
+          is set in the host environment. Error: ${err.message}
+        </div>`;
+      return;
+    }
+
+    setupShowcase();
+
+    const s = document.createElement('script');
+    s.src = '/js/pplr-data-maps.iife.js';
+    s.async = false;
+    document.head.appendChild(s);
+  })();
+
+  // ───────────────────────────────────────────────────────────────────────
+  // Showcase: builds tabs + renders the active profile's gem(s). Reads
+  // window.PPLR_TOKEN and window.PPLR_SLOTS, both set above.
+  // ───────────────────────────────────────────────────────────────────────
+  function setupShowcase() {
+    const GEM_PALETTE = {
+      amethyst:   { name: 'amethyst',   hex: '#9333ea' },
+      sapphire:   { name: 'sapphire',   hex: '#2563eb' },
+      aquamarine: { name: 'aquamarine', hex: '#0891b2' },
+      emerald:    { name: 'emerald',    hex: '#059669' },
+      topaz:      { name: 'topaz',      hex: '#d97706' },
+      citrine:    { name: 'citrine',    hex: '#ca8a04' },
+      tourmaline: { name: 'tourmaline', hex: '#db2777' },
+      onyx:       { name: 'onyx',       hex: '#1f2937' }
+    };
+    const GEM_CYCLE = ['amethyst', 'sapphire', 'aquamarine', 'emerald', 'topaz', 'citrine', 'tourmaline'];
+    function gemForIndex(i) { return GEM_PALETTE[GEM_CYCLE[((i % GEM_CYCLE.length) + GEM_CYCLE.length) % GEM_CYCLE.length]]; }
+    function gemByName(n)   { return GEM_PALETTE[n] || GEM_PALETTE.onyx; }
+    function hexToRgb(hex) {
+      const h = hex.replace('#', '');
+      const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h;
+      return parseInt(f.slice(0, 2), 16) + ', ' + parseInt(f.slice(2, 4), 16) + ', ' + parseInt(f.slice(4, 6), 16);
+    }
+
+    const TK       = window.PPLR_TOKEN || '';
+    const SLOTS    = window.PPLR_SLOTS || [];
+    const topbar   = document.getElementById('topbar');
+    const showcase = document.getElementById('showcase');
+    const STORAGE_KEY = 'pplr-data-maps:profile';
+
+    const FIXED_SLOTS    = SLOTS.filter(s => s.fixed);
+    const FIXED_PROFILES = [...new Set(FIXED_SLOTS.map(s => s.profile))];
+    const NON_FIXED      = SLOTS.filter(s => !s.fixed);
+    const PROFILES = [];
+    NON_FIXED.forEach(s => { if (!PROFILES.includes(s.profile)) PROFILES.push(s.profile); });
+    const PRIMARY_PROFILES   = PROFILES.slice(0, 5);
+    const SECONDARY_PROFILES = PROFILES.slice(5);
+    const MORE = '__more__';
+
+    const saved = localStorage.getItem(STORAGE_KEY);
+    let activeProfile = (PRIMARY_PROFILES.includes(saved) || FIXED_PROFILES.includes(saved))
+      ? saved : PRIMARY_PROFILES[0];
+
+    function buildTabs() {
+      Array.from(topbar.querySelectorAll('.profile-tab')).forEach(el => el.remove());
+      const spacer  = topbar.querySelector('.spacer');
+      const zoomBtn = document.getElementById('zoomOutBtn');
+
+      PRIMARY_PROFILES.forEach(p => {
+        const slot = NON_FIXED.find(s => s.profile === p);
+        const btn = document.createElement('button');
+        btn.className = 'profile-tab' + (p === activeProfile ? ' active' : '');
+        btn.textContent = slot?.label || p.replace(/^pplr-/, '');
+        btn.onclick = () => selectProfile(p);
+        topbar.insertBefore(btn, spacer);
+      });
+
+      if (SECONDARY_PROFILES.length > 0) {
+        const btn = document.createElement('button');
+        btn.className = 'profile-tab' + (activeProfile === MORE ? ' active' : '');
+        btn.textContent = 'More ▾';
+        btn.onclick = () => selectProfile(MORE);
+        topbar.insertBefore(btn, spacer);
+      }
+
+      FIXED_SLOTS.forEach(slot => {
+        const p   = slot.profile;
+        const btn = document.createElement('button');
+        btn.className = 'profile-tab' + (p === activeProfile ? ' active' : '');
+        btn.textContent = slot.label || p.replace(/^pplr-/, '');
+        btn.onclick = () => selectProfile(p);
+        topbar.insertBefore(btn, zoomBtn);
+      });
+    }
+
+    function makeSlotEl(slot, i) {
+      const gem    = slot.gem ? gemByName(slot.gem) : gemForIndex(i);
+      const gemRgb = hexToRgb(gem.hex);
+      const config = Object.assign({}, slot.config, { profile: slot.profile, tk: TK });
+
+      const el = document.createElement('div');
+      el.className = 'gem-frame';
+      el.id = 'frame-' + (slot.config?.instanceId || `${slot.profile}-${i}`);
+      el.style.setProperty('--gem', gem.hex);
+      el.style.setProperty('--gem-rgb', gemRgb);
+      el.innerHTML = `
+        <svg class="gem-bevel-svg" xmlns="http://www.w3.org/2000/svg">
+          <line/><line/><line/><line/>
+        </svg>
+        <div class="gem-frame-content">
+          <div class="gem-header">
+            <span class="label">${slot.label}</span>
+            <span class="gem-tag">${gem.name}</span>
+            <span class="gem-index">#${i + 1}</span>
+            <button class="gem-fs-btn" type="button" title="Fullscreen this gem (Esc to exit)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                <path d="M4 9V4H9M15 4H20V9M20 15V20H15M9 20H4V15"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+          <div class="gem-slot">
+            <doxa-map profile-config='${JSON.stringify(config).replace(/'/g, "&#39;")}'></doxa-map>
+          </div>
+        </div>`;
+      const fsBtn = el.querySelector('.gem-fs-btn');
+      fsBtn?.addEventListener('click', () => {
+        if (document.fullscreenElement === el) document.exitFullscreen?.();
+        else el.requestFullscreen?.();
+      });
+      return el;
+    }
+
+    function renderActive() {
+      showcase.innerHTML = '';
+      const isMore = activeProfile === MORE;
+      const slots  = isMore
+        ? SLOTS.filter(s => SECONDARY_PROFILES.includes(s.profile))
+        : SLOTS.filter(s => s.profile === activeProfile);
+
+      showcase.classList.toggle('more-grid', isMore);
+      slots.forEach((slot, i) => showcase.appendChild(makeSlotEl(slot, i)));
+      requestAnimationFrame(updateBevels);
+    }
+
+    function updateBevels() {
+      document.querySelectorAll('.gem-frame').forEach(frame => {
+        const svg = frame.querySelector('.gem-bevel-svg');
+        if (!svg) return;
+        const w = frame.offsetWidth, h = frame.offsetHeight;
+        if (!w || !h) return;
+        const fw = parseInt(getComputedStyle(frame).paddingTop) || 14;
+        svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+        svg.setAttribute('width', w);
+        svg.setAttribute('height', h);
+        const ls = svg.querySelectorAll('line');
+        if (ls.length < 4) return;
+        ls[0].setAttribute('x1', 0); ls[0].setAttribute('y1', 0); ls[0].setAttribute('x2', fw); ls[0].setAttribute('y2', fw);
+        ls[1].setAttribute('x1', w); ls[1].setAttribute('y1', 0); ls[1].setAttribute('x2', w - fw); ls[1].setAttribute('y2', fw);
+        ls[2].setAttribute('x1', 0); ls[2].setAttribute('y1', h); ls[2].setAttribute('x2', fw); ls[2].setAttribute('y2', h - fw);
+        ls[3].setAttribute('x1', w); ls[3].setAttribute('y1', h); ls[3].setAttribute('x2', w - fw); ls[3].setAttribute('y2', h - fw);
+      });
+    }
+    new ResizeObserver(updateBevels).observe(showcase);
+    window.addEventListener('resize', updateBevels);
+
+    function selectProfile(p) {
+      if (p === activeProfile) return;
+      activeProfile = p;
+      if (p !== MORE) localStorage.setItem(STORAGE_KEY, p);
+      buildTabs();
+      showcase.innerHTML = `
+        <div class="reload-bridge" role="status" aria-live="polite">
+          <svg class="reload-globe" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <radialGradient id="rb-grad" cx="35%" cy="35%" r="65%">
+                <stop offset="0%" stop-color="#92b195" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="#3b463d" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <circle cx="32" cy="32" r="26" fill="url(#rb-grad)" />
+            <circle cx="32" cy="32" r="26" fill="none" stroke="#73A17F" stroke-width="2"/>
+            <ellipse cx="32" cy="32" rx="26" ry="10" fill="none" stroke="#73A17F" stroke-width="1.4" opacity="0.7"/>
+            <ellipse cx="32" cy="32" rx="14" ry="26" fill="none" stroke="#73A17F" stroke-width="1.4" opacity="0.7"/>
+            <line x1="6" y1="32" x2="58" y2="32" stroke="#73A17F" stroke-width="1.2" opacity="0.45"/>
+            <line x1="32" y1="6" x2="32" y2="58" stroke="#73A17F" stroke-width="1.2" opacity="0.45"/>
+          </svg>
+          <span class="reload-text">Reloading map</span>
+        </div>`;
+      requestAnimationFrame(() => requestAnimationFrame(() => renderActive()));
+    }
+
+    window.toggleZoomOut = function() {
+      const on = document.body.classList.toggle('zoom-out-all');
+      document.getElementById('zoomOutBtn').classList.toggle('active', on);
+      requestAnimationFrame(updateBevels);
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 350);
+    };
+
+    buildTabs();
+    renderActive();
+
+    window.addEventListener('pplr-select-profile', e => {
+      const p = e.detail?.profile;
+      if (p && (PROFILES.includes(p) || FIXED_PROFILES.includes(p))) {
+        selectProfile(p);
+      }
+    });
+  }
+</script>
+
+</body>
+</html>

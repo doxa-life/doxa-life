@@ -1,0 +1,32 @@
+{
+  "name": "1040-maps",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Map Forge — Vite monorepo for embeddable Mapbox MFE bundles. One library, N bundles.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run clean && for d in app-profiles/*/; do BUNDLE=$(basename \"$d\") vite build || exit 1; done",
+    "build:watch": "vite build --watch",
+    "preview": "vite preview",
+    "clean": "mkdir -p ../../../public/js",
+    "build:bundle": "vite build"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "terser": "^5.46.0",
+    "vite": "^5.4.21",
+    "vite-plugin-css-injected-by-js": "^3.5.2"
+  },
+  "dependencies": {
+    "jspdf": "^4.2.1",
+    "pinia": "^2.3.1",
+    "topojson-client": "^3.1.0",
+    "vue": "^3.5.20",
+    "vue-i18n": "^9.14.5",
+    "world-atlas": "^2.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

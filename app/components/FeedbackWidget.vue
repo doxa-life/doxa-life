@@ -39,3 +39,18 @@ onMounted(() => {
   }
 })
 </script>
+
+<template>
+  <div class="feedback-widget-slot">
+    <feedback-web-component :profile-config="profileConfig" />
+  </div>
+</template>
+
+<style scoped>
+.feedback-widget-slot {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2147483000;
+}
+</style>
