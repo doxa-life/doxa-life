@@ -13,6 +13,7 @@ export interface Language {
   bibleLabel?: string    // Display label for the Bible translation (defaults to bibleId)
   glossaryId?: string    // DeepL glossary ID for this language pair (EN → target)
   enabled?: boolean      // Whether the language is active in the UI (default: true)
+  latinHeadings?: boolean // Headings render in the Latin display font (Bebas Neue); set false for non-Latin scripts (default: true)
 }
 
 // All known languages — disabled languages are available for API responses
@@ -25,10 +26,10 @@ export const LANGUAGES: Language[] = [
   { code: 'pt', name: 'Portuguese', nativeName: 'Português', flag: '🇵🇹', deeplTarget: 'PT-BR', deeplSource: 'PT', bibleId: 'NAA', glossaryId: 'bbe0697f-429a-45f7-9c30-576c7f21c78d' },
   { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪', deeplTarget: 'DE', deeplSource: 'DE', bibleId: 'S00', bibleLabel: 'SCH2000', glossaryId: '87ad31eb-1a58-4f91-b80e-943b3721065d', enabled: false },
   { code: 'it', name: 'Italian', nativeName: 'Italiano', flag: '🇮🇹', deeplTarget: 'IT', deeplSource: 'IT', bibleId: 'NR06', glossaryId: '98dca739-468a-4c29-a0ce-ba89f60da00b', enabled: false },
-  { code: 'zh', name: 'Chinese', nativeName: '中文', flag: '🇨🇳', deeplTarget: 'ZH-HANS', deeplSource: 'ZH', bibleId: 'CUNPS', glossaryId: '532adee9-5117-4a9e-a6cb-a8c4b670232d', enabled: false },
-  { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦', dir: 'rtl', deeplTarget: 'AR', deeplSource: 'AR', bibleId: 'SVD', glossaryId: '294b6001-2831-45d4-bab5-3fd1af92dc7a' }, // NAV (New Arabic Version) would be better but not on Bolls
-  { code: 'ru', name: 'Russian', nativeName: 'Русский', flag: '🇷🇺', deeplTarget: 'RU', deeplSource: 'RU', bibleId: 'SYNOD', glossaryId: '7363b815-3cd1-4e1a-ae8b-d6695e6dbc4a' }, // NRT (New Russian Translation) is a modern alternative
-  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳', deeplTarget: 'HI', deeplSource: 'HI', bibleId: 'HIOV', bibleLabel: 'OV', enabled: false },
+  { code: 'zh', name: 'Chinese', nativeName: '中文', flag: '🇨🇳', deeplTarget: 'ZH-HANS', deeplSource: 'ZH', bibleId: 'CUNPS', glossaryId: '532adee9-5117-4a9e-a6cb-a8c4b670232d', enabled: false, latinHeadings: false },
+  { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦', dir: 'rtl', deeplTarget: 'AR', deeplSource: 'AR', bibleId: 'SVD', glossaryId: '294b6001-2831-45d4-bab5-3fd1af92dc7a', latinHeadings: false }, // NAV (New Arabic Version) would be better but not on Bolls
+  { code: 'ru', name: 'Russian', nativeName: 'Русский', flag: '🇷🇺', deeplTarget: 'RU', deeplSource: 'RU', bibleId: 'SYNOD', glossaryId: '7363b815-3cd1-4e1a-ae8b-d6695e6dbc4a', latinHeadings: false }, // NRT (New Russian Translation) is a modern alternative
+  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳', deeplTarget: 'HI', deeplSource: 'HI', bibleId: 'HIOV', bibleLabel: 'OV', enabled: false, latinHeadings: false },
   { code: 'ro', name: 'Romanian', nativeName: 'Română', flag: '🇷🇴', deeplTarget: 'RO', deeplSource: 'RO', bibleId: 'NTR', glossaryId: 'e50d3fed-6d0e-4f2c-a3ac-96112829055e', enabled: false },
 ]
 
@@ -65,4 +66,12 @@ export function getDeeplSourceCode(code: string): string {
 
 export function getGlossaryId(code: string): string | undefined {
   return getLanguage(code)?.glossaryId
+}
+
+// Whether this language's headings render in the Latin display font (Bebas Neue).
+// Non-Latin scripts (Cyrillic, Arabic, CJK, Devanagari) fall back to other fonts,
+// so callers can skip Bebas-specific work (e.g. preloading it). Unknown codes
+// default to true.
+export function usesLatinHeadings(code: string): boolean {
+  return getLanguage(code)?.latinHeadings !== false
 }
