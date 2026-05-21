@@ -33,6 +33,7 @@ const adoptFeedbackConfig = JSON.stringify({
   profile: 'chat-bubble',
   apiBase: 'https://support.gospelambition.org',
   enabled: true,
+  showByDefault: false,
   instanceId: 'fb-adopt-map',
   projectId: 'dd1d9144-3da9-4a3b-87e8-7c17d9e94af0'
 })
