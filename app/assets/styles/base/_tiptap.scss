@@ -43,3 +43,21 @@
     margin-top: 0.5rem;
   }
 }
+
+// Embedded videos (YouTube + Vimeo). The editor stores a fixed 640×360
+// iframe (see app/utils/tiptapVimeo.ts and @tiptap/extension-youtube), so
+// without this the player renders in a small fixed box. Let it fill the
+// content column at a 16:9 ratio instead.
+[data-vimeo-video],
+[data-youtube-video] {
+  margin: var(--spacing-lg) 0;
+
+  iframe {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    border: 0;
+    border-radius: var(--border-radius-lg);
+  }
+}

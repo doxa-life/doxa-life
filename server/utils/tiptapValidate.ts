@@ -93,7 +93,7 @@ const NODE_ATTRS: Readonly<Record<string, ReadonlyArray<string>>> = {
   text: [],
   image: ['src', 'alt', 'title', 'align', 'width', 'height'],
   youtube: ['src', 'width', 'height', 'start'],
-  vimeo: ['src', 'width', 'height'],
+  vimeo: ['src', 'hash', 'width', 'height'],
   div: ['class', 'style', ...PRESERVED_DATA_ATTRS],
   verse: ['reference'],
   uupgsList: [
@@ -149,6 +149,14 @@ function isSafeYoutubeUrl(value: unknown): boolean {
 // check is sufficient — no URL can be smuggled through.
 function isSafeVimeoSrc(value: unknown): boolean {
   return typeof value === 'string' && /^\d+$/.test(value)
+}
+
+// Optional Vimeo privacy hash. Absent is fine; when present it must be
+// alphanumeric so it can be appended to the embed URL as `?h=<hash>`
+// without smuggling extra query params or markup.
+function isSafeVimeoHash(value: unknown): boolean {
+  if (value === null || value === undefined) return true
+  return typeof value === 'string' && /^[a-z0-9]+$/i.test(value)
 }
 
 // CSS color values that pass into a `color: <value>` declaration.
@@ -333,6 +341,10 @@ function walkNode(
     const src = node.attrs?.src
     if (!isSafeVimeoSrc(src)) {
       warnings.push({ path: `${path}.attrs.src`, reason: 'vimeo.src is not a valid Vimeo video id; node dropped' })
+      return 'remove'
+    }
+    if (!isSafeVimeoHash(node.attrs?.hash)) {
+      warnings.push({ path: `${path}.attrs.hash`, reason: 'vimeo.hash is not a valid Vimeo privacy hash; node dropped' })
       return 'remove'
     }
   }
