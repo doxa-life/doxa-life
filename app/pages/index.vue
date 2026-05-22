@@ -19,7 +19,7 @@ function openVideo() {
   videoModalRef.value?.open()
 }
 
-const { totalPeopleGroupsFormatted, ensureLoaded } = usePrayerStatistics()
+const { unengagedPeopleGroupsFormatted, ensureLoaded } = usePrayerStatistics()
 await ensureLoaded()
 
 const mapboxToken = config.public.mapboxToken as string
@@ -121,7 +121,7 @@ useTextHighlight()
       <div class="container stack stack--4xl">
         <div class="stack stack--2xl">
           <h2 class="highlight" data-highlight-index="1">
-            {{ t('{0} unengaged people groups', [totalPeopleGroupsFormatted]) }}
+            {{ t('{0} unengaged people groups', [unengagedPeopleGroupsFormatted]) }}
           </h2>
           <p class="subtext">
             {{ t('Our hope is to see each of them covered in 24-hour prayer, and your church can be part of it.') }}
@@ -206,7 +206,7 @@ useTextHighlight()
               <div class="stack stack--lg | info-card__content">
                 <h3>{{ t('Unengaged') }}</h3>
                 <span>{{ t('{0} Million', ['202']) }}</span>
-                <span>{{ t('{0} People Groups', [totalPeopleGroupsFormatted]) }}</span>
+                <span>{{ t('{0} People Groups', [unengagedPeopleGroupsFormatted]) }}</span>
               </div>
             </div>
           </div>
@@ -250,7 +250,7 @@ useTextHighlight()
               <div class="stack stack--xl">
                 <h3 class="subtext">{{ t('In partnership with the global church, our vision is for...') }}</h3>
                 <ul class="stack stack--md" data-list-color="primary">
-                  <li>{{ t('Daily 24-hour prayer coverage for all {0} unengaged peoples', [totalPeopleGroupsFormatted]) }}</li>
+                  <li>{{ t('Daily 24-hour prayer coverage for all {0} unengaged peoples', [unengagedPeopleGroupsFormatted]) }}</li>
                   <li>{{ t('No unengaged people groups by 2033') }}</li>
                   <li>{{ t('Mobilization of 20,000+ DOXA partnership missionaries') }}</li>
                   <li>{{ t('Fruitful engagement among frontier peoples and the under-engaged') }}</li>

@@ -1,13 +1,15 @@
 // Server-side cached proxy to campaigns-sever's `/api/people-groups/statistics`.
 // The composable `usePrayerStatistics` calls this so the upstream is only hit
-// once per cache window per server instance — and so `total` (the live count
-// of people groups) can drive the denominator that used to be hardcoded as
+// once per cache window per server instance — and so the live `total` (all
+// people groups, used by the pray/adopt denominators) and `total_unengaged`
+// (the homepage count) can drive the numbers that used to be hardcoded as
 // 2,085 in templates.
 
 import { defineCachedEventHandler } from 'nitropack/runtime'
 
 export interface PrayerStatisticsResponse {
   total: number
+  total_unengaged: number
   total_with_prayer: number
   total_with_full_prayer: number
   total_adopted: number
@@ -25,6 +27,7 @@ export default defineCachedEventHandler(
     )
     return {
       total: Number(data.total || 0),
+      total_unengaged: Number(data.total_unengaged || 0),
       total_with_prayer: Number(data.total_with_prayer || 0),
       total_with_full_prayer: Number(data.total_with_full_prayer || 0),
       total_adopted: Number(data.total_adopted || 0),
