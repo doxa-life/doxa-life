@@ -10,6 +10,7 @@
 
 export interface PrayerStatistics {
   total: number
+  total_unengaged: number
   total_with_prayer: number
   total_with_full_prayer: number
   total_adopted: number
@@ -25,6 +26,7 @@ export function usePrayerStatistics() {
 
   const stats = useState<PrayerStatistics>('prayer-stats', () => ({
     total: 0,
+    total_unengaged: 0,
     total_with_prayer: 0,
     total_with_full_prayer: 0,
     total_adopted: 0
@@ -39,6 +41,7 @@ export function usePrayerStatistics() {
       const data = await $fetch<PrayerStatistics>('/api/people-groups/statistics')
       stats.value = {
         total: Number(data.total || 0),
+        total_unengaged: Number(data.total_unengaged || 0),
         total_with_prayer: Number(data.total_with_prayer || 0),
         total_with_full_prayer: Number(data.total_with_full_prayer || 0),
         total_adopted: Number(data.total_adopted || 0)
@@ -60,6 +63,7 @@ export function usePrayerStatistics() {
       const data = await $fetch<PrayerStatistics>('/api/people-groups/statistics')
       stats.value = {
         total: Number(data.total || 0),
+        total_unengaged: Number(data.total_unengaged || 0),
         total_with_prayer: Number(data.total_with_prayer || 0),
         total_with_full_prayer: Number(data.total_with_full_prayer || 0),
         total_adopted: Number(data.total_adopted || 0)
@@ -78,6 +82,14 @@ export function usePrayerStatistics() {
     totalPeopleGroups.value.toLocaleString(`${locale.value}-u-nu-latn`)
   )
 
+  // The unengaged subset of people groups, used where the copy specifically
+  // says "unengaged" (the homepage). The pray/adopt pages use the full
+  // `totalPeopleGroups` total above instead.
+  const unengagedPeopleGroups = computed(() => stats.value.total_unengaged || FALLBACK_TOTAL)
+  const unengagedPeopleGroupsFormatted = computed(() =>
+    unengagedPeopleGroups.value.toLocaleString(`${locale.value}-u-nu-latn`)
+  )
+
   const prayerCoveragePercent = computed(
     () => Math.min(100, (stats.value.total_with_full_prayer / totalPeopleGroups.value) * 100)
   )
@@ -91,6 +103,8 @@ export function usePrayerStatistics() {
     error: readonly(error),
     totalPeopleGroups,
     totalPeopleGroupsFormatted,
+    unengagedPeopleGroups,
+    unengagedPeopleGroupsFormatted,
     prayerCoveragePercent,
     adoptedPercent,
     reload,
