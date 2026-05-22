@@ -4,9 +4,11 @@
 // Adapted from campaigns-sever's Vimeo extension, trimmed to the options
 // marketing content needs.
 //
-// `src` stores only the numeric Vimeo video id; renderHTML builds the
-// player.vimeo.com URL from it. Keeping the stored value digits-only lets
-// server/utils/tiptapValidate.ts accept it without any URL parsing.
+// `src` stores the numeric Vimeo video id and `hash` the optional privacy
+// hash (the `h=` token unlisted/private videos require); renderHTML builds
+// the player.vimeo.com URL from them. Both stored values are restricted to
+// safe character sets so server/utils/tiptapValidate.ts can accept them
+// without any URL parsing.
 //
 // No node view — like the Verse extension we keep this framework-agnostic
 // (no @tiptap/vue-3, no DOM) so generateHTML stays Vue-free on the server.
@@ -47,6 +49,19 @@ export function getVimeoVideoId(url: string): string | null {
   return null
 }
 
+// Pull the Vimeo privacy hash out of a URL — the `h=` token unlisted /
+// private videos require in their embed URL. It appears either as a query
+// param (?h=<hash>) or as the second path segment of a share link
+// (vimeo.com/<id>/<hash>). Returns null when absent.
+export function getVimeoHash(url: string): string | null {
+  if (!url) return null
+  const query = url.match(/[?&]h=([a-z0-9]+)/i)
+  if (query?.[1]) return query[1]
+  const path = url.match(/vimeo\.com\/\d+\/([a-z0-9]+)/i)
+  if (path?.[1]) return path[1]
+  return null
+}
+
 export const Vimeo = Node.create<VimeoOptions>({
   name: 'vimeo',
   group: 'block',
@@ -64,6 +79,7 @@ export const Vimeo = Node.create<VimeoOptions>({
   addAttributes() {
     return {
       src: { default: null },
+      hash: { default: null },
       width: { default: this.options.width },
       height: { default: this.options.height }
     }
@@ -82,7 +98,7 @@ export const Vimeo = Node.create<VimeoOptions>({
             if (!videoId) return false
             return commands.insertContent({
               type: this.name,
-              attrs: { src: videoId }
+              attrs: { src: videoId, hash: getVimeoHash(options.src) }
             })
           }
     }
@@ -90,15 +106,19 @@ export const Vimeo = Node.create<VimeoOptions>({
 
   renderHTML({ HTMLAttributes }) {
     const videoId = HTMLAttributes.src
+    const hash = HTMLAttributes.hash
     const width = HTMLAttributes.width ?? this.options.width
     const height = HTMLAttributes.height ?? this.options.height
+    const embedSrc = videoId
+      ? `https://player.vimeo.com/video/${videoId}${hash ? `?h=${hash}` : ''}`
+      : ''
     return [
       'div',
       { 'data-vimeo-video': '' },
       [
         'iframe',
         mergeAttributes(this.options.HTMLAttributes, {
-          src: videoId ? `https://player.vimeo.com/video/${videoId}` : '',
+          src: embedSrc,
           width,
           height,
           frameborder: '0',
