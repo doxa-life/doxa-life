@@ -299,29 +299,130 @@ export function useMapFly(options = {}) {
     const LEGEND_FIT_DURATION_MS = 800;
     const LEGEND_SINGLE_PIN_ZOOM = 8;
 
+    // Why: map.querySourceFeatures(sourceId, {filter}) is viewport-clipped —
+    // pins outside the rendered camera are dropped, so legend rows for off-screen
+    // regions silently no-op when the user is zoomed in. We evaluate the Mapbox
+    // filter expression against the full source data instead, so fitBounds can
+    // zoom OUT to a different region or IN to a tight cluster uniformly.
+    function _resolveExpr(expr, props) {
+        if (!Array.isArray(expr)) return expr;
+        const op = expr[0];
+        switch (op) {
+            case 'get':      return props?.[expr[1]];
+            case 'literal':  return expr[1];
+            case 'has':      return props != null && expr[1] in props;
+            case '!has':     return props == null || !(expr[1] in props);
+            case '!':        return !_resolveExpr(expr[1], props);
+            case 'coalesce': {
+                for (let i = 1; i < expr.length; i++) {
+                    const v = _resolveExpr(expr[i], props);
+                    if (v != null) return v;
+                }
+                return null;
+            }
+            case 'to-number': {
+                const v = _resolveExpr(expr[1], props);
+                const n = Number(v);
+                if (Number.isFinite(n)) return n;
+                if (expr.length > 2) {
+                    const fb = Number(_resolveExpr(expr[2], props));
+                    return Number.isFinite(fb) ? fb : 0;
+                }
+                return NaN;
+            }
+            case 'to-string': {
+                const v = _resolveExpr(expr[1], props);
+                return v == null ? '' : String(v);
+            }
+            case 'to-boolean': return Boolean(_resolveExpr(expr[1], props));
+            default:           return expr;
+        }
+    }
+    function _matchesFilter(filter, props) {
+        if (filter === true) return true;
+        if (filter === false) return false;
+        if (!Array.isArray(filter)) return Boolean(filter);
+        const op = filter[0];
+        if (op === 'all') {
+            for (let i = 1; i < filter.length; i++) {
+                if (!_matchesFilter(filter[i], props)) return false;
+            }
+            return true;
+        }
+        if (op === 'any') {
+            for (let i = 1; i < filter.length; i++) {
+                if (_matchesFilter(filter[i], props)) return true;
+            }
+            return false;
+        }
+        if (op === '!')   return !_matchesFilter(filter[1], props);
+        if (op === 'has') return props != null && filter[1] in props;
+        if (op === '!has') return props == null || !(filter[1] in props);
+
+        if (op === '==' || op === '!=' || op === '>' || op === '>=' ||
+            op === '<'  || op === '<=') {
+            // Legacy form: ['==', 'propName', value] (no ['get', ...])
+            const left = (typeof filter[1] === 'string')
+                ? props?.[filter[1]]
+                : _resolveExpr(filter[1], props);
+            const right = _resolveExpr(filter[2], props);
+            switch (op) {
+                case '==': return left === right || (left == null && right == null);
+                case '!=': return !(left === right || (left == null && right == null));
+                case '>':  return left >  right;
+                case '>=': return left >= right;
+                case '<':  return left <  right;
+                case '<=': return left <= right;
+            }
+        }
+        if (op === 'in') {
+            const v = _resolveExpr(filter[1], props);
+            const haystack = _resolveExpr(filter[2], props);
+            if (Array.isArray(haystack)) return haystack.includes(v);
+            if (typeof haystack === 'string') return haystack.includes(v);
+            return false;
+        }
+        if (op === 'match') {
+            const input = _resolveExpr(filter[1], props);
+            const lastIdx = filter.length - 1;
+            for (let i = 2; i < lastIdx; i += 2) {
+                const labelRaw = filter[i];
+                const labels = Array.isArray(labelRaw) ? labelRaw : [labelRaw];
+                if (labels.includes(input)) return Boolean(_resolveExpr(filter[i + 1], props));
+            }
+            return Boolean(_resolveExpr(filter[lastIdx], props));
+        }
+        return false;
+    }
+    function _readSourceFeatures(map, sourceId) {
+        const src = map.getSource(sourceId);
+        if (!src) return [];
+        const data = src._data ?? src.serialize?.()?.data;
+        if (!data) return [];
+        if (Array.isArray(data?.features)) return data.features;
+        if (data?.type === 'Feature') return [data];
+        return [];
+    }
+
     /**
      * zoomToLegendRow — uniform "click a legend row, fit the scope it represents."
      *
-     * Derives camera target from the live `language-families` source, NOT from
-     * hardcoded per-region coordinates. Any STL row (polygon / pin-cluster /
-     * single-pin) flows through the same path:
+     * Reads the full `language-families` source data via map.getSource()._data
+     * and evaluates the Mapbox filter expression in JS, bypassing the viewport
+     * clip that previously caused off-screen regions to silently no-op. fitBounds
+     * is bidirectional — it zooms OUT to a wider region just as readily as it
+     * zooms IN to a tight cluster, so Africa-row and North-India-cluster-row
+     * feel like the same gesture from any starting camera.
      *
-     *   1. Resolve a Mapbox match expression for the row's scope
-     *   2. querySourceFeatures('language-families', { filter }) for matching pins
-     *   3. count == 0 → no-op (intentional — never blank-out the map)
-     *      count == 1 → flyTo single-pin coords @ LEGEND_SINGLE_PIN_ZOOM
-     *      count >= 2 → fitBounds with padding LEGEND_FIT_PADDING_PX, duration LEGEND_FIT_DURATION_MS
-     *
-     * Bounds are computed from pin coords, so Africa-row and North-India-cluster-row
-     * feel like the same gesture.
+     *   count == 0 → no-op (intentional — never blank-out the map)
+     *   count == 1 → flyTo single-pin coords @ LEGEND_SINGLE_PIN_ZOOM
+     *   count >= 2 → fitBounds with padding LEGEND_FIT_PADDING_PX
      *
      * @param {Object} row - STL legend node { id, label, filter, ... }
      * @param {Object} [opts]
      * @param {Array}  [opts.matchExpr] - Override Mapbox expression for flat tabs
      *                                    (prayer/engagement/adoption) where row.filter
-     *                                    is a placeholder against `_flat_filter`. Caller
-     *                                    passes the real expression built from
-     *                                    peoplePraying / engagementStatus / etc.
+     *                                    is a placeholder against `_flat_filter`.
      * @param {string} [opts.sourceId='language-families'] - Pin source id to query
      */
     function zoomToLegendRow(row, opts = {}) {
@@ -334,21 +435,18 @@ export function useMapFly(options = {}) {
         const filter = opts.matchExpr ?? row.filter;
         if (!filter) return;
 
-        let features = [];
-        try {
-            features = map.querySourceFeatures(sourceId, { filter });
-        } catch (_) {
-            return;
-        }
-        if (!features.length) return;
+        const allFeatures = _readSourceFeatures(map, sourceId);
+        if (!allFeatures.length) return;
 
         let minLng = Infinity, maxLng = -Infinity;
         let minLat = Infinity, maxLat = -Infinity;
         let pointCount = 0;
         let firstLng = 0, firstLat = 0;
         const seen = new Set();
-        for (const f of features) {
-            const id = f.properties?.uniqueId;
+        for (const f of allFeatures) {
+            const props = f?.properties;
+            if (!_matchesFilter(filter, props)) continue;
+            const id = props?.uniqueId;
             if (id != null) {
                 if (seen.has(id)) continue;
                 seen.add(id);
