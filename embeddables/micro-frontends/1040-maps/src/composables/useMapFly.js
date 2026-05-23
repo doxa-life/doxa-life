@@ -474,12 +474,38 @@ export function useMapFly(options = {}) {
             return;
         }
 
+        const bounds = [[minLng, minLat], [maxLng, maxLat]];
         try {
-            map.fitBounds([[minLng, minLat], [maxLng, maxLat]], {
-                padding: LEGEND_FIT_PADDING_PX,
-                duration: LEGEND_FIT_DURATION_MS,
-                essential: true
-            });
+            // Why: when the legend row's scope spans a region wider than the
+            // mobile viewport can render at its effective minZoom, fitBounds
+            // animates toward a zoom < minZoom and Mapbox clamps mid-flight,
+            // causing a visible snap/jolt. Probe the would-be fit zoom first
+            // via cameraForBounds (no animation), and if it's tighter than
+            // the camera's minZoom (with 0.3 slack to absorb float rounding),
+            // flyTo the floor instead of fitBounds.
+            const probe = typeof map.cameraForBounds === 'function'
+                ? map.cameraForBounds(bounds, { padding: LEGEND_FIT_PADDING_PX })
+                : null;
+            const minZoom = typeof map.getMinZoom === 'function' ? map.getMinZoom() : null;
+            const wouldClamp = probe == null
+                || (typeof probe.zoom === 'number' && typeof minZoom === 'number'
+                    && probe.zoom < minZoom - 0.3);
+            if (wouldClamp && typeof minZoom === 'number') {
+                const cx = (minLng + maxLng) / 2;
+                const cy = (minLat + maxLat) / 2;
+                map.flyTo({
+                    center: [cx, cy],
+                    zoom: minZoom,
+                    duration: LEGEND_FIT_DURATION_MS,
+                    essential: true
+                });
+            } else {
+                map.fitBounds(bounds, {
+                    padding: LEGEND_FIT_PADDING_PX,
+                    duration: LEGEND_FIT_DURATION_MS,
+                    essential: true
+                });
+            }
         } catch (_) { /* fitBounds throws on degenerate bounds */ }
     }
 
