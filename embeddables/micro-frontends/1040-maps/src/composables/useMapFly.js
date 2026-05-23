@@ -294,6 +294,97 @@ export function useMapFly(options = {}) {
         });
     }
 
+    // Card d1336834 — uniform legend-row camera constants (driver-confirmed)
+    const LEGEND_FIT_PADDING_PX = 40;
+    const LEGEND_FIT_DURATION_MS = 800;
+    const LEGEND_SINGLE_PIN_ZOOM = 8;
+
+    /**
+     * zoomToLegendRow — uniform "click a legend row, fit the scope it represents."
+     *
+     * Derives camera target from the live `language-families` source, NOT from
+     * hardcoded per-region coordinates. Any STL row (polygon / pin-cluster /
+     * single-pin) flows through the same path:
+     *
+     *   1. Resolve a Mapbox match expression for the row's scope
+     *   2. querySourceFeatures('language-families', { filter }) for matching pins
+     *   3. count == 0 → no-op (intentional — never blank-out the map)
+     *      count == 1 → flyTo single-pin coords @ LEGEND_SINGLE_PIN_ZOOM
+     *      count >= 2 → fitBounds with padding LEGEND_FIT_PADDING_PX, duration LEGEND_FIT_DURATION_MS
+     *
+     * Bounds are computed from pin coords, so Africa-row and North-India-cluster-row
+     * feel like the same gesture.
+     *
+     * @param {Object} row - STL legend node { id, label, filter, ... }
+     * @param {Object} [opts]
+     * @param {Array}  [opts.matchExpr] - Override Mapbox expression for flat tabs
+     *                                    (prayer/engagement/adoption) where row.filter
+     *                                    is a placeholder against `_flat_filter`. Caller
+     *                                    passes the real expression built from
+     *                                    peoplePraying / engagementStatus / etc.
+     * @param {string} [opts.sourceId='language-families'] - Pin source id to query
+     */
+    function zoomToLegendRow(row, opts = {}) {
+        const map = getMap();
+        if (!map || !row) return;
+
+        const sourceId = opts.sourceId ?? 'language-families';
+        if (!map.getSource(sourceId)) return;
+
+        const filter = opts.matchExpr ?? row.filter;
+        if (!filter) return;
+
+        let features = [];
+        try {
+            features = map.querySourceFeatures(sourceId, { filter });
+        } catch (_) {
+            return;
+        }
+        if (!features.length) return;
+
+        let minLng = Infinity, maxLng = -Infinity;
+        let minLat = Infinity, maxLat = -Infinity;
+        let pointCount = 0;
+        let firstLng = 0, firstLat = 0;
+        const seen = new Set();
+        for (const f of features) {
+            const id = f.properties?.uniqueId;
+            if (id != null) {
+                if (seen.has(id)) continue;
+                seen.add(id);
+            }
+            const c = f.geometry?.coordinates;
+            if (!Array.isArray(c) || c.length < 2) continue;
+            const lng = c[0], lat = c[1];
+            if (!Number.isFinite(lng) || !Number.isFinite(lat)) continue;
+            if (pointCount === 0) { firstLng = lng; firstLat = lat; }
+            if (lng < minLng) minLng = lng;
+            if (lng > maxLng) maxLng = lng;
+            if (lat < minLat) minLat = lat;
+            if (lat > maxLat) maxLat = lat;
+            pointCount++;
+        }
+        if (pointCount === 0) return;
+
+        if (pointCount === 1) {
+            map.flyTo({
+                center: [firstLng, firstLat],
+                zoom: LEGEND_SINGLE_PIN_ZOOM,
+                duration: LEGEND_FIT_DURATION_MS,
+                essential: true
+            });
+            return;
+        }
+
+        try {
+            map.fitBounds([[minLng, minLat], [maxLng, maxLat]], {
+                padding: LEGEND_FIT_PADDING_PX,
+                duration: LEGEND_FIT_DURATION_MS,
+                essential: true
+            });
+        } catch (_) { /* fitBounds throws on degenerate bounds */ }
+    }
+
     return {
         // Core navigation
         getOffsetCenter,
@@ -303,6 +394,7 @@ export function useMapFly(options = {}) {
         flyToCoords,
         fitBounds,
         resetView,
+        zoomToLegendRow,
 
         // Utilities
         calculateRegionCenterFromPolygon
