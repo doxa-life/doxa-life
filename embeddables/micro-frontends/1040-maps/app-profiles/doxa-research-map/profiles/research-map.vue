@@ -714,8 +714,43 @@ provide('getActivePinColor', (properties) => {
   const strat = getColorStrategy(activeTab.value?.colorStrategy ?? 'languageFamily')
   return strat?.getColor?.(properties) ?? '#1a1a1a'
 })
+// Card d1336834 — flat-tab nodes carry a placeholder ['==', ['get','_flat_filter'], key]
+// filter that never matches real features, so we synthesize the real match
+// expression for the camera here. Tree-tab nodes carry usable Mapbox filters
+// already (fam:/lang:/dial: + region:/block:/country: + bloc:/cluster:/pg:/pgic:),
+// so this returns null for them and zoomToLegendRow falls back to node.filter.
+function _buildFlatLegendMatchExpr(node, legendType) {
+  if (!node || !legendType) return null
+  const key = node.id
+  if (legendType === 'prayer') {
+    const v = ['to-number', ['get', 'peoplePraying']]
+    if (key === 'noPrayer')   return ['==', v, 0]
+    if (key === 'fullPrayer') return ['>=', v, FULL_PRAYER_THRESHOLD]
+    if (key === 'hasPrayer')  return ['all', ['>', v, 0], ['<', v, FULL_PRAYER_THRESHOLD]]
+  } else if (legendType === 'engagement') {
+    if (key === 'hasEngagement') return ['==', ['get', 'engagementStatus'], true]
+    if (key === 'notEngaged')    return ['==', ['get', 'engagementStatus'], false]
+  } else if (legendType === 'adoption') {
+    if (key === 'hasAdoption') return ['==', ['get', 'adoptionStatus'], true]
+    if (key === 'notAdopted')  return ['==', ['get', 'adoptionStatus'], false]
+  } else if (legendType === 'religion') {
+    // expectedValue is a family letter (C/M/H/B/E/J/S/N/O/U). Match first char.
+    return ['==', ['slice', ['coalesce', ['get', 'religion'], ''], 0, 1], key]
+  }
+  return null
+}
 function onSemanticTreeSelect(node) {
   const m = map.value
+  // Card d1336834 — uniform legend-row camera: any non-null row click moves
+  // the camera to fit its scope, derived from live pin coords. Flat-tab nodes
+  // need the real match expression synthesized (their node.filter is a
+  // _flat_filter placeholder); tree-tab nodes use node.filter directly.
+  if (node) {
+    const flatExpr = _isFlatTab.value
+      ? _buildFlatLegendMatchExpr(node, activeLegendType.value)
+      : null
+    mapFly.zoomToLegendRow?.(node, flatExpr ? { matchExpr: flatExpr } : undefined)
+  }
   if (!node) {
     // Flat tabs: clear filter directly
     if (_isFlatTab.value) {

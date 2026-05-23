@@ -25,6 +25,7 @@ const LegendMobile = defineAsyncComponent(() => import('@map/components/LegendMo
 import SemanticTreeLegend from '@map/components/SemanticTreeLegend.vue'
 import { createPplrInstance, provideInstance } from '@map/composables/usePplrInstance.js'
 import { useLegendData as useFlatLegendData } from '@map/composables/useLegendData.js'
+import { useMapFly } from '@map/composables/useMapFly.js'
 import SideMenuDrawer    from '@map/components/SideMenuDrawer.vue'
 // ─── Map control components ───────────────────────────────────────────────────
 // Each button is imported individually so the profile can compose any subset
@@ -323,6 +324,15 @@ function onSemanticTreeSelect(node) {
   if (t === 'prayer')     uiStore.setPrayerFilter(node.id)
   else if (t === 'engagement') uiStore.setEngagementFilter(node.id)
   else if (t === 'adoption')   uiStore.setAdoptionFilter(node.id)
+
+  // Card d1336834 — uniform legend-row camera. node.filter is a _flat_filter
+  // placeholder for simple-map's prayer/engagement/adoption tabs, so we
+  // synthesize the real match expression via buildMatchExpr (same one
+  // applyLegendFilter uses for the dim path).
+  const matchExpr = buildMatchExpr(t, node.id)
+  if (matchExpr) {
+    mapFly.zoomToLegendRow?.(node, { matchExpr })
+  }
 }
 
 const mapContainer = ref(null)
@@ -398,6 +408,15 @@ const mapLayers = useMapLayers({
   mapId,
   getLanguageFamilyColor,
   getNormalizedPeopleGroups: () => mapData.normalizedPeopleGroups.value || []
+})
+
+// ─── Fly composable (card d1336834 — uniform legend-row camera) ─────────────
+const mapFly = useMapFly({
+  getMap: () => map.value,
+  mapId,
+  mapStore,
+  defaultCenter: [20, 10],
+  defaultZoom:   1.8
 })
 
 // ─── GO marker (selected pin highlight) ───────────────────────────────────────
