@@ -529,8 +529,25 @@ export function useMapLayers(options = {}) {
     // on water or WiFi signal waves radiating outward.
     //
     // Pin radii: z0=3, z2=3.5, z4=4, z5=5, z6=6.5, z7=8, z8=10, z10=14, z12=18, z14=22
+    //
+    // Style-swap safety:
+    //   map.setStyle() removes all custom layers + sources. The host profile
+    //   already owns the post-style.load reconciliation path: it re-adds the
+    //   pin source via addLanguageFamilyLayer, then calls startPrayerGlow()
+    //   again. We DO NOT register our own style.load handler here — having
+    //   two listeners fire on the same style.load creates a remove-then-add
+    //   race against the host's reconciliation, which is the visible
+    //   "flash" on theme toggle. Single source of truth = host's
+    //   map.once('style.load') only. Our job is just to make sure that
+    //   when startPrayerGlow() is called repeatedly we do NOT churn layers
+    //   that are already correctly attached.
     let _glowRafId = null;
     let _glowActive = false;
+    // Monotonic counter — incremented each _scheduleGlowTick() invocation.
+    // Every tick closure remembers the epoch it was created under and
+    // self-terminates if a newer scheduler has incremented it. Belt to the
+    // cancelAnimationFrame suspenders inside _scheduleGlowTick().
+    let _glowEpoch = 0;
     const GLOW_BASE  = 'prayer-glow-base';
     const RING_COUNT = 4;
     const _RING_IDS = [];
@@ -568,40 +585,55 @@ export function useMapLayers(options = {}) {
         const prayerFilter = ['>', ['get', 'peoplePraying'], 0];
         const color = _glowColorExpr();
 
-        if (!map.getLayer(GLOW_BASE)) {
+        // True idempotency: if ALL 5 glow layers already exist, do nothing.
+        // The previous remove-then-re-add path reset ring stroke-opacity
+        // and circle-radius to their addLayer defaults on every call,
+        // producing a visible flash on the next paint until the rAF tick
+        // wrote them back. Repeated calls to startPrayerGlow() (e.g. from
+        // tab switches, theme toggles, or a host calling it after style
+        // re-load) now leave already-attached layers alone — only the rAF
+        // baseline is reset by _scheduleGlowTick().
+        const allPresent = _GLOW_IDS.every(id => map.getLayer(id));
+        if (allPresent) return;
+
+        // Partial state: some layers exist, some don't. Tear down what's
+        // there so the re-add below produces a clean, consistent stack.
+        for (const id of _GLOW_IDS) {
+            if (map.getLayer(id)) {
+                try { map.removeLayer(id); } catch (_) {}
+            }
+        }
+
+        map.addLayer({
+            id: GLOW_BASE,
+            type: 'circle',
+            source: 'language-families',
+            filter: prayerFilter,
+            paint: {
+                'circle-radius': _scaledRadius(_BASE_R, 1.0),
+                'circle-color': color,
+                'circle-blur': 0.3,
+                'circle-opacity': 0.45,
+                'circle-stroke-width': 0,
+            }
+        }, 'language-family-pins');
+
+        for (const ringId of _RING_IDS) {
             map.addLayer({
-                id: GLOW_BASE,
+                id: ringId,
                 type: 'circle',
                 source: 'language-families',
                 filter: prayerFilter,
                 paint: {
                     'circle-radius': _scaledRadius(_BASE_R, 1.0),
-                    'circle-color': color,
-                    'circle-blur': 0.3,
-                    'circle-opacity': 0.45,
-                    'circle-stroke-width': 0,
+                    'circle-color': 'rgba(0,0,0,0)',
+                    'circle-blur': 0,
+                    'circle-opacity': 1,
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': color,
+                    'circle-stroke-opacity': 0,
                 }
             }, 'language-family-pins');
-        }
-
-        for (const ringId of _RING_IDS) {
-            if (!map.getLayer(ringId)) {
-                map.addLayer({
-                    id: ringId,
-                    type: 'circle',
-                    source: 'language-families',
-                    filter: prayerFilter,
-                    paint: {
-                        'circle-radius': _scaledRadius(_BASE_R, 1.0),
-                        'circle-color': 'rgba(0,0,0,0)',
-                        'circle-blur': 0,
-                        'circle-opacity': 1,
-                        'circle-stroke-width': 2,
-                        'circle-stroke-color': color,
-                        'circle-stroke-opacity': 0,
-                    }
-                }, 'language-family-pins');
-            }
         }
     }
 
@@ -629,7 +661,21 @@ export function useMapLayers(options = {}) {
         const map = getMap();
         if (!map) return;
         addPrayerGlowLayers();
-        if (_glowActive) return;
+
+        // Cancel any pending rAF before scheduling a new one. Single source
+        // of truth for the animation timer ID — guarantees exactly one
+        // tick loop is ever running, even when the host calls
+        // startPrayerGlow() multiple times (tab switch, theme toggle,
+        // initial mount, etc.). No internal style.load listener is
+        // registered: the host profile's own map.once('style.load') is
+        // the only place that re-adds the pin source after a setStyle and
+        // re-invokes startPrayerGlow(). Adding a second listener here
+        // produced a paint-property race against the host's re-add path,
+        // visible as a periodic brightness flash on every prayer dot.
+        if (_glowRafId) {
+            cancelAnimationFrame(_glowRafId);
+            _glowRafId = null;
+        }
         _glowActive = true;
 
         if (map.getLayer('language-family-pins')) {
@@ -643,12 +689,40 @@ export function useMapLayers(options = {}) {
             } catch (_) {}
         }
 
+        _scheduleGlowTick();
+    }
+
+    // Internal helper: spins up a fresh rAF tick with a fresh `t0` baseline.
+    //
+    // Concurrency contract:
+    //   Each call cancels any in-flight rAF before scheduling a new one
+    //   and bumps an epoch token; the tick closure self-terminates if a
+    //   newer scheduler has superseded it. Belt-and-suspenders against
+    //   a stray frame that was enqueued before the cancel landed.
+    function _scheduleGlowTick() {
+        // (1) Hard cancel any pending rAF — single source of truth for the
+        //     timer ID. Load-bearing for the duplicate-tick-leak fix.
+        if (_glowRafId) {
+            cancelAnimationFrame(_glowRafId);
+            _glowRafId = null;
+        }
+        // (2) Epoch stamp — older closures still referencing a stale
+        //     epoch will exit on their next frame instead of writing
+        //     paint properties.
+        const myEpoch = ++_glowEpoch;
         let t0 = performance.now();
         function tick(now) {
             if (!_glowActive) return;
-            _glowRafId = requestAnimationFrame(tick);
+            if (myEpoch !== _glowEpoch) return; // superseded by newer scheduler
             const m = getMap();
-            if (!m || !_GLOW_IDS.some(id => m.getLayer(id))) { _glowActive = false; return; }
+            if (!m || !_GLOW_IDS.some(id => m.getLayer(id))) {
+                // Layers gone (mid style swap). Stop scheduling new frames;
+                // _glowActive stays true so the host's post-style.load
+                // call to startPrayerGlow() will restart this tick chain
+                // once the layers come back.
+                _glowRafId = null;
+                return;
+            }
             const elapsed = (now - t0) / 1000;
 
             for (let i = 0; i < RING_COUNT; i++) {
@@ -668,6 +742,9 @@ export function useMapLayers(options = {}) {
                     m.setPaintProperty(ringId, 'circle-blur', 0);
                 } catch (_) {}
             }
+            // Schedule next frame LAST, after work, so _glowRafId always
+            // reflects the most recently scheduled frame for this chain.
+            _glowRafId = requestAnimationFrame(tick);
         }
         _glowRafId = requestAnimationFrame(tick);
     }
@@ -675,6 +752,8 @@ export function useMapLayers(options = {}) {
     function stopPrayerGlow() {
         _glowActive = false;
         if (_glowRafId) { cancelAnimationFrame(_glowRafId); _glowRafId = null; }
+        // No persistent style.load listener to detach — the host profile
+        // owns the post-style.load reconciliation path.
         try {
             removePrayerGlowLayers();
             const map = getMap();

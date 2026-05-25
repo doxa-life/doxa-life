@@ -430,7 +430,7 @@ useShadowStyles(`
   font: 700 11px ui-monospace, monospace;
   color: #8b949e; text-transform: uppercase; letter-spacing: 0.04em;
 }
-/* Center-aligned UPGs/Pop column header (qa: 2026-05-02 — user explicitly
+/* Center-aligned UUPGs/Pop column header (qa: 2026-05-02 — user explicitly
    requested center over right-align so the header label sits on the same
    x-center as the numeric value below; reduces eye drift across rows). */
 .stl-hdr-num {
@@ -745,9 +745,9 @@ useShadowStyles(`
         <span class="stl-hdr-name">{{ columnLabel || (hideTabs ? title : (tabList[activeTab]?.label || 'Name')) }}</span>
         <button v-if="hasCount" class="stl-hdr-num"
           :class="{ active: sortBy === 'count' }"
-          title="Sort by UPGs"
+          title="Sort by UUPGs"
           @click="clickSortHeader('count')">
-          UPGs
+          UUPGs
           <span v-if="sortBy === 'count'" class="stl-sort-arrow">{{ sortDir === 'desc' ? '▼' : '▲' }}</span>
         </button>
         <button v-if="hasPop" class="stl-hdr-num"
