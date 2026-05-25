@@ -49,6 +49,14 @@ useShadowStyles(`
 .legend-mobile-sheet.sheet-dark .mobile-collapse-caret{background:rgba(110,118,129,0.15);border-color:#30363d;color:#8b949e;box-shadow:none;}
 .legend-mobile-sheet.sheet-dark .mobile-collapse-caret:hover{color:#c9d1d9;background:rgba(59,70,61,0.18);border-color:#73A17F;}
 
+/* Detail-mode collapse caret — top-left of the sheet when in detail mode
+   and the sheet is NOT collapsed. Mirrors the .detail-close-btn placement
+   on the right; gives the user an always-visible, finger-sized tap target
+   to collapse the sheet without having to find the 12px drag-strip. z-index
+   above .sheet-drag-strip (z:2) so the strip's @click doesn't steal taps. */
+.detail-collapse-btn-mobile{position:absolute;top:10px;left:12px;background:transparent;border:none;padding:0;cursor:pointer;color:transparent;width:28px;height:28px;z-index:3;outline:none;-webkit-tap-highlight-color:transparent;}
+.detail-collapse-btn-mobile:focus{outline:none;}
+
 /* Detail-mode close X — top-right corner */
 .detail-close-btn{position:absolute;top:10px;right:12px;background:none;border:none;padding:4px;cursor:pointer;color:#666;display:flex;align-items:center;justify-content:center;z-index:3;transition:color 0.2s ease;}
 .detail-close-btn:hover{color:#333;}
@@ -57,7 +65,7 @@ useShadowStyles(`
    (caret + centered title) but for PeopleGroupDetail mode. Renders only
    when state=collapsed AND mode=detail (template v-if). Sits below the
    12px drag-strip so the strip's tap+drag still works to expand. */
-.collapsed-detail-footer{position:absolute;top:12px;left:0;right:0;height:36px;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;cursor:pointer;background:transparent;}
+.collapsed-detail-footer{position:absolute;top:12px;left:0;right:0;height:36px;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;cursor:pointer;background:transparent;z-index:4;}
 .collapsed-detail-title{font:600 13px system-ui,sans-serif;letter-spacing:0.02em;line-height:1.4;color:#1f2328;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .legend-mobile-sheet.sheet-dark .collapsed-detail-title{color:#F3F3F1;}
 
@@ -333,7 +341,7 @@ const treeTitleForMobile = computed(() => {
   return 'Languages'
 })
 const treeColumnLabelForMobile = computed(() => {
-  if (props.legendType === 'religion') return 'World Religions'
+  if (props.legendType === 'religion') return 'UUPG Religions'
   if (props.legendType === 'prayer') return 'Prayer Status'
   if (props.legendType === 'engagement') return 'Engagement Status'
   if (props.legendType === 'adoption') return 'Adoption Status'
@@ -524,6 +532,17 @@ onBeforeUnmount(() => {
            slot below, so it's vertically aligned with the title text via
            grid/flex align-items:center — matching desktop's slot pattern.
            No more absolute positioning or padding hacks.) -->
+
+      <!-- Detail-mode collapse caret — top-left, mirrors the close X on the
+           right. Provides an always-visible finger-sized affordance to
+           collapse the sheet when a people-group is selected. The 12px
+           drag-strip alone is too small to reliably hit on touch. -->
+      <button
+        v-if="legendMode === 'detail' && legendState !== 'collapsed'"
+        class="detail-collapse-btn-mobile"
+        @click.stop="handleCaretClick"
+        :aria-label="t('aria.toggleLegend')"
+      ></button>
 
       <!-- Detail-mode close X — absolutely positioned top-right.
            Hidden when collapsed so the footer is clean (the user can re-expand

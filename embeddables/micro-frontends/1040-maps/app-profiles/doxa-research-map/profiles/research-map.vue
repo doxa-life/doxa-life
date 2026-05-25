@@ -669,7 +669,7 @@ const legendInnerTabs = computed(() => {
 })
 const legendHideTabs = computed(() => _isFlatTab.value)
 const legendColumnLabel = computed(() => {
-  if (activeLegendType.value === 'religion') return 'World Religions'
+  if (activeLegendType.value === 'religion') return 'UUPG Religions'
   if (activeLegendType.value === 'prayer') return 'Prayer Status'
   if (activeLegendType.value === 'engagement') return 'Engagement Status'
   if (activeLegendType.value === 'adoption') return 'Adoption Status'
@@ -822,8 +822,12 @@ function onSemanticTreeSelect(node) {
     if (m && m.getLayer('language-family-pins') && node.filter) {
       // Drop any prior setFilter from a previous tab interaction so all pins render.
       try { m.setFilter('language-family-pins', null) } catch (_) {}
-      _syncHitboxFilter(m, null)
-      // Dim via case expression — matched pins at 1.0, others at 0.06 (matches research-map's
+      // Mirror the match expression onto the invisible hitbox layer so
+      // dimmed (opacity-0) pins are not selectable. Without this the
+      // hitbox stays full-size for every pin and the user can tap an
+      // apparent empty area to select a hidden pin.
+      _syncHitboxFilter(m, node.filter)
+      // Dim via case expression — matched pins at 1.0, others at 0 (matches
       // applyDimFilter values).
       m.setPaintProperty('language-family-pins', 'circle-opacity', [
         'case', node.filter, 1, 0
@@ -1169,6 +1173,18 @@ function clearAllHighlights(m) {
   if (mapStore.selectedFamily)   mapStore.selectFamily(null)
   if (mapStore.selectedLanguage) mapStore.selectLanguage(null)
   if (mapStore.selectedDialect)  mapStore.selectDialect(null)
+  // Flat-tab rows (prayer/engagement/adoption/religion) and tree rows are
+  // tracked separately on pplrInstance.selection — clearing the uiStore
+  // filters above does NOT cascade into pplrInstance, so without this the
+  // legend row stays visually selected while the map filter clears, leaving
+  // the UI inconsistent. Reset the legend-row selection directly so a clear
+  // anywhere (toggle-off, empty-map tap, programmatic) leaves both the map
+  // and the legend in matching states.
+  try {
+    if (pplrInstance && pplrInstance.selection && pplrInstance.selection.value) {
+      pplrInstance.selection.value = null
+    }
+  } catch (_) { /* no-op */ }
 }
 
 // Same-tick dedupe — a single legend-row click fires applyDimFilter TWICE on
@@ -1283,9 +1299,10 @@ function applyDimFilter(detail) {
     }
   } else {
     // Family / language / prayer / engagement / adoption: keep all pins
-    // rendered (no source-filter) but dim the non-matching ones.
+    // rendered on the visible pins layer (no source-filter so the bucket
+    // can still be styled / sorted), but dim the non-matching ones via a
+    // circle-opacity `case` expression.
     m.setFilter('language-family-pins', null)
-    _syncHitboxFilter(m, null)
 
     // Build the per-kind match expression. Prayer compares against a numeric
     // bucket (noPrayer=0 / hasPrayer=(0,FULL_PRAYER_THRESHOLD) / fullPrayer
@@ -1362,6 +1379,12 @@ function applyDimFilter(detail) {
         'case', matchExpr, 1, 0
       ])
     }
+    // Restrict the invisible hitbox layer to the matched bucket so dimmed
+    // (opacity-0) pins are no longer hit-testable. Without this the user
+    // can tap on apparent empty space and select a hidden pin, and the
+    // generic map-click handler sees a queryRenderedFeatures hit on the
+    // hidden pin and skips its own clear path inconsistently.
+    _syncHitboxFilter(m, matchExpr)
     mapLayers.syncGlowFilter(matchExpr)
     if (m.getLayer('regions-fill')) {
       m.setPaintProperty('regions-fill', 'fill-opacity', 0.20)
@@ -1668,30 +1691,10 @@ async function onMapReady(normalizedPeopleGroups) {
     schedule(() => { void ensureRegionsLoaded() })
   }
 
-  // Click-on-empty-map clears any active legend-row filter so dimmed pins
-  // restore (qa: 2026-05-02 iter-12 — user reported clicking a row dimmed
-  // non-matching pins as expected, but clicking off the row left the dim
-  // state stuck). Mapbox layer-specific handlers fire BEFORE this generic
-  // one, so we just check queryRenderedFeatures for the relevant interactive
-  // layers; if empty, the click landed on empty map.
-  map.value.on('click', (e) => {
-    const interactiveLayers = ['language-family-pins', 'regions-fill']
-      .filter(id => map.value.getLayer(id))
-    const hits = interactiveLayers.length
-      ? map.value.queryRenderedFeatures(e.point, { layers: interactiveLayers })
-      : []
-    if (hits.length) return
-    const hadFilter =
-      uiStore.prayerFilter || uiStore.engagementFilter || uiStore.adoptionFilter || uiStore.religionFilter ||
-      mapStore.selectedFamily || mapStore.selectedLanguage || mapStore.selectedDialect ||
-      mapStore.selectedRegion
-    if (!hadFilter) return
-    if (uiStore.prayerFilter)     uiStore.setPrayerFilter?.(null)
-    if (uiStore.engagementFilter) uiStore.setEngagementFilter?.(null)
-    if (uiStore.adoptionFilter)   uiStore.setAdoptionFilter?.(null)
-    if (uiStore.religionFilter)   uiStore.setReligionFilter?.(null)
-    clearAllHighlights(map.value)
-  })
+  // Empty-map-click intentionally does nothing. The legend selection is
+  // sticky — only the same row re-tapped or the legend close button clears
+  // it. (Spec change from earlier "click-off clears" behavior; users found
+  // the auto-clear surprising when they tapped the map just to inspect.)
 
   mapStore.setMapReady(mapId)
   appReady.value = true
