@@ -26,6 +26,17 @@ const clearCache = () => {
   }
 }
 
+// Opt this browser into the feedback widget — the same `show-feedback-widget`
+// flag that ?feedback=true sets. Lets logged-in users see the widget on public,
+// edge-cached pages without a /api/auth/me check (we don't run one there).
+const enableFeedbackWidget = () => {
+  if (import.meta.client) {
+    try {
+      localStorage.setItem('show-feedback-widget', 'true')
+    } catch {}
+  }
+}
+
 export const useAuth = () => {
   const user = useState('auth.user', () => null as any)
   const authReady = useState('auth.ready', () => false)
@@ -47,6 +58,7 @@ export const useAuth = () => {
       if (response.success) {
         user.value = response.user
         saveToCache(response.user)
+        enableFeedbackWidget()
 
         const route = useRoute()
         const redirectTo = route.query.redirect as string
@@ -112,6 +124,7 @@ export const useAuth = () => {
       const response = await $fetch('/api/auth/me') as { user: any }
       user.value = response.user
       saveToCache(response.user)
+      enableFeedbackWidget()
       return response.user
     } catch {
       user.value = null

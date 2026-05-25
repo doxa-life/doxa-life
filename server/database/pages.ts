@@ -1,9 +1,10 @@
-// Query helpers for the `pages` + `page_translations` tables (migration
-// 005). All functions use Kysely against the shared `db` instance.
+// Query helpers for the `pages` + `page_translations` tables.
+// `pages.slug` stores only the leaf segment of the URL; the full URL
+// is derived by walking `pages.category_id` up the category tree.
 //
-// Lookup semantics (`getPageBySlug`) mirror the plan: prefer the
-// requested locale's published translation, fall back to English if
-// that locale is missing/draft, return null when neither is published.
+// Translation lookup semantics: prefer the requested locale's
+// published translation, fall back to English if that locale is
+// missing/draft, return null when neither is published.
 
 import { db } from '../utils/database'
 import type { PagesTable, PageTranslationsTable } from './schema'
@@ -39,8 +40,28 @@ export async function listPages(): Promise<Page[]> {
     .execute()
 }
 
-export async function getPageBySlug(
-  slug: string,
+// Find a page by its leaf slug + parent category. Pass `null` for
+// `categoryId` to look up an uncategorized (top-level) page. Returns
+// the page row regardless of translation state — translation lookup
+// is split out into `getLocalizedTranslation` so callers can decide
+// whether to surface unpublished pages (the public endpoint won't).
+export async function findPageInCategory(
+  categoryId: string | null,
+  leafSlug: string
+): Promise<Page | null> {
+  let q = db
+    .selectFrom('pages')
+    .selectAll()
+    .where('slug', '=', leafSlug)
+  q = categoryId === null
+    ? q.where('category_id', 'is', null)
+    : q.where('category_id', '=', categoryId)
+  const row = await q.executeTakeFirst()
+  return row ?? null
+}
+
+export async function getLocalizedTranslation(
+  pageId: string,
   locale: string,
   options: { fallback?: string } = {}
 ): Promise<LocalizedPage | null> {
@@ -49,7 +70,7 @@ export async function getPageBySlug(
   const page = await db
     .selectFrom('pages')
     .selectAll()
-    .where('slug', '=', slug)
+    .where('id', '=', pageId)
     .executeTakeFirst()
   if (!page) return null
 
@@ -65,7 +86,6 @@ export async function getPageBySlug(
     return { page, translation, resolvedLocale: locale, requestedLocale: locale }
   }
 
-  // Fall back to published English if the requested locale isn't published
   if (locale !== fallbackLocale) {
     const fallback = await db
       .selectFrom('page_translations')
@@ -101,72 +121,6 @@ export async function createPage(input: {
 
 export async function deletePage(id: string): Promise<void> {
   await db.deleteFrom('pages').where('id', '=', id).execute()
-}
-
-// Moves a page into a new category (or detaches it by passing null)
-// and rewrites its slug so the `{category.slug}/...` prefix stays
-// consistent. Returns the set of slugs that need cache purging (old
-// slug + new slug).
-export async function setPageCategory(
-  pageId: string,
-  newCategoryId: string | null
-): Promise<{ page: Page; slugsToPurge: string[] }> {
-  return db.transaction().execute(async trx => {
-    const page = await trx
-      .selectFrom('pages')
-      .selectAll()
-      .where('id', '=', pageId)
-      .executeTakeFirst()
-    if (!page) {
-      throw Object.assign(new Error('Page not found'), { statusCode: 404 })
-    }
-
-    const oldSlug = page.slug
-    const oldCategoryId = page.category_id
-
-    // Figure out the slug leaf (everything after the current category
-    // prefix) so we can re-prefix it under the new category.
-    let leaf = oldSlug
-    if (oldCategoryId) {
-      const oldCategory = await trx
-        .selectFrom('categories')
-        .select('slug')
-        .where('id', '=', oldCategoryId)
-        .executeTakeFirst()
-      if (oldCategory && oldSlug.startsWith(`${oldCategory.slug}/`)) {
-        leaf = oldSlug.slice(oldCategory.slug.length + 1)
-      }
-    }
-
-    let newSlug: string
-    if (newCategoryId) {
-      const newCategory = await trx
-        .selectFrom('categories')
-        .select('slug')
-        .where('id', '=', newCategoryId)
-        .executeTakeFirst()
-      if (!newCategory) {
-        throw Object.assign(new Error('Category not found'), { statusCode: 404 })
-      }
-      newSlug = `${newCategory.slug}/${leaf}`
-    } else {
-      newSlug = leaf
-    }
-
-    const updated = await trx
-      .updateTable('pages')
-      .set({
-        category_id: newCategoryId,
-        slug: newSlug,
-        updated: sql`now()`
-      })
-      .where('id', '=', pageId)
-      .returningAll()
-      .executeTakeFirstOrThrow()
-
-    const slugsToPurge = oldSlug === newSlug ? [oldSlug] : [oldSlug, newSlug]
-    return { page: updated, slugsToPurge }
-  })
 }
 
 export async function upsertTranslation(input: {

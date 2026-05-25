@@ -35,6 +35,10 @@ class MultiFolderMigrationProvider implements MigrationProvider {
 }
 
 export default defineNitroPlugin(async () => {
+  // Skip during build-time prerender — the builder isn't attached to the VPC,
+  // so connecting to the private DB host would time out. Migrations run at runtime.
+  if (import.meta.prerender) return
+
   const cfg = useRuntimeConfig()
   const databaseUrl = cfg.databaseUrl || process.env.DATABASE_URL
   if (!databaseUrl) {

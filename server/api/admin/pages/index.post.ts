@@ -23,7 +23,9 @@ export default defineEventHandler(async (event) => {
   }
 
   const category_id = body?.category_id ? String(body.category_id) : null
-  const menu_order = Number.isFinite(body?.menu_order) ? Number(body.menu_order) : 0
+  // Leave unset when not explicitly provided so the service appends the
+  // page to the bottom of its category instead of forcing order 0 (top).
+  const menu_order = Number.isFinite(body?.menu_order) ? Number(body.menu_order) : undefined
 
   try {
     const result = await createCmsPage(

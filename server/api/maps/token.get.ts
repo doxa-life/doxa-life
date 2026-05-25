@@ -10,7 +10,6 @@
  *       caches it server-side, returns the TK
  *
  * Pattern ported from `dt-geo-steward/geo-steward.php :: get_temp_key()`
- * (DT WordPress plugin in Map-Framework/05-apps/dt-geo-steward).
  *
  * Why a server endpoint instead of `runtimeConfig.public.mapboxToken`?
  *   1. Static HTML pages in /public/ can't read runtimeConfig — they need

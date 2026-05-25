@@ -7,6 +7,7 @@
 import { defineEventHandler, getRouterParam, readBody, createError } from 'h3'
 import { requirePermission } from '../../../../utils/rbac'
 import { reorderCategoryPages, getCategoryPages, purgeSlugs } from '../../../../database/categories'
+import { loadCategoryTree, pageUrlPath } from '../../../../database/categoryTree'
 import { logUpdate } from '../../../../utils/activity-logger'
 
 export default defineEventHandler(async (event) => {
@@ -37,7 +38,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const pages = await getCategoryPages(id)
-  await purgeSlugs(pages.map(p => p.slug))
+  const tree = await loadCategoryTree()
+  await purgeSlugs(pages.map(p => pageUrlPath(tree, p)))
   logUpdate('categories', id, event, { event: 'reorder', pageCount: pageIds.length })
   return { ok: true, pageIds }
 })

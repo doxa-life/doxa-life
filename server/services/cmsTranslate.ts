@@ -108,6 +108,9 @@ export interface TranslatePageInput {
   // When true, replace the existing row's body and metadata.
   overwrite?: boolean
   status?: 'draft' | 'published'
+  // Optional actor (the user who initiated the bulk translate) — recorded
+  // on each version-history snapshot the upsert produces.
+  actor_user_id?: string | null
 }
 
 export interface TranslatePageResultEntry {
@@ -202,14 +205,16 @@ export async function translatePage(input: TranslatePageInput): Promise<Translat
         meta_title: translatedMetaTitle || null,
         meta_description: translatedMetaDescription || null,
         og_image: source.og_image,
-        status
+        status,
+        actor_user_id: input.actor_user_id ?? null,
+        source: 'deepl'
       })
 
       // Per-locale cache purge after each successful upsert. This
       // keeps the invalidation contract identical to admin's pre-
       // unification behavior — locales that errored or were skipped
       // never had their cache touched.
-      await applyTranslationInvalidations(upserted.pageSlug, upserted.categoryId, target)
+      await applyTranslationInvalidations(upserted.pageUrl, upserted.categoryId, target)
 
       results.push({ locale: target, ok: true })
     } catch (e: unknown) {

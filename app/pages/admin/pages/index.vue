@@ -11,6 +11,7 @@ definePageMeta({
 interface PageRow {
   id: string
   slug: string
+  url: string
   category_id: string | null
   category_slug: string | null
   category_name_en: string | null
@@ -24,6 +25,10 @@ interface PageRow {
 interface CategoryRow {
   id: string
   slug: string
+  url: string
+  parent_path: string | null
+  parent_label: string | null
+  parent_id: string | null
   menu_order: number
   translations: Array<{ locale: string; name: string }>
   page_count: number
@@ -45,21 +50,50 @@ const { data: categoriesData } = await useFetch<{ rows: CategoryRow[] }>(
 const categories = computed(() => categoriesData.value?.rows ?? [])
 
 function categoryLabel(cat: CategoryRow): string {
-  const en = cat.translations.find(t => t.locale === 'en')?.name
-  return en ?? cat.slug
+  const en = cat.translations.find(t => t.locale === 'en')?.name ?? cat.slug
+  return cat.parent_label ? `${cat.parent_label} / ${en}` : en
 }
 
 // Modal state for creating a new page
 const createModalOpen = ref(false)
+const newTitle = ref('')
 const newSlugLeaf = ref('')
 const newCategoryId = ref<string | null>(null)
-const newMenuOrder = ref(0)
 const creating = ref(false)
+// Once the user edits the slug by hand, stop auto-deriving it from the
+// title so their choice sticks.
+const slugManuallyEdited = ref(false)
+
+// Empty Tiptap document — matches the editor's EMPTY_DOC so the new
+// page's English translation starts with a valid (blank) body.
+const EMPTY_DOC = { type: 'doc', content: [{ type: 'paragraph' }] }
+
+// Slugify a title into a URL leaf: strip accents, lowercase, and turn
+// any run of non-alphanumerics into a single dash. Matches the server's
+// slug rule (^[a-z0-9][a-z0-9-]*$).
+function slugify(input: string): string {
+  return input
+    .normalize('NFKD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+// Auto-fill the slug from the title until the user takes it over.
+watch(newTitle, (title) => {
+  if (!slugManuallyEdited.value) newSlugLeaf.value = slugify(title)
+})
+
+function onSlugInput(value: string) {
+  newSlugLeaf.value = value
+  slugManuallyEdited.value = true
+}
 
 const newCategoryPrefix = computed(() => {
   if (!newCategoryId.value) return ''
   const cat = categories.value.find(c => c.id === newCategoryId.value)
-  return cat ? `${cat.slug}/` : ''
+  return cat ? `${cat.url}/` : ''
 })
 
 const newFullSlug = computed(() => {
@@ -69,20 +103,29 @@ const newFullSlug = computed(() => {
 
 const categoryItems = computed(() => [
   { label: '— Uncategorized —', value: null as string | null },
-  ...categories.value.map(c => ({ label: categoryLabel(c), value: c.id as string | null }))
+  ...[...categories.value]
+    .sort((a, b) => a.url.localeCompare(b.url))
+    .map(c => ({ label: categoryLabel(c), value: c.id as string | null }))
 ])
 
 function resetCreateForm() {
+  newTitle.value = ''
   newSlugLeaf.value = ''
   newCategoryId.value = null
-  newMenuOrder.value = 0
+  slugManuallyEdited.value = false
 }
 
 async function createPage() {
   creating.value = true
   try {
-    const slug = newFullSlug.value
-    if (!slug) {
+    const title = newTitle.value.trim()
+    const leaf = newSlugLeaf.value.trim().replace(/^\/+|\/+$/g, '')
+    if (!title) {
+      toast.add({ title: 'Title is required', color: 'error' })
+      creating.value = false
+      return
+    }
+    if (!leaf) {
       toast.add({ title: 'Slug is required', color: 'error' })
       creating.value = false
       return
@@ -90,12 +133,31 @@ async function createPage() {
     const page = await $fetch<{ id: string }>('/api/admin/pages', {
       method: 'POST',
       body: {
-        slug,
-        category_id: newCategoryId.value,
-        menu_order: newMenuOrder.value || 0
+        slug: leaf,
+        category_id: newCategoryId.value
       }
     })
-    toast.add({ title: 'Page created', color: 'success' })
+
+    // Persist the English title so the new page opens with it filled in
+    // and the list shows it instead of "Untitled". The page already
+    // exists at this point, so a failure here is non-fatal — we still
+    // open the editor and let the user finish there.
+    let titleSaved = true
+    try {
+      await $fetch(`/api/admin/pages/${page.id}/translations/en`, {
+        method: 'PUT',
+        body: { title, body_json: EMPTY_DOC }
+      })
+    } catch (titleErr: any) {
+      titleSaved = false
+      toast.add({
+        title: 'Page created, but the title didn’t save',
+        description: titleErr?.data?.statusMessage || titleErr?.message || 'Add it in the editor.',
+        color: 'warning'
+      })
+    }
+
+    if (titleSaved) toast.add({ title: 'Page created', color: 'success' })
     createModalOpen.value = false
     resetCreateForm()
     router.push(`/admin/pages/${page.id}`)
@@ -222,13 +284,14 @@ const filteredRows = computed<PageRow[]>(() => {
           <tr
             v-for="row in filteredRows"
             :key="row.id"
-            class="border-t border-(--ui-border) hover:bg-(--ui-bg-elevated)"
+            class="border-t border-(--ui-border) hover:bg-(--ui-bg-elevated) cursor-pointer"
+            @click="router.push(`/admin/pages/${row.id}`)"
           >
             <td class="px-3 py-2">
               <span v-if="row.title_en">{{ row.title_en }}</span>
               <em v-else class="text-(--ui-text-muted)">Untitled</em>
             </td>
-            <td class="px-3 py-2 font-mono">{{ row.slug }}</td>
+            <td class="px-3 py-2 font-mono text-xs">{{ row.url }}</td>
             <td class="px-3 py-2">
               <span v-if="row.category_slug">{{ row.category_name_en || row.category_slug }}</span>
               <em v-else class="text-(--ui-text-muted)">—</em>
@@ -239,7 +302,7 @@ const filteredRows = computed<PageRow[]>(() => {
               </UBadge>
             </td>
             <td class="px-3 py-2 text-(--ui-text-muted)">{{ formatDate(row.updated) }}</td>
-            <td class="px-3 py-2 text-right">
+            <td class="px-3 py-2 text-right" @click.stop>
               <UButton
                 size="xs"
                 variant="outline"
@@ -258,6 +321,9 @@ const filteredRows = computed<PageRow[]>(() => {
     <UModal v-model:open="createModalOpen" title="New CMS page">
       <template #body>
         <div class="space-y-4">
+          <UFormField label="Title" required description="The page’s English title. The slug below is suggested from it.">
+            <UInput v-model="newTitle" autofocus placeholder="About us" class="w-full" />
+          </UFormField>
           <UFormField label="Category" description="Pick a category or leave as uncategorized for standalone pages.">
             <USelect
               v-model="newCategoryId"
@@ -266,22 +332,19 @@ const filteredRows = computed<PageRow[]>(() => {
               class="w-full"
             />
           </UFormField>
-          <UFormField label="Slug" required :description="newCategoryPrefix ? `Full URL will be /${newFullSlug}` : 'e.g. privacy, contact'">
-            <UInput v-model="newSlugLeaf" :placeholder="newCategoryId ? 'vision' : 'privacy'">
-              <template v-if="newCategoryPrefix" #leading>
-                <span class="text-(--ui-text-muted) font-mono text-sm">{{ newCategoryPrefix }}</span>
-              </template>
-            </UInput>
-          </UFormField>
-          <UFormField label="Menu order" description="Sort order within the category sidebar.">
-            <UInput v-model.number="newMenuOrder" type="number" />
+          <UFormField label="Slug" required :description="newSlugLeaf ? `Full URL will be /${newFullSlug}` : 'Leaf segment only — lowercase letters, digits, dashes.'">
+            <div v-if="newCategoryPrefix" class="flex items-center gap-1 min-w-0">
+              <span class="shrink-0 text-(--ui-text-muted) font-mono text-sm truncate">{{ newCategoryPrefix }}</span>
+              <UInput :model-value="newSlugLeaf" :placeholder="newCategoryId ? 'vision' : 'privacy'" class="flex-1 min-w-0" @update:model-value="v => onSlugInput(String(v))" />
+            </div>
+            <UInput v-else :model-value="newSlugLeaf" :placeholder="newCategoryId ? 'vision' : 'privacy'" class="w-full" @update:model-value="v => onSlugInput(String(v))" />
           </UFormField>
         </div>
       </template>
       <template #footer>
         <div class="flex justify-end gap-2">
           <UButton color="neutral" variant="ghost" @click="createModalOpen = false">Cancel</UButton>
-          <UButton color="primary" :loading="creating" :disabled="!newSlugLeaf.trim()" @click="createPage">Create</UButton>
+          <UButton color="primary" :loading="creating" :disabled="!newTitle.trim() || !newSlugLeaf.trim()" @click="createPage">Create</UButton>
         </div>
       </template>
     </UModal>

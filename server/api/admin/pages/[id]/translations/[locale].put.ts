@@ -49,7 +49,10 @@ export default defineEventHandler(async (event) => {
       meta_title: body.meta_title ?? null,
       meta_description: body.meta_description ?? null,
       og_image: body.og_image ?? null,
-      status: body.status
+      status: body.status,
+      actor_user_id: authUser.userId,
+      source: 'admin-ui',
+      user_agent: getHeader(event, 'user-agent') || null
     })
 
     logEvent({
@@ -61,8 +64,11 @@ export default defineEventHandler(async (event) => {
       metadata: { page_id: id, locale, status: result.translation.status, source: 'admin-ui' }
     })
 
-    await applyTranslationInvalidations(result.pageSlug, result.categoryId, locale)
-    return result.translation
+    await applyTranslationInvalidations(result.pageUrl, result.categoryId, locale)
+    return {
+      ...result.translation,
+      sanitization_warnings: result.sanitizationWarnings
+    }
   } catch (e: any) {
     if (e?.statusCode) {
       throw createError({ statusCode: e.statusCode, statusMessage: e.statusMessage || e.message })

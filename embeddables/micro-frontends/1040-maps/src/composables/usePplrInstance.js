@@ -1,7 +1,7 @@
 /**
  * usePplrInstance.js — per-map "instance store" mediator.
  *
- * Ported verbatim from /Map-Framework/05-apps/PPLR-MAPS/PPLR-validate-data-mfe/src/composables/usePplrInstance.js
+ * Ported verbatim from the upstream PPLR module
  * per QA building-round-1 R4 decision: take their legend and instance pattern
  * word-for-word, integrate into research-mfe.
  *

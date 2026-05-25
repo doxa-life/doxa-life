@@ -17,7 +17,7 @@ function getDb(): Kysely<Database> {
     dialect: new PostgresJSDialect({
       postgres: postgres(databaseUrl, {
         ssl: isLocal ? false : 'require',
-        max: 10,
+        max: 5,
         idle_timeout: 20,
         connect_timeout: 30,
         onnotice: () => {},

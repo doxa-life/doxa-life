@@ -11,8 +11,52 @@
 
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import type { Editor, JSONContent } from '@tiptap/core'
+import { Fragment, Slice } from '@tiptap/pm/model'
+import type { Node as PmNode, Mark as PmMark } from '@tiptap/pm/model'
 import { buildTiptapExtensions } from '~/utils/tiptapExtensions'
 import { uploadImage } from '~/composables/useImageUpload'
+
+// Best-effort paste cleanup. The server-side sanitizer in
+// tiptapValidate is the authoritative line of defense; this just
+// keeps the most common paste sources (Google Docs, Word, Evernote)
+// from triggering "formatting was simplified" toasts on every paste.
+function cleanFragment(frag: Fragment): Fragment {
+  const out: PmNode[] = []
+  frag.forEach((child) => {
+    const cleaned = cleanNode(child)
+    if (cleaned) out.push(cleaned)
+  })
+  return Fragment.from(out)
+}
+
+function cleanNode(node: PmNode): PmNode | null {
+  // Drop inline image pastes (data:/blob:) — server would drop them anyway.
+  if (node.type.name === 'image') {
+    const src = node.attrs?.src
+    if (typeof src === 'string' && /^(data|blob):/i.test(src.trim())) return null
+  }
+
+  // Strip fontFamily from textStyle marks (Word paste noise; we don't
+  // render arbitrary fonts on the public site). If the mark has no
+  // remaining meaningful attrs after the strip, drop the whole mark.
+  const cleanedMarks: PmMark[] = []
+  for (const mark of node.marks) {
+    if (mark.type.name === 'textStyle' && mark.attrs?.fontFamily) {
+      const next = { ...mark.attrs, fontFamily: null }
+      const stillMeaningful = Object.entries(next).some(([k, v]) => k !== 'fontFamily' && v !== null && v !== undefined)
+      if (!stillMeaningful) continue
+      cleanedMarks.push(mark.type.create(next))
+    } else {
+      cleanedMarks.push(mark)
+    }
+  }
+
+  const cleanedContent = node.content && node.content.size > 0
+    ? cleanFragment(node.content)
+    : node.content
+
+  return node.copy(cleanedContent).mark(cleanedMarks)
+}
 
 const props = withDefaults(defineProps<{
   modelValue: JSONContent
@@ -34,6 +78,12 @@ const linkOpenInNewTab = ref(false)
 const editor = useEditor({
   content: props.modelValue,
   extensions: buildTiptapExtensions(),
+  editorProps: {
+    transformPasted(slice) {
+      const cleaned = cleanFragment(slice.content)
+      return new Slice(cleaned, slice.openStart, slice.openEnd)
+    }
+  },
   onUpdate({ editor: e }) {
     emit('update:modelValue', e.getJSON())
   }
@@ -148,11 +198,48 @@ async function onFileChosen(e: Event) {
   }
 }
 
-function insertYoutube() {
-  const url = window.prompt('YouTube URL')
-  if (!url) return
-  editor.value?.commands.setYoutubeVideo({ src: url })
+// Video embeds (YouTube + Vimeo) share one modal. The user pastes a URL,
+// we detect the platform and dispatch to the matching insert command.
+const videoModalOpen = ref(false)
+const videoUrl = ref('')
+const videoError = ref('')
+
+function openVideoModal() {
+  videoUrl.value = ''
+  videoError.value = ''
+  videoModalOpen.value = true
 }
+
+function detectVideoPlatform(url: string): 'youtube' | 'vimeo' | null {
+  const u = url.toLowerCase()
+  if (u.includes('youtube.com') || u.includes('youtu.be') || u.includes('youtube-nocookie.com')) return 'youtube'
+  if (u.includes('vimeo.com')) return 'vimeo'
+  return null
+}
+
+function insertVideo() {
+  const url = videoUrl.value.trim()
+  const e = editor.value
+  if (!url || !e) return
+  const platform = detectVideoPlatform(url)
+  if (!platform) {
+    videoError.value = 'Enter a valid YouTube or Vimeo URL.'
+    return
+  }
+  const inserted = platform === 'youtube'
+    ? e.chain().focus().setYoutubeVideo({ src: url }).run()
+    : e.chain().focus().setVimeoVideo({ src: url }).run()
+  if (!inserted) {
+    videoError.value = `That doesn't look like a valid ${platform === 'youtube' ? 'YouTube' : 'Vimeo'} video URL.`
+    return
+  }
+  videoModalOpen.value = false
+}
+
+// Clear the inline error as soon as the user edits the URL again.
+watch(videoUrl, () => {
+  if (videoError.value) videoError.value = ''
+})
 
 function insertUupgsList() {
   editor.value?.chain().focus().insertContent({ type: 'uupgsList' }).run()
@@ -164,6 +251,48 @@ function insertVerse() {
     content: [{ type: 'paragraph' }]
   }).run()
 }
+
+function insertGeneralResources() {
+  editor.value?.chain().focus().insertContent({
+    type: 'generalResources',
+    attrs: { useDocuments: false, layout: 'on-sidebar-page' }
+  }).run()
+}
+
+function toggleGeneralResourcesUseDocuments() {
+  const e = editor.value
+  if (!e) return
+  const current = e.getAttributes('generalResources')
+  e.chain().focus().updateAttributes('generalResources', {
+    useDocuments: !current.useDocuments
+  }).run()
+}
+
+function setGeneralResourcesLayout(layout: 'on-sidebar-page' | 'on-page') {
+  editor.value?.chain().focus().updateAttributes('generalResources', { layout }).run()
+}
+
+function generalResourcesAttr<K extends 'useDocuments' | 'layout'>(key: K): unknown {
+  return editor.value?.getAttributes('generalResources')?.[key]
+}
+
+const customNodeMenuItems = computed(() => [
+  {
+    label: 'UUPG list',
+    icon: 'i-lucide-globe',
+    onSelect: () => insertUupgsList()
+  },
+  {
+    label: 'Verse',
+    icon: 'i-lucide-book-open',
+    onSelect: () => insertVerse()
+  },
+  {
+    label: 'Adoption resources',
+    icon: 'i-lucide-library',
+    onSelect: () => insertGeneralResources()
+  }
+])
 
 // Clicks on the padding area around the ProseMirror content don't move
 // the cursor by default. Forward those clicks to the editor and focus
@@ -227,9 +356,45 @@ function onBodyClick(e: MouseEvent) {
         </template>
       </UPopover>
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-image" aria-label="Image" :loading="uploading" @click="insertImage" />
-      <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-youtube" aria-label="YouTube" @click="insertYoutube" />
-      <UButton size="xs" variant="ghost" :color="isActive('uupgsList') ? 'primary' : 'neutral'" icon="i-lucide-globe" label="UUPG list" aria-label="Insert UUPG list" @click="insertUupgsList" />
-      <UButton size="xs" variant="ghost" :color="isActive('verse') ? 'primary' : 'neutral'" icon="i-lucide-book-open" label="Verse" aria-label="Insert verse" @click="insertVerse" />
+      <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-video" aria-label="Insert video" @click="openVideoModal" />
+      <UDropdownMenu :items="customNodeMenuItems">
+        <UButton
+          size="xs"
+          variant="ghost"
+          :color="isActive('uupgsList') || isActive('verse') || isActive('generalResources') ? 'primary' : 'neutral'"
+          icon="i-lucide-plus"
+          label="Insert"
+          trailing-icon="i-lucide-chevron-down"
+          aria-label="Insert custom block"
+        />
+      </UDropdownMenu>
+      <template v-if="isActive('generalResources')">
+        <div class="w-px bg-(--ui-border) mx-1" />
+        <UButton
+          size="xs"
+          variant="ghost"
+          :color="generalResourcesAttr('useDocuments') ? 'primary' : 'neutral'"
+          :label="generalResourcesAttr('useDocuments') ? 'Documents list' : 'General resources'"
+          aria-label="Toggle list type"
+          @click="toggleGeneralResourcesUseDocuments"
+        />
+        <UButton
+          size="xs"
+          variant="ghost"
+          :color="generalResourcesAttr('layout') === 'on-sidebar-page' ? 'primary' : 'neutral'"
+          label="Sidebar"
+          aria-label="Layout: on a sidebar page"
+          @click="setGeneralResourcesLayout('on-sidebar-page')"
+        />
+        <UButton
+          size="xs"
+          variant="ghost"
+          :color="generalResourcesAttr('layout') === 'on-page' ? 'primary' : 'neutral'"
+          label="Full page"
+          aria-label="Layout: on a full page"
+          @click="setGeneralResourcesLayout('on-page')"
+        />
+      </template>
       <div class="w-px bg-(--ui-border) mx-1" />
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-undo-2" aria-label="Undo" @click="cmd(e => e.chain().focus().undo().run())" />
       <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-redo-2" aria-label="Redo" @click="cmd(e => e.chain().focus().redo().run())" />
@@ -248,6 +413,30 @@ function onBodyClick(e: MouseEvent) {
       class="hidden"
       @change="onFileChosen"
     >
+
+    <UModal v-model:open="videoModalOpen" title="Insert video">
+      <template #body>
+        <UFormField
+          label="Video URL"
+          description="Paste a YouTube or Vimeo link."
+          :error="videoError || undefined"
+        >
+          <UInput
+            v-model="videoUrl"
+            autofocus
+            class="w-full"
+            placeholder="https://www.youtube.com/watch?v=… or https://vimeo.com/…"
+            @keydown.enter.prevent="insertVideo"
+          />
+        </UFormField>
+      </template>
+      <template #footer>
+        <div class="flex justify-end gap-2">
+          <UButton color="neutral" variant="ghost" @click="videoModalOpen = false">Cancel</UButton>
+          <UButton color="primary" :disabled="!videoUrl.trim()" @click="insertVideo">Insert</UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -265,7 +454,8 @@ function onBodyClick(e: MouseEvent) {
 .tiptap-body :deep(iframe) { max-width: 100%; }
 .tiptap-body :deep(.ProseMirror:focus) { outline: none; }
 
-.tiptap-body :deep(.doxa-uupgs-list-editor-chip) {
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip),
+.tiptap-body :deep(.doxa-general-resources-editor-chip) {
   display: block;
   margin: 0.75rem 0;
   padding: 0.75rem 1rem;
@@ -276,19 +466,23 @@ function onBodyClick(e: MouseEvent) {
   user-select: none;
   cursor: grab;
 }
-.tiptap-body :deep(.doxa-uupgs-list-editor-chip.is-selected) {
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip.is-selected),
+.tiptap-body :deep(.doxa-general-resources-editor-chip.is-selected) {
   outline: 2px solid var(--ui-primary);
   outline-offset: 1px;
 }
-.tiptap-body :deep(.doxa-uupgs-list-editor-chip__header) {
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip__header),
+.tiptap-body :deep(.doxa-general-resources-editor-chip__header) {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-weight: 600;
   font-size: 0.875rem;
 }
-.tiptap-body :deep(.doxa-uupgs-list-editor-chip__icon) { font-size: 1rem; }
-.tiptap-body :deep(.doxa-uupgs-list-editor-chip__detail) {
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip__icon),
+.tiptap-body :deep(.doxa-general-resources-editor-chip__icon) { font-size: 1rem; }
+.tiptap-body :deep(.doxa-uupgs-list-editor-chip__detail),
+.tiptap-body :deep(.doxa-general-resources-editor-chip__detail) {
   margin-top: 0.25rem;
   font-size: 0.75rem;
   color: var(--ui-text-muted);

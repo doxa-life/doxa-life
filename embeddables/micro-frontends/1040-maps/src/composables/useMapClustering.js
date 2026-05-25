@@ -7,9 +7,9 @@
 //   3. 'network' — Nearest-neighbor shard/gem effect (denser visual)
 //
 // PORT NOTES:
-//   - Algorithm code (Kruskal, nearest-neighbor) ported from FARFAST3-ETHNOGRAPHIC.
+//   - Algorithm code (Kruskal, nearest-neighbor) ported from the upstream clustering project.
 //   - Pinia/inject wiring pattern adopted from doxa-simple-map-component, but
-//     adapted to the Map-Framework convention which uses provide('mapStore', …)
+//     adapted to the upstream convention which uses provide('mapStore', …)
 //     in ProfileLoader.vue (NOT a `stores` umbrella). We `inject('mapStore')`
 //     synchronously in setup so multi-instance Pinia stays isolated.
 //   - The composable never imports stores directly — keeps each <doxa-map>

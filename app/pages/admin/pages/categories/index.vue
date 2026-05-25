@@ -2,15 +2,32 @@
 // Admin: list of page categories. Categories are the first-class
 // grouping layer above pages — renaming one cascades to every member
 // page's URL, so deletion is blocked while pages are still attached.
+// Categories form a tree (parent_id) and can be reordered within their
+// sibling group via drag and drop (see CategoryTree).
 
 definePageMeta({
   layout: 'admin',
   middleware: ['auth', 'admin']
 })
 
+// Mirrors the prop shape CategoryTree expects (structural).
+interface CategoryNode {
+  id: string
+  slug: string
+  url: string
+  parent_id: string | null
+  translations: Array<{ locale: string; name: string }>
+  page_count: number
+  children: CategoryNode[]
+}
+
 interface CategoryRow {
   id: string
   slug: string
+  url: string
+  parent_id: string | null
+  parent_path: string | null
+  parent_label: string | null
   menu_order: number
   translations: Array<{ locale: string; name: string; updated: string }>
   page_count: number
@@ -25,18 +42,81 @@ const { data, pending, error, refresh } = await useFetch<{ rows: CategoryRow[] }
   { default: () => ({ rows: [] }) }
 )
 
-function englishName(row: CategoryRow): string {
-  return row.translations.find(t => t.locale === 'en')?.name ?? row.slug
+function englishName(node: { slug: string; translations: Array<{ locale: string; name: string }> }): string {
+  return node.translations.find(t => t.locale === 'en')?.name ?? node.slug
+}
+
+// Nest the flat category rows into a tree (siblings sorted by
+// menu_order then slug) so each level renders as its own draggable
+// list. Kept as a writable ref — not a computed — because vuedraggable
+// splices the sibling arrays in place on drop; rebuilding from a fresh
+// refresh() is what rolls the UI back if a save fails.
+const tree = ref<CategoryNode[]>([])
+
+function buildTree(rows: CategoryRow[]): CategoryNode[] {
+  const byParent = new Map<string | null, CategoryRow[]>()
+  for (const row of rows) {
+    const key = row.parent_id ?? null
+    const list = byParent.get(key) ?? []
+    list.push(row)
+    byParent.set(key, list)
+  }
+  for (const list of byParent.values()) {
+    list.sort((a, b) =>
+      a.menu_order - b.menu_order || a.slug.localeCompare(b.slug)
+    )
+  }
+  const build = (parentId: string | null): CategoryNode[] =>
+    (byParent.get(parentId) ?? []).map(row => ({
+      id: row.id,
+      slug: row.slug,
+      url: row.url,
+      parent_id: row.parent_id,
+      translations: row.translations,
+      page_count: row.page_count,
+      children: build(row.id)
+    }))
+  return build(null)
+}
+
+watch(data, (value) => {
+  tree.value = buildTree(value?.rows ?? [])
+}, { immediate: true })
+
+// Autosave after every drop. The dropped sibling array is already
+// reordered in place; persist the new order for that parent. Server is
+// the source of truth — on failure we refetch so the UI rolls back to
+// the persisted order instead of staying out of sync.
+const savingOrder = ref(false)
+
+async function onReorder(parentId: string | null, ids: string[]) {
+  savingOrder.value = true
+  try {
+    await $fetch('/api/admin/category-order', {
+      method: 'PATCH',
+      body: { parentId, categoryIds: ids }
+    })
+    toast.add({ title: 'Order saved', color: 'success' })
+  } catch (e: any) {
+    toast.add({
+      title: 'Save failed',
+      description: e?.data?.statusMessage || e?.message,
+      color: 'error'
+    })
+    await refresh()
+  } finally {
+    savingOrder.value = false
+  }
 }
 
 // Delete flow — blocked server-side if any pages still belong to the
 // category, so we surface the 409 message directly.
 const deleteModalOpen = ref(false)
-const deleteTarget = ref<CategoryRow | null>(null)
+const deleteTarget = ref<CategoryNode | null>(null)
 const deleting = ref(false)
 
-function askDelete(row: CategoryRow) {
-  deleteTarget.value = row
+function askDelete(node: CategoryNode) {
+  deleteTarget.value = node
   deleteModalOpen.value = true
 }
 
@@ -68,10 +148,19 @@ async function confirmDelete() {
         <UButton icon="i-lucide-arrow-left" variant="ghost" color="neutral" to="/admin/pages">Back to pages</UButton>
         <div>
           <h1 class="text-2xl font-semibold">Categories</h1>
-          <p class="text-sm text-(--ui-text-muted)">Group pages into sections. Each category's name shows as the sidebar heading on its member pages.</p>
+          <p class="text-sm text-(--ui-text-muted)">Group pages into sections. Each category's name shows as the sidebar heading on its member pages. Drag the handle to reorder categories within their group.</p>
         </div>
       </div>
-      <UButton icon="i-lucide-plus" color="primary" to="/admin/pages/categories/new">New category</UButton>
+      <div class="flex items-center gap-3">
+        <span
+          v-if="savingOrder"
+          class="text-xs text-(--ui-text-muted) inline-flex items-center gap-1"
+        >
+          <UIcon name="i-lucide-loader-2" class="size-3 animate-spin" />
+          Saving order…
+        </span>
+        <UButton icon="i-lucide-plus" color="primary" to="/admin/pages/categories/new">New category</UButton>
+      </div>
     </div>
 
     <UCard v-if="error">
@@ -87,69 +176,14 @@ async function confirmDelete() {
       <p class="text-(--ui-text-muted)">No categories yet. Click <strong>New category</strong> to create one.</p>
     </UCard>
 
-    <div v-else class="overflow-x-auto border border-(--ui-border) rounded-lg">
-      <table class="w-full text-sm">
-        <thead class="bg-(--ui-bg-elevated) text-(--ui-text-muted)">
-          <tr>
-            <th class="text-left px-3 py-2 font-medium">Name (EN)</th>
-            <th class="text-left px-3 py-2 font-medium">Slug</th>
-            <th class="text-left px-3 py-2 font-medium">Translations</th>
-            <th class="text-left px-3 py-2 font-medium">Pages</th>
-            <th class="text-right px-3 py-2 font-medium">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="row in data.rows"
-            :key="row.id"
-            class="border-t border-(--ui-border) hover:bg-(--ui-bg-elevated)"
-          >
-            <td class="px-3 py-2">{{ englishName(row) }}</td>
-            <td class="px-3 py-2 font-mono">{{ row.slug }}</td>
-            <td class="px-3 py-2">
-              <div class="flex flex-wrap gap-1">
-                <UBadge
-                  v-for="t in row.translations"
-                  :key="t.locale"
-                  size="xs"
-                  variant="subtle"
-                  color="neutral"
-                >
-                  {{ t.locale }}
-                </UBadge>
-              </div>
-            </td>
-            <td class="px-3 py-2">
-              <UBadge :color="row.page_count > 0 ? 'info' : 'neutral'" variant="subtle">
-                {{ row.page_count }}
-              </UBadge>
-            </td>
-            <td class="px-3 py-2 text-right">
-              <div class="flex justify-end gap-1">
-                <UButton
-                  size="xs"
-                  variant="outline"
-                  icon="i-lucide-pencil"
-                  :to="`/admin/pages/categories/${row.id}`"
-                >
-                  Edit
-                </UButton>
-                <UButton
-                  size="xs"
-                  variant="outline"
-                  color="error"
-                  icon="i-lucide-trash-2"
-                  :disabled="row.page_count > 0"
-                  :title="row.page_count > 0 ? 'Move or delete member pages first' : 'Delete category'"
-                  @click="askDelete(row)"
-                >
-                  Delete
-                </UButton>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div v-else class="border border-(--ui-border) rounded-lg">
+      <CategoryTree
+        :items="tree"
+        :parent-id="null"
+        :depth="0"
+        @reorder="onReorder"
+        @delete="askDelete"
+      />
     </div>
 
     <UModal v-model:open="deleteModalOpen" title="Delete category?">
