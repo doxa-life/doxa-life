@@ -50,7 +50,7 @@ export const listPagesTool = defineMcpTool({
 
 export const getPageTool = defineMcpTool({
   name: 'get_page',
-  description: 'Fetch a single CMS page by id or slug, including all translations (any status). Each translation includes body_json (Tiptap JSON), a Markdown rendering, and a body_is_lossy_in_markdown flag.',
+  description: 'Fetch a single CMS page by id or slug, including all translations (any status). The `slug` lookup takes the full URL path (e.g. "resources/overview", as returned in `url`); a bare leaf ("privacy") only matches an uncategorized page. Each translation includes body_json (Tiptap JSON), a Markdown rendering, and a body_is_lossy_in_markdown flag.',
   scope: 'pages.view',
   input: getPageInput,
   async handler(input) {
@@ -82,13 +82,15 @@ export const getPageTool = defineMcpTool({
       }
     })
     return {
-      content: [{ type: 'text', text: `Page "${found.page.slug}" (${translations.length} translation(s))` }],
+      content: [{ type: 'text', text: `Page "${found.url}" (${translations.length} translation(s))` }],
       structuredContent: {
         page: {
           id: found.page.id,
           slug: found.page.slug,
+          url: found.url,
           category_id: found.page.category_id,
           category_slug: found.category_slug,
+          category_path: found.category_path,
           menu_order: found.page.menu_order,
           theme: found.page.theme,
           custom_css: found.page.custom_css
@@ -101,11 +103,12 @@ export const getPageTool = defineMcpTool({
 
 export const createPageTool = defineMcpTool({
   name: 'create_page',
-  description: 'Create a new CMS page shell, optionally with an inline initial translation. The page shell + translation are committed atomically. Slug rules: under a category the slug must start with "<category_slug>/"; uncategorized slugs cannot collide with category slugs. If translation.body_markdown is supplied it is converted to Tiptap JSON server-side; if translation.body_json is supplied it is validated against the schema/attribute allowlist.',
+  description: 'Create a new CMS page shell, optionally with an inline initial translation. The page shell + translation are committed atomically. Slug rules: leaf-only (lowercase letters, digits, dashes — no slashes). The page\'s URL is derived from its category chain + leaf, so a page in category X with slug "foo" lives at /<X-url>/foo. Uniqueness is enforced per-category, and the leaf cannot collide with a sibling category at the same level. If translation.body_markdown is supplied it is converted to Tiptap JSON server-side; if translation.body_json is supplied it is validated against the schema/attribute allowlist.',
   scope: 'pages.write',
   input: createPageInput,
   async handler(input, ctx) {
     let inlineTranslation: Parameters<typeof createCmsPage>[0]['translation']
+    let inlineWarningCount = 0
     if (input.translation) {
       // Zod's inlineTranslationInput.refine() already enforces exactly
       // one of body_json / body_markdown, so we never reach this code
@@ -113,7 +116,8 @@ export const createPageTool = defineMcpTool({
       const body_json: Record<string, unknown> = input.translation.body_json
         ? (input.translation.body_json as Record<string, unknown>)
         : (markdownToTiptap(input.translation.body_markdown!) as unknown as Record<string, unknown>)
-      tiptapValidate(body_json)
+      const { warnings } = tiptapValidate(body_json)
+      inlineWarningCount = warnings.length
       inlineTranslation = {
         locale: input.translation.locale,
         title: input.translation.title,
@@ -153,8 +157,11 @@ export const createPageTool = defineMcpTool({
 
     await applyPageInvalidations(created.slugsToPurge, created.categoriesToPurge)
 
+    const warningSuffix = inlineWarningCount > 0
+      ? `; ${inlineWarningCount} formatting fix${inlineWarningCount === 1 ? '' : 'es'} applied`
+      : ''
     return {
-      content: [{ type: 'text', text: `Created page "${created.page.slug}"` }],
+      content: [{ type: 'text', text: `Created page "${created.page.slug}"${warningSuffix}` }],
       structuredContent: {
         page: created.page,
         translation: created.translation
@@ -165,7 +172,7 @@ export const createPageTool = defineMcpTool({
 
 export const updatePageTool = defineMcpTool({
   name: 'update_page',
-  description: 'Update a page\'s metadata: slug, category_id, menu_order, theme, custom_css. Translation edits go through upsert_page_translation. Changing the category rewrites the slug prefix; cache for the old + new slug + categories is purged.',
+  description: 'Update a page\'s metadata: slug (leaf only), category_id, menu_order, theme, custom_css. Translation edits go through upsert_page_translation. Changing slug or category changes the public URL — cache for the old and new URLs is purged.',
   scope: 'pages.write',
   input: updatePageInput,
   async handler(input, ctx) {
@@ -195,11 +202,11 @@ export const deletePageTool = defineMcpTool({
   destructive: true,
   input: deletePageInput,
   async handler(input, ctx) {
-    const { slug, categoryId } = await deleteCmsPage(input.id)
-    await mcpLog('DELETE', 'pages', input.id, ctx, { slug })
-    await applyPageInvalidations([slug], categoryId ? [categoryId] : [])
+    const { slug, url, categoryId } = await deleteCmsPage(input.id)
+    await mcpLog('DELETE', 'pages', input.id, ctx, { slug, url })
+    await applyPageInvalidations([url], categoryId ? [categoryId] : [])
     return {
-      content: [{ type: 'text', text: `Deleted page "${slug}"` }],
+      content: [{ type: 'text', text: `Deleted page "${url}"` }],
       structuredContent: { ok: true }
     }
   }

@@ -1,8 +1,7 @@
 <script setup lang="ts">
-// Admin: create a new category. Collect the slug and a per-locale name
-// for each enabled language. Server insists on a non-empty English
-// name; the other locales can be filled in here or later on the edit
-// screen.
+// Admin: create a new category. Collect the slug, an optional parent
+// category, and a per-locale name for each enabled language. Server
+// insists on a non-empty English name.
 
 import { ENABLED_LANGUAGES } from '~~/config/languages'
 
@@ -11,15 +10,52 @@ definePageMeta({
   middleware: ['auth', 'admin']
 })
 
+interface CategoryRow {
+  id: string
+  slug: string
+  url: string
+  parent_id: string | null
+  parent_path: string | null
+  parent_label: string | null
+  translations: Array<{ locale: string; name: string }>
+}
+
 const toast = useToast()
 const router = useRouter()
 
 const slug = ref('')
+const parentId = ref<string | null>(null)
 const names = reactive<Record<string, string>>({})
 for (const l of ENABLED_LANGUAGES) names[l.code] = ''
 
 const activeLocale = ref<string>('en')
 const creating = ref(false)
+
+const { data: categoriesData } = await useFetch<{ rows: CategoryRow[] }>(
+  '/api/admin/categories',
+  { default: () => ({ rows: [] }) }
+)
+
+const categories = computed(() => categoriesData.value?.rows ?? [])
+
+function categoryLabel(cat: CategoryRow): string {
+  const en = cat.translations.find(t => t.locale === 'en')?.name ?? cat.slug
+  return cat.parent_label ? `${cat.parent_label} / ${en}` : en
+}
+
+const parentItems = computed(() => [
+  { label: '— Top level —', value: null as string | null },
+  ...[...categories.value]
+    .sort((a, b) => a.url.localeCompare(b.url))
+    .map(c => ({ label: categoryLabel(c), value: c.id as string | null }))
+])
+
+const previewUrl = computed(() => {
+  const leaf = slug.value.trim().replace(/^\/+|\/+$/g, '')
+  if (!leaf) return ''
+  const parent = parentId.value ? categories.value.find(c => c.id === parentId.value) : null
+  return parent ? `${parent.url}/${leaf}` : leaf
+})
 
 async function submit() {
   const slugValue = slug.value.trim().replace(/^\/+|\/+$/g, '')
@@ -41,7 +77,7 @@ async function submit() {
 
     const category = await $fetch<{ id: string }>('/api/admin/categories', {
       method: 'POST',
-      body: { slug: slugValue, translations }
+      body: { slug: slugValue, parent_id: parentId.value, translations }
     })
     toast.add({ title: 'Category created', color: 'success' })
     router.push(`/admin/pages/categories/${category.id}`)
@@ -66,8 +102,21 @@ async function submit() {
 
     <UCard>
       <div class="space-y-4">
-        <UFormField label="Slug" required description="Lowercase letters, digits, and dashes. Used as the URL prefix for every page in this category (e.g. about).">
-          <UInput v-model="slug" placeholder="about" />
+        <UFormField label="Parent category" description="Leave as Top level for a root category like /resources.">
+          <USelect
+            v-model="parentId"
+            :items="parentItems"
+            value-key="value"
+            class="w-full"
+          />
+        </UFormField>
+
+        <UFormField
+          label="Slug"
+          required
+          :description="previewUrl ? `URL will be /${previewUrl}` : 'Lowercase letters, digits, and dashes (no slashes).'"
+        >
+          <UInput v-model="slug" placeholder="adoption" />
         </UFormField>
 
         <div>
@@ -94,7 +143,7 @@ async function submit() {
               :label="`${l.flag} ${l.nativeName}`"
               :required="l.code === 'en'"
             >
-              <UInput v-model="names[l.code]" :placeholder="l.code === 'en' ? 'About' : 'Leave blank to fill later'" />
+              <UInput v-model="names[l.code]" :placeholder="l.code === 'en' ? 'Adoption Resources' : 'Leave blank to fill later'" />
             </UFormField>
           </div>
         </div>

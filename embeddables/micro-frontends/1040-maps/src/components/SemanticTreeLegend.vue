@@ -2,7 +2,7 @@
 /**
  * SemanticTreeLegend — reusable hierarchical legend for any one-to-many semantic tree.
  *
- * EXACT CLONE of /Map-Framework/05-apps/PPLR-MAPS/PPLR-validate-data-mfe/src/components/SemanticTreeLegend.vue
+ * EXACT CLONE of the upstream PPLR module
  * per user directive: "do a direct clone, only shave the API." Only difference vs.
  * upstream is the <style scoped> block converted to useShadowStyles() so the CSS
  * lands inside doxa-research-mfe's shadow root.

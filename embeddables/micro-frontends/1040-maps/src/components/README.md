@@ -1,39 +1,3 @@
----
-id: far-fast-tools/FARFAST1-HOP-POP-PLOT/DOXA/doxa-website-nuxt/doxa-life/embeddables/micro-frontends/1040-maps/src/components/README
-audience: trinitarian-believers
-audience-strict-66-book: true
-framework: farfast-1
-kingdom-kernel: false
-parent: components
-path-tags:
-- far-fast-tools
-- FARFAST1-HOP-POP-PLOT
-- DOXA
-- doxa-website-nuxt
-- doxa-life
-- embeddables
-- micro-frontends
-- 1040-maps
-- src
-- components
-size-class: short
-svg-candidate: false
-svg-candidate-reasons: []
-svg-candidate-score: 0
-svg-candidate-tagged-at: '2026-05-09T17:40:05.451950+00:00'
-svg-candidate-version: '0.2'
-tagged-at: '2026-05-09T05:49:39.360475+00:00'
-tagged-by: lk10x-tagger-v0.1.0
-tags:
-- legends-mapcontrolscomponent-vue
-- shared-vue-components
-- new-legendmobilesheet-vue
-- mobile-legend-drawer
-- rendering-primitive-shared
-voice-memo-shape: false
-word-count: 271
----
-
 # template/src/components/
 
 > **Shared Vue components used by app-profiles.** Catalog and contracts live in [`/docs/components/`](../../../docs/components/).

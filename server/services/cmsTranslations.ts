@@ -9,9 +9,10 @@ import { ENABLED_LANGUAGE_CODES } from '~~/config/languages'
 import { purgeCmsPage, purgeCmsCategory } from '../utils/cmsCache'
 import type { PageTranslation } from '../database/pages'
 import { detectLossy } from '../utils/tiptapLossyDetector'
-import { tiptapValidate } from '../utils/tiptapValidate'
+import { tiptapValidate, type SanitizationWarning } from '../utils/tiptapValidate'
 import { markdownToTiptap } from '../utils/tiptapFromMarkdown'
 import { isSafeHttpUrl as isSafeUrl } from '../utils/urlValidation'
+import { loadCategoryTree, pageUrlPath } from '../database/categoryTree'
 
 function err(statusCode: number, message: string, extra?: Record<string, unknown>): H3Error {
   return Object.assign(new Error(message), {
@@ -34,17 +35,27 @@ export interface UpsertTranslationInput {
   og_image?: string | null
   status?: 'draft' | 'published'
   allow_lossy_overwrite?: boolean
+  // Audit context for the version-history snapshot. The fields are
+  // optional because some background paths may not have a user; the
+  // snapshot still gets written, just with NULLs.
+  actor_user_id?: string | null
+  source?: 'admin-ui' | 'mcp' | 'deepl'
+  user_agent?: string | null
 }
 
 export interface UpsertTranslationResult {
   translation: PageTranslation
+  // Full public URL path (no leading slash), e.g. "resources/adoption/overview".
+  // Cache purge keys are URL-based, so callers pass this through to
+  // `applyTranslationInvalidations` rather than the raw leaf slug.
+  pageUrl: string
   pageSlug: string
   categoryId: string | null
-  // True iff the input came in as Markdown and the existing body was
-  // lossy-in-markdown but allow_lossy_overwrite was set — the caller
-  // should log an mcp.lossy_overwrite event with the dropped reasons.
   lossyOverwriteApplied: boolean
   droppedReasons: string[]
+  // Sanitizer notes from tiptapValidate — attrs/marks/nodes that were
+  // dropped from the body before storage. Empty when the input was clean.
+  sanitizationWarnings: SanitizationWarning[]
 }
 
 const URL_BEARING_FIELDS: ReadonlyArray<keyof UpsertTranslationInput> = [
@@ -81,10 +92,11 @@ export async function upsertCmsPageTranslation(input: UpsertTranslationInput): P
   let droppedReasons: string[] = []
   let lossyOverwriteApplied = false
   let body_json: Record<string, unknown>
+  const sanitizationWarnings: SanitizationWarning[] = []
 
   if (hasJson) {
     body_json = input.body_json as Record<string, unknown>
-    tiptapValidate(body_json)
+    sanitizationWarnings.push(...tiptapValidate(body_json).warnings)
   } else {
     // Markdown path — refuse to overwrite a lossy body unless the
     // operator acknowledges via allow_lossy_overwrite.
@@ -105,7 +117,7 @@ export async function upsertCmsPageTranslation(input: UpsertTranslationInput): P
       throw err(400, 'body_markdown must be ≤ 1 MB')
     }
     body_json = markdownToTiptap(input.body_markdown ?? '') as unknown as Record<string, unknown>
-    tiptapValidate(body_json)
+    sanitizationWarnings.push(...tiptapValidate(body_json).warnings)
   }
 
   // Field-size guards (post-validate so we don't leak sanitized
@@ -163,12 +175,44 @@ export async function upsertCmsPageTranslation(input: UpsertTranslationInput): P
       .executeTakeFirstOrThrow()
   }
 
+  // Best-effort version snapshot. Mirrors the activity-logger pattern:
+  // a logging failure must not poison a successful save.
+  try {
+    await db
+      .insertInto('page_translation_versions')
+      .values({
+        page_id: input.page_id,
+        locale: input.locale,
+        title,
+        body_json: body_json as never,
+        excerpt: input.excerpt ?? null,
+        featured_image: input.featured_image ?? null,
+        meta_title: input.meta_title ?? null,
+        meta_description: input.meta_description ?? null,
+        og_image: input.og_image ?? null,
+        status: translation.status,
+        created_by_user_id: input.actor_user_id ?? null,
+        source: input.source ?? 'admin-ui',
+        user_agent: input.user_agent ?? null
+      })
+      .execute()
+  } catch (e) {
+    console.error('[cmsTranslations] failed to write version snapshot', {
+      page_id: input.page_id,
+      locale: input.locale,
+      error: e
+    })
+  }
+
+  const tree = await loadCategoryTree()
   return {
     translation,
+    pageUrl: pageUrlPath(tree, page),
     pageSlug: page.slug,
     categoryId: page.category_id,
     lossyOverwriteApplied,
-    droppedReasons
+    droppedReasons,
+    sanitizationWarnings
   }
 }
 
@@ -186,7 +230,7 @@ export async function setCmsTranslationStatus(input: {
   page_id: string
   locale: string
   status: 'draft' | 'published'
-}): Promise<{ translation: PageTranslation; pageSlug: string; categoryId: string | null }> {
+}): Promise<{ translation: PageTranslation; pageUrl: string; pageSlug: string; categoryId: string | null }> {
   if (!ENABLED_LANGUAGE_CODES.includes(input.locale)) {
     throw err(400, 'locale is not enabled')
   }
@@ -208,11 +252,14 @@ export async function setCmsTranslationStatus(input: {
 
   if (!updated) throw err(404, 'Translation not found')
 
-  return { translation: updated, pageSlug: page.slug, categoryId: page.category_id }
+  const tree = await loadCategoryTree()
+  return { translation: updated, pageUrl: pageUrlPath(tree, page), pageSlug: page.slug, categoryId: page.category_id }
 }
 
-export async function applyTranslationInvalidations(slug: string, categoryId: string | null, locale?: string): Promise<void> {
-  await purgeCmsPage(slug, locale ? [locale] : undefined)
-  if (categoryId) await purgeCmsCategory(categoryId, slug)
+// `url` is the full public URL path (no leading slash) — same string
+// the lookup endpoint uses as its cache key suffix.
+export async function applyTranslationInvalidations(url: string, categoryId: string | null, locale?: string): Promise<void> {
+  await purgeCmsPage(url, locale ? [locale] : undefined)
+  if (categoryId) await purgeCmsCategory(categoryId, url)
 }
 

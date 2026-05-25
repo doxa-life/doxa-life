@@ -85,7 +85,8 @@ export const translatePageTool = defineMcpTool({
       source_locale: input.source_locale,
       target_locales: input.target_locales,
       overwrite: input.overwrite,
-      status: input.status
+      status: input.status,
+      actor_user_id: ctx.auth.userId ?? null
     })
 
     await mcpLog('UPDATE', 'pages', input.page_id, ctx, {

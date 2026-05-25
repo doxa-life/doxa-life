@@ -294,10 +294,44 @@ export function useMapFly(options = {}) {
         });
     }
 
-    // Card d1336834 — uniform legend-row camera constants (driver-confirmed)
-    const LEGEND_FIT_PADDING_PX = 40;
+    // Uniform legend-row camera constants. Single source of truth for how
+    // tight a row-click zooms — keep these conservative so even sparse rows
+    // (single pin, single country) don't slam the camera into street-level.
+    const LEGEND_FIT_PADDING_PX = 80;
     const LEGEND_FIT_DURATION_MS = 800;
-    const LEGEND_SINGLE_PIN_ZOOM = 8;
+    const LEGEND_FIT_MAX_ZOOM = 5;
+    const LEGEND_SINGLE_PIN_ZOOM = 5;
+
+    // Antimeridian-aware longitude span. For scopes that cross ±180° (Oceania,
+    // east-Russia, Aleutians), naive min/max returns a span of ~360° because
+    // points sit at -179 and +179. Re-project longitudes into [0, 360) and
+    // recompute; pick the smaller span. Returns { minLng, maxLng } in the
+    // representation that yields the tighter bbox. Caller must accept that
+    // maxLng can exceed 180 — Mapbox's fitBounds accepts that and wraps.
+    function _tightLngBounds(longitudes) {
+        if (!longitudes.length) return null;
+        let aMin = Infinity, aMax = -Infinity; // raw [-180, 180]
+        let bMin = Infinity, bMax = -Infinity; // shifted [0, 360)
+        for (const lng of longitudes) {
+            if (!Number.isFinite(lng)) continue;
+            if (lng < aMin) aMin = lng;
+            if (lng > aMax) aMax = lng;
+            const shifted = lng < 0 ? lng + 360 : lng;
+            if (shifted < bMin) bMin = shifted;
+            if (shifted > bMax) bMax = shifted;
+        }
+        if (!Number.isFinite(aMin)) return null;
+        const spanA = aMax - aMin;
+        const spanB = bMax - bMin;
+        if (spanB < spanA) {
+            // The cross-antimeridian representation is tighter. Convert back
+            // to fitBounds-friendly form: keep minLng in [-180,180] and let
+            // maxLng exceed 180 (Mapbox wraps it correctly).
+            const minRaw = bMin > 180 ? bMin - 360 : bMin;
+            return { minLng: minRaw, maxLng: minRaw + spanB };
+        }
+        return { minLng: aMin, maxLng: aMax };
+    }
 
     // Why: map.querySourceFeatures(sourceId, {filter}) is viewport-clipped —
     // pins outside the rendered camera are dropped, so legend rows for off-screen
@@ -335,6 +369,13 @@ export function useMapFly(options = {}) {
                 return v == null ? '' : String(v);
             }
             case 'to-boolean': return Boolean(_resolveExpr(expr[1], props));
+            case 'slice': {
+                const s = _resolveExpr(expr[1], props);
+                const i = _resolveExpr(expr[2], props);
+                const j = expr.length > 3 ? _resolveExpr(expr[3], props) : undefined;
+                if (typeof s !== 'string') return '';
+                return j != null ? s.slice(i, j) : s.slice(i);
+            }
             default:           return expr;
         }
     }
@@ -429,6 +470,46 @@ export function useMapFly(options = {}) {
         const map = getMap();
         if (!map || !row) return;
 
+        // Region rows on the doxa-regions tab represent polygons, not pin clusters.
+        // The pin-cluster path below would zoom to whatever sparse pins happen to
+        // overlap the region's bbox — which for sparse regions like Oceania zooms
+        // OUT to fit a few scattered pins. Fit the polygon directly instead, so
+        // "click Oceania" zooms TO Oceania.
+        if (opts.regionPolygonSource && map.getSource(opts.regionPolygonSource)) {
+            const polyFeatures = _readSourceFeatures(map, opts.regionPolygonSource);
+            const regionKey = row.id ?? row.label;
+            const match = polyFeatures.find(f => {
+                const p = f?.properties || {};
+                return p.region === regionKey || p.name === regionKey || p.id === regionKey;
+            });
+            if (match) {
+                const lngs = [];
+                let pMinLat = Infinity, pMaxLat = -Infinity;
+                const visit = (coords) => {
+                    for (const c of coords) {
+                        if (Array.isArray(c[0])) visit(c);
+                        else if (Number.isFinite(c[0]) && Number.isFinite(c[1])) {
+                            lngs.push(c[0]);
+                            if (c[1] < pMinLat) pMinLat = c[1];
+                            if (c[1] > pMaxLat) pMaxLat = c[1];
+                        }
+                    }
+                };
+                if (match.geometry?.coordinates) visit(match.geometry.coordinates);
+                const lngBounds = _tightLngBounds(lngs);
+                if (lngBounds && Number.isFinite(pMinLat)) {
+                    map.fitBounds([[lngBounds.minLng, pMinLat], [lngBounds.maxLng, pMaxLat]], {
+                        padding: LEGEND_FIT_PADDING_PX,
+                        maxZoom: LEGEND_FIT_MAX_ZOOM,
+                        duration: LEGEND_FIT_DURATION_MS,
+                        essential: true
+                    });
+                    return;
+                }
+            }
+            // Polygon not found — fall through to pin-cluster path below.
+        }
+
         const sourceId = opts.sourceId ?? 'language-families';
         if (!map.getSource(sourceId)) return;
 
@@ -438,7 +519,7 @@ export function useMapFly(options = {}) {
         const allFeatures = _readSourceFeatures(map, sourceId);
         if (!allFeatures.length) return;
 
-        let minLng = Infinity, maxLng = -Infinity;
+        const lngs = [];
         let minLat = Infinity, maxLat = -Infinity;
         let pointCount = 0;
         let firstLng = 0, firstLat = 0;
@@ -456,13 +537,18 @@ export function useMapFly(options = {}) {
             const lng = c[0], lat = c[1];
             if (!Number.isFinite(lng) || !Number.isFinite(lat)) continue;
             if (pointCount === 0) { firstLng = lng; firstLat = lat; }
-            if (lng < minLng) minLng = lng;
-            if (lng > maxLng) maxLng = lng;
+            lngs.push(lng);
             if (lat < minLat) minLat = lat;
             if (lat > maxLat) maxLat = lat;
             pointCount++;
         }
         if (pointCount === 0) return;
+
+        // Antimeridian-aware longitude bounds — prevents Oceania/east-Russia
+        // rows from "zooming out to fit both wrap-around copies."
+        const lngBounds = _tightLngBounds(lngs);
+        const minLng = lngBounds ? lngBounds.minLng : 0;
+        const maxLng = lngBounds ? lngBounds.maxLng : 0;
 
         if (pointCount === 1) {
             map.flyTo({
@@ -484,7 +570,7 @@ export function useMapFly(options = {}) {
             // the camera's minZoom (with 0.3 slack to absorb float rounding),
             // flyTo the floor instead of fitBounds.
             const probe = typeof map.cameraForBounds === 'function'
-                ? map.cameraForBounds(bounds, { padding: LEGEND_FIT_PADDING_PX })
+                ? map.cameraForBounds(bounds, { padding: LEGEND_FIT_PADDING_PX, maxZoom: LEGEND_FIT_MAX_ZOOM })
                 : null;
             const minZoom = typeof map.getMinZoom === 'function' ? map.getMinZoom() : null;
             const wouldClamp = probe == null
@@ -502,6 +588,7 @@ export function useMapFly(options = {}) {
             } else {
                 map.fitBounds(bounds, {
                     padding: LEGEND_FIT_PADDING_PX,
+                    maxZoom: LEGEND_FIT_MAX_ZOOM,
                     duration: LEGEND_FIT_DURATION_MS,
                     essential: true
                 });

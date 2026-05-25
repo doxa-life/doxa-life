@@ -15,6 +15,7 @@ import Typography from '@tiptap/extension-typography'
 import Subscript from '@tiptap/extension-subscript'
 import Superscript from '@tiptap/extension-superscript'
 import Youtube from '@tiptap/extension-youtube'
+import { Vimeo } from './tiptapVimeo'
 import { Div } from './tiptapDiv'
 import { UupgsListNode } from './tiptapUupgsList'
 import { GeneralResourcesNode } from './tiptapGeneralResources'
@@ -32,6 +33,7 @@ export function buildTiptapExtensions() {
     Subscript,
     Superscript,
     Youtube,
+    Vimeo,
     Div,
     UupgsListNode,
     GeneralResourcesNode,

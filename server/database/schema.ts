@@ -58,6 +58,7 @@ export interface PagesTable {
 export interface CategoriesTable {
   id: Generated<string>
   slug: string
+  parent_id: string | null
   menu_order: Generated<number>
   created: ColumnType<Date, Date | string | undefined, Date | string>
   updated: ColumnType<Date, Date | string | undefined, Date | string>
@@ -86,6 +87,26 @@ export interface PageTranslationsTable {
   updated: ColumnType<Date, Date | string | undefined, Date | string>
 }
 
+export type PageTranslationVersionSource = 'admin-ui' | 'mcp' | 'deepl'
+
+export interface PageTranslationVersionsTable {
+  id: Generated<string>
+  page_id: string
+  locale: string
+  title: string
+  body_json: Generated<Record<string, any>>
+  excerpt: string | null
+  featured_image: string | null
+  meta_title: string | null
+  meta_description: string | null
+  og_image: string | null
+  status: 'draft' | 'published'
+  created_by_user_id: string | null
+  source: Generated<PageTranslationVersionSource>
+  user_agent: string | null
+  created: ColumnType<Date, Date | string | undefined, Date | string>
+}
+
 export interface Database {
   users: UsersTable
   site_settings: SiteSettingsTable
@@ -93,6 +114,7 @@ export interface Database {
   activity_logs: ActivityLogsTable
   pages: PagesTable
   page_translations: PageTranslationsTable
+  page_translation_versions: PageTranslationVersionsTable
   categories: CategoriesTable
   category_translations: CategoryTranslationsTable
 }

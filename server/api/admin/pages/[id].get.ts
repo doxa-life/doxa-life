@@ -1,4 +1,5 @@
-// Admin: fetch a single page with all its translations (any status).
+// Admin: fetch a single page with all its translations (any status),
+// plus the computed full public URL.
 
 import { defineEventHandler, getRouterParam, createError } from 'h3'
 import { requirePermission } from '../../../utils/rbac'
@@ -12,8 +13,10 @@ export default defineEventHandler(async (event) => {
   const found = await getCmsPage({ id })
   if (!found) throw createError({ statusCode: 404, statusMessage: 'Page not found' })
 
-  // Match the legacy admin contract: `{page, translations}`. The
-  // service additionally returns `category_slug`, but the Vue admin
-  // doesn't read that field — drop it from the response.
-  return { page: found.page, translations: found.translations }
+  return {
+    page: found.page,
+    translations: found.translations,
+    url: found.url,
+    category_path: found.category_path
+  }
 })

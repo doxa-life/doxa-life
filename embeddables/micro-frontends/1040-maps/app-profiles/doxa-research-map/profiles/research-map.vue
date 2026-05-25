@@ -749,7 +749,12 @@ function onSemanticTreeSelect(node) {
     const flatExpr = _isFlatTab.value
       ? _buildFlatLegendMatchExpr(node, activeLegendType.value)
       : null
-    mapFly.zoomToLegendRow?.(node, flatExpr ? { matchExpr: flatExpr } : undefined)
+    // doxa-regions tab → fit polygon (sparse regions like Oceania should
+    // zoom TO the region, not OUT to span its few scattered pins).
+    const isRegionsTab = activeTab.value?.id === 'doxa-regions'
+    const flyOpts = flatExpr ? { matchExpr: flatExpr } : {}
+    if (isRegionsTab) flyOpts.regionPolygonSource = 'regions'
+    mapFly.zoomToLegendRow?.(node, Object.keys(flyOpts).length ? flyOpts : undefined)
   }
   if (!node) {
     // Flat tabs: clear filter directly

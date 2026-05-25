@@ -1,40 +1,3 @@
----
-id: far-fast-tools/FARFAST1-HOP-POP-PLOT/DOXA/doxa-website-nuxt/doxa-life/embeddables/micro-frontends/1040-maps/README
-audience: trinitarian-believers
-audience-strict-66-book: true
-framework: farfast-1
-kingdom-kernel: false
-parent: 1040-maps
-path-tags:
-- far-fast-tools
-- FARFAST1-HOP-POP-PLOT
-- DOXA
-- doxa-website-nuxt
-- doxa-life
-- embeddables
-- micro-frontends
-- 1040-maps
-size-class: short
-svg-candidate: true
-svg-candidate-reasons:
-- ascii-diagram:20
-svg-candidate-score: 3
-svg-candidate-tagged-at: '2026-05-09T17:40:05.449172+00:00'
-svg-candidate-version: '0.2'
-tagged-at: '2026-05-09T05:49:37.391885+00:00'
-tagged-by: lk10x-tagger-v0.1.0
-tags:
-- mapbox-mfe-bundles
-- repo-map-helps
-- template-src-drifting
-- library-components-composables
-- semantictreelegend-colorstrategies-happen
-- exists-replaces-clone
-- vite-powered-monorepo
-voice-memo-shape: false
-word-count: 298
----
-
 # 1040-maps
 
 A Vite-powered monorepo + map forge for building embeddable Mapbox MFE bundles. Named after the 10/40 window — the geographic frame most of these maps serve.
@@ -91,4 +54,4 @@ npm run build
 
 ## Migration plan
 
-See `Map-Framework/00-input/map-framework-refactor/migration-001-doxa-simple-map.md` for the first refactor (doxa-simple-map-mfe → 1040-maps).
+See `the refactor ideation` for the first refactor (doxa-simple-map-mfe → 1040-maps).

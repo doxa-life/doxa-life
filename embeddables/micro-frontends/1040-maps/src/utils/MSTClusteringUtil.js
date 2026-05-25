@@ -18,8 +18,8 @@
  *  - Better visual clarity
  *  - No maxDistance parameter needed (connects everything)
  *
- * Ported verbatim from FARFAST3-ETHNOGRAPHIC/MSTClusteringUtil.js (~250 lines)
- * to the Map-Framework template. No external deps beyond ES2020.
+ * Ported verbatim from the upstream MSTClusteringUtil module (~250 lines)
+ * to the the upstream template. No external deps beyond ES2020.
  *
  * @module utils/MSTClusteringUtil
  */

@@ -17,6 +17,15 @@ const BUNDLES = {
 } as const
 type BundleKey = keyof typeof BUNDLES
 
+declare global {
+  interface Window {
+    // Set by the host before the IIFE bundle loads so the maps fetch from the
+    // configured prayer API instead of the build-time baked fallback. Read by
+    // getApiBaseUrl() inside the bundle. See embeddables/.../utils/apiBaseUrl.js.
+    MAP_APP_API_URL?: string
+  }
+}
+
 function loadScript(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const existing = document.querySelector<HTMLScriptElement>(`script[data-doxa-map="${src}"]`)
@@ -44,6 +53,8 @@ function loadScript(src: string): Promise<void> {
  *                 5-tab research bundle.
  */
 export function useDoxaMap(bundle: BundleKey = 'simple-map') {
+  const config = useRuntimeConfig()
+
   useHead({
     link: [
       { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css' },
@@ -55,6 +66,12 @@ export function useDoxaMap(bundle: BundleKey = 'simple-map') {
 
   onMounted(async () => {
     try {
+      // Tell the map bundle which prayer API to fetch from. Must be set before
+      // the IIFE loads so getApiBaseUrl() picks it up instead of the build-time
+      // fallback baked into the bundle.
+      if (config.public.prayBaseUrl) {
+        window.MAP_APP_API_URL = config.public.prayBaseUrl as string
+      }
       await loadScript(MAPBOX_JS)
       await loadScript(MAPBOX_GEOCODER_JS)
       await loadScript(MAP_APP_JS)

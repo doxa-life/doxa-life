@@ -28,6 +28,10 @@ interface Page {
 interface CategoryRow {
   id: string
   slug: string
+  url: string
+  parent_path: string | null
+  parent_label: string | null
+  parent_id: string | null
   menu_order: number
   translations: Array<{ locale: string; name: string }>
   page_count: number
@@ -51,6 +55,8 @@ interface Translation {
 interface PageDetail {
   page: Page
   translations: Translation[]
+  url: string
+  category_path: string | null
 }
 
 const route = useRoute()
@@ -59,16 +65,16 @@ const toast = useToast()
 
 const pageId = computed(() => String(route.params.id))
 
-// Live public URL for the "View page" link in the Publish card. Uses the
-// committed slug (data) not the in-flight slug ref, so the link always
-// points to an existing route even if the author is editing the slug.
-// English is the default locale, so `prefix_except_default` means no prefix.
+// Live public URL for the "View page" link in the Publish card. Uses
+// the server-computed full URL (data.url) so it stays correct as the
+// page moves between categories. English is the default locale, so
+// `prefix_except_default` means no prefix.
 const publicUrl = computed(() => {
-  const committedSlug = data.value?.page.slug
-  if (!committedSlug) return null
+  const committedUrl = data.value?.url
+  if (!committedUrl) return null
   return activeLocale.value === 'en'
-    ? `/${committedSlug}`
-    : `/${activeLocale.value}/${committedSlug}`
+    ? `/${committedUrl}`
+    : `/${activeLocale.value}/${committedUrl}`
 })
 
 const EMPTY_DOC = { type: 'doc', content: [{ type: 'paragraph' }] }
@@ -82,19 +88,20 @@ const { data: categoriesData } = await useFetch<{ rows: CategoryRow[] }>(
 const categories = computed(() => categoriesData.value?.rows ?? [])
 
 function categoryLabel(cat: CategoryRow): string {
-  const en = cat.translations.find(t => t.locale === 'en')?.name
-  return en ?? cat.slug
+  const en = cat.translations.find(t => t.locale === 'en')?.name ?? cat.slug
+  return cat.parent_label ? `${cat.parent_label} / ${en}` : en
 }
 
 const categoryItems = computed(() => [
   { label: '— Uncategorized —', value: null as string | null },
-  ...categories.value.map(c => ({ label: categoryLabel(c), value: c.id as string | null }))
+  ...[...categories.value]
+    .sort((a, b) => a.url.localeCompare(b.url))
+    .map(c => ({ label: categoryLabel(c), value: c.id as string | null }))
 ])
 
 // Metadata editable in the top bar
 const slug = ref('')
 const categoryId = ref<string | null>(null)
-const menuOrder = ref(0)
 const theme = ref<PageTheme>('default')
 const customCss = ref('')
 // Original category id at load time — used to detect moves that also
@@ -105,7 +112,6 @@ watchEffect(() => {
     slug.value = data.value.page.slug
     categoryId.value = data.value.page.category_id
     originalCategoryId.value = data.value.page.category_id
-    menuOrder.value = data.value.page.menu_order
     theme.value = data.value.page.theme ?? 'default'
     customCss.value = data.value.page.custom_css ?? ''
   }
@@ -116,6 +122,16 @@ const selectedCategory = computed(() =>
 )
 
 const isCategoryChanged = computed(() => categoryId.value !== originalCategoryId.value)
+
+// Live preview of the full URL — re-derived from the (in-flight) leaf
+// slug + selected category so the editor sees the new URL before they
+// save. Used in the Slug field's helper text.
+const previewFullUrl = computed(() => {
+  const leaf = slug.value.trim().replace(/^\/+|\/+$/g, '')
+  if (!leaf) return ''
+  const prefix = selectedCategory.value?.url
+  return prefix ? `${prefix}/${leaf}` : leaf
+})
 
 const THEME_OPTIONS: Array<{ label: string; value: PageTheme }> = [
   { label: 'Default', value: 'default' },
@@ -217,7 +233,6 @@ async function saveAll(statusOverride?: 'draft' | 'published', localeOverride?: 
       body: {
         slug: slug.value,
         category_id: categoryId.value,
-        menu_order: menuOrder.value,
         theme: theme.value,
         custom_css: customCss.value.trim() ? customCss.value : null
       }
@@ -234,10 +249,10 @@ async function saveAll(statusOverride?: 'draft' | 'published', localeOverride?: 
     }
     if (statusOverride) body.status = statusOverride
 
-    await $fetch(`/api/admin/pages/${pageId.value}/translations/${locale}`, {
-      method: 'PUT',
-      body
-    })
+    const saveResponse = await $fetch<{ sanitization_warnings?: { path: string; reason: string }[] }>(
+      `/api/admin/pages/${pageId.value}/translations/${locale}`,
+      { method: 'PUT', body }
+    )
     if (statusOverride) f.status = statusOverride
     f.loaded = true
     f.dirty = false
@@ -248,6 +263,17 @@ async function saveAll(statusOverride?: 'draft' | 'published', localeOverride?: 
         ? 'Unpublished'
         : 'Saved'
     toast.add({ title: `${verb} ${locale}`, color: 'success' })
+
+    const warnings = saveResponse?.sanitization_warnings ?? []
+    if (warnings.length > 0) {
+      const example = warnings[0]?.reason ?? ''
+      toast.add({
+        title: 'Some formatting was simplified',
+        description: `${warnings.length} change${warnings.length === 1 ? '' : 's'} on save${example ? ` — e.g. ${example}` : ''}`,
+        color: 'warning'
+      })
+    }
+
     await refresh()
     return true
   } catch (e: any) {
@@ -359,6 +385,128 @@ async function runTranslate() {
 }
 
 const enabledLanguages = ENABLED_LANGUAGES
+
+// ── Version history ─────────────────────────────────────────────
+//
+// Per-locale snapshot list. Loaded lazily when the drawer opens (or
+// the active locale changes while it's open). Restoring a version
+// hydrates the form fields with the old content and marks the form
+// dirty — nothing hits the DB until the user clicks Save/Publish.
+
+interface VersionSummary {
+  id: string
+  created: string
+  status: 'draft' | 'published'
+  source: 'admin-ui' | 'mcp' | 'deepl'
+  title: string
+  created_by: { id: string; name: string } | null
+}
+
+interface VersionDetail extends VersionSummary {
+  body_json: Record<string, any>
+  body_html: string
+  excerpt: string | null
+  featured_image: string | null
+  meta_title: string | null
+  meta_description: string | null
+  og_image: string | null
+}
+
+const historyOpen = ref(false)
+const versionsLoading = ref(false)
+const versions = ref<VersionSummary[]>([])
+const selectedVersionId = ref<string | null>(null)
+const selectedVersion = ref<VersionDetail | null>(null)
+const versionDetailLoading = ref(false)
+
+async function loadVersions() {
+  versionsLoading.value = true
+  selectedVersionId.value = null
+  selectedVersion.value = null
+  try {
+    const res = await $fetch<{ versions: VersionSummary[] }>(
+      `/api/admin/pages/${pageId.value}/translations/${activeLocale.value}/versions`
+    )
+    versions.value = res.versions
+  } catch (e: any) {
+    toast.add({
+      title: 'Could not load history',
+      description: e?.data?.statusMessage || e?.message,
+      color: 'error'
+    })
+    versions.value = []
+  } finally {
+    versionsLoading.value = false
+  }
+}
+
+async function selectVersion(id: string) {
+  if (selectedVersionId.value === id) return
+  selectedVersionId.value = id
+  selectedVersion.value = null
+  versionDetailLoading.value = true
+  try {
+    selectedVersion.value = await $fetch<VersionDetail>(
+      `/api/admin/pages/${pageId.value}/translations/${activeLocale.value}/versions/${id}`
+    )
+  } catch (e: any) {
+    toast.add({
+      title: 'Could not load version',
+      description: e?.data?.statusMessage || e?.message,
+      color: 'error'
+    })
+  } finally {
+    versionDetailLoading.value = false
+  }
+}
+
+function openHistory() {
+  historyOpen.value = true
+  loadVersions()
+}
+
+// Refetch when the editor switches locale tabs while the drawer is open.
+watch(activeLocale, () => {
+  if (historyOpen.value) loadVersions()
+})
+
+function loadVersionIntoEditor() {
+  const v = selectedVersion.value
+  if (!v) return
+  const f = forms[activeLocale.value]
+  if (!f) return
+  f.title = v.title
+  f.excerpt = v.excerpt ?? ''
+  f.featured_image = v.featured_image ?? ''
+  f.meta_title = v.meta_title ?? ''
+  f.meta_description = v.meta_description ?? ''
+  f.og_image = v.og_image ?? ''
+  f.body_json = JSON.parse(JSON.stringify(v.body_json))
+  f.dirty = true
+  f.loaded = true
+  historyOpen.value = false
+  toast.add({
+    title: 'Version loaded into editor',
+    description: 'Click Save or Publish to apply.',
+    color: 'success'
+  })
+}
+
+const SOURCE_LABELS: Record<string, string> = {
+  'admin-ui': 'Admin',
+  mcp: 'MCP',
+  deepl: 'DeepL'
+}
+
+function formatVersionTime(iso: string): string {
+  try {
+    const d = new Date(iso)
+    return d.toLocaleString(undefined, {
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    })
+  } catch { return iso }
+}
 </script>
 
 <template>
@@ -485,6 +633,15 @@ const enabledLanguages = ENABLED_LANGUAGES
                 >Save draft</UButton>
               </template>
 
+              <UButton
+                block
+                variant="ghost"
+                color="neutral"
+                icon="i-lucide-history"
+                :disabled="!forms[activeLocale]?.loaded"
+                @click="openHistory"
+              >History</UButton>
+
               <div v-if="publicUrl" class="pt-2 mt-1 border-t border-(--ui-border)">
                 <a
                   :href="publicUrl"
@@ -507,7 +664,7 @@ const enabledLanguages = ENABLED_LANGUAGES
             <div class="space-y-4">
               <UFormField
                 label="Category"
-                :description="isCategoryChanged ? 'Changing the category rewrites the slug prefix — the old URL will 404.' : 'Group this page under a category.'"
+                :description="isCategoryChanged ? 'Moving to a different category will change this page’s URL — the old URL will 404.' : 'Group this page under a category.'"
               >
                 <USelect
                   v-model="categoryId"
@@ -518,12 +675,13 @@ const enabledLanguages = ENABLED_LANGUAGES
               </UFormField>
               <UFormField
                 label="Slug"
-                :description="selectedCategory ? `Full URL: /${slug}. Must start with ${selectedCategory.slug}/` : 'URL path (e.g. privacy)'"
+                :description="previewFullUrl ? `Full URL: /${previewFullUrl}` : 'Leaf segment only — lowercase letters, digits, dashes.'"
               >
-                <UInput v-model="slug" />
-              </UFormField>
-              <UFormField label="Menu order" description="Position within the category sidebar.">
-                <UInput v-model.number="menuOrder" type="number" />
+                <div v-if="selectedCategory" class="flex items-center gap-1 min-w-0">
+                  <span class="shrink-0 text-(--ui-text-muted) font-mono text-sm truncate">{{ selectedCategory.url }}/</span>
+                  <UInput v-model="slug" class="flex-1 min-w-0" />
+                </div>
+                <UInput v-else v-model="slug" class="w-full" />
               </UFormField>
               <UFormField label="Page theme" description="Applied to <body>.">
                 <USelect v-model="theme" :items="THEME_OPTIONS" class="w-full" />
@@ -628,6 +786,99 @@ const enabledLanguages = ENABLED_LANGUAGES
       </template>
     </UModal>
 
+    <USlideover
+      v-model:open="historyOpen"
+      side="right"
+      :title="`Version history · ${activeLocale}`"
+      :ui="{ content: 'w-screen max-w-full sm:max-w-none sm:w-[80vw] lg:w-[70vw]' }"
+    >
+      <template #body>
+        <div class="grid grid-cols-1 md:grid-cols-[280px_minmax(0,1fr)] gap-4 h-full">
+          <!-- Version list -->
+          <div class="border border-(--ui-border) rounded-lg overflow-y-auto">
+            <div v-if="versionsLoading" class="p-4 text-sm text-(--ui-text-muted)">
+              Loading…
+            </div>
+            <div v-else-if="versions.length === 0" class="p-4 text-sm text-(--ui-text-muted)">
+              No saved versions for this locale yet.
+            </div>
+            <ul v-else class="divide-y divide-(--ui-border)">
+              <li
+                v-for="v in versions"
+                :key="v.id"
+                :class="[
+                  'p-3 cursor-pointer hover:bg-(--ui-bg-elevated) transition-colors',
+                  selectedVersionId === v.id ? 'bg-(--ui-bg-elevated)' : ''
+                ]"
+                @click="selectVersion(v.id)"
+              >
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs text-(--ui-text-muted)">{{ formatVersionTime(v.created) }}</span>
+                  <UBadge
+                    size="xs"
+                    :color="v.status === 'published' ? 'success' : 'neutral'"
+                    variant="subtle"
+                  >{{ v.status }}</UBadge>
+                </div>
+                <div class="mt-1 text-sm font-medium truncate">{{ v.title || '(untitled)' }}</div>
+                <div class="mt-0.5 text-xs text-(--ui-text-muted) flex items-center gap-1.5">
+                  <span>{{ v.created_by?.name ?? 'System' }}</span>
+                  <span>·</span>
+                  <span>{{ SOURCE_LABELS[v.source] ?? v.source }}</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Preview pane -->
+          <div class="border border-(--ui-border) rounded-lg overflow-y-auto">
+            <div v-if="!selectedVersionId" class="p-6 text-sm text-(--ui-text-muted)">
+              Select a version to preview.
+            </div>
+            <div v-else-if="versionDetailLoading" class="p-6 text-sm text-(--ui-text-muted)">
+              Loading version…
+            </div>
+            <div v-else-if="selectedVersion" class="p-6 space-y-4">
+              <div>
+                <h2 class="text-lg font-semibold">{{ selectedVersion.title || '(untitled)' }}</h2>
+                <div class="mt-1 text-xs text-(--ui-text-muted) flex flex-wrap items-center gap-1.5">
+                  <UBadge
+                    size="xs"
+                    :color="selectedVersion.status === 'published' ? 'success' : 'neutral'"
+                    variant="subtle"
+                  >{{ selectedVersion.status }}</UBadge>
+                  <span>·</span>
+                  <span>{{ formatVersionTime(selectedVersion.created) }}</span>
+                  <span>·</span>
+                  <span>{{ selectedVersion.created_by?.name ?? 'System' }}</span>
+                  <span>·</span>
+                  <span>{{ SOURCE_LABELS[selectedVersion.source] ?? selectedVersion.source }}</span>
+                </div>
+              </div>
+
+              <div v-if="selectedVersion.excerpt" class="text-sm text-(--ui-text-muted) italic border-l-2 border-(--ui-border) pl-3">
+                {{ selectedVersion.excerpt }}
+              </div>
+
+              <div v-if="selectedVersion.body_html" class="version-body" v-html="selectedVersion.body_html"></div>
+              <div v-else class="text-sm text-(--ui-text-muted)">(empty body)</div>
+            </div>
+          </div>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex justify-end gap-2 w-full">
+          <UButton color="neutral" variant="ghost" @click="historyOpen = false">Close</UButton>
+          <UButton
+            color="primary"
+            icon="i-lucide-rotate-ccw"
+            :disabled="!selectedVersion"
+            @click="loadVersionIntoEditor"
+          >Load into editor</UButton>
+        </div>
+      </template>
+    </USlideover>
+
     <UModal v-model:open="translateModalOpen" title="Translate with DeepL">
       <template #body>
         <div class="space-y-3">
@@ -673,3 +924,70 @@ const enabledLanguages = ENABLED_LANGUAGES
     </UModal>
   </div>
 </template>
+
+<style scoped>
+/* Mirror RichTextEditor's .tiptap-body rules so server-rendered Tiptap
+   HTML in the version-history preview pane shows the same formatting
+   as the editor — Tailwind Typography is not installed, so prose
+   classes are inert. */
+.version-body :deep(h1) { font-size: 1.875rem; font-weight: 700; margin: 1rem 0 0.5rem; }
+.version-body :deep(h2) { font-size: 1.5rem;   font-weight: 700; margin: 1rem 0 0.5rem; }
+.version-body :deep(h3) { font-size: 1.25rem;  font-weight: 600; margin: 1rem 0 0.5rem; }
+.version-body :deep(p)  { margin: 0.5rem 0; }
+.version-body :deep(ul) { list-style: disc;    padding-left: 1.5rem; }
+.version-body :deep(ol) { list-style: decimal; padding-left: 1.5rem; }
+.version-body :deep(blockquote) { border-left: 3px solid var(--ui-border); padding-left: 1rem; color: var(--ui-text-muted); }
+.version-body :deep(code) { background: var(--ui-bg-elevated); padding: 0.1em 0.3em; border-radius: 0.25rem; }
+.version-body :deep(a) { color: var(--ui-primary); text-decoration: underline; }
+.version-body :deep(img) { max-width: 100%; height: auto; border-radius: 0.375rem; }
+.version-body :deep(iframe) { max-width: 100%; }
+.version-body :deep(strong) { font-weight: 700; }
+.version-body :deep(em) { font-style: italic; }
+.version-body :deep(hr) { margin: 1rem 0; border-color: var(--ui-border); }
+
+/* Custom-node placeholders. renderTiptap outputs empty divs for
+   UupgsList / GeneralResources (hydrated on the public page); show
+   them as labeled blocks so editors can see "yes, a block lived here". */
+.version-body :deep(.doxa-uupgs-list-slot),
+.version-body :deep(.doxa-general-resources-slot) {
+  display: block;
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px dashed var(--ui-border-accented, var(--ui-border));
+  border-radius: 0.5rem;
+  background: var(--ui-bg-elevated);
+  color: var(--ui-text-muted);
+  font-size: 0.875rem;
+  font-style: italic;
+}
+.version-body :deep(.doxa-uupgs-list-slot)::before { content: '[ UUPGs list ]'; }
+.version-body :deep(.doxa-general-resources-slot)::before { content: '[ General resources ]'; }
+
+/* Verse block — has real content, just needs framing. */
+.version-body :deep(.doxa-verse) {
+  position: relative;
+  margin: 1rem 0;
+  padding: 1rem 1rem 1rem 2.5rem;
+  border-left: 4px solid var(--ui-primary);
+  background: var(--ui-bg-elevated);
+  border-radius: 0 0.375rem 0.375rem 0;
+}
+.version-body :deep(.doxa-verse)::before {
+  content: '“';
+  position: absolute;
+  left: 0.5rem;
+  top: 0.25rem;
+  font-size: 2rem;
+  color: var(--ui-primary);
+  line-height: 1;
+}
+.version-body :deep(.doxa-verse[data-reference])::after {
+  content: '— ' attr(data-reference);
+  display: block;
+  margin-top: 0.5rem;
+  text-align: right;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--ui-text-muted);
+}
+</style>
