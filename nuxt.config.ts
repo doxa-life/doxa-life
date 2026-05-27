@@ -186,11 +186,11 @@ export default defineNuxtConfig({
       // list below are prerendered — they don't hit the DB.
       crawlLinks: false,
       routes: [
-        '/', '/es', '/fr', '/pt', '/ar', '/ru',
-        '/adopt', '/es/adopt', '/fr/adopt', '/pt/adopt', '/ar/adopt', '/ru/adopt',
-        '/pray', '/es/pray', '/fr/pray', '/pt/pray', '/ar/pray', '/ru/pray',
-        '/research', '/es/research', '/fr/research', '/pt/research', '/ar/research', '/ru/research',
-        '/contact-us', '/es/contact-us', '/fr/contact-us', '/pt/contact-us', '/ar/contact-us', '/ru/contact-us'
+        '/', '/es', '/fr', '/pt', '/ar', '/ru', '/de', '/hi',
+        '/adopt', '/es/adopt', '/fr/adopt', '/pt/adopt', '/ar/adopt', '/ru/adopt', '/de/adopt', '/hi/adopt',
+        '/pray', '/es/pray', '/fr/pray', '/pt/pray', '/ar/pray', '/ru/pray', '/de/pray', '/hi/pray',
+        '/research', '/es/research', '/fr/research', '/pt/research', '/ar/research', '/ru/research', '/de/research', '/hi/research',
+        '/contact-us', '/es/contact-us', '/fr/contact-us', '/pt/contact-us', '/ar/contact-us', '/ru/contact-us', '/de/contact-us', '/hi/contact-us'
       ]
     }
   },
