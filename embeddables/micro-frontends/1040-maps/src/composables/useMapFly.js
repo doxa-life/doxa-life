@@ -294,6 +294,308 @@ export function useMapFly(options = {}) {
         });
     }
 
+    // Uniform legend-row camera constants. Single source of truth for how
+    // tight a row-click zooms — keep these conservative so even sparse rows
+    // (single pin, single country) don't slam the camera into street-level.
+    const LEGEND_FIT_PADDING_PX = 80;
+    const LEGEND_FIT_DURATION_MS = 800;
+    const LEGEND_FIT_MAX_ZOOM = 5;
+    const LEGEND_SINGLE_PIN_ZOOM = 5;
+
+    // Antimeridian-aware longitude span. For scopes that cross ±180° (Oceania,
+    // east-Russia, Aleutians), naive min/max returns a span of ~360° because
+    // points sit at -179 and +179. Re-project longitudes into [0, 360) and
+    // recompute; pick the smaller span. Returns { minLng, maxLng } in the
+    // representation that yields the tighter bbox. Caller must accept that
+    // maxLng can exceed 180 — Mapbox's fitBounds accepts that and wraps.
+    function _tightLngBounds(longitudes) {
+        if (!longitudes.length) return null;
+        let aMin = Infinity, aMax = -Infinity; // raw [-180, 180]
+        let bMin = Infinity, bMax = -Infinity; // shifted [0, 360)
+        for (const lng of longitudes) {
+            if (!Number.isFinite(lng)) continue;
+            if (lng < aMin) aMin = lng;
+            if (lng > aMax) aMax = lng;
+            const shifted = lng < 0 ? lng + 360 : lng;
+            if (shifted < bMin) bMin = shifted;
+            if (shifted > bMax) bMax = shifted;
+        }
+        if (!Number.isFinite(aMin)) return null;
+        const spanA = aMax - aMin;
+        const spanB = bMax - bMin;
+        if (spanB < spanA) {
+            // The cross-antimeridian representation is tighter. Convert back
+            // to fitBounds-friendly form: keep minLng in [-180,180] and let
+            // maxLng exceed 180 (Mapbox wraps it correctly).
+            const minRaw = bMin > 180 ? bMin - 360 : bMin;
+            return { minLng: minRaw, maxLng: minRaw + spanB };
+        }
+        return { minLng: aMin, maxLng: aMax };
+    }
+
+    // Why: map.querySourceFeatures(sourceId, {filter}) is viewport-clipped —
+    // pins outside the rendered camera are dropped, so legend rows for off-screen
+    // regions silently no-op when the user is zoomed in. We evaluate the Mapbox
+    // filter expression against the full source data instead, so fitBounds can
+    // zoom OUT to a different region or IN to a tight cluster uniformly.
+    function _resolveExpr(expr, props) {
+        if (!Array.isArray(expr)) return expr;
+        const op = expr[0];
+        switch (op) {
+            case 'get':      return props?.[expr[1]];
+            case 'literal':  return expr[1];
+            case 'has':      return props != null && expr[1] in props;
+            case '!has':     return props == null || !(expr[1] in props);
+            case '!':        return !_resolveExpr(expr[1], props);
+            case 'coalesce': {
+                for (let i = 1; i < expr.length; i++) {
+                    const v = _resolveExpr(expr[i], props);
+                    if (v != null) return v;
+                }
+                return null;
+            }
+            case 'to-number': {
+                const v = _resolveExpr(expr[1], props);
+                const n = Number(v);
+                if (Number.isFinite(n)) return n;
+                if (expr.length > 2) {
+                    const fb = Number(_resolveExpr(expr[2], props));
+                    return Number.isFinite(fb) ? fb : 0;
+                }
+                return NaN;
+            }
+            case 'to-string': {
+                const v = _resolveExpr(expr[1], props);
+                return v == null ? '' : String(v);
+            }
+            case 'to-boolean': return Boolean(_resolveExpr(expr[1], props));
+            case 'slice': {
+                const s = _resolveExpr(expr[1], props);
+                const i = _resolveExpr(expr[2], props);
+                const j = expr.length > 3 ? _resolveExpr(expr[3], props) : undefined;
+                if (typeof s !== 'string') return '';
+                return j != null ? s.slice(i, j) : s.slice(i);
+            }
+            default:           return expr;
+        }
+    }
+    function _matchesFilter(filter, props) {
+        if (filter === true) return true;
+        if (filter === false) return false;
+        if (!Array.isArray(filter)) return Boolean(filter);
+        const op = filter[0];
+        if (op === 'all') {
+            for (let i = 1; i < filter.length; i++) {
+                if (!_matchesFilter(filter[i], props)) return false;
+            }
+            return true;
+        }
+        if (op === 'any') {
+            for (let i = 1; i < filter.length; i++) {
+                if (_matchesFilter(filter[i], props)) return true;
+            }
+            return false;
+        }
+        if (op === '!')   return !_matchesFilter(filter[1], props);
+        if (op === 'has') return props != null && filter[1] in props;
+        if (op === '!has') return props == null || !(filter[1] in props);
+
+        if (op === '==' || op === '!=' || op === '>' || op === '>=' ||
+            op === '<'  || op === '<=') {
+            // Legacy form: ['==', 'propName', value] (no ['get', ...])
+            const left = (typeof filter[1] === 'string')
+                ? props?.[filter[1]]
+                : _resolveExpr(filter[1], props);
+            const right = _resolveExpr(filter[2], props);
+            switch (op) {
+                case '==': return left === right || (left == null && right == null);
+                case '!=': return !(left === right || (left == null && right == null));
+                case '>':  return left >  right;
+                case '>=': return left >= right;
+                case '<':  return left <  right;
+                case '<=': return left <= right;
+            }
+        }
+        if (op === 'in') {
+            const v = _resolveExpr(filter[1], props);
+            const haystack = _resolveExpr(filter[2], props);
+            if (Array.isArray(haystack)) return haystack.includes(v);
+            if (typeof haystack === 'string') return haystack.includes(v);
+            return false;
+        }
+        if (op === 'match') {
+            const input = _resolveExpr(filter[1], props);
+            const lastIdx = filter.length - 1;
+            for (let i = 2; i < lastIdx; i += 2) {
+                const labelRaw = filter[i];
+                const labels = Array.isArray(labelRaw) ? labelRaw : [labelRaw];
+                if (labels.includes(input)) return Boolean(_resolveExpr(filter[i + 1], props));
+            }
+            return Boolean(_resolveExpr(filter[lastIdx], props));
+        }
+        return false;
+    }
+    function _readSourceFeatures(map, sourceId) {
+        const src = map.getSource(sourceId);
+        if (!src) return [];
+        const data = src._data ?? src.serialize?.()?.data;
+        if (!data) return [];
+        if (Array.isArray(data?.features)) return data.features;
+        if (data?.type === 'Feature') return [data];
+        return [];
+    }
+
+    /**
+     * zoomToLegendRow — uniform "click a legend row, fit the scope it represents."
+     *
+     * Reads the full `language-families` source data via map.getSource()._data
+     * and evaluates the Mapbox filter expression in JS, bypassing the viewport
+     * clip that previously caused off-screen regions to silently no-op. fitBounds
+     * is bidirectional — it zooms OUT to a wider region just as readily as it
+     * zooms IN to a tight cluster, so Africa-row and North-India-cluster-row
+     * feel like the same gesture from any starting camera.
+     *
+     *   count == 0 → no-op (intentional — never blank-out the map)
+     *   count == 1 → flyTo single-pin coords @ LEGEND_SINGLE_PIN_ZOOM
+     *   count >= 2 → fitBounds with padding LEGEND_FIT_PADDING_PX
+     *
+     * @param {Object} row - STL legend node { id, label, filter, ... }
+     * @param {Object} [opts]
+     * @param {Array}  [opts.matchExpr] - Override Mapbox expression for flat tabs
+     *                                    (prayer/engagement/adoption) where row.filter
+     *                                    is a placeholder against `_flat_filter`.
+     * @param {string} [opts.sourceId='language-families'] - Pin source id to query
+     */
+    function zoomToLegendRow(row, opts = {}) {
+        const map = getMap();
+        if (!map || !row) return;
+
+        // Region rows on the doxa-regions tab represent polygons, not pin clusters.
+        // The pin-cluster path below would zoom to whatever sparse pins happen to
+        // overlap the region's bbox — which for sparse regions like Oceania zooms
+        // OUT to fit a few scattered pins. Fit the polygon directly instead, so
+        // "click Oceania" zooms TO Oceania.
+        if (opts.regionPolygonSource && map.getSource(opts.regionPolygonSource)) {
+            const polyFeatures = _readSourceFeatures(map, opts.regionPolygonSource);
+            const regionKey = row.id ?? row.label;
+            const match = polyFeatures.find(f => {
+                const p = f?.properties || {};
+                return p.region === regionKey || p.name === regionKey || p.id === regionKey;
+            });
+            if (match) {
+                const lngs = [];
+                let pMinLat = Infinity, pMaxLat = -Infinity;
+                const visit = (coords) => {
+                    for (const c of coords) {
+                        if (Array.isArray(c[0])) visit(c);
+                        else if (Number.isFinite(c[0]) && Number.isFinite(c[1])) {
+                            lngs.push(c[0]);
+                            if (c[1] < pMinLat) pMinLat = c[1];
+                            if (c[1] > pMaxLat) pMaxLat = c[1];
+                        }
+                    }
+                };
+                if (match.geometry?.coordinates) visit(match.geometry.coordinates);
+                const lngBounds = _tightLngBounds(lngs);
+                if (lngBounds && Number.isFinite(pMinLat)) {
+                    map.fitBounds([[lngBounds.minLng, pMinLat], [lngBounds.maxLng, pMaxLat]], {
+                        padding: LEGEND_FIT_PADDING_PX,
+                        maxZoom: LEGEND_FIT_MAX_ZOOM,
+                        duration: LEGEND_FIT_DURATION_MS,
+                        essential: true
+                    });
+                    return;
+                }
+            }
+            // Polygon not found — fall through to pin-cluster path below.
+        }
+
+        const sourceId = opts.sourceId ?? 'language-families';
+        if (!map.getSource(sourceId)) return;
+
+        const filter = opts.matchExpr ?? row.filter;
+        if (!filter) return;
+
+        const allFeatures = _readSourceFeatures(map, sourceId);
+        if (!allFeatures.length) return;
+
+        const lngs = [];
+        let minLat = Infinity, maxLat = -Infinity;
+        let pointCount = 0;
+        let firstLng = 0, firstLat = 0;
+        const seen = new Set();
+        for (const f of allFeatures) {
+            const props = f?.properties;
+            if (!_matchesFilter(filter, props)) continue;
+            const id = props?.uniqueId;
+            if (id != null) {
+                if (seen.has(id)) continue;
+                seen.add(id);
+            }
+            const c = f.geometry?.coordinates;
+            if (!Array.isArray(c) || c.length < 2) continue;
+            const lng = c[0], lat = c[1];
+            if (!Number.isFinite(lng) || !Number.isFinite(lat)) continue;
+            if (pointCount === 0) { firstLng = lng; firstLat = lat; }
+            lngs.push(lng);
+            if (lat < minLat) minLat = lat;
+            if (lat > maxLat) maxLat = lat;
+            pointCount++;
+        }
+        if (pointCount === 0) return;
+
+        // Antimeridian-aware longitude bounds — prevents Oceania/east-Russia
+        // rows from "zooming out to fit both wrap-around copies."
+        const lngBounds = _tightLngBounds(lngs);
+        const minLng = lngBounds ? lngBounds.minLng : 0;
+        const maxLng = lngBounds ? lngBounds.maxLng : 0;
+
+        if (pointCount === 1) {
+            map.flyTo({
+                center: [firstLng, firstLat],
+                zoom: LEGEND_SINGLE_PIN_ZOOM,
+                duration: LEGEND_FIT_DURATION_MS,
+                essential: true
+            });
+            return;
+        }
+
+        const bounds = [[minLng, minLat], [maxLng, maxLat]];
+        try {
+            // Why: when the legend row's scope spans a region wider than the
+            // mobile viewport can render at its effective minZoom, fitBounds
+            // animates toward a zoom < minZoom and Mapbox clamps mid-flight,
+            // causing a visible snap/jolt. Probe the would-be fit zoom first
+            // via cameraForBounds (no animation), and if it's tighter than
+            // the camera's minZoom (with 0.3 slack to absorb float rounding),
+            // flyTo the floor instead of fitBounds.
+            const probe = typeof map.cameraForBounds === 'function'
+                ? map.cameraForBounds(bounds, { padding: LEGEND_FIT_PADDING_PX, maxZoom: LEGEND_FIT_MAX_ZOOM })
+                : null;
+            const minZoom = typeof map.getMinZoom === 'function' ? map.getMinZoom() : null;
+            const wouldClamp = probe == null
+                || (typeof probe.zoom === 'number' && typeof minZoom === 'number'
+                    && probe.zoom < minZoom - 0.3);
+            if (wouldClamp && typeof minZoom === 'number') {
+                const cx = (minLng + maxLng) / 2;
+                const cy = (minLat + maxLat) / 2;
+                map.flyTo({
+                    center: [cx, cy],
+                    zoom: minZoom,
+                    duration: LEGEND_FIT_DURATION_MS,
+                    essential: true
+                });
+            } else {
+                map.fitBounds(bounds, {
+                    padding: LEGEND_FIT_PADDING_PX,
+                    maxZoom: LEGEND_FIT_MAX_ZOOM,
+                    duration: LEGEND_FIT_DURATION_MS,
+                    essential: true
+                });
+            }
+        } catch (_) { /* fitBounds throws on degenerate bounds */ }
+    }
+
     return {
         // Core navigation
         getOffsetCenter,
@@ -303,6 +605,7 @@ export function useMapFly(options = {}) {
         flyToCoords,
         fitBounds,
         resetView,
+        zoomToLegendRow,
 
         // Utilities
         calculateRegionCenterFromPolygon

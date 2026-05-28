@@ -23,3 +23,13 @@ dist/
 .env.local
 .env.*.local
 !.env.example
+
+# Internal engineering scratch — never commit
+.local-scratch/
+.lk10x/
+.agent-restricted
+build-status.md
+embeddables/**/intel/
+
+# Sub-project lockfile — root bun.lock is authoritative
+bun.lock

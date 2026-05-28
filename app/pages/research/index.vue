@@ -6,7 +6,7 @@
 // (PHP equivalent: `get_query_var('uupg_search')`).
 //
 // Below the UupgsList we embed the 5-tab `research-map` IIFE built from
-// Map-Framework/apps/DOXA-MAPS/doxa-research-mfe — exposes Engagement / Prayer
+// the upstream DOXA-MAPS module — exposes Engagement / Prayer
 // / Adoption (clones of doxa-simple-map) plus Language Families. The
 // 1040-maps build now publishes /js/doxa-research-map.js (canonical name).
 // via the publishToDoxaLife() plugin.
@@ -50,7 +50,7 @@ useTextHighlight()
 
     <!-- Research map embed — sits directly under the H1, above the UUPG
          search bar. Loads /js/doxa-research-map.js (auto-published from
-         Map-Framework on every research-mfe build). -->
+         the upstream module on every research-mfe build). -->
     <DoxaMapSlot
       map-id="research-page-map"
       bundle="research-map"
