@@ -10,6 +10,8 @@ import { defineCachedEventHandler } from 'nitropack/runtime'
 export interface PrayerStatisticsResponse {
   total: number
   total_unengaged: number
+  total_population: number
+  unengaged_population: number
   total_with_prayer: number
   total_with_full_prayer: number
   total_adopted: number
@@ -28,6 +30,8 @@ export default defineCachedEventHandler(
     return {
       total: Number(data.total || 0),
       total_unengaged: Number(data.total_unengaged || 0),
+      total_population: Number(data.total_population || 0),
+      unengaged_population: Number(data.unengaged_population || 0),
       total_with_prayer: Number(data.total_with_prayer || 0),
       total_with_full_prayer: Number(data.total_with_full_prayer || 0),
       total_adopted: Number(data.total_adopted || 0),

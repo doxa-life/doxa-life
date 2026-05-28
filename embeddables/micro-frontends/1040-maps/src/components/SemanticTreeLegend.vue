@@ -25,6 +25,12 @@ const props = defineProps({
   hideTabs: { type: Boolean, default: false },
   columnLabel: { type: String, default: '' },
   open: { type: Boolean, default: null },
+  // Optional totals footer pinned below the row list. When `totalLabel` is set
+  // a non-clickable summary row renders the count/pop totals aligned under the
+  // column headers (used by doxa-simple-map to show e.g. Unengaged + Engaged = Total).
+  totalLabel: { type: String, default: '' },
+  totalCount: { type: Number, default: null },
+  totalPop:   { type: Number, default: null },
 })
 
 const emit = defineEmits(['select', 'update:open'])
@@ -471,6 +477,19 @@ useShadowStyles(`
   text-align: center; font: 10px system-ui; color: #6e7681;
 }
 .stl-overflow-hint { color: #73A17F; }
+.stl-footer {
+  display: flex; align-items: center; gap: var(--stl-gap);
+  padding: 0 var(--stl-pad-x);
+  height: 30px; flex-shrink: 0;
+  border-top: 1px solid #21262d;
+  background: #0d1117;
+}
+.stl-footer-label {
+  flex: 1; min-width: 0;
+  font: 700 11px ui-monospace, monospace;
+  color: #8b949e; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.stl-footer-num { color: #e6edf3; font-weight: 700; }
 .stl-row {
   min-height: 27px;
   cursor: pointer; transition: opacity 0.12s, background 0.1s;
@@ -670,6 +689,9 @@ useShadowStyles(`
   color: #57606a; background: #f6f8fa; border-color: #d8dee4;
 }
 .stl-panel[data-theme="light"] .stl-overflow-hint { color: #3b463d; }
+.stl-panel[data-theme="light"] .stl-footer { background: #f6f8fa; border-color: #d8dee4; }
+.stl-panel[data-theme="light"] .stl-footer-label { color: #57606a; }
+.stl-panel[data-theme="light"] .stl-footer-num { color: #1f2328; }
 .stl-panel[data-theme="light"] .stl-row { border-color: rgba(208,215,222,0.5); }
 .stl-panel[data-theme="light"] .stl-row:hover { background: rgba(59,70,61,0.04); }
 .stl-panel[data-theme="light"] .stl-row.child .stl-name { color: #57606a; }
@@ -806,6 +828,15 @@ useShadowStyles(`
           {{ topNodesAll.length.toLocaleString() }} —
           <span class="stl-overflow-hint">use the geocoder above to find the rest</span>
         </div>
+      </div>
+
+      <div v-if="totalLabel" class="stl-footer">
+        <span class="stl-caret-sp"></span>
+        <span class="stl-dot-sp"></span>
+        <span class="stl-footer-label">{{ totalLabel }}</span>
+        <span v-if="hasCount" class="stl-num stl-footer-num">{{ fmtCount(totalCount) }}</span>
+        <span v-if="hasPop"   class="stl-num stl-footer-num">{{ fmtPop(totalPop) }}</span>
+        <span class="stl-x-slot"></span>
       </div>
     </div>
   </div>

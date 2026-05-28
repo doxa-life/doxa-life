@@ -307,6 +307,11 @@ const legendColumnLabel = computed(() => {
   if (t === 'adoption') return 'Adoption Status'
   return 'Status'
 })
+// Totals footer for the STL — sums the mutually-exclusive legend rows so the
+// panel shows e.g. Unengaged (2080) + Engaged (26) = Total (2106).
+const legendTotalLabel = computed(() => t('legend.footer.total'))
+const legendTotalCount = computed(() => flatLegend.totalCount.value)
+const legendTotalPop   = computed(() => flatLegend.totalPopulation.value)
 const _stlOpen = computed(() => uiStore.legendState !== 'collapsed')
 function _onStlOpenChange(open) {
   if (open) uiStore.openLegend()
@@ -1219,6 +1224,9 @@ onBeforeUnmount(() => {
           :title="legendTitle"
           :hideTabs="true"
           :columnLabel="legendColumnLabel"
+          :total-label="legendTotalLabel"
+          :total-count="legendTotalCount"
+          :total-pop="legendTotalPop"
           :open="_stlOpen"
           @select="onSemanticTreeSelect"
           @update:open="_onStlOpenChange"
@@ -1231,6 +1239,7 @@ onBeforeUnmount(() => {
           :legend-type="activeLegendType"
           :popup-action="activePopupAction"
           :is-dark="isDark"
+          :show-total="true"
         />
       </div>
 
