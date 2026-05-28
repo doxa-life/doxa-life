@@ -6,7 +6,7 @@
  *  - MSTClusteringUtil.js (Kruskal MST)
  *  - NetworkClusteringUtil.js (nearest-neighbor)
  *
- * Convex hull is extracted from FARFAST3-ETHNOGRAPHIC/PolygonClusteringFeature.js.
+ * Convex hull is extracted from the upstream PolygonClusteringFeature module.
  * Centroid + distance helpers are extracted to avoid duplication across the
  * clustering modules.
  *

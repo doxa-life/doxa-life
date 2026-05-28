@@ -125,6 +125,13 @@ export default defineNuxtConfig({
         { rel: 'apple-touch-icon', href: '/favicon/cropped-Favicon-light-doxa-01-180x180.png' }
       ],
       meta: [
+        // Mobile viewport. `viewport-fit=cover` lets the map canvas extend
+        // behind iOS notch/home-indicator safe areas. We intentionally do
+        // NOT set `user-scalable=no` or `maximum-scale=1` — those break
+        // pinch-zoom recovery if the page ever does get zoomed. The real
+        // fix for "tapping the search input zooms the page" is keeping the
+        // input's font-size >= 16px (handled in the geocoder shadow CSS).
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
         { name: 'msapplication-TileImage', content: '/favicon/cropped-Favicon-light-doxa-01-270x270.png' }
       ]
     }

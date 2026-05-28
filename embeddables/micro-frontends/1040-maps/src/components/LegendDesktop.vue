@@ -62,8 +62,22 @@ useShadowStyles(`
 .legend-container:not(.legend-dark) .legend-collapse-caret:hover{background:rgba(59,70,61,0.12);border-color:#3b463d;color:#3b463d;}
 
 /* Detail-mode close button — top-right of the card */
-.detail-close-btn{position:absolute;top:10px;right:10px;background:none;border:none;padding:4px;cursor:pointer;color:#888;display:flex;align-items:center;justify-content:center;z-index:2;transition:color 0.2s ease;}
+.detail-close-btn{position:absolute;top:10px;right:10px;background:none;border:none;padding:4px;cursor:pointer;color:#888;display:flex;align-items:center;justify-content:center;z-index:20;transition:color 0.2s ease;}
 .detail-close-btn:hover{color:#333;}
+
+/* Detail-mode collapse caret — top-left of the card, mirrors the inline
+   .legend-collapse-caret used by the data-view title row. Sits at z-index
+   above the PeopleGroupDetail sticky header (.detail-header z-index:10) so
+   it is always tappable even when the detail panel scrolls. The button is
+   only rendered in the detail-mode template branch (see <template> below). */
+.detail-collapse-btn{position:absolute;top:10px;left:10px;z-index:20;background:transparent;border:none;color:transparent;cursor:pointer;width:28px;height:28px;padding:0;outline:none;-webkit-tap-highlight-color:transparent;}
+.detail-collapse-btn:focus{outline:none;}
+/* Inside the detail panel: leave a 32px left gutter on the title text so the
+   absolute-positioned .detail-collapse-btn at top:10px/left:10px does not
+   overlap the people-group name. Targets the .pg-name-lead inside any
+   .people-group-detail (which itself is rendered as a child of
+   .legend-content). Right gutter clears the .detail-close-btn the same way. */
+.legend-container .people-group-detail .pg-name-lead{padding-left:28px;padding-right:32px;}
 
 /* ── Content — no padding; left/right AND top/bottom are handled by the
    LegendRows grid (caret + trailing columns + .lrg-items padding 12px 0).
@@ -263,15 +277,21 @@ const legendTitle = computed(() => {
 // NOTE: speedLabel / flyInterval / showAutoFlyButton predicate moved to
 // LegendTools.vue along with the toolbar UI.
 
-// Toggle legend collapse — blocked in detail mode so X button click can't accidentally collapse
+// Toggle legend collapse — always honors the user gesture, including while a
+// people-group is selected (detail mode). The collapse caret + reopen pill
+// are the only intentional collapse affordances; the detail-close-btn (X)
+// clears the selection separately and never triggers a collapse.
 function toggleCollapse() {
-  if (legendMode.value === 'detail') return
   isCollapsed.value = !isCollapsed.value
 }
 
-// Auto-expand when pin is clicked and legend enters detail mode
-watch(legendMode, (mode) => {
-  if (mode === 'detail' && isCollapsed.value) {
+// Auto-expand only on the FIRST transition into detail mode so the user sees
+// what they just picked. Tracking the previous mode lets the user manually
+// collapse afterwards (and have that stick) — legendMode does not change
+// again until selection is cleared, so this watcher will not refire and
+// stomp on the user's choice.
+watch(legendMode, (mode, prevMode) => {
+  if (mode === 'detail' && prevMode !== 'detail' && isCollapsed.value) {
     isCollapsed.value = false
   }
 })
@@ -341,6 +361,16 @@ onBeforeUnmount(() => {
 
   <!-- Expanded legend card -->
   <div v-else :class="['legend-container', { 'legend-dark': isDark }]">
+    <!-- Detail-mode collapse caret — only rendered when a people-group is
+         selected (LegendRows + its #title-caret slot are not on screen in
+         this branch). Lives at top-left, mirroring the caret position in
+         data-view, so collapse is always one tap away regardless of mode. -->
+    <button
+      v-if="legendMode === 'detail'"
+      class="detail-collapse-btn"
+      @click.stop="toggleCollapse"
+      :aria-label="t('aria.toggleLegend')"
+    ></button>
     <button
       v-if="legendMode === 'detail'"
       class="detail-close-btn"

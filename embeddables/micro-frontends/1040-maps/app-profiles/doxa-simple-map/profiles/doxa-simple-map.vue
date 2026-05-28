@@ -25,6 +25,7 @@ const LegendMobile = defineAsyncComponent(() => import('@map/components/LegendMo
 import SemanticTreeLegend from '@map/components/SemanticTreeLegend.vue'
 import { createPplrInstance, provideInstance } from '@map/composables/usePplrInstance.js'
 import { useLegendData as useFlatLegendData } from '@map/composables/useLegendData.js'
+import { useMapFly } from '@map/composables/useMapFly.js'
 import SideMenuDrawer    from '@map/components/SideMenuDrawer.vue'
 // ─── Map control components ───────────────────────────────────────────────────
 // Each button is imported individually so the profile can compose any subset
@@ -328,6 +329,15 @@ function onSemanticTreeSelect(node) {
   if (t === 'prayer')     uiStore.setPrayerFilter(node.id)
   else if (t === 'engagement') uiStore.setEngagementFilter(node.id)
   else if (t === 'adoption')   uiStore.setAdoptionFilter(node.id)
+
+  // Card d1336834 — uniform legend-row camera. node.filter is a _flat_filter
+  // placeholder for simple-map's prayer/engagement/adoption tabs, so we
+  // synthesize the real match expression via buildMatchExpr (same one
+  // applyLegendFilter uses for the dim path).
+  const matchExpr = buildMatchExpr(t, node.id)
+  if (matchExpr) {
+    mapFly.zoomToLegendRow?.(node, { matchExpr })
+  }
 }
 
 const mapContainer = ref(null)
@@ -403,6 +413,15 @@ const mapLayers = useMapLayers({
   mapId,
   getLanguageFamilyColor,
   getNormalizedPeopleGroups: () => mapData.normalizedPeopleGroups.value || []
+})
+
+// ─── Fly composable (card d1336834 — uniform legend-row camera) ─────────────
+const mapFly = useMapFly({
+  getMap: () => map.value,
+  mapId,
+  mapStore,
+  defaultCenter: [20, 10],
+  defaultZoom:   1.8
 })
 
 // ─── GO marker (selected pin highlight) ───────────────────────────────────────
@@ -721,6 +740,16 @@ function switchTab(tabId) {
 
 const ACTIVE_LAYER = 'language-family-pins-active'
 const PULSE_LAYER  = 'language-family-pins-pulse'
+const HITBOX_LAYER = 'language-family-pins-hitbox'
+
+// Mirror a Mapbox filter expression to the invisible hitbox layer so dimmed
+// (low-opacity) pins are no longer hit-testable. Pass `null` to restore the
+// full-dataset hitbox (every pin selectable again).
+function _syncHitboxFilter(m, filter) {
+  if (m?.getLayer(HITBOX_LAYER)) {
+    try { m.setFilter(HITBOX_LAYER, filter) } catch (_) {}
+  }
+}
 
 let _pulseRaf      = null
 let _pulsePhase    = 0
@@ -949,6 +978,7 @@ function applyLegendFilter(filterType, filterKey) {
     m.setPaintProperty('language-family-pins', 'circle-color', getBaseColorExpr())
     m.setPaintProperty('language-family-pins', 'circle-opacity', 0.9)
     m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', 1)
+    _syncHitboxFilter(m, null)
     mapLayers.syncGlowFilter(null)
     clearActiveLayer()
     return
@@ -960,6 +990,7 @@ function applyLegendFilter(filterType, filterKey) {
     m.setPaintProperty('language-family-pins', 'circle-color', getBaseColorExpr())
     m.setPaintProperty('language-family-pins', 'circle-opacity', 0.9)
     m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', 1)
+    _syncHitboxFilter(m, null)
     mapLayers.syncGlowFilter(null)
     clearActiveLayer()
     return
@@ -976,6 +1007,10 @@ function applyLegendFilter(filterType, filterKey) {
       ['case', matchExpr, 1, 0.06])
     m.setPaintProperty('language-family-pins', 'circle-stroke-opacity',
       ['case', matchExpr, 1, 0.06])
+    // Restrict the invisible hitbox layer to the matched bucket so dimmed
+    // (low-opacity) pins are no longer hit-testable. Without this the user
+    // can tap an apparent empty area to select a near-invisible pin.
+    _syncHitboxFilter(m, matchExpr)
     mapLayers.syncGlowFilter(matchExpr)
     return
   }
@@ -1216,7 +1251,11 @@ onBeforeUnmount(() => {
            MapToolbar is a layout-only shell (positioned column + slot).
            Binding :map="map" here guarantees that in a multi-map profile
            these buttons operate ONLY on their own map instance. -->
-      <MapToolbar v-if="appReady">
+      <!-- :has-geocoder mirrors the FEATURES.geocoder flag so the toolbar
+           collapses its mobile top offset when no search pill is rendered.
+           When the flag is flipped back on, the toolbar reserves space
+           below the geocoder again with no further changes here. -->
+      <MapToolbar v-if="appReady" :has-geocoder="FEATURES.geocoder">
         <ZoomInButton      :map="map"          :is-dark="isDark" />
         <ZoomOutButton     :map="map"          :is-dark="isDark" />
         <LocationButton    :map="map"          :is-dark="isDark" />

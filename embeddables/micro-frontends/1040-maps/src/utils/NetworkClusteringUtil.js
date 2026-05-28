@@ -16,8 +16,8 @@
  * "embedded" in its group). Use MSTClusteringUtil when you want a clean
  * tree with no redundant edges.
  *
- * Ported verbatim from FARFAST3-ETHNOGRAPHIC/NetworkClusteringUtil.js (~393 lines)
- * to the Map-Framework template. No external deps beyond ES2020.
+ * Ported verbatim from the upstream NetworkClusteringUtil module (~393 lines)
+ * to the the upstream template. No external deps beyond ES2020.
  *
  * @module utils/NetworkClusteringUtil
  */

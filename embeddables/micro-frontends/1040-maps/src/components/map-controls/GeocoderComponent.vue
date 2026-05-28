@@ -45,6 +45,21 @@
 import { ref, onMounted, onBeforeUnmount, computed, inject, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDoxaSearch } from '../../composables/useDoxaSearch.js'
+import { useShadowStyles } from '../../composables/useShadowStyles.js'
+
+// iOS Safari auto-zooms the page whenever a text input with computed
+// font-size < 16px receives focus, and the "Done" keyboard button re-fires
+// the same zoom on blur. We override the Mapbox geocoder input to 16px in
+// the shadow root so the auto-zoom never triggers. 16px is the documented
+// threshold; setting it explicitly here also stops the page from getting
+// stuck zoomed-in on devices that disallow pinch-zoom recovery.
+useShadowStyles(
+  '.mapboxgl-ctrl-geocoder--input,'
+  + '.mapboxgl-ctrl-geocoder input[type="text"],'
+  + '.mapboxgl-ctrl-geocoder input[type="search"]'
+  + '{font-size:16px !important;line-height:1.3;}',
+  'geocoder-ios-zoom-fix'
+)
 
 const { t } = useI18n()
 

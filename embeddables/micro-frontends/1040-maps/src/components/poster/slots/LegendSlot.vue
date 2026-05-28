@@ -2,7 +2,7 @@
 /**
  * LegendSlot.vue — STUB. Poster-rendering slot for LegendSlot.
  * Wired into PosterPreview.vue. Real implementation pending — see
- * Map-Framework/intel/build-friction/2026-04-23-research-mfe-bootstrap.md
+ * the build-friction notes
  * (Friction 13/14: Wave-3 poster agent ran out before finishing slots).
  */
 defineProps({ spec: { type: Object, default: () => ({}) } })

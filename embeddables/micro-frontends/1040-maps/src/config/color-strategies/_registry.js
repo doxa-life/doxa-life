@@ -3,7 +3,7 @@
  *
  * Central enum + lookup for all per-strategy modules in this folder.
  * Each strategy lives in its own file (one strategy = one file rule, per
- * Map-Framework refactor ideation3.md § R2).
+ * upstream refactor ideation3.md § R2).
  *
  * Add a new strategy:
  *   1. Create <name>.js next to this file (export default { ... }).
