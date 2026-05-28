@@ -231,6 +231,15 @@ const props = defineProps({
   disableCollapse: {
     type: Boolean,
     default: false
+  },
+  /**
+   * Show a totals footer below the legend rows (count + population sums).
+   * Opt-in — only doxa-simple-map enables it so the engagement/prayer/adoption
+   * tabs show e.g. Unengaged + Engaged = Total. Off for research-map.
+   */
+  showTotal: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -591,6 +600,9 @@ onBeforeUnmount(() => {
           :hideTabs="_isFlatTabMobile"
           :columnLabel="treeColumnLabelForMobile"
           :columns="['count', 'pop']"
+          :total-label="showTotal && _isFlatTabMobile ? t('legend.footer.total') : ''"
+          :total-count="totalCount"
+          :total-pop="totalPopulation"
           @select="onSemanticTreeSelect"
         >
           <template #title-caret>
