@@ -19,7 +19,7 @@ function openVideo() {
   videoModalRef.value?.open()
 }
 
-const { unengagedPeopleGroupsFormatted, ensureLoaded } = usePrayerStatistics()
+const { unengagedPeopleGroupsFormatted, totalPeopleGroupsFormatted, unengagedPopulationMillionsFormatted, ensureLoaded } = usePrayerStatistics()
 await ensureLoaded()
 
 const mapboxToken = config.public.mapboxToken as string
@@ -104,7 +104,7 @@ useTextHighlight()
           data-highlight-index="1"
           data-highlight-last
           data-highlight-color="primary"
-        >{{ t('Unengaged peoples around the world') }}</h1>
+        >{{ t('DOXA people groups around the world') }}</h1>
       </div>
       <DoxaMapSlot map-id="home-map" :profile-config="homeMapConfig" class="rounded-xlg">
         <FeedbackWidgetSlot :profile-config="homeFeedbackConfig" />
@@ -205,7 +205,7 @@ useTextHighlight()
             <div class="info-card surface-brand-dark justify-center">
               <div class="stack stack--lg | info-card__content">
                 <h3>{{ t('Unengaged') }}</h3>
-                <span>{{ t('{0} Million', ['202']) }}</span>
+                <span>{{ t('{0} Million', [unengagedPopulationMillionsFormatted]) }}</span>
                 <span>{{ t('{0} People Groups', [unengagedPeopleGroupsFormatted]) }}</span>
               </div>
             </div>
@@ -250,7 +250,7 @@ useTextHighlight()
               <div class="stack stack--xl">
                 <h3 class="subtext">{{ t('In partnership with the global church, our vision is for...') }}</h3>
                 <ul class="stack stack--md" data-list-color="primary">
-                  <li>{{ t('Daily 24-hour prayer coverage for all {0} unengaged peoples', [unengagedPeopleGroupsFormatted]) }}</li>
+                  <li>{{ t('Daily 24-hour prayer coverage for all {0} DOXA people groups', [totalPeopleGroupsFormatted]) }}</li>
                   <li>{{ t('No unengaged people groups by 2033') }}</li>
                   <li>{{ t('Mobilization of 20,000+ DOXA partnership missionaries') }}</li>
                   <li>{{ t('Fruitful engagement among frontier peoples and the under-engaged') }}</li>
