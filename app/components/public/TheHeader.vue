@@ -62,7 +62,7 @@ watch(() => route.fullPath, close)
               >
             </NuxtLink>
             <span class="wagf-text">
-              {{ t('World assemblies of God Fellowship') }}
+              {{ t('World Assemblies of God Fellowship') }}
             </span>
           </div>
 
