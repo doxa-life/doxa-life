@@ -74,15 +74,29 @@ const adoptUrl = computed(() => {
 })
 
 const infoOpen = ref(false)
+const FULL_PRAYER_COVERAGE_COUNT = 144
+
+type StatusIcon = 'done' | 'partial' | 'not-done'
+
+function getPrayerStatusIcon(peopleCommitted: number | null | undefined): StatusIcon {
+  const committed = Number(peopleCommitted ?? 0)
+  if (committed >= FULL_PRAYER_COVERAGE_COUNT) return 'done'
+  if (committed > 0) return 'partial'
+  return 'not-done'
+}
+
+function getBinaryStatusIcon(done: boolean): StatusIcon {
+  return done ? 'done' : 'not-done'
+}
 
 const statusItems = computed(() => {
   const u = uupg.value as UupgDetail
   return [
-    { label: t('Prayer Status'), done: (u.people_committed ?? 0) > 0 },
-    { label: t('Adoption Status'), done: (u.adopted_by_churches ?? 0) > 0 },
-    { label: t('Cross-cultural workers present'), done: !!u.workers_long_term },
-    { label: t('Work in local language & culture'), done: !!u.work_in_local_language },
-    { label: t('Disciple & church multiplication'), done: !!u.disciple_and_church_multiplication }
+    { label: t('Prayer Status'), icon: getPrayerStatusIcon(u.people_committed) },
+    { label: t('Adoption Status'), icon: getBinaryStatusIcon((u.adopted_by_churches ?? 0) > 0) },
+    { label: t('Cross-cultural workers present'), icon: getBinaryStatusIcon(!!u.workers_long_term) },
+    { label: t('Work in local language & culture'), icon: getBinaryStatusIcon(!!u.work_in_local_language) },
+    { label: t('Disciple & church multiplication'), icon: getBinaryStatusIcon(!!u.disciple_and_church_multiplication) }
   ]
 })
 
@@ -100,7 +114,7 @@ const progressItems = computed(() => {
 
 const prayerCoveragePercent = computed(() => {
   const committed = (uupg.value as UupgDetail)?.people_committed ?? 0
-  return Math.min(100, (Number(committed) / 144) * 100)
+  return Math.min(100, (Number(committed) / FULL_PRAYER_COVERAGE_COUNT) * 100)
 })
 
 const mapSrc = computed(() => {
@@ -194,9 +208,14 @@ const mapSrc = computed(() => {
                 class="status-item"
               >
                 <img
-                  v-if="item.done"
+                  v-if="item.icon === 'done'"
                   src="/assets/icons/Check-GreenCircle.png"
                   :alt="t('Done')"
+                >
+                <img
+                  v-else-if="item.icon === 'partial'"
+                  src="/assets/icons/Check-YellowCircle.png"
+                  :alt="t('Has prayer coverage')"
                 >
                 <img
                   v-else
