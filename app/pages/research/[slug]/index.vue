@@ -77,6 +77,10 @@ const infoOpen = ref(false)
 const FULL_PRAYER_COVERAGE_COUNT = 144
 
 type StatusIcon = 'done' | 'partial' | 'not-done'
+type StatusItem = {
+  label: string
+  icon: StatusIcon
+}
 
 function getPrayerStatusIcon(peopleCommitted: number | null | undefined): StatusIcon {
   const committed = Number(peopleCommitted ?? 0)
@@ -89,11 +93,27 @@ function getBinaryStatusIcon(done: boolean): StatusIcon {
   return done ? 'done' : 'not-done'
 }
 
+const isEngaged = computed(() => {
+  const status = (uupg.value as UupgDetail | null)?.engagement_status?.value
+  return String(status || '').toLowerCase() === 'engaged'
+})
+
 const statusItems = computed(() => {
   const u = uupg.value as UupgDetail
-  return [
+  const leadingItems: StatusItem[] = [
     { label: t('Prayer Status'), icon: getPrayerStatusIcon(u.people_committed) },
-    { label: t('Adoption Status'), icon: getBinaryStatusIcon((u.adopted_by_churches ?? 0) > 0) },
+    { label: t('Adoption Status'), icon: getBinaryStatusIcon((u.adopted_by_churches ?? 0) > 0) }
+  ]
+
+  if (isEngaged.value) {
+    return [
+      ...leadingItems,
+      { label: t('Engaged!'), icon: 'done' }
+    ]
+  }
+
+  return [
+    ...leadingItems,
     { label: t('Cross-cultural workers present'), icon: getBinaryStatusIcon(!!u.workers_long_term) },
     { label: t('Work in local language & culture'), icon: getBinaryStatusIcon(!!u.work_in_local_language) },
     { label: t('Disciple & church multiplication'), icon: getBinaryStatusIcon(!!u.disciple_and_church_multiplication) }
@@ -177,9 +197,9 @@ const mapSrc = computed(() => {
             </div>
             <div
               class="engaged-stamp"
-              :data-engaged="uupg.engagement_status?.value === 'engaged' ? 'true' : 'false'"
+              :data-engaged="isEngaged ? 'true' : 'false'"
             >
-              <span v-if="uupg.engagement_status?.value === 'engaged'">{{ t('Engaged') }}</span>
+              <span v-if="isEngaged">{{ t('Engaged') }}</span>
               <span v-else>{{ t('Not Engaged') }}</span>
             </div>
           </div>
