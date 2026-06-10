@@ -9,7 +9,7 @@
 interface PageResponse {
   title: string
   menu_parent: { slug: string; title: string }
-  children: Array<{ slug: string; title: string }>
+  children: Array<{ slug: string; url: string; title: string }>
 }
 
 const { t, locale } = useI18n()
@@ -44,10 +44,10 @@ useHead(() => ({ title: t('Documents') }))
                   {{ about.menu_parent.title }}
                 </span>
               </li>
-              <li v-for="child in about?.children ?? []" :key="child.slug">
+              <li v-for="child in about?.children ?? []" :key="child.url">
                 <NuxtLink
-                  :class="{ 'current-link': child.slug === 'about/documents' }"
-                  :to="localePath(`/${child.slug}`)"
+                  :class="{ 'current-link': child.url === 'about/documents' }"
+                  :to="localePath(`/${child.url}`)"
                 >{{ child.title }}</NuxtLink>
               </li>
             </ul>
