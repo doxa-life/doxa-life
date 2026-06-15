@@ -16,7 +16,6 @@ const translations = computed(() => buildUupgListTranslations(t))
 
 const {
   stats,
-  prayerCoveragePercent,
   totalPeopleGroups,
   totalPeopleGroupsFormatted,
   reload,
@@ -43,6 +42,31 @@ const prayFeedbackConfig = JSON.stringify({
   projectId: '809ee16b-46e2-4bcd-a93d-b7ea0879d93d'
 })
 
+const DEMO_PRAYER_COVERAGE = {
+  enabled: false,
+  complete: 100,
+  partial: 1300
+}
+
+const noPrayerCount = computed(() => {
+  if (DEMO_PRAYER_COVERAGE.enabled) {
+    return Math.max(0, totalPeopleGroups.value - DEMO_PRAYER_COVERAGE.partial - DEMO_PRAYER_COVERAGE.complete)
+  }
+  return Math.max(0, totalPeopleGroups.value - stats.value.total_with_prayer)
+})
+const partialPrayerCount = computed(() =>
+  DEMO_PRAYER_COVERAGE.enabled
+    ? DEMO_PRAYER_COVERAGE.partial
+    : Math.max(0, stats.value.total_with_prayer - stats.value.total_with_full_prayer)
+)
+const fullPrayerCount = computed(() =>
+  DEMO_PRAYER_COVERAGE.enabled ? DEMO_PRAYER_COVERAGE.complete : stats.value.total_with_full_prayer
+)
+
+function getCoveragePercent(count: number) {
+  return `${Math.min(100, (count / totalPeopleGroups.value) * 100)}%`
+}
+
 useTextHighlight()
 </script>
 
@@ -60,22 +84,35 @@ useTextHighlight()
           <div class="card-two-tone | text-center grow-1">
             <div class="stack stack--lg">
               <h2 class="h3">{{ t('Prayer Goal') }}</h2>
-              <p class="subtext font-size-md">{{ t('Daily Prayer Coverage') }}</p>
-              <p class="subtext font-size-md">{{ t('Mobilize 100+ people praying daily for every DOXA people group') }}</p>
+              <p class="subtext font-size-md">{{ t('Mobilize 100+ people praying daily for each DOXA people group') }}</p>
             </div>
-            <div>
+            <div class="stack stack--lg">
               <h2 class="h3">{{ t('Current Status') }}</h2>
-              <span class="font-size-4xl font-weight-bold font-button">
-                <span id="prayer-current-status">{{ stats.total_with_full_prayer }}</span> / {{ totalPeopleGroups }}
-              </span>
               <div class="stack stack--3xs">
-                <p class="subtext font-size-md">{{ t('People groups with complete daily prayer coverage') }}</p>
-                <div class="progress-bar" data-size="md">
+                <p class="subtext font-size-md">{{ t('Out of {0} DOXA people groups:', [totalPeopleGroupsFormatted]) }}</p>
+                <div
+                  class="progress-bar prayer-coverage-segments"
+                  data-size="md"
+                  :aria-label="t('Prayer coverage progress')"
+                >
                   <div
                     id="prayer-current-status-percentage"
-                    class="progress-bar__slider"
-                    :style="{ width: `${prayerCoveragePercent}%` }"
+                    class="prayer-coverage-segment prayer-coverage-segment--full"
+                    :style="{ width: getCoveragePercent(fullPrayerCount) }"
                   />
+                  <div
+                    class="prayer-coverage-segment prayer-coverage-segment--partial"
+                    :style="{ width: getCoveragePercent(partialPrayerCount) }"
+                  />
+                  <div
+                    class="prayer-coverage-segment prayer-coverage-segment--none"
+                    :style="{ width: getCoveragePercent(noPrayerCount) }"
+                  />
+                </div>
+                <div class="prayer-coverage-legend">
+                  <span><i class="prayer-coverage-key prayer-coverage-key--full" />{{ t('100+ People Praying') }}: {{ fullPrayerCount }}</span>
+                  <span><i class="prayer-coverage-key prayer-coverage-key--partial" />{{ t('1+ People Praying') }}: {{ partialPrayerCount }}</span>
+                  <span><i class="prayer-coverage-key prayer-coverage-key--none" />{{ t('No One Praying') }}: {{ noPrayerCount }}</span>
                 </div>
               </div>
             </div>
@@ -317,5 +354,65 @@ useTextHighlight()
 }
 .research-map-link:hover {
   color: var(--color-brand-primary-darker, #1f2328);
+}
+
+.prayer-coverage-segments {
+  display: flex;
+  height: clamp(15px, 6vw, 25px);
+  padding-top: 0 !important;
+}
+
+.prayer-coverage-segment {
+  height: 100%;
+  transition: width 1s ease-out;
+}
+
+.prayer-coverage-segment--none {
+  background: var(--color-brand-light);
+}
+
+.prayer-coverage-segment--partial {
+  background: #f0c64a;
+}
+
+.prayer-coverage-segment--full {
+  background: var(--color-brand-primary);
+}
+
+.prayer-coverage-legend {
+  display: grid;
+  justify-content: center;
+  gap: 0.55rem;
+  margin-top: 0.85rem;
+  font-size: clamp(1.2rem, 1.6vw, 1.45rem);
+  font-weight: 600;
+  text-align: center;
+}
+
+.prayer-coverage-legend span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.prayer-coverage-key {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 100px;
+}
+
+.prayer-coverage-key--none {
+  background: var(--color-brand-light);
+}
+
+.prayer-coverage-key--partial {
+  background: #f0c64a;
+}
+
+.prayer-coverage-key--full {
+  background: var(--color-brand-primary);
 }
 </style>
