@@ -10,7 +10,7 @@
   },
   "header": {
     "collapsed": "Légende",
-    "peopleGroupFallback": "Groupe de personnes"
+    "peopleGroupFallback": "Peuple"
   },
   "prayer": {
     "needsPrayer": "Besoin de prière",
@@ -26,7 +26,7 @@
     "hasAdoption": "Adoption en cours"
   },
   "columns": {
-    "upgs": "UUPGs",
+    "upgs": "UUPG",
     "population": "Population"
   },
   "footer": {
