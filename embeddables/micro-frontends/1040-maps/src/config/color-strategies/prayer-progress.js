@@ -17,22 +17,22 @@ export const PROPERTY_KEY = 'peoplePraying'
 
 /**
  * Number of people praying required for "Full Prayer Coverage".
- * Set to match the platform's prayer goal (144 people per people group).
+ * Set to match the platform's prayer goal (100 people per people group).
  * Adjust this constant to change the green threshold.
  */
-export const FULL_PRAYER_THRESHOLD = 144
+export const FULL_PRAYER_THRESHOLD = 100
 
 export const PALETTE = {
-  noPrayer:   '#e74c3c', // Red — Needs Prayer (default)
-  hasPrayer:  '#f39c12', // Orange — Has Prayer (partial)
-  fullPrayer: '#22c55e'  // Green — Full Prayer Coverage
+  noPrayer: '#e74c3c', // Red — Needs Prayer (default)
+  hasPrayer: '#f39c12', // Orange — Has Prayer (partial)
+  fullPrayer: '#22c55e' // Green — Full Prayer Coverage
 }
 
 export const PRAYER_COLORS = PALETTE
 
 export const LABELS = {
-  noPrayer:   'Needs Prayer',
-  hasPrayer:  'Has Prayer',
+  noPrayer: 'Needs Prayer',
+  hasPrayer: 'Has Prayer',
   fullPrayer: 'Has Full Prayer Coverage'
 }
 

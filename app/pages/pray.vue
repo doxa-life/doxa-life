@@ -60,8 +60,8 @@ useTextHighlight()
           <div class="card-two-tone | text-center grow-1">
             <div class="stack stack--lg">
               <h2 class="h3">{{ t('Prayer Goal') }}</h2>
-              <p class="subtext font-size-md">{{ t('24-Hour Prayer Coverage') }}</p>
-              <p class="subtext font-size-md">{{ t('Mobilize 144+ people praying 10 minutes a day for all {0} people groups', [totalPeopleGroupsFormatted]) }}</p>
+              <p class="subtext font-size-md">{{ t('Daily Prayer Coverage') }}</p>
+              <p class="subtext font-size-md">{{ t('Mobilize 100+ people praying daily for every DOXA people group') }}</p>
             </div>
             <div>
               <h2 class="h3">{{ t('Current Status') }}</h2>
@@ -69,7 +69,7 @@ useTextHighlight()
                 <span id="prayer-current-status">{{ stats.total_with_full_prayer }}</span> / {{ totalPeopleGroups }}
               </span>
               <div class="stack stack--3xs">
-                <p class="subtext font-size-md">{{ t('People groups with committed 24-hour prayer coverage') }}</p>
+                <p class="subtext font-size-md">{{ t('People groups with complete daily prayer coverage') }}</p>
                 <div class="progress-bar" data-size="md">
                   <div
                     id="prayer-current-status-percentage"
