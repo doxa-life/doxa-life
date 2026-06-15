@@ -12,8 +12,7 @@ export interface NavItem {
 // Main header navigation (desktop). Minimal on purpose — the full list
 // lives in the hamburger menu; this matches the live site layout.
 export const PRIMARY_NAV: NavItem[] = [
-  { key: 'Pray', to: '/pray' },
-  { key: 'Adopt', to: '/adopt' }
+  { key: 'Pray', to: '/pray' }
 ]
 
 // Footer navigation. Matches the live `#menu-footer` list exactly.
