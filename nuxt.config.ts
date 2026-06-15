@@ -38,6 +38,17 @@ const marketingRouteRules = Object.fromEntries(
   )
 )
 
+// Cache headers for the per-country pages (/countries and /countries/<slug>).
+// The actual prerender route list is enumerated in modules/country-routes.ts
+// (the country set is data-driven, so it can't be a static glob); these rules
+// just apply the marketing HTML cache policy across all enabled locales.
+const countryRouteRules = Object.fromEntries(
+  MARKETING_LOCALE_PREFIXES.flatMap(prefix => [
+    [`${prefix}/countries`, { headers: { 'cache-control': MARKETING_HTML_CACHE } }],
+    [`${prefix}/countries/**`, { headers: { 'cache-control': MARKETING_HTML_CACHE } }]
+  ])
+)
+
 export default defineNuxtConfig({
   // Embeddables (micro-frontends + web-components) have their own Vite builds —
   // Nuxt must not watch or scan their source trees.
@@ -73,6 +84,7 @@ export default defineNuxtConfig({
 
   modules: [
     './modules/migrations',
+    './modules/country-routes',
     '@nuxt/eslint',
     '@nuxt/ui',
     '@nuxtjs/i18n',
@@ -145,6 +157,8 @@ export default defineNuxtConfig({
     '/assets/**': { headers: { 'cache-control': 'public, max-age=604800' } },
     // Prerendered marketing pages (all enabled locales) — edge-cacheable HTML.
     ...marketingRouteRules,
+    // Per-country pages — same cache policy; routes enumerated at build time.
+    ...countryRouteRules,
     '/login': { ssr: false, prerender: false },
     '/register': { ssr: false, prerender: false },
     '/reset-password': { ssr: false, prerender: false },
