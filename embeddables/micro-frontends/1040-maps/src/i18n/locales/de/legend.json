@@ -13,9 +13,9 @@
     "peopleGroupFallback": "Volksgruppe"
   },
   "prayer": {
-    "needsPrayer": "Braucht Gebet",
-    "hasPrayer": "Hat Gebet",
-    "fullPrayerCoverage": "Vollständige Gebetsabdeckung"
+    "needsPrayer": "Niemand betet",
+    "hasPrayer": "1+ Menschen beten",
+    "fullPrayerCoverage": "100+ Menschen beten"
   },
   "engagement": {
     "needsEngagement": "Braucht Engagement",

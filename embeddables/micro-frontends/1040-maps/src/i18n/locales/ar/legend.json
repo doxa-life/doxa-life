@@ -13,9 +13,9 @@
     "peopleGroupFallback": "مجموعة الشعب"
   },
   "prayer": {
-    "needsPrayer": "يحتاج إلى صلاة",
-    "hasPrayer": "لديه صلاة",
-    "fullPrayerCoverage": "تغطية صلاة كاملة"
+    "needsPrayer": "لا أحد يصلّي",
+    "hasPrayer": "شخص واحد أو أكثر يصلّي",
+    "fullPrayerCoverage": "أكثر من 100 شخص يصلّون"
   },
   "engagement": {
     "needsEngagement": "يحتاج إلى انخراط",
