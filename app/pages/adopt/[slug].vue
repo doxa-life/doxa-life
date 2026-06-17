@@ -240,7 +240,7 @@ async function onSubmit(e: Event) {
             <ul class="stack" data-list-color="primary">
               <li>
                 <strong>{{ t('Pray') }} – </strong>
-                {{ t('Mobilize toward the goal of at least 144 prayer partners to cover the people group in continuous, daily prayer (10 minutes each, 24 hours a day).') }}
+                {{ t('Mobilize toward the goal of at least 100 prayer partners to cover the people group in daily prayer.') }}
               </li>
               <li>
                 <strong>{{ t('Give') }} – </strong>
@@ -257,7 +257,7 @@ async function onSubmit(e: Event) {
 
           <div class="stack">
             <h3 class="h5">{{ t('Champion Details') }}</h3>
-            <i class="color-primary font-size-sm">{{ t('The Champion is the person who will organize the 144 intercessors and receive updates.') }}</i>
+            <i class="color-primary font-size-sm">{{ t('The Champion is the person who will organize the 100 intercessors and receive updates.') }}</i>
             <div class="">
               <label for="first-name">{{ t('First Name') }}</label>
               <input id="first-name" v-model="firstName" type="text" name="first_name" required :placeholder="t('First Name')">

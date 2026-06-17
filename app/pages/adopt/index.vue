@@ -122,7 +122,7 @@ useTextHighlight()
             <div class="step-card__number">2</div>
             <div class="step-card__content" data-no-action>
               <h2 class="step-card__title overflow-wrap-anywhere">{{ t('Mobilize') }}</h2>
-              <p>{{ t('Raise up 144+ daily intercessors to pray 10 minutes a day.') }}</p>
+              <p>{{ t('Raise up 100+ daily intercessors to pray for this people group.') }}</p>
             </div>
           </div>
           <div class="step-card">
@@ -226,7 +226,7 @@ useTextHighlight()
             </div>
             <div class="stack stack--lg | text-card | surface-brand-lightest justify-center">
               <h4 class="font-heading font-size-2xl overflow-wrap-anywhere">{{ t('Prayer opens the door for engagement') }}</h4>
-              <p>{{ t('Adoption mobilizes 144+ daily intercessors, creating 24 hours of prayer that prepares the soil, breaks spiritual barriers, and supports workers who go. Every gospel movement begins with prayer.') }}</p>
+              <p>{{ t('Adoption mobilizes 100+ daily intercessors whose prayer prepares the soil, breaks spiritual barriers, and supports workers who go. Every gospel movement begins with prayer.') }}</p>
             </div>
           </div>
           <div class="switcher | gap-md" data-width="xl">

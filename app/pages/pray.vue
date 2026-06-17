@@ -162,7 +162,7 @@ useTextHighlight()
             <div class="step-card__number">3</div>
             <div class="step-card__content" data-no-action>
               <h2 class="step-card__title overflow-wrap-anywhere">{{ t('Pray') }}</h2>
-              <p>{{ t('Pray for 10 minutes a day and help provide 24-hour prayer coverage.') }}</p>
+              <p>{{ t('Pray daily and help provide complete prayer coverage for a people group.') }}</p>
             </div>
           </div>
         </div>
