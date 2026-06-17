@@ -124,7 +124,7 @@ useTextHighlight()
             {{ t('{0} unengaged people groups', [unengagedPeopleGroupsFormatted]) }}
           </h2>
           <p class="subtext">
-            {{ t('Our hope is to see each of them covered in 24-hour prayer, and your church can be part of it.') }}
+            {{ t('Our hope is to cover each of them in extraordinary prayer. You and your church can be part of it.') }}
           </p>
         </div>
         <PeopleGroupReel
@@ -148,7 +148,7 @@ useTextHighlight()
                 <h2 class="step-card__title">{{ t('Adopt') }}</h2>
                 <p>{{ t('Churches and networks take ownership – praying, giving, and preparing the way for gospel workers.') }}</p>
               </div>
-              <NuxtLink :to="localePath('/adopt')" class="button | compact">{{ t('Commit') }}</NuxtLink>
+              <NuxtLink :to="localePath('/contact-us')" class="button | compact">{{ t('Contact Us') }}</NuxtLink>
             </div>
             <div class="step-card">
               <div class="step-card__number">3</div>
@@ -250,7 +250,7 @@ useTextHighlight()
               <div class="stack stack--xl">
                 <h3 class="subtext">{{ t('In partnership with the global church, our vision is for...') }}</h3>
                 <ul class="stack stack--md" data-list-color="primary">
-                  <li>{{ t('Daily 24-hour prayer coverage for all {0} DOXA people groups', [totalPeopleGroupsFormatted]) }}</li>
+                  <li>{{ t('Daily prayer coverage for all {0} DOXA people groups', [totalPeopleGroupsFormatted]) }}</li>
                   <li>{{ t('No unengaged people groups by 2033') }}</li>
                   <li>{{ t('Mobilization of 20,000+ DOXA partnership missionaries') }}</li>
                   <li>{{ t('Fruitful engagement among frontier peoples and the under-engaged') }}</li>
