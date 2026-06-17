@@ -13,9 +13,9 @@
     "peopleGroupFallback": "民族群体"
   },
   "prayer": {
-    "needsPrayer": "需要祷告",
-    "hasPrayer": "已有祷告",
-    "fullPrayerCoverage": "全面祷告覆盖"
+    "needsPrayer": "无人祷告",
+    "hasPrayer": "1+ 人祷告",
+    "fullPrayerCoverage": "100+ 人祷告"
   },
   "engagement": {
     "needsEngagement": "需要参与",

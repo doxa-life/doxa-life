@@ -13,9 +13,9 @@
     "peopleGroupFallback": "Народная группа"
   },
   "prayer": {
-    "needsPrayer": "Нуждается в молитве",
-    "hasPrayer": "Есть молитва",
-    "fullPrayerCoverage": "Полное молитвенное покрытие"
+    "needsPrayer": "Никто не молится",
+    "hasPrayer": "1+ человек молится",
+    "fullPrayerCoverage": "100+ человек молятся"
   },
   "engagement": {
     "needsEngagement": "Нуждается в вовлечённости",

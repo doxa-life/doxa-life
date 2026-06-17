@@ -74,7 +74,7 @@ const adoptUrl = computed(() => {
 })
 
 const infoOpen = ref(false)
-const FULL_PRAYER_COVERAGE_COUNT = 144
+const FULL_PRAYER_COVERAGE_COUNT = 100
 
 type StatusIcon = 'done' | 'partial' | 'not-done'
 type StatusItem = {
@@ -257,7 +257,7 @@ const mapSrc = computed(() => {
               <div class="progress-bar" data-size="md">
                 <div class="progress-bar__slider" :style="{ width: `${prayerCoveragePercent}%` }" />
               </div>
-              <p class="font-size-lg font-weight-medium">{{ t('24-Hour Prayer Coverage') }}</p>
+              <p class="font-size-lg font-weight-medium">{{ t('Daily Prayer Coverage') }}</p>
             </div>
             <a
               class="button fit-content mx-auto stack-spacing-4xl clamp-padding"
