@@ -600,7 +600,7 @@ const showMore = computed(() => hasMore())
             </div>
             <div class="repel">
               <p class="font-size-sm color-brand-lighter">{{ t.prayer_coverage }}:</p>
-              <p class="font-size-xl font-button">{{ uupg.people_committed ?? 0 }}/144</p>
+              <p class="font-size-xl font-button">{{ uupg.people_committed ?? 0 }}/100</p>
             </div>
             <div class="switcher | text-center" data-width="md">
               <a class="highlighted-uupg__prayer-coverage-button button compact" :href="`${selectUrl}${uupg.slug}?source=doxalife`">{{ t.select }}</a>
