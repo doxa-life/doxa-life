@@ -46,7 +46,10 @@ useTextHighlight()
 
 <template>
   <div class="container page-content uupgs-page stack stack--3xl">
-    <h1 class="text-center highlight" data-highlight-last>{{ t('Find a UUPG') }}</h1>
+    <div class="stack stack--xs text-center">
+      <h1 class="highlight" data-highlight-last>{{ t('Find a UUPG') }}</h1>
+      <p><NuxtLink class="light-link" :to="localePath('/countries')">{{ t('By Country') }} &rarr;</NuxtLink></p>
+    </div>
 
     <!-- Research map embed — sits directly under the H1, above the UUPG
          search bar. Loads /js/doxa-research-map.js (auto-published from
