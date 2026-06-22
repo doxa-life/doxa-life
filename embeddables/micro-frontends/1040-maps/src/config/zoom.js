@@ -248,25 +248,38 @@ export const ZOOM_INTERPOLATIONS = {
 /**
  * Clustering Zoom Thresholds
  * Define when clustering should activate/deactivate
+ *
+ * INVARIANT (COMMIT-LOG #8): clusterMaxZoom MUST sit a few levels BELOW the
+ * map's zoom-in cap, or clusters never break apart within reach and overlapping
+ * pins stay permanently un-clickable. The research map caps at
+ * RESEARCH_MAX_ZOOM = 10 (deliberately low for location obfuscation —
+ * metro-in-region, not street-level), so the live value is 6 with radius 40 in
+ * ClusterHelpers.DEFAULT_MAPBOX_CLUSTER_OPTIONS, which is the SOURCE OF TRUTH the
+ * runtime actually uses. These centralized values are kept in lockstep with it
+ * so that if/when a map is wired to read clustering config from here, it cannot
+ * re-introduce COMMIT-LOG #8. Any override below must keep
+ * maxZoom <= (the consuming map's zoom-in cap − ~2) for declustering headroom.
  */
 export const CLUSTERING_ZOOM = {
-    // Maximum zoom level where clustering is active (beyond this, show individual pins)
-    maxZoom: 14,
-    
+    // Maximum zoom where clustering is active (beyond this, show individual pins).
+    // Matches ClusterHelpers.DEFAULT_MAPBOX_CLUSTER_OPTIONS.clusterMaxZoom (live).
+    maxZoom: 6,
+
     // Minimum zoom for cluster expansion
     minExpandZoom: 2,
-    
-    // Cluster radius (pixels) - larger = more aggressive clustering
-    radius: 50,
-    
-    // Map-specific overrides
+
+    // Cluster radius (pixels) - larger = more aggressive clustering.
+    // Matches the live clusterRadius (40) from ClusterHelpers.
+    radius: 40,
+
+    // Map-specific overrides — must still decluster BELOW the map's zoom-in cap.
     denseData: {
-        maxZoom: 16,  // Keep clustering longer for dense datasets
-        radius: 75
+        maxZoom: 8,   // cluster a little longer for dense data, but stay below the cap
+        radius: 60
     },
-    
+
     sparseData: {
-        maxZoom: 12,  // Stop clustering earlier for sparse datasets
+        maxZoom: 4,   // decluster early — sparse data rarely overlaps
         radius: 30
     }
 };
