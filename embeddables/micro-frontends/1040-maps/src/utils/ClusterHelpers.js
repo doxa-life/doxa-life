@@ -204,10 +204,15 @@ export function makeLineFeature(from, to, properties = {}) {
  *
  * @type {{cluster: boolean, clusterMaxZoom: number, clusterRadius: number}}
  */
+// clusterMaxZoom MUST sit a few levels below the research map's zoom-in cap
+// (RESEARCH_MAX_ZOOM = 10 in research-map.vue). At 14 it was above the cap, so
+// clusters never broke apart and overlapping pins stayed permanently un-clickable
+// (COMMIT-LOG #8). At 6 pins decluster well before the user hits the limit, and the
+// tighter radius (40) lets dense areas like South Asia separate instead of merging.
 export const DEFAULT_MAPBOX_CLUSTER_OPTIONS = Object.freeze({
     cluster: true,
-    clusterMaxZoom: 14,
-    clusterRadius: 50
+    clusterMaxZoom: 6,
+    clusterRadius: 40
 });
 
 /**

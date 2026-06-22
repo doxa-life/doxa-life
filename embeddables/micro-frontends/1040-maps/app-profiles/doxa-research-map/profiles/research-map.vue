@@ -440,6 +440,15 @@ watch(() => activeTabId?.value, async (newTabId, oldTabId) => {
 const mapContainer = ref(null)
 const appReady     = ref(false)
 
+// Feedback #9 (/research): ceiling on manual zoom-in for the research map.
+// Mapbox zoom ~10 still frames a place within its surrounding country/region
+// (metro-in-region, not intra-city streets), so approximate locations stay
+// obfuscated. COMMIT-LOG #8: the prior cap of 7 sat below the cluster break
+// threshold, so overlapping pins could never separate enough to be clickable.
+// Raised to 10 to leave headroom above clusterMaxZoom (6) for declustering.
+// Used as the maxZoom fallback below; profile-config can still override.
+const RESEARCH_MAX_ZOOM = 10
+
 // ─── Map instance (shadow-DOM safe — element ref, never string ID) ───────────
 const { map, isMapReady, initializeMap, destroy } = useMapInstance({
   containerRef: mapContainer,
@@ -448,7 +457,17 @@ const { map, isMapReady, initializeMap, destroy } = useMapInstance({
   center:       profileConfig?.value?.center  ?? mapDefaults.center ?? [20, 10],
   zoom:         profileConfig?.value?.zoom    ?? mapDefaults.zoom   ?? 1.8,
   pitch:        profileConfig?.value?.pitch   ?? mapDefaults.pitch  ?? 0,
-  bearing:      profileConfig?.value?.bearing ?? mapDefaults.bearing?? 0
+  bearing:      profileConfig?.value?.bearing ?? mapDefaults.bearing?? 0,
+  // Per-map zoom constraints (feedback #1 /pray): the research map defines its
+  // own min/max in profile-config so users don't get lost zooming too far, and
+  // precise locations stay obfuscated. Falls back to mapDefaults.
+  minZoom:      profileConfig?.value?.minZoom ?? mapDefaults.minZoom ?? 0.5,
+  // Feedback #9 (/research): cap zoom-in so the camera can't dive to
+  // intra-city / street level — people-group framing should always keep
+  // surrounding-country context (and keep approximate locations obfuscated).
+  // RESEARCH_MAX_ZOOM (10) ≈ metro-in-region framing; a city reads as a place
+  // inside its country, not a set of streets. profile-config can still override.
+  maxZoom:      profileConfig?.value?.maxZoom ?? RESEARCH_MAX_ZOOM
 })
 
 // ─── Data composable ─────────────────────────────────────────────────────────
