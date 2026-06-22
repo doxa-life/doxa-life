@@ -212,6 +212,14 @@ export function useMapInstance({
     // floorFor releases the floor entirely. Centralized here so _onResize picks it
     // up automatically on an orientation/breakpoint flip into mobile.
     const isDesktop = () => typeof window !== 'undefined' && window.innerWidth >= 1024
+    // Touch-capability gate (NOT width) for cooperativeGestures. A landscape phone
+    // or tablet can report innerWidth >= 1024 yet still be a single-finger-swipe
+    // device — `(pointer: coarse)` is true iff the PRIMARY pointer is touch, so it
+    // fires on phones/tablets and stays false on a mouse desktop (incl. touch
+    // laptops whose primary pointer is the trackpad/mouse). See cooperativeGestures.
+    const isTouchPrimary = () => typeof window !== 'undefined' &&
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(pointer: coarse)').matches
     const floorFor = (W, H) => {
       if (!isDesktop()) return MIN_ZOOM_FLOOR   // mobile/tablet — no floor
       const f = computeWorldMinZoom(W, H, maxZoom, southCutoff)
@@ -239,8 +247,13 @@ export function useMapInstance({
       // finger scrolls the PAGE (map shows a brief "use two fingers" hint), while two
       // fingers pan and pinch zooms the map. Desktop already scrolls fine via its
       // left/right gutters, and enabling this there would force ctrl+scroll to zoom —
-      // so it is mobile/tablet-only, matching the isDesktop() floor breakpoint above.
-      cooperativeGestures: !isDesktop(),
+      // so gate on TOUCH capability, not viewport width. (2026-06-22 fix: was
+      // `!isDesktop()` = innerWidth < 1024, which mis-fired on >=1024px touch devices
+      // — a wide/landscape phone or tablet got NO overlay and single-finger drag
+      // stayed trapped, the exact failure the Driver reported. isTouchPrimary() keys
+      // off `(pointer: coarse)` so any touch-primary device gets the overlay
+      // regardless of width, while a mouse desktop is unaffected.)
+      cooperativeGestures: isTouchPrimary(),
       ...(maxBounds ? { maxBounds } : {}),  // only if a profile explicitly supplied bounds
       attributionControl: false
     })
