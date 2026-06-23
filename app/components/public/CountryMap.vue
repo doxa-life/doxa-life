@@ -136,22 +136,11 @@ async function initMap() {
 
   const { brand, muted, inCountry } = mapColors()
 
-  // Mobile single-finger page-scroll rescue: on touch devices a one-finger swipe
-  // scrolls the PAGE (map shows a brief "use two fingers" hint), while two fingers
-  // pan/pinch the map — otherwise the full-width embed traps the user's scroll.
-  // Gate on touch capability (pointer: coarse), NOT viewport width, so a wide
-  // landscape phone/tablet still gets it while a mouse desktop is unaffected.
-  // Mirrors useMapInstance.js (cooperativeGestures: isTouchPrimary()).
-  const isTouchPrimary = typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(pointer: coarse)').matches
-
   map = new mapboxgl.Map({
     container: container.value,
     style: 'mapbox://styles/mapbox/light-v11',
     center: props.center,
-    zoom: props.zoom,
-    cooperativeGestures: isTouchPrimary
+    zoom: props.zoom
   })
   map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right')
   map.addControl(new mapboxgl.FullscreenControl(), 'top-right')

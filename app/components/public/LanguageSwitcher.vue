@@ -11,7 +11,7 @@ const switchLocalePath = useSwitchLocalePath()
 const route = useRoute()
 
 const current = computed(() => LANGUAGES.find(l => l.code === locale.value) ?? LANGUAGES[0])
-const others = computed(() => ENABLED_LANGUAGES.filter(l => l.code !== locale.value))
+const others = computed(() => ENABLED_LANGUAGES.filter(l => l.code !== locale.value && !l.hideFromSwitcher))
 
 const isOpen = ref(false)
 const isPinned = ref(false)

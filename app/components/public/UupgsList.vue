@@ -6,6 +6,7 @@
 
 import Fuse from 'fuse.js'
 import type { Uupg, FilterOption } from '~/types/uupg'
+import { countrySlug } from '~~/config/countries-meta'
 
 interface Translations {
   search?: string
@@ -48,7 +49,7 @@ const props = withDefaults(defineProps<{
   hideSeeAllLink?: boolean
   /** When set (ISO-3 code), the list is locked to this country: the country
    *  filter is pre-applied and its dropdown/chip hidden. Used by the per-country
-   *  pages (/countries/[country]). Empty string = unlocked (default). */
+   *  pages. Empty string = unlocked (default research-page behaviour). */
   lockCountryCode?: string
 }>(), {
   t: () => ({}),
@@ -67,6 +68,7 @@ const props = withDefaults(defineProps<{
 })
 
 const config = useRuntimeConfig()
+const localePath = useLocalePath()
 const prayBaseUrl = config.public.prayBaseUrl as string
 const imagesUrl = '/assets/images'
 const iconsUrl = '/assets/icons'
@@ -487,7 +489,7 @@ const showMore = computed(() => hasMore())
             @filter-clear="onFilterClear"
           />
           <FilterDropdown
-            :label="t.wagf_block || 'WAGF Bloc'"
+            :label="t.wagf_block || 'WAGF Block'"
             name="wagf_block"
             :options="filterOptions.wagf_block || []"
             :value="activeFilters.wagf_block?.value ?? ''"
@@ -598,7 +600,7 @@ const showMore = computed(() => hasMore())
             </div>
             <div class="repel">
               <p class="font-size-sm color-brand-lighter">{{ t.prayer_coverage }}:</p>
-              <p class="font-size-xl font-button">{{ uupg.people_committed ?? 0 }}/144</p>
+              <p class="font-size-xl font-button">{{ uupg.people_committed ?? 0 }}/100</p>
             </div>
             <div class="switcher | text-center" data-width="md">
               <a class="highlighted-uupg__prayer-coverage-button button compact" :href="`${selectUrl}${uupg.slug}?source=doxalife`">{{ t.select }}</a>
@@ -612,7 +614,10 @@ const showMore = computed(() => hasMore())
             <div class="uupg__header">
               <h3 class="uupg__name line-height-tight" v-html="uupg.name" />
               <p class="uupg__country">
-                <span v-html="uupg.country_label ? uupg.country_label : uupg.country_code.label" /> (<span v-html="uupg.rop1_label ? uupg.rop1_label : uupg.rop1.label" />)
+                <a
+                  class="uupg__country-link light-link"
+                  :href="localePath(`/countries/${countrySlug(uupg.country_code.value, uupg.country_code.label)}`)"
+                ><span v-html="uupg.country_label ? uupg.country_label : uupg.country_code.label" /></a> (<span v-html="uupg.rop1_label ? uupg.rop1_label : uupg.rop1.label" />)
               </p>
               <template v-if="uupg.matches">
                 <p v-for="(match, mi) in uupg.matches" :key="mi" class="font-size-sm color-brand-lighter">

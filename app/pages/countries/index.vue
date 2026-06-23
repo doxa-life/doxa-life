@@ -36,25 +36,6 @@ useSeoMeta({
   description: () => t('Find unreached people groups by country.')
 })
 
-// Country-first map embed — loads /js/doxa-countries-map.js (built from the
-// 1040-maps app-profiles/doxa-countries-map bundle) and mounts the
-// <doxa-countries-map> custom element via DoxaMapSlot. Mirrors the research
-// page's embed pattern (see research/index.vue); the bundle defaults to the
-// Countries (WAGF Regions) tab so the index lands on a country-level overview.
-const runtimeConfig = useRuntimeConfig()
-const countriesProfileConfig = computed(() => JSON.stringify({
-  profile:    'countries-map',
-  tk:         (runtimeConfig.public as { mapboxToken?: string }).mapboxToken || '',
-  dataSource: 'pray-tools',
-  instanceId: 'countries-page',
-  // Active Nuxt locale → drives the map bundle's UI i18n AND its API `lang`
-  // param so /fr/countries, /es/countries etc. render localized chrome + data.
-  locale:     locale.value,
-  // Zoom-OUT floor so the map can't zoom out past world context (matches the
-  // research map). The zoom-IN cap is owned by the profile.
-  minZoom:    0.5
-}))
-
 useTextHighlight()
 </script>
 
@@ -64,16 +45,6 @@ useTextHighlight()
       <h1 class="highlight" data-highlight-last>{{ t('Countries') }}</h1>
       <p class="color-brand-lighter">{{ t('Find unreached people groups by country.') }}</p>
     </div>
-
-    <!-- Country-first map embed — sits under the header, above the country
-         index. Loads /js/doxa-countries-map.js and mounts <doxa-countries-map>.
-         Embedded the same way as the research map (see research/index.vue). -->
-    <DoxaMapSlot
-      map-id="countries-page-map"
-      bundle="countries-map"
-      :profile-config="countriesProfileConfig"
-      class="rounded-xlg"
-    />
 
     <section v-for="region in regions" :key="region.label" class="stack stack--sm">
       <h2>{{ region.label }}</h2>

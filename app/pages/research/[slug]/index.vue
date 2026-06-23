@@ -74,15 +74,49 @@ const adoptUrl = computed(() => {
 })
 
 const infoOpen = ref(false)
+const FULL_PRAYER_COVERAGE_COUNT = 100
+
+type StatusIcon = 'done' | 'partial' | 'not-done'
+type StatusItem = {
+  label: string
+  icon: StatusIcon
+}
+
+function getPrayerStatusIcon(peopleCommitted: number | null | undefined): StatusIcon {
+  const committed = Number(peopleCommitted ?? 0)
+  if (committed >= FULL_PRAYER_COVERAGE_COUNT) return 'done'
+  if (committed > 0) return 'partial'
+  return 'not-done'
+}
+
+function getBinaryStatusIcon(done: boolean): StatusIcon {
+  return done ? 'done' : 'not-done'
+}
+
+const isEngaged = computed(() => {
+  const status = (uupg.value as UupgDetail | null)?.engagement_status?.value
+  return String(status || '').toLowerCase() === 'engaged'
+})
 
 const statusItems = computed(() => {
   const u = uupg.value as UupgDetail
+  const leadingItems: StatusItem[] = [
+    { label: t('Prayer Status'), icon: getPrayerStatusIcon(u.people_committed) },
+    { label: t('Adoption Status'), icon: getBinaryStatusIcon((u.adopted_by_churches ?? 0) > 0) }
+  ]
+
+  if (isEngaged.value) {
+    return [
+      ...leadingItems,
+      { label: t('Engaged!'), icon: 'done' }
+    ]
+  }
+
   return [
-    { label: t('Prayer Status'), done: (u.people_committed ?? 0) > 0 },
-    { label: t('Adoption Status'), done: (u.adopted_by_churches ?? 0) > 0 },
-    { label: t('Cross-cultural workers present'), done: !!u.workers_long_term },
-    { label: t('Work in local language & culture'), done: !!u.work_in_local_language },
-    { label: t('Disciple & church multiplication'), done: !!u.disciple_and_church_multiplication }
+    ...leadingItems,
+    { label: t('Cross-cultural workers present'), icon: getBinaryStatusIcon(!!u.workers_long_term) },
+    { label: t('Work in local language & culture'), icon: getBinaryStatusIcon(!!u.work_in_local_language) },
+    { label: t('Disciple & church multiplication'), icon: getBinaryStatusIcon(!!u.disciple_and_church_multiplication) }
   ]
 })
 
@@ -100,7 +134,7 @@ const progressItems = computed(() => {
 
 const prayerCoveragePercent = computed(() => {
   const committed = (uupg.value as UupgDetail)?.people_committed ?? 0
-  return Math.min(100, (Number(committed) / 144) * 100)
+  return Math.min(100, (Number(committed) / FULL_PRAYER_COVERAGE_COUNT) * 100)
 })
 
 const mapSrc = computed(() => {
@@ -163,9 +197,9 @@ const mapSrc = computed(() => {
             </div>
             <div
               class="engaged-stamp"
-              :data-engaged="uupg.engagement_status?.value === 'engaged' ? 'true' : 'false'"
+              :data-engaged="isEngaged ? 'true' : 'false'"
             >
-              <span v-if="uupg.engagement_status?.value === 'engaged'">{{ t('Engaged') }}</span>
+              <span v-if="isEngaged">{{ t('Engaged') }}</span>
               <span v-else>{{ t('Not Engaged') }}</span>
             </div>
           </div>
@@ -194,9 +228,14 @@ const mapSrc = computed(() => {
                 class="status-item"
               >
                 <img
-                  v-if="item.done"
+                  v-if="item.icon === 'done'"
                   src="/assets/icons/Check-GreenCircle.png"
                   :alt="t('Done')"
+                >
+                <img
+                  v-else-if="item.icon === 'partial'"
+                  src="/assets/icons/Check-YellowCircle.png"
+                  :alt="t('Has prayer coverage')"
                 >
                 <img
                   v-else
@@ -218,7 +257,7 @@ const mapSrc = computed(() => {
               <div class="progress-bar" data-size="md">
                 <div class="progress-bar__slider" :style="{ width: `${prayerCoveragePercent}%` }" />
               </div>
-              <p class="font-size-lg font-weight-medium">{{ t('24-Hour Prayer Coverage') }}</p>
+              <p class="font-size-lg font-weight-medium">{{ t('Daily Prayer Coverage') }}</p>
             </div>
             <a
               class="button fit-content mx-auto stack-spacing-4xl clamp-padding"

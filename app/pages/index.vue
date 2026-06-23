@@ -19,7 +19,7 @@ function openVideo() {
   videoModalRef.value?.open()
 }
 
-const { unengagedPeopleGroupsFormatted, ensureLoaded } = usePrayerStatistics()
+const { unengagedPeopleGroupsFormatted, totalPeopleGroupsFormatted, unengagedPopulationMillionsFormatted, ensureLoaded } = usePrayerStatistics()
 await ensureLoaded()
 
 const mapboxToken = config.public.mapboxToken as string
@@ -41,10 +41,6 @@ const homeMapConfig = JSON.stringify({
   profile: 'doxa-simple-map',
   dataSource: 'pray-tools',
   tk: mapboxToken,
-  // Per-map zoom (feedback #1 /pray): cap how far the home map zooms so users
-  // don't get lost and people-group locations stay obfuscated (regional view).
-  minZoom: 1.0,
-  maxZoom: 14,
   tabs: [{ id: 'engagement', colorStrategy: 'engagement', legend: 'engagement', popup: 'engagement' }]
 })
 
@@ -108,7 +104,7 @@ useTextHighlight()
           data-highlight-index="1"
           data-highlight-last
           data-highlight-color="primary"
-        >{{ t('Unengaged peoples around the world') }}</h1>
+        >{{ t('DOXA people groups around the world') }}</h1>
       </div>
       <DoxaMapSlot map-id="home-map" :profile-config="homeMapConfig" class="rounded-xlg">
         <FeedbackWidgetSlot :profile-config="homeFeedbackConfig" />
@@ -128,7 +124,7 @@ useTextHighlight()
             {{ t('{0} unengaged people groups', [unengagedPeopleGroupsFormatted]) }}
           </h2>
           <p class="subtext">
-            {{ t('Our hope is to see each of them covered in 24-hour prayer, and your church can be part of it.') }}
+            {{ t('Our hope is to cover each of them in extraordinary prayer. You and your church can be part of it.') }}
           </p>
         </div>
         <PeopleGroupReel
@@ -152,7 +148,7 @@ useTextHighlight()
                 <h2 class="step-card__title">{{ t('Adopt') }}</h2>
                 <p>{{ t('Churches and networks take ownership – praying, giving, and preparing the way for gospel workers.') }}</p>
               </div>
-              <NuxtLink :to="localePath('/adopt')" class="button | compact">{{ t('Commit') }}</NuxtLink>
+              <NuxtLink :to="localePath('/contact-us')" class="button | compact">{{ t('Contact Us') }}</NuxtLink>
             </div>
             <div class="step-card">
               <div class="step-card__number">3</div>
@@ -209,7 +205,7 @@ useTextHighlight()
             <div class="info-card surface-brand-dark justify-center">
               <div class="stack stack--lg | info-card__content">
                 <h3>{{ t('Unengaged') }}</h3>
-                <span>{{ t('{0} Million', ['202']) }}</span>
+                <span>{{ t('{0} Million', [unengagedPopulationMillionsFormatted]) }}</span>
                 <span>{{ t('{0} People Groups', [unengagedPeopleGroupsFormatted]) }}</span>
               </div>
             </div>
@@ -254,7 +250,7 @@ useTextHighlight()
               <div class="stack stack--xl">
                 <h3 class="subtext">{{ t('In partnership with the global church, our vision is for...') }}</h3>
                 <ul class="stack stack--md" data-list-color="primary">
-                  <li>{{ t('Daily 24-hour prayer coverage for all {0} unengaged peoples', [unengagedPeopleGroupsFormatted]) }}</li>
+                  <li>{{ t('Daily prayer coverage for all {0} DOXA people groups', [totalPeopleGroupsFormatted]) }}</li>
                   <li>{{ t('No unengaged people groups by 2033') }}</li>
                   <li>{{ t('Mobilization of 20,000+ DOXA partnership missionaries') }}</li>
                   <li>{{ t('Fruitful engagement among frontier peoples and the under-engaged') }}</li>

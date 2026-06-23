@@ -38,6 +38,17 @@ const marketingRouteRules = Object.fromEntries(
   )
 )
 
+// Cache headers for the per-country pages (/countries and /countries/<slug>).
+// The actual prerender route list is enumerated in modules/country-routes.ts
+// (the country set is data-driven, so it can't be a static glob); these rules
+// just apply the marketing HTML cache policy across all enabled locales.
+const countryRouteRules = Object.fromEntries(
+  MARKETING_LOCALE_PREFIXES.flatMap(prefix => [
+    [`${prefix}/countries`, { headers: { 'cache-control': MARKETING_HTML_CACHE } }],
+    [`${prefix}/countries/**`, { headers: { 'cache-control': MARKETING_HTML_CACHE } }]
+  ])
+)
+
 export default defineNuxtConfig({
   // Embeddables (micro-frontends + web-components) have their own Vite builds —
   // Nuxt must not watch or scan their source trees.
@@ -146,6 +157,8 @@ export default defineNuxtConfig({
     '/assets/**': { headers: { 'cache-control': 'public, max-age=604800' } },
     // Prerendered marketing pages (all enabled locales) — edge-cacheable HTML.
     ...marketingRouteRules,
+    // Per-country pages — same cache policy; routes enumerated at build time.
+    ...countryRouteRules,
     '/login': { ssr: false, prerender: false },
     '/register': { ssr: false, prerender: false },
     '/reset-password': { ssr: false, prerender: false },
@@ -194,11 +207,11 @@ export default defineNuxtConfig({
       // list below are prerendered — they don't hit the DB.
       crawlLinks: false,
       routes: [
-        '/', '/es', '/fr', '/pt', '/ar', '/ru',
-        '/adopt', '/es/adopt', '/fr/adopt', '/pt/adopt', '/ar/adopt', '/ru/adopt',
-        '/pray', '/es/pray', '/fr/pray', '/pt/pray', '/ar/pray', '/ru/pray',
-        '/research', '/es/research', '/fr/research', '/pt/research', '/ar/research', '/ru/research',
-        '/contact-us', '/es/contact-us', '/fr/contact-us', '/pt/contact-us', '/ar/contact-us', '/ru/contact-us'
+        '/', '/es', '/fr', '/pt', '/ar', '/ru', '/de', '/hi',
+        '/adopt', '/es/adopt', '/fr/adopt', '/pt/adopt', '/ar/adopt', '/ru/adopt', '/de/adopt', '/hi/adopt',
+        '/pray', '/es/pray', '/fr/pray', '/pt/pray', '/ar/pray', '/ru/pray', '/de/pray', '/hi/pray',
+        '/research', '/es/research', '/fr/research', '/pt/research', '/ar/research', '/ru/research', '/de/research', '/hi/research',
+        '/contact-us', '/es/contact-us', '/fr/contact-us', '/pt/contact-us', '/ar/contact-us', '/ru/contact-us', '/de/contact-us', '/hi/contact-us'
       ]
     }
   },
