@@ -31,6 +31,11 @@ const prayMapConfig = JSON.stringify({
   profile: 'doxa-simple-map',
   dataSource: 'pray-tools',
   tk: mapboxToken,
+  // Per-map zoom (feedback #1 /pray, [user]): the prayer map caps maxZoom
+  // hardest — prayer is over people groups, not pinpoint locations. Keeps users
+  // from getting lost zooming too far and obfuscates precise locations.
+  minZoom: 1.0,
+  maxZoom: 12,
   tabs: [{ id: 'prayer', colorStrategy: 'prayer', legend: 'prayer', popup: 'prayer' }]
 })
 

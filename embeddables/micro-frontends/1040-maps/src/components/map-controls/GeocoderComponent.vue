@@ -76,7 +76,15 @@ const props = defineProps({
    * Optional data source id the local-geocoder should search.
    * Defaults to "auto" (first populated source in dataStore.sources).
    */
-  dataSourceId: { type: String,  default: '' }
+  dataSourceId: { type: String,  default: '' },
+  /**
+   * Active search context — one of 'people-groups' | 'language' | 'regions' |
+   * 'religion' (or '' for the default order). Mirrors the active legend tab so
+   * the unified search surfaces the tab-relevant category first while still
+   * matching every category (Round 16). Read live by useDoxaSearch on each
+   * keystroke, so changing tabs needs no geocoder rebuild.
+   */
+  activeContext: { type: String, default: '' }
 })
 
 // Effective placeholder: explicit prop > i18n default
@@ -98,15 +106,43 @@ function strLabel(v) {
   return String(v)
 }
 
+// ── Category tags (Round 16 — replace emoji prefixes with clear labels) ───────
+// place_type → i18n key under `search.kinds`. The tag is a small labeled pill
+// (with a matching title for a11y/tooltip) so each result's category is
+// unambiguous — e.g. "Deaf" can appear as an Affinity Block, a Cluster AND a
+// People Group; the tag disambiguates what a bare name + emoji used to.
+const KIND_TAG_KEY = {
+  'people-group':         'people',
+  'doxa-people-group':    'peopleGroup',
+  'doxa-affinity-bloc':   'bloc',
+  'doxa-cluster':         'cluster',
+  'doxa-country':         'country',
+  'doxa-region':          'region',
+  'doxa-language-family': 'family',
+  'doxa-language':        'languageKind',
+  'doxa-dialect':         'dialect',
+  'doxa-religion':        'religionKind',
+}
+function kindTag(placeType) {
+  const key = KIND_TAG_KEY[placeType]
+  if (!key) return ''
+  const label = t('search.kinds.' + key)
+  return `<span class="dg-tag" title="${esc(label)}">${esc(label)}</span>`
+}
+
 /**
  * Custom row renderer for suggestions. Receives a Carmen-GeoJSON feature
  * and returns an HTML string that Mapbox injects into the suggestion `<a>`.
  *
- * People-group layout (match the search placeholder "People, place, language,
- * religion" — same 4 words, same order, all bold-labeled):
+ * Layout (Round 16 — no emoji; a labeled category tag leads every row):
  *
- *     🗺️ People: <bold Name>
+ *   People-group pin — shows the 2-4 valid indicators (only the ones present):
+ *     [People] <bold Name>
  *        Place: <country>   Language: <lang>   Religion: <religion>
+ *
+ *   DOXA aggregate (bloc / cluster / PG / country / region / family / language
+ *   / dialect / religion):
+ *     [Affinity Block] <label>  <count>
  */
 function renderSuggestion(item) {
   if (!item) return ''
@@ -126,8 +162,9 @@ function renderSuggestion(item) {
     const language = strLabel(props.language) || strLabel(props.primaryLanguage) || strLabel(props.languageFamily) || ''
     const religion = strLabel(props.religionName) || strLabel(props.religion) || ''
 
-    // Bold labels mirror the placeholder text word-for-word: People / Place / Language / Religion.
-    const peopleLabel   = t('search.labels.people')
+    // The 2-4 indicator combo: People (always — it's the pin) + only the valid
+    // ones of Place / Language / Religion. Bold labels mirror the placeholder
+    // text word-for-word (Place / Language / Religion).
     const placeLabel    = t('search.labels.place')
     const languageLabel = t('search.labels.language')
     const religionLabel = t('search.labels.religion')
@@ -138,14 +175,21 @@ function renderSuggestion(item) {
     if (religion) meta.push(`<span class="dg-field"><strong>${esc(religionLabel)}</strong> ${esc(religion)}</span>`)
 
     return (
-      `<div class="dg-main">🗺️ <strong>${esc(peopleLabel)}</strong> <strong>${esc(name)}</strong></div>` +
+      `<div class="dg-main">${kindTag('people-group')}<strong>${esc(name)}</strong></div>` +
       (meta.length ? `<div class="dg-meta">${meta.join('')}</div>` : '')
     )
   }
 
-  // DOXA aggregate (country / language / religion) — emoji + label + count
-  if (types.some((t) => t.startsWith('doxa-'))) {
-    return `<div class="dg-main">${esc(item.place_name || item.text || '')}</div>`
+  // DOXA aggregate — labeled category tag + clean label + member count. Built
+  // from properties (not place_name) so the tag carries the tier and we drop
+  // the old "(Cluster)/(PG)" suffix the emoji layout needed for disambiguation.
+  const aggType = types.find((tp) => tp.startsWith('doxa-'))
+  if (aggType) {
+    const props = item.properties || {}
+    const label = esc(strLabel(props.label) || item.text || '')
+    const count = Number(props.count) || 0
+    const countHtml = count ? ` <span class="dg-count">${count}</span>` : ''
+    return `<div class="dg-main">${kindTag(aggType)}<span class="dg-agg-label">${label}</span>${countHtml}</div>`
   }
 
   // Native Mapbox remote result — keep its default rendering style.
@@ -160,6 +204,10 @@ function renderSuggestion(item) {
 // underlying features change.
 const dataStore = inject('dataStore', null)
 const mapStore  = inject('mapStore',  null)
+// uiStore holds the prayer / engagement / adoption / religion legend filters,
+// which live outside mapStore. Needed so a search result can clear them too
+// (otherwise filter ∩ result = zero pins → blank map, JD 2026-04-27).
+const uiStore   = inject('uiStore',   null)
 
 // getActiveFilter is a closure over the live mapStore so each search call
 // reads the current selection without re-creating the geocoder instance.
@@ -173,7 +221,9 @@ function getActiveFilter() {
 const { search: doxaLocalGeocoder } = useDoxaSearch({
   dataStore,
   dataSourceId: props.dataSourceId || undefined,
-  getActiveFilter
+  getActiveFilter,
+  // Read live so a tab switch re-orders results without rebuilding the geocoder.
+  getActiveContext: () => props.activeContext || null
 })
 
 // Exposed so a parent can call geocoder.value.query('...') or add custom filters
@@ -254,12 +304,32 @@ onMounted(() => {
     // Section headers are non-selectable visual dividers — swallow the event.
     if (f.place_type?.includes('doxa-section-header')) return
 
-    // "All DOXA Data" result: deselect the active legend selection so the full
-    // pin set shows alongside the geocoder result (QA R1 A2 Option B).
+    // A chosen search result must not stay hidden behind a still-active legend
+    // filter — the filter and result intersect to zero pins (the blank-map bug,
+    // JD 2026-04-27). Clear every legend selection that has NO "within selection"
+    // UX: region, resource, affinity-bloc, dialect (mapStore) + prayer /
+    // engagement / adoption / religion (uiStore). Map selections are mutually
+    // exclusive, so assign state directly — the select*(null) actions cross-clear
+    // family/language, which would defeat the two-section UX handled below.
+    if (mapStore) {
+      mapStore.selectedRegion        = null
+      mapStore.selectedResource      = null
+      mapStore.selectedAffinityBlock = null
+      mapStore.selectedDialect       = null
+    }
+    if (uiStore) {
+      uiStore.setPrayerFilter?.(null)
+      uiStore.setEngagementFilter?.(null)
+      uiStore.setAdoptionFilter?.(null)
+      uiStore.setReligionFilter?.(null)
+    }
+
+    // Family / language DO have a two-section UX: a "Within [selection]" result
+    // keeps the filter, an "All DOXA Data" result (tagged _allDataSection) clears
+    // it (QA R1 A2 Option B). Only clear them in the latter case.
     if (f.properties?._allDataSection && mapStore) {
-      mapStore.selectFamily?.(null)
-      mapStore.selectLanguage?.(null)
-      mapStore.selectDialect?.(null)
+      mapStore.selectedFamily   = null
+      mapStore.selectedLanguage = null
     }
 
     emit('result', e)
@@ -273,6 +343,7 @@ onMounted(() => {
       })
     } else if (
       f.place_type?.includes('doxa-country')         ||
+      f.place_type?.includes('doxa-region')          ||
       f.place_type?.includes('doxa-language-family') ||
       f.place_type?.includes('doxa-language')        ||
       f.place_type?.includes('doxa-dialect')         ||

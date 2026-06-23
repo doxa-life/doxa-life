@@ -4,6 +4,7 @@
 
 // Import Vue functions from NPM package
 import { ref, inject } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 /**
  * useMapEvents composable - manages Mapbox layer event handlers
@@ -29,6 +30,15 @@ export function useMapEvents(options = {}) {
     // Using inject() here (synchronously during setup) guarantees isolation
     // when multiple map elements share a page.
     const uiStore = inject('uiStore');
+
+    // ── i18n ─────────────────────────────────────────────────────────────────
+    // Locale parity (feedback #8 /fr/research): the country-click detail popup
+    // (WAGF Region / Block / Country / UUPG count) was hardcoded English, so on
+    // /fr the country geography click rendered an all-English card. Route the
+    // labels through i18n so every locale behaves identically. Missing-key
+    // behavior falls back to English (see src/i18n/index.js), so locales without
+    // a `popup` catalog keep the prior English text rather than breaking.
+    const { t, locale } = useI18n();
 
     // Track registered event handlers for cleanup
     const registeredHandlers = ref([]);
@@ -156,7 +166,12 @@ export function useMapEvents(options = {}) {
      */
     function generateRegionPopupContent(tileProps) {
         const iso3 = tileProps.iso_3166_1_alpha_3 || ''
-        const countryName = tileProps.name_en || tileProps.name || iso3
+        // Prefer the active locale's tile name field when present, then the
+        // canonical English name, then the bare name, then the ISO code. The
+        // country-boundaries tileset may not carry a per-locale name for every
+        // country, so the coalesce keeps the popup populated in every locale.
+        const localeName = tileProps['name_' + (locale?.value || 'en')]
+        const countryName = localeName || tileProps.name_en || tileProps.name || iso3
         const pgs = getNormalizedPeopleGroups()
         // Match by countryIso (pray-tools) OR country (doxa-api uses `country` for ISO alpha-3)
         const iso3Upper = iso3.toUpperCase()
@@ -174,16 +189,16 @@ export function useMapEvents(options = {}) {
                     ${countryName}
                 </h3>
                 <p style="margin: 4px 0; font-size: 14px;">
-                    <strong>WAGF Region:</strong> ${wagfRegion}
+                    <strong>${t('popup.country.wagfRegion')}:</strong> ${wagfRegion}
                 </p>
                 <p style="margin: 4px 0; font-size: 14px;">
-                    <strong>WAGF Block:</strong> ${wagfBlock}
+                    <strong>${t('popup.country.wagfBlock')}:</strong> ${wagfBlock}
                 </p>
                 <p style="margin: 4px 0; font-size: 14px;">
-                    <strong>Country:</strong> ${countryName} (${iso3})
+                    <strong>${t('popup.country.country')}:</strong> ${countryName} (${iso3})
                 </p>
                 <p style="margin: 4px 0; font-size: 14px;">
-                    <strong>UUPG Count:</strong> ${uupgCount}
+                    <strong>${t('popup.country.uupgCount')}:</strong> ${uupgCount}
                 </p>
             </div>
         `;

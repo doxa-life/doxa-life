@@ -101,6 +101,7 @@ export function applyColor() {
 export const buildColorExpression = applyColor
 
 export default {
+  name:        'Religion',
   propertyKey: PROPERTY_KEY,
   palette:     PALETTE,
   families:    RELIGION_FAMILIES,

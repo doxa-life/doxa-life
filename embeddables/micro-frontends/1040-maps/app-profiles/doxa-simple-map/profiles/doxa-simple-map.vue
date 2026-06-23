@@ -26,6 +26,7 @@ import SemanticTreeLegend from '@map/components/SemanticTreeLegend.vue'
 import { createPplrInstance, provideInstance } from '@map/composables/usePplrInstance.js'
 import { useLegendData as useFlatLegendData } from '@map/composables/useLegendData.js'
 import { useMapFly } from '@map/composables/useMapFly.js'
+import { useCountryOutline, resolveCountryIso } from '@map/composables/useCountryOutline.js'
 import SideMenuDrawer    from '@map/components/SideMenuDrawer.vue'
 // ─── Map control components ───────────────────────────────────────────────────
 // Each button is imported individually so the profile can compose any subset
@@ -87,14 +88,20 @@ useShadowStyles(`
   /* ── DOXA custom suggestion rows — bold labels + compact meta ─────── */
   /* GeocoderComponent.renderSuggestion() produces <div class="dg-main">
      Name</div><div class="dg-meta"><span class="dg-field">…</span>…</div> */
-  .dg-main { font-weight:500;font-size:13px;color:#222;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-  .dg-main strong { font-weight:700; }
+  .dg-main { font-weight:500;font-size:13px;color:#222;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px; }
+  .dg-main strong { font-weight:700;overflow:hidden;text-overflow:ellipsis; }
   .dg-meta { margin-top:2px;display:flex;flex-wrap:wrap;gap:4px 10px;font-size:11px;color:#555;line-height:1.35; }
   .dg-field strong { font-weight:600;color:#333;margin-right:2px; }
+  /* Round 16 — labeled category tag replacing the old emoji prefixes. */
+  .dg-tag { flex:none;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#3b463d;background:rgba(59,70,61,0.10);border-radius:4px;padding:1px 5px;line-height:1.5;white-space:nowrap; }
+  .dg-agg-label { overflow:hidden;text-overflow:ellipsis; }
+  .dg-count { flex:none;font-size:11px;font-weight:600;color:#73a17f; }
   /* Dark theme variants */
   .dsm-dark .dg-main { color:#F3F3F1; }
   .dsm-dark .dg-meta { color:rgba(243,243,241,0.7); }
   .dsm-dark .dg-field strong { color:#F3F3F1; }
+  .dsm-dark .dg-tag { color:#cfe3d6;background:rgba(115,161,127,0.22); }
+  .dsm-dark .dg-count { color:#9fd0ab; }
   @media(max-width:767px){
     /* Mobile: centered full-width pill, using native Mapbox geocoder height + icons. */
     .mapboxgl-ctrl-top-left { top:10px!important;left:10px!important;right:10px!important;width:calc(100% - 20px)!important;max-width:none!important; }
@@ -392,7 +399,12 @@ const { map, isMapReady, initializeMap, destroy } = useMapInstance({
   center: [20, 10],
   zoom: 1.8,
   pitch:   profileConfig?.value?.pitch   ?? mapDefaults.pitch,
-  bearing: profileConfig?.value?.bearing ?? mapDefaults.bearing
+  bearing: profileConfig?.value?.bearing ?? mapDefaults.bearing,
+  // Per-map zoom constraints (feedback #1 /pray): each map (simple, prayer)
+  // defines its own min/max in profile-config so users don't get lost zooming
+  // too far, and precise locations stay obfuscated. Falls back to mapDefaults.
+  minZoom: profileConfig?.value?.minZoom ?? mapDefaults.minZoom,
+  maxZoom: profileConfig?.value?.maxZoom ?? mapDefaults.maxZoom
 })
 
 const mapData = useMapData({
@@ -418,6 +430,9 @@ const mapFly = useMapFly({
   defaultCenter: [20, 10],
   defaultZoom:   1.8
 })
+
+// ─── Country-outline composable (geoBoundaries ADM0 on country search) ───────
+const countryOutline = useCountryOutline(() => map.value)
 
 // ─── GO marker (selected pin highlight) ───────────────────────────────────────
 const selectedPin = useSelectedPin({ getMap: () => map.value })
@@ -536,6 +551,8 @@ function handleToggleTheme() {
 // the pin-click UX in useMapEvents.attachPinClickHandler.
 function handlePeopleGroupResult(feature) {
   if (!feature || !uiStore) return
+  // A people-group pick is "clicking elsewhere" — drop any country outline.
+  countryOutline.clearCountry()
   uiStore.selectPeopleGroup(feature)
   if (uiStore.isMobile && uiStore.legendState === 'collapsed') {
     uiStore.setLegendState('open')
@@ -560,6 +577,8 @@ function handlePeopleGroupResult(feature) {
 // pin stayed highlighted and all other pins stayed dim + animated indefinitely.
 function handleSearchClear() {
   if (!uiStore) return
+  // Drop the country boundary outline drawn by a country search pick.
+  countryOutline.clearCountry()
   uiStore.selectPeopleGroup(null)   // closes popup + Go-pin highlight (via useSelectedPin watcher)
   try {
     const m = map.value
@@ -586,6 +605,16 @@ function handleAggregateResult(evt) {
   if (!Array.isArray(memberIds) || !memberIds.length) return
 
   const m = map.value
+
+  // Country pick → draw the country boundary OUTLINE (geoBoundaries ADM0) and
+  // fit to its bbox. Any other aggregate kind drops a prior outline so it only
+  // ever shows for the live country selection.
+  if (evt.kind === 'country') {
+    const iso = resolveCountryIso(evt, mapData.normalizedPeopleGroups.value || [])
+    if (iso) countryOutline.showCountry(iso)
+  } else {
+    countryOutline.clearCountry()
+  }
   // Clear any single-pin highlight from a prior people-group search
   if (m.getLayer(ACTIVE_LAYER)) {
     m.setFilter(ACTIVE_LAYER, ['==', 'uniqueId', ''])

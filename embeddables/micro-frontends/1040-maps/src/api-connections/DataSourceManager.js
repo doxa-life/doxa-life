@@ -26,13 +26,18 @@ import sourcesConfig from '../config/sources.json'
 import { getApiBaseUrl } from './apiBaseUrl.js'
 
 export class DataSourceManager {
-    constructor() {
+    constructor(options = {}) {
         this.sourcesConfig = null;
         this.activeSource = null;
         this.rawData = [];
         this.normalizedData = [];
         this.dataByUniqueId = new Map();
         this.baseUrl = (typeof window !== 'undefined' && window.MAP_APP_BASE_URL) || './';
+
+        // Active UI locale (e.g. 'fr'). When set, overrides a rest-api source's
+        // static `queryParams.lang` so the API returns translated field values.
+        // Unset → the source's own `lang` (sources.json defaults it to 'en').
+        this.locale = options.locale || null;
 
         // CACHE: Store normalized data per source to avoid re-parsing on tab switch
         this.cache = new Map();
@@ -245,6 +250,9 @@ export class DataSourceManager {
         const queryParts = [];
         if (fields) queryParts.push(`fields=${fields}`);
         const extraParams = { ...(sourceConfig.queryParams || {}) };
+        // Layer-1 i18n: the active UI locale wins over the source's frozen
+        // `lang` so /fr/research etc. get translated API field values.
+        if (this.locale) extraParams.lang = this.locale;
         for (const [k, v] of Object.entries(extraParams)) {
             queryParts.push(`${k}=${encodeURIComponent(v)}`);
         }

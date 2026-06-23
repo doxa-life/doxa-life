@@ -25,6 +25,10 @@ const props = defineProps({
   hideTabs: { type: Boolean, default: false },
   columnLabel: { type: String, default: '' },
   open: { type: Boolean, default: null },
+  // Per-app-profile feature flag. Off by default so existing profiles are
+  // unchanged; a profile opts in by passing :export-enabled. Gates the
+  // top-right Export affordance (UX scaffold only — no export yet).
+  exportEnabled: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['select', 'update:open'])
@@ -76,6 +80,7 @@ const expandedIds    = ref(new Set())
 const localSelected  = ref(null)
 const panelOpen      = ref(props.open !== null ? props.open : true)
 const showInfoForTab = ref(null)
+const exportMenuOpen = ref(false)  // top-right Export dropdown (scaffold only)
 const sortBy         = ref(null)   // null = default (pop desc), 'count' | 'pop'
 const sortDir        = ref('desc') // 'desc' | 'asc'
 
@@ -254,7 +259,7 @@ const parentBreadcrumb = computed(() => {
   const parent = chain[chain.length - 1]
   const parentDepth = chain.length - 1
   const tabName = tabList.value[parentDepth]?.label || 'Parent'
-  return { node: parent, tabName }
+  return { node: parent, tabName, depth: parentDepth }
 })
 
 // ── Actions ────────────────────────────────────────────────────────────────────
@@ -284,6 +289,34 @@ function toggleExpand(id, e) {
     }
   }
 }
+// Drill UP the tree: re-root the legend on the breadcrumb parent shown in the
+// header (e.g. drilled into "Telugu" on the Language tab → click "Dravidian" →
+// jump to the Lang Family tab with Dravidian selected and the map filtered to
+// the whole family).
+//
+// The active-tab switch MUST happen here. The internal selection watcher that
+// adjusts the tab from sel.depth is guarded out for internally-originated
+// selections (sel.id === _lastInternalId), and the external mapStore→selection
+// bridge also skips re-applying a same-kind+label selection — so neither path
+// moves the tab. We switch it explicitly to the parent's generation depth.
+// Works for any tree tab (language-family / WAGF-regions / affinity) since it
+// reuses the same parentBreadcrumb + selectNode mechanism.
+function upToParent() {
+  const bc = parentBreadcrumb.value
+  if (!bc?.node) return
+  // Switch to the parent's generation tab first so the parent row is visible
+  // and highlighted on its own tab (selectNode highlights by id, and the
+  // parent only appears in that tab's rows). Clear any child-tab expansion so
+  // the parent tab opens clean — mirrors the geocoder-reveal flow's behavior.
+  if (!props.hideTabs && typeof bc.depth === 'number') {
+    activeTab.value = bc.depth
+  }
+  expandedIds.value = new Set()
+  // selectNode toggles off if the same id is already selected; the breadcrumb
+  // parent is never the current selection, so this always selects the parent
+  // and emits @select, which drives the map filter to the parent's scope.
+  selectNode(bc.node)
+}
 function switchTab(idx) {
   if (activeTab.value === idx) {
     showInfoForTab.value = showInfoForTab.value === idx ? null : idx
@@ -306,6 +339,14 @@ function showInfo(idx, e) {
   e?.stopPropagation()
   showInfoForTab.value = showInfoForTab.value === idx ? null : idx
 }
+// Export affordance (UX scaffold only — both menu options are locked/disabled).
+function toggleExportMenu(e) {
+  e?.stopPropagation()
+  exportMenuOpen.value = !exportMenuOpen.value
+}
+// The Export button only exists while a row is selected; if the selection is
+// cleared (deselect / tab switch / nodes change) the menu must not linger.
+watch(selectedId, id => { if (!id) exportMenuOpen.value = false })
 
 // ── Formatters ─────────────────────────────────────────────────────────────────
 function fmtPop(n) {
@@ -373,6 +414,39 @@ useShadowStyles(`
   font: 600 12px system-ui; color: #e6edf3;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+/* Clickable header breadcrumb — drill UP the tree onto the parent. Styled to
+   read as part of the titlebar (transparent, inherits header layout) but with
+   hover/focus affordances that mark it interactive. Accent uses the legend's
+   green family (#73A17F); no brown tones. */
+.stl-tb-up {
+  flex: 1; min-width: 0;
+  display: inline-flex; align-items: center; gap: 6px;
+  background: transparent; border: 1px solid transparent; border-radius: 6px;
+  margin: -2px -4px; padding: 2px 6px 2px 4px;
+  cursor: pointer; text-align: left;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.stl-tb-up:hover { background: rgba(115,161,127,0.10); border-color: rgba(115,161,127,0.35); }
+.stl-tb-up:focus-visible {
+  outline: none;
+  border-color: #73A17F;
+  box-shadow: 0 0 0 2px rgba(115,161,127,0.30);
+}
+.stl-tb-up .stl-tb-text {
+  flex: 1; min-width: 0;
+  font: 600 12px system-ui; color: #e6edf3;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.stl-tb-up:hover .stl-tb-text { color: #fff; }
+.stl-tb-up-icon { color: #73A17F; flex-shrink: 0; }
+.stl-panel[data-theme="light"] .stl-tb-up:hover {
+  background: rgba(59,70,61,0.08); border-color: rgba(59,70,61,0.3);
+}
+.stl-panel[data-theme="light"] .stl-tb-up:focus-visible {
+  border-color: #3b463d; box-shadow: 0 0 0 2px rgba(59,70,61,0.25);
+}
+.stl-panel[data-theme="light"] .stl-tb-up .stl-tb-text { color: #1f2328; }
+.stl-panel[data-theme="light"] .stl-tb-up-icon { color: #3b463d; }
 .stl-tabs-wrap { flex-shrink: 0; }
 .stl-tabs {
   display: flex; flex-wrap: nowrap; gap: 4px;
@@ -690,6 +764,59 @@ useShadowStyles(`
 .stl-reopen[data-theme="light"] .stl-reopen-caret { color: #57606a; }
 .stl-panel[data-theme="light"] .stl-x-chip { color: #57606a; border-color: rgba(208,215,222,0.6); }
 .stl-panel[data-theme="light"] .stl-x-chip:hover { color: #1f2328; background: rgba(208,215,222,0.3); border-color: #afb8c1; }
+
+/* ── Export affordance (top-right of titlebar) ──────────────────────────────
+   margin-left:auto pins it to the right edge whether the titlebar shows the
+   plain title (flex-shrink:0) or the flex:1 breadcrumb button. */
+.stl-export { margin-left: auto; position: relative; flex-shrink: 0; }
+.stl-export-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(110,118,129,0.15); border: 1px solid #30363d; border-radius: 6px;
+  color: #c9d1d9; cursor: pointer;
+  height: 22px; padding: 0 8px;
+  font: 600 10px ui-monospace, monospace; text-transform: uppercase; letter-spacing: 0.05em;
+  transition: color 0.12s, background 0.12s, border-color 0.12s;
+}
+.stl-export-btn:hover { color: #fff; background: rgba(59,70,61,0.25); border-color: #73A17F; }
+.stl-export-btn.open { color: #fff; background: #3b463d; border-color: #73A17F; box-shadow: 0 0 0 2px rgba(115,161,127,0.22); }
+.stl-export-btn:focus-visible { outline: none; border-color: #73A17F; box-shadow: 0 0 0 2px rgba(115,161,127,0.3); }
+.stl-export-label { line-height: 1; }
+/* Backdrop sits below the menu, above the panel — captures the next click. */
+.stl-export-backdrop { position: fixed; inset: 0; z-index: 9; }
+.stl-export-menu {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 10;
+  min-width: 168px;
+  display: flex; flex-direction: column;
+  background: #0d1117; border: 1px solid #30363d; border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  padding: 4px; overflow: hidden;
+}
+.stl-export-item {
+  display: flex; align-items: center; gap: 8px;
+  background: transparent; border: none; border-radius: 5px;
+  padding: 7px 8px; width: 100%; text-align: left;
+  color: #6e7681; cursor: not-allowed;
+  font: 600 11px system-ui, sans-serif;
+}
+.stl-export-item[disabled] { opacity: 0.55; }
+.stl-export-lock { color: #6e7681; flex-shrink: 0; }
+.stl-export-item-label { flex: 1; min-width: 0; }
+.stl-export-soon {
+  flex-shrink: 0;
+  font: 700 8px ui-monospace, monospace; text-transform: uppercase; letter-spacing: 0.06em;
+  color: #6e7681; background: rgba(110,118,129,0.15);
+  border-radius: 4px; padding: 2px 5px;
+}
+/* Light-theme overrides */
+.stl-panel[data-theme="light"] .stl-export-btn {
+  background: rgba(208,215,222,0.4); border-color: #d0d7de; color: #57606a;
+}
+.stl-panel[data-theme="light"] .stl-export-btn:hover { color: #3b463d; background: rgba(59,70,61,0.12); border-color: #3b463d; }
+.stl-panel[data-theme="light"] .stl-export-btn.open { color: #fff; background: #3b463d; border-color: #3b463d; }
+.stl-panel[data-theme="light"] .stl-export-menu { background: #ffffff; border-color: #d0d7de; box-shadow: 0 8px 24px rgba(31,35,40,0.18); }
+.stl-panel[data-theme="light"] .stl-export-item { color: #57606a; }
+.stl-panel[data-theme="light"] .stl-export-lock { color: #57606a; }
+.stl-panel[data-theme="light"] .stl-export-soon { color: #57606a; background: rgba(208,215,222,0.5); }
 `, 'semantic-tree-legend')
 </script>
 
@@ -716,13 +843,70 @@ useShadowStyles(`
         </button>
         <template v-if="parentBreadcrumb && selectedNode">
           <span class="stl-tb-eyebrow">{{ parentBreadcrumb.tabName }}</span>
-          <span v-if="parentBreadcrumb.node.color" class="stl-tb-dot"
-            :style="{ background: parentBreadcrumb.node.color }"></span>
-          <span class="stl-tb-text" :title="parentBreadcrumb.node.label">{{ parentBreadcrumb.node.label }}</span>
+          <!-- Clickable breadcrumb: drills UP the tree onto the parent
+               family/group. Keyboard-focusable button with aria-label; Enter/
+               Space activate natively. -->
+          <button type="button" class="stl-tb-up"
+            :title="`Go up to ${parentBreadcrumb.node.label}`"
+            :aria-label="`Go up to ${parentBreadcrumb.tabName} ${parentBreadcrumb.node.label}`"
+            @click.stop="upToParent">
+            <svg class="stl-tb-up-icon" width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M3 7.5L6 4.5L9 7.5" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span v-if="parentBreadcrumb.node.color" class="stl-tb-dot"
+              :style="{ background: parentBreadcrumb.node.color }"></span>
+            <span class="stl-tb-text" :title="parentBreadcrumb.node.label">{{ parentBreadcrumb.node.label }}</span>
+          </button>
         </template>
         <template v-else>
           <span class="stl-tb-title">{{ title }}</span>
         </template>
+
+        <!-- Export affordance — top-right of the titlebar. Gated by the
+             per-app-profile feature flag AND a current row selection. UX
+             scaffold only: the menu's two options are locked "coming soon"
+             stubs with no behaviour wired yet. -->
+        <div v-if="exportEnabled && selectedNode" class="stl-export">
+          <button type="button" class="stl-export-btn"
+            :class="{ open: exportMenuOpen }"
+            :aria-expanded="exportMenuOpen ? 'true' : 'false'"
+            aria-haspopup="menu"
+            title="Export selection"
+            aria-label="Export selection"
+            @click.stop="toggleExportMenu">
+            <svg width="11" height="11" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M7 1.5V9M7 1.5L4.2 4.3M7 1.5L9.8 4.3" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 9.5V11.5C2 12.05 2.45 12.5 3 12.5H11C11.55 12.5 12 12.05 12 11.5V9.5"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span class="stl-export-label">Export</span>
+          </button>
+
+          <template v-if="exportMenuOpen">
+            <!-- Click-away backdrop closes the menu without a global listener. -->
+            <div class="stl-export-backdrop" @click.stop="exportMenuOpen = false"></div>
+            <div class="stl-export-menu" role="menu">
+              <button type="button" class="stl-export-item" role="menuitem" disabled aria-disabled="true">
+                <svg class="stl-export-lock" width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <rect x="2.5" y="5.5" width="7" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
+                  <path d="M4 5.5V4a2 2 0 1 1 4 0v1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+                <span class="stl-export-item-label">Poster</span>
+                <span class="stl-export-soon">coming soon</span>
+              </button>
+              <button type="button" class="stl-export-item" role="menuitem" disabled aria-disabled="true">
+                <svg class="stl-export-lock" width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <rect x="2.5" y="5.5" width="7" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
+                  <path d="M4 5.5V4a2 2 0 1 1 4 0v1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+                <span class="stl-export-item-label">Packet</span>
+                <span class="stl-export-soon">coming soon</span>
+              </button>
+            </div>
+          </template>
+        </div>
       </div>
 
       <div v-if="!hideTabs" class="stl-tabs-wrap">

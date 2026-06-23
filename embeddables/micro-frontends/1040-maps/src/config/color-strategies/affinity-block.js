@@ -7,7 +7,7 @@
  * ARCHITECTURE DECISION:
  * - Use ROP1 codes (A001, A002, etc.) as the PRIMARY KEY
  * - Store mappings from ROP1 → Name and ROP1 → Color
- * - Avoids issues with typos in affinity block names
+ * - Avoids issues with typos in affinity bloc names
  *
  * Sourced from doxa-research-mfe (research wins on drift).
  */

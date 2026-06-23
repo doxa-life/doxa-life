@@ -51,3 +51,6 @@ package-lock.json
 plans
 .claude
 .vscode
+
+# qa-cycle scaffolding is local-only dev tooling — never ship into production
+**/_qa-cycle/

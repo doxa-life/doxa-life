@@ -41,6 +41,10 @@ const homeMapConfig = JSON.stringify({
   profile: 'doxa-simple-map',
   dataSource: 'pray-tools',
   tk: mapboxToken,
+  // Per-map zoom (feedback #1 /pray): cap how far the home map zooms so users
+  // don't get lost and people-group locations stay obfuscated (regional view).
+  minZoom: 1.0,
+  maxZoom: 14,
   tabs: [{ id: 'engagement', colorStrategy: 'engagement', legend: 'engagement', popup: 'engagement' }]
 })
 

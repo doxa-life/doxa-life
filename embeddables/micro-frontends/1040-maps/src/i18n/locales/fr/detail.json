@@ -4,7 +4,8 @@
     "population": "Population :",
     "language": "Langue :",
     "religion": "Religion :",
-    "languageFamily": "Famille de langues :"
+    "languageFamily": "Famille de langues :",
+    "peopleCommitted": "Engagés à prier :"
   },
   "messages": {
     "noDescription": "Aucune description disponible."

@@ -4,8 +4,9 @@ interface Props {
   profileConfig: string
   /** Which IIFE bundle to load. Defaults to 'simple-map' to preserve
    *  existing call-sites (home, pray, adopt). Pass 'research-map' on the
-   *  research page to load the 5-tab research-mfe bundle instead. */
-  bundle?: 'simple-map' | 'research-map'
+   *  research page to load the 5-tab research-mfe bundle, or 'countries-map'
+   *  on the /countries index page to load the country-first bundle. */
+  bundle?: 'simple-map' | 'research-map' | 'countries-map'
 }
 
 const props = withDefaults(defineProps<Props>(), { bundle: 'simple-map' })
@@ -18,7 +19,12 @@ useDoxaMap(props.bundle)
  * overwritten by the next one. Using a distinct tag per bundle eliminates
  * the "Profile not found" error that occurred when /research had loaded
  * its IIFE first and then the user navigated to /, /pray, or /adopt. */
-const tagName = props.bundle === 'research-map' ? 'doxa-research-map' : 'doxa-map'
+const TAG_BY_BUNDLE = {
+  'simple-map': 'doxa-map',
+  'research-map': 'doxa-research-map',
+  'countries-map': 'doxa-countries-map'
+} as const
+const tagName = TAG_BY_BUNDLE[props.bundle]
 const isSimple = props.bundle === 'simple-map'
 </script>
 
@@ -48,7 +54,8 @@ const isSimple = props.bundle === 'simple-map'
 }
 
 .doxa-map-slot :deep(doxa-map),
-.doxa-map-slot :deep(doxa-research-map) {
+.doxa-map-slot :deep(doxa-research-map),
+.doxa-map-slot :deep(doxa-countries-map) {
   display: block;
   position: absolute;
   inset: 0;
@@ -90,7 +97,9 @@ const isSimple = props.bundle === 'simple-map'
 .doxa-map-slot :deep(doxa-map:fullscreen),
 .doxa-map-slot :deep(doxa-map:-webkit-full-screen),
 .doxa-map-slot :deep(doxa-research-map:fullscreen),
-.doxa-map-slot :deep(doxa-research-map:-webkit-full-screen) {
+.doxa-map-slot :deep(doxa-research-map:-webkit-full-screen),
+.doxa-map-slot :deep(doxa-countries-map:fullscreen),
+.doxa-map-slot :deep(doxa-countries-map:-webkit-full-screen) {
   position: fixed;
   inset: 0;
   width: 100vw;

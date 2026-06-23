@@ -24,6 +24,12 @@
     a.bundle .name { font-size: 16px; font-weight: 600; color: #e5e7eb; }
     a.bundle .desc { font-size: 13px; color: #9ca3af; margin-top: 4px; }
     .footer { margin-top: 32px; font-size: 12px; color: #6b7280; line-height: 1.6; }
+    .provenance {
+      margin-top: 24px; padding: 14px 16px; border-radius: 10px;
+      background: #0f1520; border: 1px solid #1f2937;
+      font-size: 12px; color: #9ca3af; line-height: 1.6;
+    }
+    .provenance strong { color: #d1d5db; }
     code { background: #1f2937; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #d1d5db; }
   </style>
 </head>
@@ -41,11 +47,22 @@
         <div class="name">doxa-research-map</div>
         <div class="desc">Nested profile · prayer / adoption / engagement / doxa-regions / languages / affinity-blocks</div>
       </a>
+      <a class="bundle" href="/app-profiles/my-upg-100-list/">
+        <div class="name">my-upg-100-list</div>
+        <div class="desc">Research preview · 13 geographic prayer lists + 2 deaf lists · Regions tab cloned from research-map + admin-2 unlock for India + China</div>
+      </a>
     </div>
 
     <div class="footer">
       Build outputs land at <code>app/&lt;bundle&gt;.js</code> (CSS inlined). Production embed:<br>
       <code>&lt;script src="…/&lt;bundle&gt;.js"&gt;&lt;/script&gt;</code> + <code>&lt;doxa-map profile-config='…'&gt;&lt;/doxa-map&gt;</code>.
+    </div>
+
+    <div class="provenance">
+      <strong>Built using the 1040 Maps Forge template (Apache-2.0).</strong>
+      Your maps are private, custom and uniquely yours; the shared template
+      <strong>library</strong> is Apache. Your maps live in the
+      <code>app-profiles/</code> folder.
     </div>
   </div>
 </body>

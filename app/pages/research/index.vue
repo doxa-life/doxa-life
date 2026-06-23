@@ -28,7 +28,18 @@ const researchProfileConfig = computed(() => JSON.stringify({
   profile:    'research-map',
   tk:         (runtimeConfig.public as { mapboxToken?: string }).mapboxToken || '',
   dataSource: 'pray-tools',
-  instanceId: 'research-page'
+  instanceId: 'research-page',
+  // Active Nuxt locale → drives the map bundle's UI i18n AND its API `lang`
+  // param so /fr/research, /es/research etc. render French/Spanish chrome and
+  // data, not English. See research-map.vue (activeLocale) + DataSourceManager.
+  locale:     locale.value,
+  // Per-map zoom-OUT floor only (feedback #1 /pray): pin a lower bound so the
+  // map can't zoom out past world context. The zoom-IN cap is intentionally
+  // NOT set here — the research map must reach street level (RESEARCH_MAX_ZOOM
+  // = 18 in research-map.vue) so users can zoom deep into a dense cluster and
+  // click *between* overlapping pins (Driver directive 2026-06-22). Do NOT
+  // re-add a maxZoom here; it would override the 18 cap and re-block zoom-in.
+  minZoom:    0.5
 }))
 
 // Feedback widget — mirrors the pray.vue pattern (qa.md R5 status flag).

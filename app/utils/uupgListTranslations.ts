@@ -21,7 +21,7 @@ export function buildUupgListTranslations(t: (key: string) => string) {
     alternate_name: t('Alternate Names'),
     rop1: t('People Group'),
     wagf_region: t('WAGF Region'),
-    wagf_block: t('WAGF Block'),
+    wagf_block: t('WAGF Bloc'),
     show_filters: t('Show Filters'),
     hide_filters: t('Hide Filters'),
     clear_all: t('Clear All'),

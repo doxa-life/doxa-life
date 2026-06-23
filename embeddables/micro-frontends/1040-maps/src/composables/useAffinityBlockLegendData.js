@@ -5,7 +5,7 @@
  * highlight) so research-map.vue can swap data sources by activeLegendType while
  * reusing the SAME <SemanticTreeLegend> component (no duplicate legend).
  *
- * Tree shape: 4 tiers — Affinity Bloc → Cluster → People Group → People Group in Country.
+ * Tree shape: 4 tiers — Affinity Block → Cluster → People Group → People Group in Country.
  *
  *   { id: 'bloc:A008',                                        ← rop1
  *     label: 'Malay Peoples', color, count, pop, filter,

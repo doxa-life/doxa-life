@@ -97,7 +97,8 @@ export {
   affinityBlock,
   languageFamily,
   doxaRegion,
-  resource
+  resource,
+  religion
 }
 
 // Back-compat: name matches the monolithic colorStrategies.js export.

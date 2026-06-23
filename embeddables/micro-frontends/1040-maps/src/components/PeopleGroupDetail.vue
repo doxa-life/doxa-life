@@ -69,6 +69,13 @@
           <span class="stat-label">{{ t('detail.labels.religion') }}</span>
           <span class="stat-value">{{ religion || '—' }}</span>
         </div>
+        <!-- Prayer commitments — Feedback #11: show how many people have
+             committed to pray for this group. Live pray-tools count; never
+             stubbed. Highlighted so the relational invitation stands out. -->
+        <div class="stat-item stat-committed">
+          <span class="stat-label">{{ t('detail.labels.peopleCommitted') }}</span>
+          <span class="stat-value">{{ formattedCommitted }}</span>
+        </div>
       </div>
 
       <!-- Image Display: desktop always shows; mobile only at 90% (fullyOpen). At mobile 40%, parent renders floating image above drawer -->
@@ -132,6 +139,9 @@ useShadowStyles(`
 .dark-mode .stat-label{color:#9ca3af;}
 .stat-value{color:#333;font-weight:600;text-align:right;}
 .dark-mode .stat-value{color:#e5e7eb;}
+/* Prayer-commitment row — accent the count so the relational invitation reads. */
+.stat-committed .stat-value{color:#73A17F;}
+.dark-mode .stat-committed .stat-value{color:#92b195;}
 /* Name lead — rendered when the parent legend hides its own header
    (hideHeader=true). Stands in for the old legend-header title bar. */
 .pg-name-lead{margin:0 0 8px 0;font-size:16px;font-weight:700;color:#333;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;user-select:text;-webkit-user-select:text;cursor:text;}
@@ -278,6 +288,39 @@ const language = computed(() => {
 })
 const languageFamily = computed(() => properties.value.languageFamily || properties.value._raw?.LanguageFamily || 'Unknown');
 const population = computed(() => properties.value.population || properties.value._raw?.Population || 0);
+
+// Prayer count — how many people are currently praying for this group.
+// MUST match the map's prayer heatmap, else the popup shows 0 while the
+// heatmap shows activity (Feedback #7/#11).
+//
+// Root cause of the "popup 0 vs map active" bug: the clicked GeoJSON feature
+// carries `properties.peoplePraying` frozen at INITIAL LOAD (useMapLayers.js
+// coerces missing → 0). Polling refreshes the live count ONLY via Mapbox
+// setFeatureState() — which recolors the heatmap (`['feature-state','peoplePraying']`)
+// but NEVER writes back to feature.properties. So the popup's bulk property is
+// a stale 0 while the map shows real activity.
+//
+// Fix: prefer the LIVE value from the real campaigns-server endpoint
+// (GET /api/people-groups/detail/{slug} → `people_praying`), which reads the
+// same people_groups.people_praying column the poll refreshes, so popup == map.
+// The stale bulk property and _raw are fallbacks for the pre-fetch instant
+// (detailData loads async after click). Never stub — always the live count.
+// 0 is meaningful ("be the first to pray"); a truly absent field → em-dash.
+const peoplePraying = computed(() => {
+  const candidates = [
+    detailData.value?.people_praying,
+    properties.value.peoplePraying,
+    properties.value._raw?.people_praying,
+  ];
+  for (const c of candidates) {
+    if (c !== undefined && c !== null && c !== '') return Number(c);
+  }
+  return null;
+});
+
+const formattedCommitted = computed(() =>
+  peoplePraying.value === null ? '—' : peoplePraying.value.toLocaleString()
+);
 // Religion — prefer the unified decoded label; DataSourceManager handles
 // pray-tools {value,label} and UUPG raw-code records transparently.
 const religion = computed(() =>

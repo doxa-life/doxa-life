@@ -46,6 +46,10 @@ const props = withDefaults(defineProps<{
   useHighlightedUUPGs?: boolean
   randomizeList?: boolean
   hideSeeAllLink?: boolean
+  /** When set (ISO-3 code), the list is locked to this country: the country
+   *  filter is pre-applied and its dropdown/chip hidden. Used by the per-country
+   *  pages (/countries/[country]). Empty string = unlocked (default). */
+  lockCountryCode?: string
 }>(), {
   t: () => ({}),
   selectUrl: '',
@@ -58,7 +62,8 @@ const props = withDefaults(defineProps<{
   useSelectCard: false,
   useHighlightedUUPGs: false,
   randomizeList: false,
-  hideSeeAllLink: false
+  hideSeeAllLink: false,
+  lockCountryCode: ''
 })
 
 const config = useRuntimeConfig()
@@ -143,10 +148,21 @@ function removeFilter(name: string) {
 }
 
 function clearAllFilters() {
-  activeFilters.value = {}
+  // When the list is locked to a country, keep that filter applied.
+  activeFilters.value = props.lockCountryCode && activeFilters.value.country_code
+    ? { country_code: activeFilters.value.country_code }
+    : {}
   page.value = 1
   filterUUPGs()
 }
+
+// Active filters the user can see/remove — excludes the country filter when the
+// list is locked to a country (that one is fixed and has no chip/dropdown).
+const visibleFilterCount = computed(() =>
+  Object.keys(activeFilters.value).filter(
+    name => !(props.lockCountryCode && name === 'country_code')
+  ).length
+)
 
 function toggleAdopted() {
   if (activeFilters.value.adopted) return removeFilter('adopted')
@@ -363,6 +379,13 @@ async function getUUPGs() {
     total.value = data.total
     uupgs.value = data.posts
     extractFilterOptions()
+    if (props.lockCountryCode) {
+      const match = uupgs.value.find(u => u.country_code?.value === props.lockCountryCode)
+      activeFilters.value = {
+        ...activeFilters.value,
+        country_code: { value: props.lockCountryCode, label: match?.country_code?.label || props.lockCountryCode }
+      }
+    }
     if (props.randomizeList) {
       uupgs.value = uupgs.value.sort(() => Math.random() - 0.5)
     }
@@ -464,7 +487,7 @@ const showMore = computed(() => hasMore())
             @filter-clear="onFilterClear"
           />
           <FilterDropdown
-            :label="t.wagf_block || 'WAGF Block'"
+            :label="t.wagf_block || 'WAGF Bloc'"
             name="wagf_block"
             :options="filterOptions.wagf_block || []"
             :value="activeFilters.wagf_block?.value ?? ''"
@@ -473,6 +496,7 @@ const showMore = computed(() => hasMore())
             @filter-clear="onFilterClear"
           />
           <FilterDropdown
+            v-if="!lockCountryCode"
             :label="t.country || 'Country'"
             name="country_code"
             :options="filterOptions.country_code || []"
@@ -522,11 +546,13 @@ const showMore = computed(() => hasMore())
         </div>
       </template>
 
-      <div v-if="!useSelectCard && Object.keys(activeFilters).length > 0" class="filters__active">
-        <span v-for="(filter, name) in activeFilters" :key="name" class="filter-chip">
-          {{ filter.label }}
-          <button class="filter-chip__remove" type="button" @click="removeFilter(String(name))">&times;</button>
-        </span>
+      <div v-if="!useSelectCard && visibleFilterCount > 0" class="filters__active">
+        <template v-for="(filter, name) in activeFilters" :key="name">
+          <span v-if="!(lockCountryCode && name === 'country_code')" class="filter-chip">
+            {{ filter.label }}
+            <button class="filter-chip__remove" type="button" @click="removeFilter(String(name))">&times;</button>
+          </span>
+        </template>
         <button class="filters__clear-all | button compact link" type="button" @click="clearAllFilters">
           {{ t.clear_all || 'Clear All' }}
         </button>

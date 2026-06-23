@@ -12,8 +12,9 @@ const MAPBOX_GEOCODER_JS = 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-g
 // Map of bundle keys → /public/js URLs. The IIFE bundles all register the
 // same `<doxa-map>` custom element, so only one bundle should load per page.
 const BUNDLES = {
-  'simple-map':   '/js/doxa-simple-map.js',
-  'research-map': '/js/doxa-research-map.js'
+  'simple-map':    '/js/doxa-simple-map.js',
+  'research-map':  '/js/doxa-research-map.js',
+  'countries-map': '/js/doxa-countries-map.js'
 } as const
 type BundleKey = keyof typeof BUNDLES
 

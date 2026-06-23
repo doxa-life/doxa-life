@@ -276,7 +276,7 @@ export function useMapLayers(options = {}) {
      * vector tileset (mapbox.country-boundaries-v1). No external fetch —
      * same CDN as the base map, vector tiles load only the visible viewport.
      *
-     * @param {Object} regionsData - { isoToRegion: { 'AF': 'Asia', … } }
+     * @param {Object} regionsData - { isoToRegion: { 'AFG': 'asia', … } } (region SLUGs)
      * @param {string} colorScheme - 'doxa-regions' | 'none'
      */
     function addRegionsLayer(regionsData, colorScheme = 'doxa-regions') {
@@ -288,14 +288,17 @@ export function useMapLayers(options = {}) {
         if (map.getLayer('regions-border')) map.removeLayer('regions-border');
         if (map.getSource('regions'))       map.removeSource('regions');
 
+        // Keyed on the STABLE region slug (wagf_region.value) — loadRegionsData
+        // builds isoToRegion as ISO → slug. A label-keyed palette greys out every
+        // region except "Asia" once the API returns localized labels (locale bug).
         const REGION_COLORS = {
-            'Africa':                                 '#e74c3c',
-            'Asia':                                   '#3498db',
-            'Europe':                                 '#2ecc71',
-            'Latin America & Caribbean':              '#f39c12',
-            'Middle East':                            '#9b59b6',
-            'North America & Non-Spanish Caribbean':  '#1abc9c',
-            'Oceania':                                '#e67e22',
+            'africa':                                 '#e74c3c',
+            'asia':                                   '#3498db',
+            'europe':                                 '#2ecc71',
+            'latin_america_&_caribbean':              '#f39c12',
+            'middle_east':                            '#9b59b6',
+            'north_america_&_non-spanish_caribbean':  '#1abc9c',
+            'oceania':                                '#e67e22',
         };
         const DEFAULT_COLOR = '#cccccc';
 
@@ -305,10 +308,10 @@ export function useMapLayers(options = {}) {
         // (e.g. 'MYS', 'SDN') so we match on the alpha-3 property to avoid a lookup table.
         const isoToRegion = (regionsData && regionsData.isoToRegion) ? regionsData.isoToRegion : {};
         const matchPairs = [];
-        // Build regionIsoMap: region label → array of ISO alpha-3 codes for that region.
+        // Build regionIsoMap: region slug → array of ISO alpha-3 codes for that region.
         const _regionIsoMap = {};
         for (const [iso, region] of Object.entries(isoToRegion)) {
-            const color = REGION_COLORS[region];
+            const color = REGION_COLORS[String(region).toLowerCase()];
             if (color) matchPairs.push(iso, color);
             if (!_regionIsoMap[region]) _regionIsoMap[region] = [];
             _regionIsoMap[region].push(iso);

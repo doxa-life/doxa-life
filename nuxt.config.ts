@@ -73,6 +73,7 @@ export default defineNuxtConfig({
 
   modules: [
     './modules/migrations',
+    './modules/country-routes',
     '@nuxt/eslint',
     '@nuxt/ui',
     '@nuxtjs/i18n',
