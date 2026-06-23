@@ -54,3 +54,11 @@ plans
 
 # qa-cycle scaffolding is local-only dev tooling — never ship into production
 **/_qa-cycle/
+
+# C3MOS builder scratch — never commit to public remotes
+ccm.db
+.lk10x/
+*-output.md
+BUILDER-NOTE-*.md
+AGENTS.md
+.mcp.json
