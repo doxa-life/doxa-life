@@ -370,7 +370,7 @@ watch(selectedId, async id => {
   const tryScroll = (attempt = 0) => {
     const row = container.querySelector(`[data-stl-node-id="${CSS.escape(String(id))}"]`)
     if (row) {
-      container.scrollTop = row.offsetTop - 8
+      container.scrollTop = row.offsetTop - container.clientHeight / 2 + row.offsetHeight / 2
       return
     }
     if (attempt < 2) requestAnimationFrame(() => tryScroll(attempt + 1))

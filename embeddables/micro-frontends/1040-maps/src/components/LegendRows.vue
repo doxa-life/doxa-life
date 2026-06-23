@@ -9,7 +9,7 @@
          carets on tree rows). A matching trailing column on the right of
          the same width provides symmetric right padding without the card
          needing its own left/right padding. See docs/legend-spec.md. -->
-    <div class="lrg-items" :style="{ '--lrg-grid-cols': gridCols }">
+    <div class="lrg-items" :style="{ '--lrg-grid-cols': gridCols }" ref="itemsContainer">
 
       <!-- Title row — first row of the table. Caret slot in col 1, title in
            col 2, column headers auto-placed into remaining tracks. -->
@@ -23,7 +23,7 @@
            wrappers are present for LegendMobile.vue CSS compatibility; on
            desktop they are display:contents so the subgrid is flat. -->
       <template v-for="item in items" :key="item.key">
-        <div class="lrg-row">
+        <div class="lrg-row" :data-lrg-filter-key="item.filterKey">
           <button
             v-if="item.children && item.children.length && !disableCollapse"
             class="lrg-caret"
@@ -56,7 +56,7 @@
 
         <!-- Children rows -->
         <template v-if="item.children && item.children.length && !collapsed[item.key]">
-          <div v-for="child in item.children" :key="child.key" class="lrg-row lrg-row-child">
+          <div v-for="child in item.children" :key="child.key" class="lrg-row lrg-row-child" :data-lrg-filter-key="child.filterKey">
             <span class="lrg-caret-placeholder" aria-hidden="true"></span>
             <div
               class="lrg-item"
@@ -90,7 +90,7 @@
 </template>
 
 <script setup>
-import { reactive, computed } from 'vue'
+import { reactive, computed, ref, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useShadowStyles } from '../composables/useShadowStyles.js'
 
@@ -211,6 +211,29 @@ const props = defineProps({
 })
 
 defineEmits(['filter-click'])
+
+// Scroll-to-selected — universal across flat-legend tabs (prayer / engagement /
+// adoption / religion), mirroring SemanticTreeLegend's tree-legend scroll. When
+// the active filter changes (incl. from a search/geocoder result), bring the
+// matching row into view. Scoped to this component's own scroll container so
+// multiple legends on a page don't fight; retries across frames since the row
+// may render a frame later.
+const itemsContainer = ref(null)
+watch(() => props.activeFilter, async (filterKey) => {
+  if (!filterKey) return
+  const container = itemsContainer.value
+  if (!container) return
+  await nextTick()
+  const tryScroll = (attempt = 0) => {
+    const row = container.querySelector(`[data-lrg-filter-key="${CSS.escape(String(filterKey))}"]`)
+    // IMPORTANT: container.scrollTop, NOT row.scrollIntoView() — scrollIntoView walks
+    // past the shadow-DOM boundary and scrolls the HOST page (regression 554bf10).
+    // offsetTop is relative to the scroll container, so this stays inside the legend.
+    if (row) { container.scrollTop = row.offsetTop - container.clientHeight / 2 + row.offsetHeight / 2; return }
+    if (attempt < 2) requestAnimationFrame(() => tryScroll(attempt + 1))
+  }
+  requestAnimationFrame(() => tryScroll(0))
+})
 
 const collapsed = reactive({})
 function toggleCollapse(key) {
