@@ -55,6 +55,29 @@ const ALLDATA_CAPS = {
   dialects: 3, people: 5, places: 2, regions: 3, religions: 2,
 }
 
+// Parameterized search per tab (Driver R42). The key is the geocoder context
+// string (TAB_SEARCH_CONTEXT in the profile .vue: 'regions'|'people-groups'|
+// 'language'|'religion'); the value is the subset of grouped-result keys to keep.
+// A context absent here (or '') = all categories (no regression).
+//
+// UNIVERSAL (every tab): People Group (peopleGroups+people), Country (places),
+// Default Language (languages), Religion (religions). Each tab then ADDS its own
+// domain categories:
+//   Regions tab       + WAGF Region/Block (regions)        — and NO blocs/clusters/families/dialects
+//   People Groups tab + Affinity Block (blocs) + Cluster (clusters)
+//   Languages tab     + Dialect (dialects) + Language Family (families)
+//   Religion tab      + (nothing beyond universal)
+// "ONLY the Regions tab shows Regions/Blocks; showing affinity blocks or people
+// clusters on the Regions tab is the reported bug." WAGF blocks (e.g. "South
+// Asia") fold into the `regions` aggregate (doxaRegion||wagfRegion).
+const UNIVERSAL_SEARCH = ['peopleGroups', 'people', 'places', 'languages', 'religions']
+const ALLOWED_BY_CONTEXT = {
+  'regions':       [...UNIVERSAL_SEARCH, 'regions'],
+  'people-groups': [...UNIVERSAL_SEARCH, 'blocs', 'clusters'],
+  'language':      [...UNIVERSAL_SEARCH, 'dialects', 'families'],
+  'religion':      [...UNIVERSAL_SEARCH],
+}
+
 // ── Score weights ────────────────────────────────────────────────────────────
 const SCORE_NAME     = 100
 const SCORE_COUNTRY  = 50
@@ -172,7 +195,7 @@ function buildIndex(features) {
     const countryHay  = norm(pg.countryName) + ' ' + norm(pg.country) + ' ' + norm(pg.countryIso) + ' ' + norm(pg.countryIsoLabel)
     const religionHay = norm(pg.religionName) + ' ' + norm(pg.religion) + ' ' + norm(pg.religionLabel) + ' ' + norm(pg.religionCode)
     const languageHay = norm(pg.language) + ' ' + norm(pg.languageFamily) + ' ' + norm(pg.languageCode)
-    const regionHay   = norm(pg.doxaRegion) + ' ' + norm(pg.wagfRegion)
+    const regionHay   = norm(pg.doxaRegion) + ' ' + norm(pg.wagfRegion) + ' ' + norm(pg.wagfBlock)
     const blocHay     = norm(pg.affinityBlock) + ' ' + norm(pg.affinityBlockLabel) + ' ' + norm(pg._raw?.rop1)
     const clusterHay  = norm(pg.cluster) + ' ' + norm(pg.clusterLabel) + ' ' + norm(pg._raw?.imb_reg_of_people_2)
     const pgHay       = norm(pg.peopleGroup) + ' ' + norm(pg.peopleGroupLabel) + ' ' + norm(pg._raw?.imb_reg_of_people_25)
@@ -296,8 +319,8 @@ function buildAggregates(entries) {
     // handler (onGeocoderAggregateResult) already maps kind 'region' →
     // doxaRegion and dims pins to that region; the bbox auto-fits the camera.
     regions: aggregate(
-      (e) => norm(e.feature.doxaRegion) || norm(e.feature.wagfRegion),
-      (e) => e.feature.doxaRegion || e.feature.wagfRegion || ''
+      (e) => norm(e.feature.doxaRegion) || norm(e.feature.wagfRegion) || norm(e.feature.wagfBlock),
+      (e) => e.feature.doxaRegion || e.feature.wagfRegion || e.feature.wagfBlock || ''
     ),
     // Affinity blocs (rop1) — keyed by bloc label so a search for "Malay" matches "Malay Peoples"
     blocs: aggregate(
@@ -561,7 +584,16 @@ export function useDoxaSearch(opts = {}) {
     // semantic-tree-first order; the same context drives the "All DOXA Data"
     // section below so both halves of the dropdown agree. qa: 2026-05-02.
     const order   = groupOrder(activeContext)
-    const allFlat = order.flatMap(k => g[k] || [])
+    // Context-aware FILTERING (not just ordering): each tab's search should only
+    // surface result types relevant to that tab's legend domain — e.g. the
+    // Regions tab must NOT show affinity blocks / clusters / people groups, only
+    // countries + WAGF regions. groupOrder() already ranks; this restricts the
+    // category SET. Unknown/empty context → all categories (no regression).
+    const allowed = ALLOWED_BY_CONTEXT[activeContext]
+    const gFiltered = allowed
+      ? Object.fromEntries(allowed.filter(k => g[k]).map(k => [k, g[k]]))
+      : g
+    const allFlat = order.flatMap(k => gFiltered[k] || [])
 
     if (!activeFilter?.key || !allFlat.length) {
       return allFlat.slice(0, MAX_TOTAL)
@@ -596,7 +628,7 @@ export function useDoxaSearch(opts = {}) {
     // the SAME context order as the flat list so the context-relevant category
     // leads here too (Round 16). Per-kind caps live in ALLDATA_CAPS.
     const allTagged = order
-      .flatMap(k => (g[k] || []).slice(0, ALLDATA_CAPS[k] ?? 3))
+      .flatMap(k => (gFiltered[k] || []).slice(0, ALLDATA_CAPS[k] ?? 3))
       .map(f => ({ ...f, properties: { ...f.properties, _allDataSection: true } }))
     result.push(makeSectionHeader('All DOXA Data', true))
     result.push(...allTagged)
