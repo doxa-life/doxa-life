@@ -37,7 +37,10 @@ import { useMapEvents }    from '@map/composables/useMapEvents.js'
 import { useMapFly }       from '@map/composables/useMapFly.js'
 import { useSelectedPin }  from '@map/composables/useSelectedPin.js'
 import { useShadowStyles } from '@map/composables/useShadowStyles.js'
+import { useCountryOutline, resolveCountryIso } from '@map/composables/useCountryOutline.js'
 import { FULL_PRAYER_THRESHOLD } from '@map/config/prayerColors.js'
+import { useI18n } from 'vue-i18n'
+import { SUPPORTED_LOCALES } from '@map/i18n/index.js'
 
 // TODO(Wave 3): useMapData lives in doxa-map-mfe; not yet ported to template.
 // Parallel agent ports it to template/src/composables/useMapData.js.
@@ -155,6 +158,10 @@ const PeopleGroupDetail = defineAsyncComponent(() => import('@map/components/Peo
 import ResearchMapSideMenu    from '@map/components/ResearchMapSideMenu.vue'
 import ResearchMapFilterPanel from '@map/components/ResearchMapFilterPanel.vue'
 import SemanticTreeLegend     from '@map/components/SemanticTreeLegend.vue'
+// Per-app-profile feature flag: surface the SemanticTreeLegend Export
+// affordance (Poster/Packet) for this profile. UX scaffold only — the menu
+// options are locked "coming soon" stubs. Flip to false to hide it here.
+const EXPORT_FEATURE_ENABLED = true
 // Per-map mediator instance (PPLR-ported). createPplrInstance + provideInstance
 // give the SemanticTreeLegend its selection/activeTab/theme refs via inject().
 import { createPplrInstance, provideInstance } from '@map/composables/usePplrInstance.js'
@@ -203,10 +210,16 @@ useShadowStyles(`
   .suggestions::-webkit-scrollbar-thumb { background:rgba(0,0,0,0.3);border-radius:4px; }
   .mapboxgl-ctrl-geocoder--suggestions::-webkit-scrollbar-track,
   .suggestions::-webkit-scrollbar-track { background:rgba(0,0,0,0.05); }
-  .dg-main { font-weight:500;font-size:13px;color:#222;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-  .dg-main strong { font-weight:700; }
+  .dg-main { font-weight:500;font-size:13px;color:#222;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px; }
+  .dg-main strong { font-weight:700;overflow:hidden;text-overflow:ellipsis; }
   .dg-meta { margin-top:2px;display:flex;flex-wrap:wrap;gap:4px 10px;font-size:11px;color:#555;line-height:1.35; }
   .dg-field strong { font-weight:600;color:#333;margin-right:2px; }
+  /* Round 16 — labeled category tag replacing the old emoji prefixes. */
+  .dg-tag { flex:none;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#3b463d;background:rgba(59,70,61,0.10);border-radius:4px;padding:1px 5px;line-height:1.5;white-space:nowrap; }
+  .dg-agg-label { overflow:hidden;text-overflow:ellipsis; }
+  .dg-count { flex:none;font-size:11px;font-weight:600;color:#73a17f; }
+  .dsm-dark .dg-tag { color:#cfe3d6;background:rgba(115,161,127,0.22); }
+  .dsm-dark .dg-count { color:#9fd0ab; }
   /* Geocoder section divider headers — non-clickable visual labels */
   .suggestions li:has(.dg-section-header-item) > a { pointer-events:none!important;cursor:default!important;background:none!important;padding:4px 10px 2px!important; }
   .dg-section-header-item { font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#9ca3af;padding:2px 0; }
@@ -289,7 +302,7 @@ useShadowStyles(`
   .rm-tab:hover { color:#cbc5b9; }
   .rm-tab.active { color:#cbc5b9;border-bottom-color:#cbc5b9; }
   /* Separator: thin vertical bar between simple-map-style tabs (Prayer/Adoption/
-     Engagement) and research-only tabs (Languages/Affinity Blocks/Religion).
+     Engagement) and research-only tabs (Languages/Affinity Blocs/Religion).
      Sits at ~50% height so it reads as a divider, not as a tall border. */
   .rm-tab-sep {
     flex: 0 0 1px;
@@ -327,6 +340,19 @@ const mapboxToken   = inject('mapboxToken')
 const dataSource    = inject('dataSource')
 const colorSet      = inject('colorSet')
 const injectedInstanceId = inject('instanceId', null)
+
+// ─── Active locale (Layer-1 API data + Layer-2 UI chrome) ────────────────────
+// The host Nuxt page passes its @nuxtjs/i18n locale via profile-config.locale.
+// We use it as the authoritative locale for BOTH the map's UI i18n and the
+// API `lang` param, so /fr/research shows French chrome AND French API data
+// without depending on <html lang> read-timing in detectLocale(). When the
+// host passes nothing, createAppI18n()'s detectLocale() fallback still applies.
+const activeLocale = (() => {
+  const l = profileConfig?.value?.locale
+  return (l && SUPPORTED_LOCALES.includes(l)) ? l : null
+})()
+const { locale: uiLocale } = useI18n()
+if (activeLocale) uiLocale.value = activeLocale
 
 // Stores — instance-scoped Pinia, supplied by ProfileLoader
 const mapStore  = inject('mapStore')
@@ -398,8 +424,29 @@ const geocoderPlaceholder = computed(() => {
   if (activeTab.value?.id === 'affinity-blocks') {
     return 'Search affinity bloc, cluster, people group'
   }
+  if (activeTab.value?.id === 'doxa-regions') {
+    return 'Search region, country, people group'
+  }
+  if (activeTab.value?.id === 'religion') {
+    return 'Search religion, people group'
+  }
   return ''  // empty → GeocoderComponent falls back to i18n default
 })
+
+// Search context (Round 16) — maps the active legend tab to the category the
+// unified search bar should surface FIRST. The three people-centric color tabs
+// (prayer / adoption / engagement) share the people-groups context since they
+// all paint people-group pins. null → useDoxaSearch uses its default order.
+const TAB_SEARCH_CONTEXT = {
+  'affinity-blocks':   'people-groups',
+  'prayer':            'people-groups',
+  'adoption':          'people-groups',
+  'engagement':        'people-groups',
+  'language-families': 'language',
+  'doxa-regions':      'regions',
+  'religion':          'religion',
+}
+const geocoderContext = computed(() => TAB_SEARCH_CONTEXT[activeTab.value?.id] || '')
 
 // ─── Map ID + container refs ─────────────────────────────────────────────────
 // Per-instance map ID. Each <doxa-map> on the page MUST have a unique value so
@@ -440,14 +487,16 @@ watch(() => activeTabId?.value, async (newTabId, oldTabId) => {
 const mapContainer = ref(null)
 const appReady     = ref(false)
 
-// Feedback #9 (/research): ceiling on manual zoom-in for the research map.
-// Mapbox zoom ~10 still frames a place within its surrounding country/region
-// (metro-in-region, not intra-city streets), so approximate locations stay
-// obfuscated. COMMIT-LOG #8: the prior cap of 7 sat below the cluster break
-// threshold, so overlapping pins could never separate enough to be clickable.
-// Raised to 10 to leave headroom above clusterMaxZoom (6) for declustering.
-// Used as the maxZoom fallback below; profile-config can still override.
-const RESEARCH_MAX_ZOOM = 10
+// Manual zoom-in ceiling for the research map. COMMIT-LOG #8: the prior cap of 7
+// sat below the cluster-break threshold so overlapping pins could never separate
+// enough to be clickable; 10 still didn't give dense clusters room to spread.
+// Driver directive (2026-06-22): lift the cap to 18 so users can zoom deep into a
+// dense cluster and click *between* overlapping pins. clusterMaxZoom (6) stays
+// well below this, preserving the COMMIT-LOG #8 declustering-headroom invariant.
+// NOTE: this trades away some of the location-obfuscation the low cap provided
+// (street-level framing is now reachable) — accepted per explicit Driver request.
+// The zoom-IN cap below is pinned to this value; profile-config canNOT override it.
+const RESEARCH_MAX_ZOOM = 18
 
 // ─── Map instance (shadow-DOM safe — element ref, never string ID) ───────────
 const { map, isMapReady, initializeMap, destroy } = useMapInstance({
@@ -462,18 +511,19 @@ const { map, isMapReady, initializeMap, destroy } = useMapInstance({
   // own min/max in profile-config so users don't get lost zooming too far, and
   // precise locations stay obfuscated. Falls back to mapDefaults.
   minZoom:      profileConfig?.value?.minZoom ?? mapDefaults.minZoom ?? 0.5,
-  // Feedback #9 (/research): cap zoom-in so the camera can't dive to
-  // intra-city / street level — people-group framing should always keep
-  // surrounding-country context (and keep approximate locations obfuscated).
-  // RESEARCH_MAX_ZOOM (10) ≈ metro-in-region framing; a city reads as a place
-  // inside its country, not a set of streets. profile-config can still override.
-  maxZoom:      profileConfig?.value?.maxZoom ?? RESEARCH_MAX_ZOOM
+  // Zoom-in cap. PINNED to RESEARCH_MAX_ZOOM (18) per Driver directive so the
+  // camera CAN reach street level inside a dense cluster — letting overlapping
+  // pins separate enough to be clicked between. Deliberately NOT overridable
+  // from profile-config: an injected maxZoom (e.g. the page once passed 7)
+  // would re-cap zoom-in and re-block declustering, which is the exact bug
+  // this pin prevents. minZoom stays config-driven; only the IN cap is locked.
+  maxZoom:      RESEARCH_MAX_ZOOM
 })
 
 // ─── Data composable ─────────────────────────────────────────────────────────
 // Lean instantiation — no lookups, no detectLocale. The shared DSM handles
 // {value,label} from pray-tools natively; raw codes fall through unchanged.
-const dsm = new DataSourceManager({ sourcesConfig })
+const dsm = new DataSourceManager({ sourcesConfig, locale: activeLocale })
 const mapData = useMapData({
   mapId,
   dataSourceId:      dataSource.value,
@@ -481,6 +531,9 @@ const mapData = useMapData({
   dataStore,
   markRaw:           (v) => v
 })
+
+// ─── Country-outline composable (geoBoundaries ADM0 on country search) ───────
+const countryOutline = useCountryOutline(() => map.value)
 
 // ─── Layers composable ───────────────────────────────────────────────────────
 const mapLayers = useMapLayers({
@@ -641,10 +694,10 @@ const { regionsTree } = useWagfRegionsLegendData(_langPgRef)
 const REGIONS_TABS = [
   { id: 'region',  label: 'WAGF Region',
     info: 'WAGF macro-region (e.g. "Asia", "Africa"). Color-coded on the map.' },
-  { id: 'block',   label: 'WAGF Block',
-    info: 'WAGF block — the organizational sub-grouping within each region (e.g. "South East Asia", "West Africa").' },
+  { id: 'block',   label: 'WAGF Bloc',
+    info: 'WAGF bloc — the organizational sub-grouping within each region (e.g. "South East Asia", "West Africa").' },
   { id: 'country', label: 'Country',
-    info: 'Individual countries, listed by unreached-population size within their block.' },
+    info: 'Individual countries, listed by unreached-population size within their bloc.' },
 ]
 
 // Flat legend data for prayer/adoption/engagement/religion tabs — converted to
@@ -1288,8 +1341,8 @@ function applyDimFilter(detail) {
     if (m.getLayer('regions-fill')) {
       // Build a match expression on iso_3166_1_alpha_3 (vector tile property) to
       // highlight only the countries belonging to the selected WAGF region.
-      // regionIsoMap keys are labels ('Asia'); expectedValue is a slug ('asia').
-      // Normalize both sides to lowercase-alpha for reliable matching.
+      // regionIsoMap keys are slugs ('asia'); expectedValue is also a slug, so the
+      // direct lookup hits. The normalized fallback stays for defensive matching.
       const rMap = mapLayers.regionIsoMap?.value || {}
       const norm = (s) => String(s).toLowerCase().replace(/[^a-z]/g, '')
       const ev = norm(expectedValue)
@@ -1427,15 +1480,56 @@ function applyDimFilter(detail) {
 const _GEOCODER_FILTER_LAYER = 'language-family-pins'
 
 function onGeocoderPeopleGroupResult(feature) {
-  if (!feature || !mapStore) return
-  // Open the detail panel — research-map gates PeopleGroupDetail on
-  // mapStore.selectedFeature, so a single selectFeature() call is sufficient.
-  mapStore.selectFeature(feature)
+  if (!feature) return
+  // A people-group pick is "clicking elsewhere" relative to a prior country
+  // outline — drop it so it doesn't linger over the new selection.
+  countryOutline.clearCountry()
+  const m = map.value
+  // Resolve the pin's promoted id the SAME way useMapLayers builds it
+  // (`pg.id || pg.uniqueId` → properties.uniqueId). The single-PG search feature
+  // carries the full normalized pg on its properties, so this yields an exact
+  // match against the pin layer below + the highlight layer in useSelectedPin.
+  const uid = feature.properties?.id || feature.properties?.uniqueId || null
+
+  // Open the people-group detail + float the GO highlight marker via the SAME
+  // path a real pin click uses (useMapEvents → uiStore.selectPeopleGroup;
+  // useSelectedPin watches uiStore.selectedPeopleGroup). Stamp the resolved
+  // uniqueId onto the feature so the highlight layer's
+  // ['==',['get','uniqueId'],…] filter matches this pin. (The prior
+  // `mapStore.selectFeature()` call was a no-op — that action/state never
+  // existed on mapStore, so it threw and the handler did nothing.)
+  uiStore?.selectPeopleGroup?.({
+    ...feature,
+    properties: { ...feature.properties, uniqueId: uid }
+  })
+
+  // Dim every OTHER people-group pin and keep only the picked one at full
+  // opacity — parity with a language search result (which hides non-matching
+  // pins). Without this the popup opened but all other PG pins stayed at full
+  // opacity (2026-06-22 driver report). Mirrors the bloc/cluster/pg dim path in
+  // onSemanticTreeSelect: case-expression opacity + hitbox + glow sync.
+  if (m && uid != null && m.getLayer('language-family-pins')) {
+    const selFilter = ['==', ['get', 'uniqueId'], uid]
+    // Drop any prior tab/legend setFilter so the case-expression governs all pins.
+    try { m.setFilter('language-family-pins', null) } catch (_) {}
+    // Mirror onto the invisible hitbox so dimmed (opacity-0) pins aren't tappable.
+    _syncHitboxFilter(m, selFilter)
+    m.setPaintProperty('language-family-pins', 'circle-opacity', ['case', selFilter, 1, 0])
+    m.setPaintProperty('language-family-pins', 'circle-stroke-opacity', ['case', selFilter, 1, 0])
+    if (m.getLayer('language-family-pins-shadow')) {
+      m.setPaintProperty('language-family-pins-shadow', 'circle-opacity', ['case', selFilter, 1, 0])
+    }
+    mapLayers.syncGlowFilter(selFilter)
+  }
 }
 
 function onGeocoderAggregateResult(evt) {
   const m = map.value
   if (!evt || !m || !m.getLayer(_GEOCODER_FILTER_LAYER)) return
+
+  // Any non-country aggregate pick drops a prior country outline; a country
+  // pick re-draws its own below. Keeps the outline tied to the live selection.
+  if (evt.kind !== 'country') countryOutline.clearCountry()
 
   // Map result.kind → the corresponding pin property to filter on.
   // Note 'language-family' uses the derived `languageFamily` pin prop; 'dialect'
@@ -1562,33 +1656,87 @@ function onGeocoderAggregateResult(evt) {
       }
     }
     if (node && node.filter) {
-      // Drop the harsh setFilter applied earlier in this function — we want
-      // dim, not hide. Then call the same handler the legend uses on row click.
-      try { m.setFilter(_GEOCODER_FILTER_LAYER, null) } catch (_) {}
-      onSemanticTreeSelect(node)
-      // Drive the legend's selection ref so the matching row visually highlights.
-      if (pplrInstance && pplrInstance.selection) {
-        pplrInstance.selection.value = node
+      const applyAffinitySel = () => {
+        // Drop the harsh setFilter applied earlier in this function — we want
+        // dim, not hide. Then call the same handler the legend uses on row click.
+        try { m.setFilter(_GEOCODER_FILTER_LAYER, null) } catch (_) {}
+        onSemanticTreeSelect(node)
+        // Drive the legend's selection ref so the matching row visually highlights.
+        if (pplrInstance && pplrInstance.selection) {
+          pplrInstance.selection.value = node
+        }
+      }
+      // feedback#9: a PG/bloc/cluster search-pick only mirrors in the legend when
+      // the People Groups (affinity-blocks) lens is the active OUTER tab — on any
+      // other tab legendNodes holds a different tree, so pplrInstance.selection
+      // finds no matching row and nothing highlights. Switch to that tab first,
+      // THEN drive the selection. switchTab swaps legendNodes, and the
+      // SemanticTreeLegend's props.nodes watcher resets its selection to null on
+      // the same flush — so defer the selection to nextTick to land it AFTER that
+      // reset instead of being clobbered.
+      if (activeTabId.value !== 'affinity-blocks') {
+        switchTab('affinity-blocks')
+        nextTick(applyAffinitySel)
+      } else {
+        applyAffinitySel()
       }
     }
     _clearGeocoderProgrammatic()
     _emitLegendReveal()
+  } else if (evt.kind === 'country') {
+    // Country geography pick → STAY on the current tab. A search pick must
+    // NEVER auto-swap the active tab (2026-06-22 driver report: a country pick
+    // used to yank the user onto the WAGF Regions tab). The pin/cluster filter
+    // on `countryName` was already applied above, so the active tab's data is
+    // now scoped to this country (people groups within it, languages within it,
+    // etc., exactly like the language-search reference flow). All that's left is
+    // to zoom the camera to the country's bounding box so the scoped data fills
+    // the viewport.
+    if (Array.isArray(evt.bounds) && evt.bounds.length === 4) {
+      const [minLng, minLat, maxLng, maxLat] = evt.bounds
+      mapFly.fitBounds?.([[minLng, minLat], [maxLng, maxLat]], 60)
+    } else if (Array.isArray(evt.center) && evt.center.length === 2) {
+      mapFly.flyTo?.(evt.center)
+    }
+    // Draw the country boundary OUTLINE (geoBoundaries ADM0) + fit to its bbox.
+    // Resolve the aggregate → alpha-3 ISO from the pin data (locale-independent).
+    const iso = resolveCountryIso(evt, mapData.normalizedPeopleGroups.value || [])
+    if (iso) countryOutline.showCountry(iso)
+    _clearGeocoderProgrammatic()
+    _emitLegendReveal()
   }
-  // For country / region / religion: keep geocoder text as the active-filter
-  // indicator. User clicks geocoder X to clear.
+  // For religion: keep the geocoder text as the active-filter indicator.
+  // User clicks the geocoder X to clear.
 }
 
 function onGeocoderClear() {
   if (_geoBeingCleared) return  // programmatic clear, not a user-X click
+  // Drop the country boundary outline drawn by a country search pick.
+  countryOutline.clearCountry()
   const m = map.value
-  if (m && m.getLayer(_GEOCODER_FILTER_LAYER)) {
-    try { m.setFilter(_GEOCODER_FILTER_LAYER, null) } catch (e) { /* no-op */ }
+  // A search pick can leave THREE kinds of state behind: the geocoder text
+  // (Mapbox clears it on the X click), a legend-row/store selection, and a map
+  // filter — which for a country/region pick is BOTH the pin-layer filter AND the
+  // WAGF-region polygon highlight (selected country at fill-opacity 0.30, every
+  // other country dimmed to 0.02). Clearing only the pin filter left India's
+  // polygon bright, every other country's polygon near-invisible, and the legend
+  // row still highlighted (2026-06-22 driver report). All three must reset
+  // together. clearAllHighlights() is the canonical full reset: pin filter +
+  // opacity, region polygons, flat-tab filters, clustering, family/language/
+  // dialect selections, AND the legend-row highlight (pplrInstance.selection).
+  // It does NOT null selectedRegion/selectedResource (region/resource search
+  // picks set those), so null them first.
+  if (mapStore.selectedRegion)   mapStore.selectRegion?.(null)
+  if (mapStore.selectedResource) mapStore.selectResource?.(null)
+  if (m && m.getLayer('language-family-pins')) {
+    clearAllHighlights(m)
+  } else {
+    // Map/layer not ready — still null store selections so the legend stays consistent.
+    mapStore.selectFamily(null)
+    mapStore.selectLanguage(null)
+    mapStore.selectDialect?.(null)
+    clustering.setSelectionFilter(null)
   }
-  clustering.setSelectionFilter(null)
-  // Bidirectional sync — clearing search must also deselect the legend row (QA R7 Q4)
-  mapStore.selectFamily(null)
-  mapStore.selectLanguage(null)
-  mapStore.selectDialect?.(null)
 }
 
 // ─── Filter sync — ResearchMapFilterPanel writes to mapStore.filters ─────────
@@ -1839,6 +1987,7 @@ onBeforeUnmount(() => {
         :data-source-id="dataSource"
         :is-dark="isDark"
         :placeholder="geocoderPlaceholder"
+        :active-context="geocoderContext"
         @people-group-result="onGeocoderPeopleGroupResult"
         @aggregate-result="onGeocoderAggregateResult"
         @clear="onGeocoderClear"
@@ -1905,6 +2054,7 @@ onBeforeUnmount(() => {
             :hideTabs="legendHideTabs"
             :columnLabel="legendColumnLabel"
             :open="_stlOpen"
+            :export-enabled="EXPORT_FEATURE_ENABLED"
             @select="onSemanticTreeSelect"
             @update:open="_onStlOpenChange"
           />
