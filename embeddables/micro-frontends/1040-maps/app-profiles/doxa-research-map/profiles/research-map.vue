@@ -22,7 +22,7 @@
  *   1. Prayer Progress     (prayerProgress / prayer)
  *   2. Adoption            (adoption / adoption)
  *   3. Engagement          (engagement / engagement)           [separator after]
- *   4. People Groups       (affinityBlock / affinity-block)    [was "Affinity Blocks"]
+ *   4. People Groups       (affinityBlock / affinity-block)    [was "Affinity Blockks"]
  *   5. WAGF Regions        (doxaRegion / doxa-regions)
  *   6. Languages           (languageFamily / language-families)
  *   7. Religions           (religion / religion)
@@ -37,7 +37,7 @@ import { useMapEvents }    from '@map/composables/useMapEvents.js'
 import { useMapFly }       from '@map/composables/useMapFly.js'
 import { useSelectedPin }  from '@map/composables/useSelectedPin.js'
 import { useShadowStyles } from '@map/composables/useShadowStyles.js'
-import { useCountryOutline, resolveCountryIso } from '@map/composables/useCountryOutline.js'
+import { resolveCountryIso } from '@map/composables/useCountryOutline.js'
 import { FULL_PRAYER_THRESHOLD } from '@map/config/prayerColors.js'
 import { useI18n } from 'vue-i18n'
 import { SUPPORTED_LOCALES } from '@map/i18n/index.js'
@@ -302,7 +302,7 @@ useShadowStyles(`
   .rm-tab:hover { color:#cbc5b9; }
   .rm-tab.active { color:#cbc5b9;border-bottom-color:#cbc5b9; }
   /* Separator: thin vertical bar between simple-map-style tabs (Prayer/Adoption/
-     Engagement) and research-only tabs (Languages/Affinity Blocs/Religion).
+     Engagement) and research-only tabs (Languages/Affinity Blocks/Religion).
      Sits at ~50% height so it reads as a divider, not as a tall border. */
   .rm-tab-sep {
     flex: 0 0 1px;
@@ -532,8 +532,51 @@ const mapData = useMapData({
   markRaw:           (v) => v
 })
 
-// ─── Country-outline composable (geoBoundaries ADM0 on country search) ───────
-const countryOutline = useCountryOutline(() => map.value)
+// ─── Country search highlight — REUSE the WAGF Regions country feature ───────
+// A country search result now paints the SAME `regions-fill`/`regions-border`
+// polygon highlight the Regions tab uses (selected country at fill-opacity 0.30,
+// dark border; all others dimmed) instead of the old bolted-on geoBoundaries
+// outline (useCountryOutline). One country-display system, no duplicate source.
+// Regions are lazy-loaded on this profile, so ensure the layer exists first,
+// then force it visible (country search stays on the current tab — d7e741b — so
+// the polygon layers, normally hidden off the Regions tab, must be shown here).
+async function highlightCountryByIso(iso3) {
+  const code = String(iso3 || '').trim().toUpperCase()
+  if (code.length !== 3) return
+  await ensureRegionsLoaded()
+  const m = map.value
+  if (!m || !m.getLayer('regions-fill')) return
+  m.setLayoutProperty('regions-fill',   'visibility', 'visible')
+  m.setLayoutProperty('regions-border', 'visibility', 'visible')
+  const isoArr = ['literal', [code]]
+  m.setPaintProperty('regions-fill', 'fill-opacity', [
+    'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], 0.30, 0.02
+  ])
+  m.setPaintProperty('regions-border', 'line-color', [
+    'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], '#111827', 'rgba(60,60,80,0.15)'
+  ])
+  m.setPaintProperty('regions-border', 'line-width', [
+    'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], 2.5, 0.3
+  ])
+  // Pins must stay above the freshly-shown polygon.
+  if (m.getLayer('language-family-pins')) m.moveLayer('language-family-pins')
+}
+
+// Reverse highlightCountryByIso: reset the regions polygon paint to default and
+// re-hide it when we're not on the Regions tab (a country search may have shown
+// it cross-tab). Used when the user picks a non-country result or clears search.
+function clearCountryHighlight() {
+  const m = map.value
+  if (!m || !m.getLayer('regions-fill')) return
+  m.setPaintProperty('regions-fill', 'fill-opacity', 0.20)
+  m.setPaintProperty('regions-fill', 'fill-outline-color', null)
+  m.setPaintProperty('regions-border', 'line-color', 'rgba(60,60,80,0.35)')
+  m.setPaintProperty('regions-border', 'line-width', 0.6)
+  if (activeTab.value?.id !== 'doxa-regions') {
+    m.setLayoutProperty('regions-fill',   'visibility', 'none')
+    m.setLayoutProperty('regions-border', 'visibility', 'none')
+  }
+}
 
 // ─── Layers composable ───────────────────────────────────────────────────────
 const mapLayers = useMapLayers({
@@ -674,11 +717,11 @@ const LANG_TABS = [
     info: 'A dialect/variety is a regional or social form of a language (e.g. Arabic, Sudanese; Pakistan Sign Language).' },
 ]
 
-// Affinity-block tab — mirrors PPLR's pplr-rop-tree.vue hierarchy (Affinity Bloc → Cluster → PG).
+// Affinity-block tab — mirrors PPLR's pplr-rop-tree.vue hierarchy (Affinity Block → Cluster → PG).
 const { affinityTree } = useAffinityBlockLegendData(_langPgRef)
 const AFFINITY_TABS = [
-  { id: 'bloc',    label: 'Affinity Bloc',
-    info: 'Affinity Bloc (field: rop1) — broadest grouping by cultural/linguistic/geographic kinship. 16 blocs total. Examples: Malay Peoples, South Asian Peoples, Deaf, Arab World.' },
+  { id: 'bloc',    label: 'Affinity Block',
+    info: 'Affinity Block (field: rop1) — broadest grouping by cultural/linguistic/geographic kinship. 16 blocks total. Examples: Malay Peoples, South Asian Peoples, Deaf, Arab World.' },
   { id: 'cluster', label: 'Cluster',
     info: 'Cluster (field: imb_reg_of_people_2, ROP 2) — finer-grained grouping inside a bloc. 194 clusters total. Suffix "(Cluster)" appears on each row to distinguish from PG/PGIC. Example: Borneo-Kalimantan within Malay Peoples.' },
   { id: 'group',   label: 'People Group',
@@ -1482,8 +1525,8 @@ const _GEOCODER_FILTER_LAYER = 'language-family-pins'
 function onGeocoderPeopleGroupResult(feature) {
   if (!feature) return
   // A people-group pick is "clicking elsewhere" relative to a prior country
-  // outline — drop it so it doesn't linger over the new selection.
-  countryOutline.clearCountry()
+  // highlight — drop it so it doesn't linger over the new selection.
+  clearCountryHighlight()
   const m = map.value
   // Resolve the pin's promoted id the SAME way useMapLayers builds it
   // (`pg.id || pg.uniqueId` → properties.uniqueId). The single-PG search feature
@@ -1527,9 +1570,9 @@ function onGeocoderAggregateResult(evt) {
   const m = map.value
   if (!evt || !m || !m.getLayer(_GEOCODER_FILTER_LAYER)) return
 
-  // Any non-country aggregate pick drops a prior country outline; a country
-  // pick re-draws its own below. Keeps the outline tied to the live selection.
-  if (evt.kind !== 'country') countryOutline.clearCountry()
+  // Any non-country aggregate pick drops a prior country highlight; a country
+  // pick re-draws its own below. Keeps the highlight tied to the live selection.
+  if (evt.kind !== 'country') clearCountryHighlight()
 
   // Map result.kind → the corresponding pin property to filter on.
   // Note 'language-family' uses the derived `languageFamily` pin prop; 'dialect'
@@ -1698,10 +1741,11 @@ function onGeocoderAggregateResult(evt) {
     } else if (Array.isArray(evt.center) && evt.center.length === 2) {
       mapFly.flyTo?.(evt.center)
     }
-    // Draw the country boundary OUTLINE (geoBoundaries ADM0) + fit to its bbox.
-    // Resolve the aggregate → alpha-3 ISO from the pin data (locale-independent).
+    // Highlight the country by REUSING the Regions polygon feature (regions-fill
+    // /regions-border) instead of the old bolted-on outline. Resolve the
+    // aggregate → alpha-3 ISO from the pin data (locale-independent).
     const iso = resolveCountryIso(evt, mapData.normalizedPeopleGroups.value || [])
-    if (iso) countryOutline.showCountry(iso)
+    if (iso) void highlightCountryByIso(iso)
     _clearGeocoderProgrammatic()
     _emitLegendReveal()
   }
@@ -1711,8 +1755,8 @@ function onGeocoderAggregateResult(evt) {
 
 function onGeocoderClear() {
   if (_geoBeingCleared) return  // programmatic clear, not a user-X click
-  // Drop the country boundary outline drawn by a country search pick.
-  countryOutline.clearCountry()
+  // Drop the country polygon highlight drawn by a country search pick.
+  clearCountryHighlight()
   const m = map.value
   // A search pick can leave THREE kinds of state behind: the geocoder text
   // (Mapbox clears it on the X click), a legend-row/store selection, and a map

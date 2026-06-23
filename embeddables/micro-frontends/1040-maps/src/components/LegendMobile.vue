@@ -288,8 +288,8 @@ const LANG_TABS_MOBILE = [
   { id: 'dialect',  label: 'Dialect',     info: 'A dialect/variety is a regional or social form of a language.' },
 ]
 const AFFINITY_TABS_MOBILE = [
-  { id: 'bloc',    label: 'Bloc',    info: 'Affinity Block (rop1) — broadest grouping. 16 blocs total.' },
-  { id: 'cluster', label: 'Cluster', info: 'Cluster (imb_reg_of_people_2, ROP 2) — finer grouping inside a bloc. 194 total.' },
+  { id: 'bloc',    label: 'Block',   info: 'Affinity Block (rop1) — broadest grouping. 16 blocks total.' },
+  { id: 'cluster', label: 'Cluster', info: 'Cluster (imb_reg_of_people_2, ROP 2) — finer grouping inside a block. 194 total.' },
   { id: 'group',   label: 'PG',      info: 'People Group (imb_reg_of_people_25, ROP 2.5) — abstract identity. 1,736 PGs.' },
   { id: 'pgic',    label: 'PGIC',    info: 'PG in Country (imb_reg_of_people_3 + country_code) — one row per PG-country pair. 2,106 rows.' },
 ]

@@ -1,5 +1,5 @@
 # Doxa map — feedback bug-fix log (branch `feedback-bug-fixes`)
-> Plain-English record of every fix this session, so each commit's reasons are clear. **Nothing committed yet** — all on the working branch awaiting Driver approval. Source: support.gospelambition.org feedback + Driver testing.
+> Plain-English record of every fix this session, so each commit's reasons are clear. **Fixes are committed** on `feedback-bug-fixes` (186 commits ahead of `master`, incl. one 85-commit `origin/master` integration merge at `9b61910`). See **Branch Review Prep** at the bottom for merge-readiness status. Source: support.gospelambition.org feedback + Driver testing.
 
 | # | What was wrong (in plain terms) | Fix | Status |
 |---|---|---|---|
@@ -37,5 +37,41 @@ _Prayer count uses the real pray-tools API (never stubbed). Commits will be grou
 | 5 | Legend "go up to language family" jumped to wrong tab | Click handler had wrong tab index and didn't set the parent family as selected | Fixed handler: switch to family tab + set the parent family selection state atomically | Both state changes now happen together — tab switches AND correct row is highlighted | builder wave |
 | 6 | Clicking a people group zoomed in too deep | fitBounds maxZoom too high; no breathing room | Set fitBounds maxZoom to reasonable level (3), added 20% padding | Zoom level leaves context visible; verified desktop + mobile | builder wave |
 | 7 | Prayer count showed 0 in popup | Popup used placeholder data, not real API | Wired popup to pray-tools API using real people group ID | Count now matches the map's live prayer data | builder wave |
-| 8 | Zoom-in cap blocked users from zooming to street level | RESEARCH_MAX_ZOOM set too low; maxZoom override in profileConfig | Removed maxZoom cap; RESEARCH_MAX_ZOOM=18 (Mapbox GL max) | Users can now zoom all the way to street level to separate overlapping pins | builder wave |
-| 9 | Legend go-up: clicking parent label from child view didn't navigate | Handler only scrolled, didn't switch tab or set selection | Fixed for dialect→language, language→family, region→bloc; atomic tab+selection change | Entire stair-step navigation now works in both directions | builder wave |
+| 8 | Zoom-in cap blocked users from zooming to street level | RESEARCH_MAX_ZOOM set too low; maxZoom override in profileConfig | Removed maxZoom cap; RESEARCH_MAX_ZOOM=18 (Mapbox GL max) | Users can now zoom all the way to street level to separate overlapping pins | `e5b67bd` (cap→18), `a75db7c` (align dead CLUSTERING_ZOOM) |
+| 9 | Legend go-up: clicking parent label from child view didn't navigate | Handler only scrolled, didn't switch tab or set selection | Fixed for dialect→language, language→family, region→bloc; atomic tab+selection change | Entire stair-step navigation now works in both directions | builder wave (pre-merge) |
+| 10 | Country search result auto-swapped to the Regions tab (should stay on current tab) | Aggregate-result handler force-switched tab on country picks | Country picks now draw the geoBoundaries outline + fitBounds without changing the active tab | Tab no longer changes under the user on a country search | `d7e741b` |
+| 11 | Map pinch/scroll gesture gating used `innerWidth>=1024` instead of input type | `cooperativeGestures` keyed off viewport width, mis-firing on large touch devices | Gate `cooperativeGestures` on `(pointer: coarse)` media query, not `innerWidth` | Gesture mode now follows the actual input device, not the window size | `968028b` |
+
+> Commit attribution for #4–#7 ("builder wave (pre-merge)"): these landed across the pre-merge map-fly / mobile-bug-wave commits (`12ba7b5`, `fb96140`, `f3dc756`, `5e5aa2c`, `dd5d978`) and were not cleanly isolated to one SHA each. Exact per-fix SHAs were not recoverable from the squashed wave; the fixes themselves are Driver-verified (see top table).
+
+---
+
+## Branch Review Prep (2026-06-22, card `2cdcd6d8`)
+
+Senior-dev merge-readiness audit of `feedback-bug-fixes` (186 commits ahead of `master`). Performed by `bt-doxa-maps` (headless builder).
+
+### 1. Build — ⏸ DEFERRED (cannot run headlessly)
+`pnpm run build` was **not** run: the persistent builder operates under a hard no-build/no-install rule. **Action required before merge:** the closer/CT (or Driver) must run `pnpm run build` from the repo root and confirm zero errors. This is the one outstanding gate; everything else below is verified.
+
+### 2. WIP / temporary commits — ✅ CLEAN
+`git log master..HEAD` shows **no** `wip`/`fixup`/`squash`/`temp`/`debug` commits. The branch does contain one large integration merge (`9b61910`, "integrate origin/master (85 commits)") — expected, not a squash candidate. No history rewrite was performed (out of headless-builder scope); if the senior wants the 186 commits grouped, that is a Driver/closer call.
+
+### 3. Debug / console code — ✅ CLEAN
+Scanned every `.vue`/`.ts`/`.js` changed since the master merge (`9b61910..HEAD`, excluding built `public/js/` bundles + `.lk10x/` scratch). **No `debugger` statements and no stray `console.log` debug junk.** All `console.*` calls present are intentional error handling (`console.error`/`console.warn` with `[module]` prefixes — e.g. `useMapInstance.js` token/container diagnostics, `DataSourceManager.js` load-failure logs). The single `console.log` in `modules/country-routes.ts:45` is a legitimate build-time prerender count. **Nothing to remove.**
+
+### 4. ⚠️ Scratch / infra files tracked in the branch — CLEANUP RECOMMENDED before PR
+These are committed in the branch but are builder scratch / local infra that a senior reviewer should not receive. **Not removed here** (removal + `.gitignore` is a commit the Driver/closer should make deliberately — builder does not commit unprompted):
+
+| Path | What it is | Recommended action |
+|---|---|---|
+| `ccm.db` | local C3MOS event-bus DB copy at repo root | `git rm --cached ccm.db` + add to `.gitignore` |
+| `.lk10x/builder-*-output.md` (8 files) | per-card builder scratch output | `git rm --cached .lk10x/` + gitignore `.lk10x/` |
+| `embeddables/.../1040-maps/.lk10x-builder-output.md` | builder scratch (outside gitignored `.lk10x/`) | move into `.lk10x/` or remove |
+| `embeddables/.../1040-maps/BUILDER-NOTE-*.md` (3 files) | builder working notes | move to `docs/` or remove (see template `AUDIT.md` §4) |
+| `embeddables/.../1040-maps/AGENTS.md` | agent scratch | review — remove if not intended for the template |
+| `.mcp.json` | local MCP server config | confirm intentional; usually local-only |
+
+`.gitignore` currently has **no** rule covering any of these. Adding `ccm.db`, `.lk10x/`, and `*-output.md` to `.gitignore` is the durable fix.
+
+### Summary
+Branch is **debug-clean and free of WIP commits**, COMMIT-LOG reconciled to real SHAs. **Two items block a clean senior-review PR:** (a) run `pnpm run build` to confirm it compiles, and (b) untrack the scratch/infra files in §4. Both are deliberate actions left to the closer/Driver, not the headless builder.

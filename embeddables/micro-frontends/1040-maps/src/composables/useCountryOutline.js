@@ -5,17 +5,23 @@
  * When the user selects a country result from the geocoder, we:
  *   1. resolve the aggregate → its alpha-3 ISO (locale-independent, from the
  *      people-group data — `countryIso` is already alpha-3, e.g. 'IND'),
- *   2. fetch that country's ADM0 boundary from geoBoundaries (gbOpen,
- *      simplified — same data source the my-upg-100-list admin-2 layer uses,
- *      just the ADM0 level instead of ADM2),
- *   3. draw an OUTLINE-ONLY line layer (no fill, so the underlying pins /
- *      basemap data stay visible), and
- *   4. fitBounds to the country's bounding box.
+ *   2. draw an OUTLINE-ONLY line layer from the SAME Mapbox vector tileset the
+ *      Regions-tab legend already uses (`mapbox.country-boundaries-v1`), so the
+ *      highlight is INSTANT (vector tiles stream from the same CDN as the
+ *      basemap and are cached) — no per-country GeoJSON fetch.
+ *
+ * WHY VECTOR TILES (card aee14dbc): the previous implementation fetched a
+ * per-country geoBoundaries ADM0 GeoJSON over the network, which cost ~5s on the
+ * first selection and duplicated the country-polygon data the Regions legend
+ * already paints from `country-boundaries-v1`. Reusing that one tileset removes
+ * the delay AND the duplicate code path — one country-highlight source, used
+ * everywhere. Camera framing is the caller's job (every call site already
+ * fitBounds() to the country bbox from the search aggregate's `bounds`).
  *
  * The outline is a singleton (one source + one line layer per map). Calling
- * showCountry() again swaps it; clearCountry() removes it (wired to the
- * geocoder "clear" + any non-country pick so it disappears when the user
- * clicks elsewhere or clears the search).
+ * showCountry() again swaps the filter; clearCountry() removes it (wired to the
+ * geocoder "clear" + any non-country pick so it disappears when the user clicks
+ * elsewhere or clears the search).
  *
  * Usage:
  *   const outline = useCountryOutline(() => map.value)
@@ -28,16 +34,11 @@
 const SOURCE_ID = 'doxa-country-outline'
 const LAYER_ID  = 'doxa-country-outline-line'
 
-// gbOpen ADM0 simplified — pinned to the same geoBoundaries commit the
-// admin-2 (ADM2) loader uses, so the whole app draws from one frozen release.
-const GEOBOUNDARIES_COMMIT = '9469f09592ced973a3448cf66b6100b741b64c0d'
-function adm0Url(iso3) {
-  return `https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/${GEOBOUNDARIES_COMMIT}/releaseData/gbOpen/${iso3}/ADM0/geoBoundaries-${iso3}-ADM0_simplified.geojson`
-}
-
-// Module-level cache: a country's ADM0 GeoJSON is identical across every map
-// instance and never changes, so fetch each ISO at most once per page load.
-const ADM0_CACHE = {}
+// Same vector tileset the Regions-tab legend highlights from (see
+// useMapLayers.addRegionsLayer). Exposes iso_3166_1_alpha_3 (alpha-3) so we
+// match the locale-independent ISO the search aggregate resolves to.
+const COUNTRY_BOUNDARIES_URL = 'mapbox://mapbox.country-boundaries-v1'
+const SOURCE_LAYER = 'country_boundaries'
 
 /**
  * Resolve a doxa-country search aggregate to its alpha-3 ISO using the
@@ -65,34 +66,16 @@ export function resolveCountryIso(evt, pgs) {
   return String(pg?.countryIso ?? '').trim().toUpperCase()
 }
 
-// Walk every coordinate in a GeoJSON FeatureCollection and accumulate a bbox.
-function bboxOfFeatureCollection(fc) {
-  let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity
-  const walk = (coords) => {
-    if (!Array.isArray(coords)) return
-    if (typeof coords[0] === 'number') {
-      const [lng, lat] = coords
-      if (lng < minLng) minLng = lng
-      if (lat < minLat) minLat = lat
-      if (lng > maxLng) maxLng = lng
-      if (lat > maxLat) maxLat = lat
-      return
-    }
-    for (const c of coords) walk(c)
-  }
-  for (const f of fc?.features || []) {
-    if (f?.geometry?.coordinates) walk(f.geometry.coordinates)
-  }
-  return Number.isFinite(minLng) ? [minLng, minLat, maxLng, maxLat] : null
-}
-
-async function fetchAdm0(iso3) {
-  if (ADM0_CACHE[iso3]) return ADM0_CACHE[iso3]
-  const r = await fetch(adm0Url(iso3))
-  if (!r.ok) throw new Error(`geoBoundaries ADM0 ${iso3}: HTTP ${r.status}`)
-  const fc = await r.json()
-  ADM0_CACHE[iso3] = fc
-  return fc
+// The country-boundaries-v1 tileset carries one feature per WORLDVIEW (e.g.
+// 'all', 'US', 'CN', 'IN'); without a worldview filter an outline would be
+// drawn 2-3× over itself. Mirror the homepage CountryMap.vue filter: keep the
+// 'all' worldview plus the US-recognized worldview.
+function countryFilter(code) {
+  return [
+    'all',
+    ['==', ['get', 'iso_3166_1_alpha_3'], code],
+    ['any', ['==', ['get', 'worldview'], 'all'], ['in', 'US', ['get', 'worldview']]]
+  ]
 }
 
 /**
@@ -111,42 +94,43 @@ export function useCountryOutline(getMap, opts = {}) {
     const m = typeof getMap === 'function' ? getMap() : null
     if (!m) return
     try {
-      if (m.getLayer(LAYER_ID))  m.removeLayer(LAYER_ID)
+      if (m.getLayer(LAYER_ID))   m.removeLayer(LAYER_ID)
       if (m.getSource(SOURCE_ID)) m.removeSource(SOURCE_ID)
     } catch (_) { /* style mid-load — nothing to remove */ }
   }
 
   /**
-   * Draw the country's ADM0 outline + fit the camera to its bounding box.
+   * Draw the country's outline from the country-boundaries vector tileset.
+   * INSTANT — no network fetch. Camera framing is the caller's responsibility
+   * (every call site already fitBounds() to the aggregate's bbox).
+   *
    * @param {string} iso3  alpha-3 ISO (e.g. 'IND')
-   * @param {object} [o]
-   * @param {boolean} [o.fit=true]  fitBounds to the country bbox
    */
-  async function showCountry(iso3, o = {}) {
+  function showCountry(iso3) {
     const code = String(iso3 || '').trim().toUpperCase()
     if (code.length !== 3) return
-    const fit = o.fit !== false
-
-    let fc
-    try {
-      fc = await fetchAdm0(code)
-    } catch (e) {
-      // Network / 404 — outline is a nice-to-have, never break the search flow.
-      if (typeof console !== 'undefined') console.warn('[country-outline]', e?.message || e)
-      return
-    }
 
     const m = typeof getMap === 'function' ? getMap() : null
     if (!m) return
 
-    // Swap any existing outline (different country, or re-pick).
+    const filter = countryFilter(code)
+
+    // Fast path: source/layer already present from a prior pick — just swap the
+    // filter so the highlight moves to the new country with zero teardown.
+    if (m.getLayer(LAYER_ID)) {
+      try { m.setFilter(LAYER_ID, filter); return } catch (_) { /* fall through to rebuild */ }
+    }
+
+    // Swap any stale source, then (re)create the singleton outline layer.
     clearCountry()
     try {
-      m.addSource(SOURCE_ID, { type: 'geojson', data: fc })
+      m.addSource(SOURCE_ID, { type: 'vector', url: COUNTRY_BOUNDARIES_URL })
       m.addLayer({
         id: LAYER_ID,
         type: 'line',
         source: SOURCE_ID,
+        'source-layer': SOURCE_LAYER,
+        filter,
         layout: { 'line-join': 'round', 'line-cap': 'round' },
         // Outline only — no fill layer — so pins / labels under the country
         // stay fully visible (Driver spec: "just an outline/border").
@@ -157,17 +141,7 @@ export function useCountryOutline(getMap, opts = {}) {
         },
       })
     } catch (_) {
-      return // style not ready — skip silently
-    }
-
-    if (fit) {
-      const bbox = bboxOfFeatureCollection(fc)
-      if (bbox) {
-        const [minLng, minLat, maxLng, maxLat] = bbox
-        try {
-          m.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 40, duration: 1000 })
-        } catch (_) { /* degenerate bounds */ }
-      }
+      // style not ready — outline is a nice-to-have, never break the search flow.
     }
   }
 

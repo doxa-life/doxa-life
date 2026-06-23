@@ -413,6 +413,7 @@ useShadowStyles(`
             :tabs="legendTabs"
             :columns="['count', 'pop']"
             title="My UPG 100 List"
+            :export-enabled="true"
           />
         </div>
       </div>

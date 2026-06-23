@@ -27,7 +27,7 @@
  *   1. Prayer Progress     (prayerProgress / prayer)
  *   2. Adoption            (adoption / adoption)
  *   3. Engagement          (engagement / engagement)           [separator after]
- *   4. People Groups       (affinityBlock / affinity-block)    [was "Affinity Blocks"]
+ *   4. People Groups       (affinityBlock / affinity-block)    [was "Affinity Blockks"]
  *   5. WAGF Regions        (doxaRegion / doxa-regions)
  *   6. Languages           (languageFamily / language-families)
  *   7. Religions           (religion / religion)
@@ -42,7 +42,6 @@ import { useMapEvents }    from '@map/composables/useMapEvents.js'
 import { useMapFly }       from '@map/composables/useMapFly.js'
 import { useSelectedPin }  from '@map/composables/useSelectedPin.js'
 import { useShadowStyles } from '@map/composables/useShadowStyles.js'
-import { useCountryOutline } from '@map/composables/useCountryOutline.js'
 import { FULL_PRAYER_THRESHOLD } from '@map/config/prayerColors.js'
 import { useI18n } from 'vue-i18n'
 import { SUPPORTED_LOCALES } from '@map/i18n/index.js'
@@ -310,7 +309,7 @@ useShadowStyles(`
   .rm-tab:hover { color:#cbc5b9; }
   .rm-tab.active { color:#cbc5b9;border-bottom-color:#cbc5b9; }
   /* Separator: thin vertical bar between simple-map-style tabs (Prayer/Adoption/
-     Engagement) and research-only tabs (Languages/Affinity Blocs/Religion).
+     Engagement) and research-only tabs (Languages/Affinity Blocks/Religion).
      Sits at ~50% height so it reads as a divider, not as a tall border. */
   .rm-tab-sep {
     flex: 0 0 1px;
@@ -549,8 +548,8 @@ const mapData = useMapData({
   markRaw:           (v) => v
 })
 
-// ─── Country-outline composable (geoBoundaries ADM0 on country search) ───────
-const countryOutline = useCountryOutline(() => map.value)
+// Country search reuses the WAGF Regions polygon highlight (regions-fill /
+// regions-border) via onSemanticTreeSelect — no separate country outline.
 
 // ─── Layers composable ───────────────────────────────────────────────────────
 const mapLayers = useMapLayers({
@@ -696,11 +695,11 @@ const LANG_TABS = [
     info: 'A dialect/variety is a regional or social form of a language (e.g. Arabic, Sudanese; Pakistan Sign Language).' },
 ]
 
-// Affinity-block tab — mirrors PPLR's pplr-rop-tree.vue hierarchy (Affinity Bloc → Cluster → PG).
+// Affinity-block tab — mirrors PPLR's pplr-rop-tree.vue hierarchy (Affinity Block → Cluster → PG).
 const { affinityTree } = useAffinityBlockLegendData(_langPgRef)
 const AFFINITY_TABS = [
-  { id: 'bloc',    label: 'Affinity Bloc',
-    info: 'Affinity Bloc (field: rop1) — broadest grouping by cultural/linguistic/geographic kinship. 16 blocs total. Examples: Malay Peoples, South Asian Peoples, Deaf, Arab World.' },
+  { id: 'bloc',    label: 'Affinity Block',
+    info: 'Affinity Block (field: rop1) — broadest grouping by cultural/linguistic/geographic kinship. 16 blocks total. Examples: Malay Peoples, South Asian Peoples, Deaf, Arab World.' },
   { id: 'cluster', label: 'Cluster',
     info: 'Cluster (field: imb_reg_of_people_2, ROP 2) — finer-grained grouping inside a bloc. 194 clusters total. Suffix "(Cluster)" appears on each row to distinguish from PG/PGIC. Example: Borneo-Kalimantan within Malay Peoples.' },
   { id: 'group',   label: 'People Group',
@@ -1503,8 +1502,6 @@ const _GEOCODER_FILTER_LAYER = 'language-family-pins'
 
 function onGeocoderPeopleGroupResult(feature) {
   if (!feature || !mapStore) return
-  // A people-group pick is "clicking elsewhere" — drop any country outline.
-  countryOutline.clearCountry()
   // Open the detail panel — research-map gates PeopleGroupDetail on
   // mapStore.selectedFeature, so a single selectFeature() call is sufficient.
   mapStore.selectFeature(feature)
@@ -1537,9 +1534,8 @@ function onGeocoderAggregateResult(evt) {
   const m = map.value
   if (!evt || !m || !m.getLayer(_GEOCODER_FILTER_LAYER)) return
 
-  // Any non-country aggregate pick drops a prior country outline; a country
-  // pick re-draws its own below.
-  if (evt.kind !== 'country') countryOutline.clearCountry()
+  // Non-country aggregate picks reset the regions polygon highlight via
+  // clearAllHighlights() in onGeocoderClear; no separate outline to drop here.
 
   // Map result.kind → the corresponding pin property to filter on.
   // Note 'language-family' uses the derived `languageFamily` pin prop; 'dialect'
@@ -1701,8 +1697,8 @@ function onGeocoderAggregateResult(evt) {
     // pin filter (by countryIso) and the polygon highlight, mirroring a legend
     // row click so search-pick and row-click look identical.
     const wantIso = _isoForCountryAggregate(evt)
-    // Draw the country boundary OUTLINE (geoBoundaries ADM0) + fit to its bbox.
-    if (wantIso) countryOutline.showCountry(wantIso)
+    // goRegions() applies the WAGF Regions polygon highlight for this country
+    // via onSemanticTreeSelect — that IS the country display (no extra outline).
     const goRegions = () => {
       const node = wantIso
         ? _findNodeInTree(regionsTree.value, n =>
@@ -1732,8 +1728,6 @@ function onGeocoderAggregateResult(evt) {
 
 function onGeocoderClear() {
   if (_geoBeingCleared) return  // programmatic clear, not a user-X click
-  // Drop the country boundary outline drawn by a country search pick.
-  countryOutline.clearCountry()
   const m = map.value
   // A search pick can leave THREE kinds of state behind: the geocoder text
   // (Mapbox clears it on the X click), a legend-row/store selection, and a map

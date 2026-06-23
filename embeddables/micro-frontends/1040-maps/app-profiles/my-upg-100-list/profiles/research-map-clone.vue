@@ -22,7 +22,7 @@
  *   1. Prayer Progress     (prayerProgress / prayer)
  *   2. Adoption            (adoption / adoption)
  *   3. Engagement          (engagement / engagement)           [separator after]
- *   4. People Groups       (affinityBlock / affinity-block)    [was "Affinity Blocks"]
+ *   4. People Groups       (affinityBlock / affinity-block)    [was "Affinity Blockks"]
  *   5. WAGF Regions        (doxaRegion / doxa-regions)
  *   6. Languages           (languageFamily / language-families)
  *   7. Religions           (religion / religion)
@@ -300,7 +300,7 @@ useShadowStyles(`
   .rm-tab:hover { color:#cbc5b9; }
   .rm-tab.active { color:#cbc5b9;border-bottom-color:#cbc5b9; }
   /* Separator: thin vertical bar between simple-map-style tabs (Prayer/Adoption/
-     Engagement) and research-only tabs (Languages/Affinity Blocs/Religion).
+     Engagement) and research-only tabs (Languages/Affinity Blocks/Religion).
      Sits at ~50% height so it reads as a divider, not as a tall border. */
   .rm-tab-sep {
     flex: 0 0 1px;
@@ -612,11 +612,11 @@ const LANG_TABS = [
     info: 'A dialect/variety is a regional or social form of a language (e.g. Arabic, Sudanese; Pakistan Sign Language).' },
 ]
 
-// Affinity-block tab — mirrors PPLR's pplr-rop-tree.vue hierarchy (Affinity Bloc → Cluster → PG).
+// Affinity-block tab — mirrors PPLR's pplr-rop-tree.vue hierarchy (Affinity Block → Cluster → PG).
 const { affinityTree } = useAffinityBlockLegendData(_langPgRef)
 const AFFINITY_TABS = [
-  { id: 'bloc',    label: 'Affinity Bloc',
-    info: 'Affinity Bloc (field: rop1) — broadest grouping by cultural/linguistic/geographic kinship. 16 blocs total. Examples: Malay Peoples, South Asian Peoples, Deaf, Arab World.' },
+  { id: 'bloc',    label: 'Affinity Block',
+    info: 'Affinity Block (field: rop1) — broadest grouping by cultural/linguistic/geographic kinship. 16 blocks total. Examples: Malay Peoples, South Asian Peoples, Deaf, Arab World.' },
   { id: 'cluster', label: 'Cluster',
     info: 'Cluster (field: imb_reg_of_people_2, ROP 2) — finer-grained grouping inside a bloc. 194 clusters total. Suffix "(Cluster)" appears on each row to distinguish from PG/PGIC. Example: Borneo-Kalimantan within Malay Peoples.' },
   { id: 'group',   label: 'People Group',
@@ -2030,6 +2030,7 @@ function exportAdmin2DraftList() {
             :hideTabs="legendHideTabs"
             :columnLabel="legendColumnLabel"
             :open="_stlOpen"
+            :export-enabled="true"
             @select="onSemanticTreeSelect"
             @update:open="_onStlOpenChange"
           />
