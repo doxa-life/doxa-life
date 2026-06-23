@@ -13,11 +13,11 @@
  *   - <doxa-countries-map>   explicit tag matching the bundle name
  *
  * The profile-config attribute is parsed by ProfileLoader (in @map). `profile`
- * must match a .vue file in this bundle's profiles/ folder.
+ * must match a .vue file in this bundle's folder.
  *
  * Profile registry — Q3 contract from the migration plan: ProfileLoader lives
  * inside @map, so it cannot use import.meta.glob to reach into a bundle's
- * folder. The bundle evaluates import.meta.glob('./profiles/*.vue') HERE and
+ * folder. The bundle evaluates import.meta.glob('./*.vue') HERE and
  * hands the result to the loader via app.provide('profileModules').
  */
 
@@ -29,7 +29,7 @@ import { createAppI18n } from '@map/i18n/index.js'
 // ─── Bundle-private profile registry ─────────────────────────────────────────
 // import.meta.glob is evaluated by Vite at build time relative to THIS file —
 // so it captures only this bundle's profiles.
-const profileModules = import.meta.glob('./profiles/*.vue')
+const profileModules = import.meta.glob('./*.vue')
 
 // ─── Mapbox RTL text plugin — load ONCE before any map instance ──────────────
 if (typeof window !== 'undefined' && window.mapboxgl?.setRTLTextPlugin) {

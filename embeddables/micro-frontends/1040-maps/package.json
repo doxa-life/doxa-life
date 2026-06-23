@@ -6,11 +6,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run clean && for d in app-profiles/*/; do BUNDLE=$(basename \"$d\") vite build || exit 1; done",
+    "build": "npm run clean && for d in app-profiles/*/; do BUNDLE=$(basename \"$d\") vite build || exit 1; done && npm run manifest",
     "build:watch": "vite build --watch",
     "preview": "vite preview",
     "clean": "mkdir -p ../../../public/js",
-    "build:bundle": "vite build"
+    "build:bundle": "vite build",
+    "manifest": "node generate-manifest.mjs"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",

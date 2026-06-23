@@ -1,48 +1,50 @@
 /**
- * Color Strategies Registry
+ * Color Strategies Registry — AUTO-DISCOVERED
  *
- * Central enum + lookup for all per-strategy modules in this folder.
- * Each strategy lives in its own file (one strategy = one file rule, per
- * upstream refactor ideation3.md § R2).
+ * Each strategy lives in its own file in this folder (one strategy = one file).
+ * Strategies are discovered automatically at build time via Vite's
+ * `import.meta.glob` — the SAME pattern app-profiles use to auto-discover
+ * bundles. There is NO manual registration step.
  *
  * Add a new strategy:
- *   1. Create <name>.js next to this file (export default { ... }).
- *   2. Add an entry to COLOR_MODES.
- *   3. Import + register in STRATEGIES below.
+ *   1. Create <name>.js next to this file with `export default { name, propertyKey,
+ *      getColor, applyColor, ... }` (see religion.js for the canonical shape).
+ *   2. Build. It appears automatically.
+ *
+ * That's it — no import, no COLOR_MODES entry, no STRATEGIES entry to maintain.
+ *
+ * Naming contract (how the mode key is derived from the filename):
+ *   file `affinity-block.js`  → mode string `affinityBlock`  (camelCase)
+ *                             → COLOR_MODES.AFFINITY_BLOCK    (UPPER_SNAKE enum key)
+ *   file `religion.js`        → mode string `religion`        → COLOR_MODES.RELIGION
+ *   Files whose name starts with `_` or `.` are skipped (e.g. THIS file).
  */
 
-import prayerProgress  from './prayer-progress.js'
-import engagement      from './engagement.js'
-import adoption        from './adoption.js'
-import affinityBlock   from './affinity-block.js'
-import languageFamily  from './language-family.js'
-import doxaRegion      from './doxa-region.js'
-import resource        from './resource.js'
-import religion        from './religion.js'
+// ─── Auto-discovery ──────────────────────────────────────────────────────────
+// Eager glob: Vite inlines every sibling .js at build time (relative to THIS
+// file), so each bundle that imports the registry gets the full strategy set.
+const modules = import.meta.glob('./*.js', { eager: true })
 
-export const COLOR_MODES = {
-  LANGUAGE_FAMILY:  'languageFamily',
-  AFFINITY_BLOCK:   'affinityBlock',
-  DOXA_REGION:      'doxaRegion',
-  RESOURCE:         'resource',
-  STATUS:           'status',
-  CUSTOM:           'custom',
-  PRAYER_PROGRESS:  'prayerProgress',
-  ENGAGEMENT:       'engagement',
-  ADOPTION:         'adoption',
-  RELIGION:         'religion'
+const kebabToCamel = (s) => s.replace(/-([a-z0-9])/g, (_, c) => c.toUpperCase())
+const kebabToUpperSnake = (s) => s.replace(/-/g, '_').toUpperCase()
+
+// Reserved modes that have NO strategy file (enum values referenced elsewhere).
+const RESERVED_MODES = { STATUS: 'status', CUSTOM: 'custom' }
+
+const COLOR_MODES = { ...RESERVED_MODES }
+const STRATEGIES = {}
+
+for (const path of Object.keys(modules).sort()) {
+  const file = path.split('/').pop().replace(/\.js$/, '')    // e.g. 'affinity-block'
+  if (file.startsWith('_') || file.startsWith('.')) continue  // skip this registry + dotfiles
+  const strategy = modules[path].default
+  if (!strategy) continue                                     // a file with no default export is not a strategy
+  const mode = kebabToCamel(file)                             // 'affinityBlock'
+  COLOR_MODES[kebabToUpperSnake(file)] = mode                 // COLOR_MODES.AFFINITY_BLOCK = 'affinityBlock'
+  STRATEGIES[mode] = strategy
 }
 
-const STRATEGIES = {
-  [COLOR_MODES.LANGUAGE_FAMILY]:  languageFamily,
-  [COLOR_MODES.AFFINITY_BLOCK]:   affinityBlock,
-  [COLOR_MODES.DOXA_REGION]:      doxaRegion,
-  [COLOR_MODES.RESOURCE]:         resource,
-  [COLOR_MODES.PRAYER_PROGRESS]:  prayerProgress,
-  [COLOR_MODES.ENGAGEMENT]:       engagement,
-  [COLOR_MODES.ADOPTION]:         adoption,
-  [COLOR_MODES.RELIGION]:        religion,
-}
+export { COLOR_MODES }
 
 /**
  * Resolve a color strategy by mode key.
@@ -88,17 +90,6 @@ export function listStrategies() {
     name: strategy.name,
     propertyKey: strategy.propertyKey
   }))
-}
-
-export {
-  prayerProgress,
-  engagement,
-  adoption,
-  affinityBlock,
-  languageFamily,
-  doxaRegion,
-  resource,
-  religion
 }
 
 // Back-compat: name matches the monolithic colorStrategies.js export.

@@ -2,9 +2,15 @@
 
 One strategy = one file (per upstream refactor `ideation3.md § R2`). Each strategy
 decides how people-group pins are colored on the map for a given "color mode"
-(language family, prayer progress, religion, …). `_registry.js` is the central
-enum + lookup; back-compat shims `../colorStrategies.js` and `../colors.js`
-re-export from here so older imports keep working.
+(language family, prayer progress, religion, …). `_registry.js` **auto-discovers**
+every `<name>.js` in this folder via Vite's `import.meta.glob` (the same pattern
+app-profiles use) and builds the `COLOR_MODES` enum + strategy lookup from the
+filenames — **no manual registration**. Back-compat shims `../colorStrategies.js`
+and `../colors.js` re-export from here so older imports keep working.
+
+**Filename → mode mapping:** `affinity-block.js` → mode `affinityBlock` /
+`COLOR_MODES.AFFINITY_BLOCK`; `religion.js` → `religion` / `COLOR_MODES.RELIGION`.
+Files whose name starts with `_` (like this registry) or `.` are skipped.
 
 ## The strategy contract
 
@@ -39,11 +45,13 @@ directly to `circle-color` in `useMapLayers.addLanguageFamilyLayer`.
 1. **Create `<name>.js`** next to this file, following the contract above.
    If you derive color from a string, reuse `generateColorFromString` from
    `../../utils/geoUtils.js` (see `doxa-region.js`).
-2. **Register it in `_registry.js`:**
-   - add an `import` at the top,
-   - add a key to `COLOR_MODES`,
-   - add it to the `STRATEGIES` map,
-   - add it to the bottom named re-export block (parity — all strategies are listed there).
+   The mode key is auto-derived from the filename (`my-thing.js` → `myThing` /
+   `COLOR_MODES.MY_THING`) — pick the filename so that camelCase matches the mode
+   string you want consumers to pass.
+2. **Build — it auto-registers.** `_registry.js` globs this folder; your file
+   appears in `COLOR_MODES`, `getColorStrategy`, `listStrategies` automatically.
+   **No `_registry.js` edit needed.** (Just make sure the file has a `export
+   default` with a non-empty `name` — files without a default export are ignored.)
 3. **Make sure the pin feature carries your `PROPERTY_KEY`.** Pin properties are
    built in `composables/useMapLayers.js → addLanguageFamilyLayer` (the big
    `properties: { … }` block). If your field isn't there, the Mapbox expression

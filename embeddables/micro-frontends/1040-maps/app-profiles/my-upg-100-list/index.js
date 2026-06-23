@@ -19,7 +19,7 @@ import { createPinia } from 'pinia'
 import ProfileLoader from '@map/ProfileLoader.vue'
 import { createAppI18n } from '@map/i18n/index.js'
 
-const profileModules = import.meta.glob('./profiles/*.vue')
+const profileModules = import.meta.glob('./*.vue')
 
 if (typeof window !== 'undefined' && window.mapboxgl?.setRTLTextPlugin) {
   try {

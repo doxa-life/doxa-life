@@ -59,20 +59,20 @@ const instanceId = computed(() =>
 
 // ─── Profile Registry — provided by bundle entry ────────────────────────────
 // The bundle entry (app-profiles/<bundle>/index.js) MUST run
-//   app.provide('profileModules', import.meta.glob('./profiles/*.vue'))
+//   app.provide('profileModules', import.meta.glob('./*.vue'))
 // because import.meta.glob cannot cross package boundaries — it must be
 // evaluated by the bundle that owns the profile .vue files.
 
 const profileModules = inject('profileModules', null)
 if (!profileModules) {
-  throw new Error('[ProfileLoader] No profileModules provided. Bundle entry must `app.provide("profileModules", import.meta.glob("./profiles/*.vue"))`')
+  throw new Error('[ProfileLoader] No profileModules provided. Bundle entry must `app.provide("profileModules", import.meta.glob("./*.vue"))`')
 }
 
 // ─── Async component — loads the resolved profile file ───────────────────────
 
 const ProfileComponent = computed(() => {
   if (!profileName.value) return null
-  const key = `./profiles/${profileName.value}.vue`
+  const key = `./${profileName.value}.vue`
   if (!profileModules[key]) {
     console.error(`[ProfileLoader] Profile not found: "${profileName.value}". Available:`, Object.keys(profileModules))
     return null

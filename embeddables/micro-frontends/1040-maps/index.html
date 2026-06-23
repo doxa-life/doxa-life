@@ -4,66 +4,59 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>1040-maps · staging index</title>
+  <link rel="icon" href="data:,">
+  <!-- Mapbox GL peer (the bundles use window.mapboxgl) -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      background: #0b0f14; color: #e5e7eb; min-height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      padding: 48px 24px;
-    }
-    .wrap { max-width: 720px; margin: 0 auto; }
-    h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.02em; }
-    .sub { color: #9ca3af; margin-bottom: 32px; font-size: 14px; }
-    .bundles { display: flex; flex-direction: column; gap: 12px; }
-    a.bundle {
-      display: block; padding: 18px 20px; border-radius: 10px;
-      background: #111827; border: 1px solid #1f2937;
-      color: inherit; text-decoration: none; transition: border-color 0.15s, background 0.15s;
-    }
-    a.bundle:hover { border-color: #374151; background: #1a2233; }
-    a.bundle .name { font-size: 16px; font-weight: 600; color: #e5e7eb; }
-    a.bundle .desc { font-size: 13px; color: #9ca3af; margin-top: 4px; }
-    .footer { margin-top: 32px; font-size: 12px; color: #6b7280; line-height: 1.6; }
+    html, body { background: #0b0f14; color: #e5e7eb;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; }
+    body { padding: 40px 24px; }
+    .wrap { max-width: 1100px; margin: 0 auto; }
+    h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+    .sub { color: #9ca3af; font-size: 13px; margin: 6px 0 4px; }
+    #count { color: #46d4ff; font-size: 12px; margin-bottom: 28px; display: block; }
+    .bundle { background: #111827; border: 1px solid #1f2937; border-radius: 12px;
+      padding: 18px 20px; margin-bottom: 18px; }
+    .bundle header { display: flex; align-items: baseline; gap: 12px; }
+    .bundle h2 { font-size: 18px; font-weight: 600; }
+    .open { margin-left: auto; font-size: 12px; color: #46d4ff; text-decoration: none; }
+    .open:hover { text-decoration: underline; }
+    .profiles { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .profile summary { cursor: pointer; font-size: 14px; padding: 8px 10px;
+      background: #0f1520; border: 1px solid #1f2937; border-radius: 8px; list-style: none; }
+    .profile summary code { color: #ffc24b; }
+    .profile .tag { color: #6b7787; font-size: 12px; margin-left: 8px; }
+    .profile pre { margin: 8px 0; padding: 12px; background: #0f1520; border-radius: 8px;
+      font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; color: #cdd6e2; overflow-x: auto; }
+    .profile iframe { width: 100%; height: 520px; border: 1px solid #1f2937; border-radius: 8px; background: #0a0e15; }
+    .empty { color: #6b7280; font-size: 13px; }
+    .note { margin-top: 28px; font-size: 12px; color: #6b7280; line-height: 1.6; }
     .provenance {
       margin-top: 24px; padding: 14px 16px; border-radius: 10px;
       background: #0f1520; border: 1px solid #1f2937;
       font-size: 12px; color: #9ca3af; line-height: 1.6;
     }
     .provenance strong { color: #d1d5db; }
-    code { background: #1f2937; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #d1d5db; }
+    code { background: #1f2937; padding: 1px 5px; border-radius: 4px; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>1040-maps · staging</h1>
-    <p class="sub">Vite dev server. Each link below loads a bundle from <code>app-profiles/&lt;name&gt;/</code>.</p>
-
-    <div class="bundles">
-      <a class="bundle" href="/app-profiles/doxa-simple-map/">
-        <div class="name">doxa-simple-map</div>
-        <div class="desc">Parameterized profile · prayer / adoption / engagement tabs · child-prop driven</div>
-      </a>
-      <a class="bundle" href="/app-profiles/doxa-research-map/">
-        <div class="name">doxa-research-map</div>
-        <div class="desc">Nested profile · prayer / adoption / engagement / doxa-regions / languages / affinity-blocks</div>
-      </a>
-      <a class="bundle" href="/app-profiles/my-upg-100-list/">
-        <div class="name">my-upg-100-list</div>
-        <div class="desc">Research preview · 13 geographic prayer lists + 2 deaf lists · Regions tab cloned from research-map + admin-2 unlock for India + China</div>
-      </a>
-    </div>
-
-    <div class="footer">
-      Build outputs land at <code>app/&lt;bundle&gt;.js</code> (CSS inlined). Production embed:<br>
-      <code>&lt;script src="…/&lt;bundle&gt;.js"&gt;&lt;/script&gt;</code> + <code>&lt;doxa-map profile-config='…'&gt;&lt;/doxa-map&gt;</code>.
-    </div>
+    <p class="sub">Auto-detected from <code>app-profiles/*/</code> at dev time — no build, no hardcoded list. Add a folder or a <code>.vue</code> and it appears here on HMR.</p>
+    <span id="count">detecting…</span>
+    <div id="app"></div>
+    <p class="note">Each profile expands to a live <code>&lt;iframe&gt;</code> of that bundle's own dev page (lazy-loaded so all the maps don't boot Mapbox at once). The script-tag snippet is auto-named from the folder + <code>.vue</code> file. Discovery + HMR logic: <code>src/staging.js</code>.</p>
 
     <div class="provenance">
       <strong>Built using the 1040 Maps Forge template (Apache-2.0).</strong>
       Your maps are private, custom and uniquely yours; the shared template
-      <strong>library</strong> is Apache. Your maps live in the
+      <strong>library</strong> (<code>src/</code>) is Apache. Your maps live in the
       <code>app-profiles/</code> folder.
     </div>
   </div>
+  <script type="module" src="/src/staging.js"></script>
 </body>
 </html>

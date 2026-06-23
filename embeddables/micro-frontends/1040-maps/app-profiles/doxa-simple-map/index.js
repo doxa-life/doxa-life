@@ -17,11 +17,11 @@
  *   <doxa-simple-map profile-config='{"profile":"doxa-simple-map","tk":"pk.eyJ..."}'></doxa-simple-map>
  *
  * The profile-config attribute is parsed by ProfileLoader (in @map).
- * `profile` must match a file in this bundle's profiles/ folder.
+ * `profile` must match a .vue file in this bundle's folder.
  *
  * Profile registry — Q3 contract from the migration plan: ProfileLoader lives
  * inside @map, so it cannot use import.meta.glob to reach into a
- * bundle's folder. The bundle MUST evaluate import.meta.glob('./profiles/*.vue')
+ * bundle's folder. The bundle MUST evaluate import.meta.glob('./*.vue')
  * locally and hand the result to the loader via app.provide('profileModules').
  *
  * Mapbox RTL text plugin: registered ONCE at module init (before any map
@@ -37,7 +37,7 @@ import { createAppI18n } from '@map/i18n/index.js'
 // import.meta.glob is evaluated by Vite at build time relative to THIS file —
 // so it captures only this bundle's profiles. Handed to ProfileLoader via
 // app.provide('profileModules', ...) below.
-const profileModules = import.meta.glob('./profiles/*.vue')
+const profileModules = import.meta.glob('./*.vue')
 
 // ─── Mapbox RTL text plugin — load ONCE before any map instance ──────────────
 // Required for proper rendering of Arabic text on the basemap.

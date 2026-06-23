@@ -5,8 +5,8 @@
  *   src/                   ← shared library (components, composables, config, etc.)
  *   app-profiles/<name>/   ← bundle source folder
  *     ├── index.html       ← Vite html entry (staging page; loads index.js as a module in dev)
- *     ├── index.js         ← bundle entry — registers the custom element
- *     └── profiles/*.vue   ← profile components (auto-discovered via import.meta.glob)
+ *     ├── index.js         ← bundle entry — registers the custom element (globs ./*.vue)
+ *     └── *.vue            ← profile components at the bundle root (auto-discovered via import.meta.glob('./*.vue'))
  *   app/                   ← build outputs — exactly one <bundle>.js per app-profiles folder
  *
  * Build mode: each invocation builds ONE bundle (selected via BUNDLE env var) so we can

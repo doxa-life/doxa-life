@@ -22,7 +22,7 @@ import { useMapData } from '@map/composables/useMapData.js'
 import { createPplrInstance, provideInstance } from '@map/composables/usePplrInstance.js'
 import SemanticTreeLegend from '@map/components/SemanticTreeLegend.vue'
 
-import clustersJson from '../data/clusters.json'
+import clustersJson from './data/clusters.json'
 
 const ResearchMapClone = defineAsyncComponent(() => import('./research-map-clone.vue'))
 
