@@ -13,7 +13,7 @@
  * Tree node shape:
  *   { id, label, color?, count?, pop?, filter?, info?, children?: TreeNode[] }
  */
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useShadowStyles } from '../composables/useShadowStyles.js'
 import { useInstance } from '../composables/usePplrInstance.js'
 
@@ -106,6 +106,10 @@ const selectedNode = computed({
 
 const selectedId = computed(() => selectedNode.value?.id || null)
 
+// Scroll container for the legend rows — used to bring a freshly-selected row
+// (e.g. from a People-Group search result) into view without the user scrolling.
+const rowsContainer = ref(null)
+
 watch(() => props.open, (v) => {
   if (v !== null) panelOpen.value = v
 })
@@ -128,9 +132,11 @@ if (instance) {
     if (typeof sel.depth === 'number') {
       activeTab.value = Math.min(sel.depth, tabList.value.length - 1)
     }
-    const tabIdx = activeTab.value
+    // Expand ALL ancestors of the selection (not just from the active tab down)
+    // so a selected row in a collapsed sub-branch actually enters visibleRows —
+    // otherwise the scroll-to-selected watcher can't find its DOM row.
     const newExp = new Set()
-    chain.slice(tabIdx).forEach(p => newExp.add(p.id))
+    chain.forEach(p => newExp.add(p.id))
     expandedIds.value = newExp
     emit('select', sel)
   })
@@ -347,6 +353,30 @@ function toggleExportMenu(e) {
 // The Export button only exists while a row is selected; if the selection is
 // cleared (deselect / tab switch / nodes change) the menu must not linger.
 watch(selectedId, id => { if (!id) exportMenuOpen.value = false })
+
+// Bring the selected row into view when the selection changes (e.g. a People-Group
+// search result highlights a row that may be scrolled off-screen). Scoped to THIS
+// component's scroll container so multiple legend instances on one page don't fight.
+//
+// IMPORTANT: use container.scrollTop, NOT row.scrollIntoView(). scrollIntoView walks
+// up the entire DOM tree and will scroll the host page's scrollbar (the shadow-DOM
+// embed's parent document) — not just the legend panel. offsetTop is relative to the
+// container so setting scrollTop directly keeps the scroll 100% inside the legend.
+watch(selectedId, async id => {
+  if (!id) return
+  const container = rowsContainer.value
+  if (!container) return
+  await nextTick()
+  const tryScroll = (attempt = 0) => {
+    const row = container.querySelector(`[data-stl-node-id="${CSS.escape(String(id))}"]`)
+    if (row) {
+      container.scrollTop = row.offsetTop - 8
+      return
+    }
+    if (attempt < 2) requestAnimationFrame(() => tryScroll(attempt + 1))
+  }
+  requestAnimationFrame(() => tryScroll(0))
+})
 
 // ── Formatters ─────────────────────────────────────────────────────────────────
 function fmtPop(n) {
@@ -944,9 +974,10 @@ useShadowStyles(`
         <span class="stl-x-slot"></span>
       </div>
 
-      <div class="stl-rows" :class="{ 'has-sel': hasSel }">
+      <div class="stl-rows" :class="{ 'has-sel': hasSel }" ref="rowsContainer">
         <div v-for="row in visibleRows" :key="row.node.id"
           class="stl-row" :class="rowClasses(row)"
+          :data-stl-node-id="row.node.id"
           :style="{
             '--trunk-color': (row.parent?.color || '#6e7681'),
             '--row-color':   (row.node.color   || '#73A17F'),

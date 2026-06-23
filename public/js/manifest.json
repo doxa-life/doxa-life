@@ -1,0 +1,93 @@
+{
+  "schema": "doxa-1040-maps-manifest@1",
+  "generatedFrom": "app-profiles/*/*.vue",
+  "bundleCount": 5,
+  "profileCount": 7,
+  "bundles": [
+    {
+      "bundle": "doxa-countries-map",
+      "output": "public/js/doxa-countries-map.js",
+      "elements": [
+        "doxa-countries-map"
+      ],
+      "profiles": [
+        {
+          "profile": "countries-map",
+          "file": "countries-map.vue",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "bundle": "doxa-research-map",
+      "output": "public/js/doxa-research-map.js",
+      "elements": [
+        "doxa-research-map"
+      ],
+      "profiles": [
+        {
+          "profile": "research-map",
+          "file": "research-map.vue",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "bundle": "doxa-simple-map",
+      "output": "public/js/doxa-simple-map.js",
+      "elements": [
+        "doxa-map",
+        "doxa-simple-map"
+      ],
+      "profiles": [
+        {
+          "profile": "doxa-simple-map",
+          "file": "doxa-simple-map.vue",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "bundle": "my-upg-100-list",
+      "output": "public/js/my-upg-100-list.js",
+      "elements": [
+        "my-upg-100-list-map"
+      ],
+      "profiles": [
+        {
+          "profile": "research-map-clone",
+          "file": "research-map-clone.vue",
+          "description": ""
+        },
+        {
+          "profile": "upg-100-list",
+          "file": "upg-100-list.vue",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "bundle": "template-bundle",
+      "output": "public/js/template-bundle.js",
+      "elements": [
+        "template-bundle"
+      ],
+      "profiles": [
+        {
+          "profile": "template-map-a",
+          "file": "template-map-a.vue",
+          "description": "Minimal example profile A — a colored placeholder, no Mapbox or data.",
+          "bundle": "template-bundle",
+          "element": "template-bundle"
+        },
+        {
+          "profile": "template-map-b",
+          "file": "template-map-b.vue",
+          "description": "Minimal example profile B — a second profile in the same bundle.",
+          "bundle": "template-bundle",
+          "element": "template-bundle"
+        }
+      ]
+    }
+  ]
+}
