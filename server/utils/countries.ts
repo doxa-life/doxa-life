@@ -6,8 +6,14 @@
 // (175 countries × 8 locales) calls this during build, and the upstream list is
 // ~2,100 rows. Without caching each page would re-fetch the whole list.
 
+import dns from 'node:dns'
 import { summarizeCountries, type CountrySummary } from '~~/config/countries-meta'
 import { LANGUAGE_CODES } from '~~/config/languages'
+
+// undici (Nitro's HTTP client) has its own DNS stack and ignores NODE_OPTIONS.
+// Force IPv4-first so the pray.doxa.life fetch doesn't time out on networks
+// where IPv6 routing to Cloudflare is unavailable.
+dns.setDefaultResultOrder('ipv4first')
 
 const LIST_FIELDS = 'country_code,wagf_region,latitude,longitude'
 
