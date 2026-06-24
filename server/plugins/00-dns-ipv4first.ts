@@ -25,6 +25,12 @@
 import { createRequire } from 'node:module'
 
 export default defineNitroPlugin(() => {
+  // Dev-only by design. In prod (Bun preset) this is already a no-op — Bun's fetch
+  // is not undici and `require('undici')` won't resolve — but guard explicitly so a
+  // future runtime change can never silently force IPv4-only on a healthy dual-stack
+  // production host. `family: 4` is IPv4-ONLY at the socket layer, not a DNS reorder
+  // (a reorder via dns.setDefaultResultOrder was tried and undici ignores it).
+  if (!import.meta.dev) return
   try {
     const require = createRequire(import.meta.url)
     const { Agent, setGlobalDispatcher } = require('undici') as typeof import('undici')
