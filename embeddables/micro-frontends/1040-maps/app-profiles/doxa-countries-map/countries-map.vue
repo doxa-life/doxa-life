@@ -1512,7 +1512,7 @@ function onGeocoderPeopleGroupResult(feature) {
 // (the exact pins it was built from) and fall back to the canonical
 // countryName/country field — both are locale-INDEPENDENT, so the lookup never
 // depends on the active UI locale or a translated country label. This is the
-// fix for [redacted]'s 2026-06-08 report: on /fr/research a country
+// fix for 2026-06-08 user report: on /fr/research a country
 // pick used to leave the user on the Prayer tab because the regions navigation
 // keyed off a localized name; keying off the ISO makes it behave identically in
 // every locale.

@@ -61,7 +61,7 @@ useShadowStyles(
   'geocoder-ios-zoom-fix'
 )
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const props = defineProps({
   mapInstance:  { type: Object,  required: true },
@@ -206,7 +206,7 @@ const dataStore = inject('dataStore', null)
 const mapStore  = inject('mapStore',  null)
 // uiStore holds the prayer / engagement / adoption / religion legend filters,
 // which live outside mapStore. Needed so a search result can clear them too
-// (otherwise filter ∩ result = zero pins → blank map, JD 2026-04-27).
+// (otherwise filter ∩ result = zero pins → blank map).
 const uiStore   = inject('uiStore',   null)
 
 // getActiveFilter is a closure over the live mapStore so each search call
@@ -278,6 +278,10 @@ onMounted(() => {
     mapboxgl:       mapboxgl,   // CDN global — same reference used by the map instance
     marker:         false,
     placeholder:    effectivePlaceholder.value,
+    // Localize Mapbox's remote place results AND the geocoder's own UI strings.
+    // Mapbox accepts ISO-639-1 codes (comma-separated); the active i18n locale
+    // is set once at mount from profile-config.lang (default 'en'). See loc-002.
+    language:       locale.value || 'en',
     localGeocoder:  doxaLocalGeocoder,
     // Raise suggestion limit well above Mapbox's default (5) so a query like
     // "India" can surface many people-groups. CSS caps the dropdown height
@@ -306,7 +310,7 @@ onMounted(() => {
 
     // A chosen search result must not stay hidden behind a still-active legend
     // filter — the filter and result intersect to zero pins (the blank-map bug,
-    // JD 2026-04-27). Clear every legend selection that has NO "within selection"
+    // Clear every legend selection that has NO "within selection"
     // UX: region, resource, affinity-bloc, dialect (mapStore) + prayer /
     // engagement / adoption / religion (uiStore). Map selections are mutually
     // exclusive, so assign state directly — the select*(null) actions cross-clear
@@ -398,6 +402,15 @@ watch(effectivePlaceholder, (next) => {
   }
   // Also stash on the instance so any internal reads pick it up.
   if (inst.options) inst.options.placeholder = next
+})
+
+// Locale can change at runtime via the LanguageSelector control (loc-005).
+// MapboxGeocoder reads `language` only at construction and has no public
+// updater, so patch the stashed option directly — the next forward query then
+// localizes remote results to the new locale without a costly geocoder rebuild.
+watch(locale, (next) => {
+  const inst = geocoder.value
+  if (inst?.options) inst.options.language = next || 'en'
 })
 
 onBeforeUnmount(() => {

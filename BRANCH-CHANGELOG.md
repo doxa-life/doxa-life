@@ -8,13 +8,13 @@ Real user reports that drove this branch:
 
 | Problem reported | Status |
 |------------------|--------|
-| Legend doesn't reflect search selection _([user], 2026-05-25)_ | FIXED ✅ |
-| French map behaves differently from English _(gospelambition, 2026-06-08)_ | FIXED ✅ |
-| Search should clear legend selection _(JD, 2026-04-27)_ | HELD — can't reproduce |
-| Max zoom-out — world repeats on edges _([user], 2026-05-21)_ | FUTURE BRANCH |
-| Scroll hijack — map zooms instead of page scroll _([user], 2026-05-27)_ | FUTURE BRANCH |
-| Mobile scroll capture _(Nath, 2026-04-27)_ | FUTURE BRANCH |
-| "Block" → "Bloc" spelling _([user], 2026-05-22)_ | API team request — can't fix in frontend |
+| Legend doesn't reflect search selection _(2026-05-25)_ | FIXED ✅ |
+| French map behaves differently from English _(2026-06-08)_ | FIXED ✅ |
+| Search should clear legend selection _(2026-04-27)_ | HELD — can't reproduce |
+| Max zoom-out — world repeats on edges _(2026-05-21)_ | FUTURE BRANCH |
+| Scroll hijack — map zooms instead of page scroll _(2026-05-27)_ | FUTURE BRANCH |
+| Mobile scroll capture _(2026-04-27)_ | FUTURE BRANCH |
+| "Block" → "Bloc" spelling _(2026-05-22)_ | API team request — can't fix in frontend |
 
 > **FIXED** = shipped in this branch · **HELD** = could not reproduce · **FUTURE BRANCH** = real but scoped to a later branch · **API team request** = needs a data/API change, not a frontend fix.
 

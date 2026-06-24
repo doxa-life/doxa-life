@@ -1,7 +1,7 @@
 # Bundle outputs — regenerated on every build
 app/
 !app/.gitkeep
-
+_qa-cycle
 # Node
 node_modules/
 .npm/
@@ -30,6 +30,21 @@ dist/
 .agent-restricted
 build-status.md
 embeddables/**/intel/
+
+# Private design specs / research — local working docs, not for production/GitHub
+# Public docs (BUILD-A-MAP.md, prayer-ripple-animation.md) are tracked intentionally.
+# Private files are listed in docs/.gitignore
+docs/AUDIT-*.md
+docs/BUNDLE-*.md
+docs/BUNDLE-ENTRY-*.md
+docs/DECISION-*.md
+docs/DIAGNOSIS-*.md
+docs/I18N-AUDIT-*.md
+docs/NOTE-*.md
+docs/PERF-*.md
+docs/RESEARCH-*.md
+docs/SEARCH-BAR-REBUILD-SPEC.md
+docs/STAGING-REFACTOR-PLAN.md
 
 # Sub-project lockfile — root bun.lock is authoritative
 bun.lock
