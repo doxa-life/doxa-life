@@ -349,7 +349,7 @@ function filterUUPGs() {
             newItem.wagf_region_label = highlightedValue
           } else if (parentKey === 'rop1' && !props.useSelectCard) {
             newItem.rop1_label = highlightedValue
-          } else if (parentKey === 'country_code' && !props.useSelectCard) {
+          } else if (parentKey === 'country_code') {
             newItem.country_label = highlightedValue
           } else if (parentKey === 'wagf_region' && !props.useSelectCard) {
             // do nothing
@@ -592,6 +592,12 @@ const showMore = computed(() => hasMore())
             </div>
             <div>
               <p class="line-height-tight" v-html="uupg.name" />
+              <p v-if="uupg.country_code" class="uupg__country font-size-sm">
+                <a
+                  class="uupg__country-link light-link"
+                  :href="localePath(`/countries/${countrySlug(uupg.country_code.value, uupg.country_code.label)}`)"
+                ><span v-html="uupg.country_label ? uupg.country_label : uupg.country_code.label" /></a>
+              </p>
               <template v-if="uupg.matches">
                 <p v-for="(match, mi) in uupg.matches" :key="mi" class="font-size-sm color-brand-lighter">
                   <strong>{{ match.key }}</strong>: <span v-html="match.label" />
@@ -624,15 +630,6 @@ const showMore = computed(() => hasMore())
                   <strong>{{ match.key }}</strong>: <span v-html="match.label" />
                 </p>
               </template>
-            </div>
-            <div class="uupg_adopted">
-              <div>
-                <img
-                  :src="(uupg.adopted_by_churches && uupg.adopted_by_churches > 0) ? `${iconsUrl}/Check-GreenCircle.png` : `${iconsUrl}/RedX-Circle.png`"
-                  :alt="(uupg.adopted_by_churches && uupg.adopted_by_churches > 0) ? (t.adopted || '') : (t.not_adopted || '')"
-                >
-                <span>{{ (uupg.adopted_by_churches && uupg.adopted_by_churches > 0) ? t.adopted : t.not_adopted }}</span>
-              </div>
             </div>
             <p v-if="uupg.location_description" class="uupg__content">{{ uupg.location_description }}</p>
             <a class="uupg__more-button button compact" :href="`${researchUrl}${uupg.slug}`">{{ t.full_profile }}</a>

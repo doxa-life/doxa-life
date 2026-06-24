@@ -359,6 +359,7 @@ const uiStore   = inject('uiStore')
 // stays warm; flip `doxaRegions: true` to bring it back).
 const FEATURES = {
   doxaRegions:    true,
+  adoption:       false,  // Adoption tab hidden per UX request; wiring kept warm (flip to true to restore)
   hamburgerMenu:  false,  // canonical default — emit/listen mismatch + drawer surplus
   // Per QA building-round-1 R3 A4: clear the geocoder text on tab switch by
   // default; flip to true to preserve the previous tab's query when returning.
@@ -371,7 +372,7 @@ const FEATURES = {
 // than the previous alphabetical Engagement-before-Adoption.)
 const ALL_TABS = [
   { id: 'prayer',            label: 'Prayer',            colorStrategy: 'prayerProgress', legend: 'prayer',            popup: 'pray',  feature: null            },
-  { id: 'adoption',          label: 'Adoption',          colorStrategy: 'adoption',       legend: 'adoption',          popup: 'adopt', feature: null            },
+  { id: 'adoption',          label: 'Adoption',          colorStrategy: 'adoption',       legend: 'adoption',          popup: 'adopt', feature: 'adoption'      },
   { id: 'engagement',        label: 'Engagement',        colorStrategy: 'engagement',     legend: 'engagement',        popup: 'pray',  feature: null,           sepAfter: true },
   { id: 'affinity-blocks',   label: 'People Groups',     colorStrategy: 'affinityBlock',  legend: 'affinity-block',    popup: 'pray',  feature: null            },
   { id: 'doxa-regions',      label: 'Regions',            colorStrategy: 'doxaRegion',     legend: 'doxa-regions',      popup: 'pray',  feature: 'doxaRegions'   },

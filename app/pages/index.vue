@@ -135,28 +135,11 @@ useTextHighlight()
           <h2 class="highlight" data-highlight-last>{{ t('A simple path to faithful obedience') }}</h2>
           <div class="switcher | gap-md">
             <div class="step-card">
-              <div class="step-card__number">1</div>
               <div class="step-card__content">
                 <h2 class="step-card__title">{{ t('Pray') }}</h2>
                 <p>{{ t('Receive daily prayer points and join believers worldwide in prayer for the unengaged peoples.') }}</p>
               </div>
               <NuxtLink :to="localePath('/pray')" class="button | compact">{{ t('Join') }}</NuxtLink>
-            </div>
-            <div class="step-card">
-              <div class="step-card__number">2</div>
-              <div class="step-card__content">
-                <h2 class="step-card__title">{{ t('Adopt') }}</h2>
-                <p>{{ t('Churches and networks take ownership – praying, giving, and preparing the way for gospel workers.') }}</p>
-              </div>
-              <NuxtLink :to="localePath('/contact-us')" class="button | compact">{{ t('Contact Us') }}</NuxtLink>
-            </div>
-            <div class="step-card">
-              <div class="step-card__number">3</div>
-              <div class="step-card__content">
-                <h2 class="step-card__title">{{ t('Engage') }}</h2>
-                <p>{{ t('God raises up men and women to go, serve, and proclaim Christ among the nations.') }}</p>
-              </div>
-              <a href="#" class="button | compact invisible-placeholder">{{ t('Commit') }}</a>
             </div>
           </div>
         </div>
