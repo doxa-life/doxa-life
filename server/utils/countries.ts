@@ -11,6 +11,11 @@ import { LANGUAGE_CODES } from '~~/config/languages'
 
 const LIST_FIELDS = 'country_code,wagf_region,latitude,longitude'
 
+// NOTE: a dev box whose IPv6 route to Cloudflare is dead makes this $fetch ETIMEDOUT
+// locally. That is handled OUT-OF-BAND by the dev-only Nitro plugin
+// server/plugins/00-dns-ipv4first.ts (forces IPv4 for undici in dev; no-op in Bun
+// production). Keep this on $fetch so production keeps ofetch's defensive parsing,
+// timeouts and Bun-native networking — do not reintroduce a hand-rolled node:https path.
 async function fetchCountriesSummary(lang: string): Promise<CountrySummary[]> {
   const base = useRuntimeConfig().prayBaseUrl as string
   const data = await $fetch<{ posts?: unknown[] }>(`${base}/api/people-groups/list`, {

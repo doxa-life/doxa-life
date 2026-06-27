@@ -6,7 +6,7 @@
 // connectedCallback calls `new mapboxgl.Map(…)` before the global exists.
 // The <feedback-widget> bundle is loaded globally via nuxt.config.ts.
 
-const MAPBOX_JS = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js'
+const MAPBOX_JS = 'https://api.mapbox.com/mapbox-gl-js/v3.24.0/mapbox-gl.js'
 const MAPBOX_GEOCODER_JS = 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js'
 
 // Map of bundle keys → /public/js URLs. The IIFE bundles all register the
@@ -55,14 +55,21 @@ function loadScript(src: string): Promise<void> {
 export function useDoxaMap(bundle: BundleKey = 'simple-map') {
   const config = useRuntimeConfig()
 
+  const MAP_APP_JS = BUNDLES[bundle]
+
   useHead({
     link: [
-      { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css' },
-      { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css' }
+      // Warm the Mapbox CDN connection (DNS + TLS) before the script/tile requests.
+      { rel: 'preconnect', href: 'https://api.mapbox.com', crossorigin: '' },
+      { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/v3.24.0/mapbox-gl.css' },
+      { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css' },
+      // Preload the heavy scripts so the browser starts downloading them DURING
+      // page parse (in parallel), instead of waiting for onMounted to request them
+      // one-by-one. Execution order is still controlled by the onMounted chain.
+      { rel: 'preload', as: 'script', href: MAPBOX_JS, crossorigin: '' },
+      { rel: 'preload', as: 'script', href: MAP_APP_JS }
     ]
   })
-
-  const MAP_APP_JS = BUNDLES[bundle]
 
   onMounted(async () => {
     try {
@@ -72,8 +79,11 @@ export function useDoxaMap(bundle: BundleKey = 'simple-map') {
       if (config.public.prayBaseUrl) {
         window.MAP_APP_API_URL = config.public.prayBaseUrl as string
       }
-      await loadScript(MAPBOX_JS)
-      await loadScript(MAPBOX_GEOCODER_JS)
+      // mapbox-gl and the geocoder are INDEPENDENT — load them concurrently
+      // (was sequential). The map bundle needs BOTH globals defined before it
+      // runs, so it still loads after both resolve. With the preload hints above
+      // these are already in/near the HTTP cache, so this is mostly instant.
+      await Promise.all([loadScript(MAPBOX_JS), loadScript(MAPBOX_GEOCODER_JS)])
       await loadScript(MAP_APP_JS)
     } catch (err) {
       console.error('[useDoxaMap] script load failed', err)

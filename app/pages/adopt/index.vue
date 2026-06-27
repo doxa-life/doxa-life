@@ -29,11 +29,18 @@ onMounted(() => reload())
 const config = useRuntimeConfig()
 const mapboxToken = config.public.mapboxToken as string
 
+// Feature flag (runtime, no embeddable rebuild): the adoption-status tab is OFF by
+// default — set NUXT_PUBLIC_ENABLE_ADOPTION_MAP=true to show it. When off, the map
+// falls back to the prayer-coverage tab so the page still renders a useful map.
+const enableAdoptionMap = config.public.enableAdoptionMap === true
+
 const adoptMapConfig = JSON.stringify({
   profile: 'doxa-simple-map',
   dataSource: 'pray-tools',
   tk: mapboxToken,
-  tabs: [{ id: 'adoption', colorStrategy: 'adoption', legend: 'adoption', popup: 'adoption' }]
+  tabs: enableAdoptionMap
+    ? [{ id: 'adoption', colorStrategy: 'adoption', legend: 'adoption', popup: 'adoption' }]
+    : [{ id: 'prayer', colorStrategy: 'prayer', legend: 'prayer', popup: 'pray' }]
 })
 
 const adoptFeedbackConfig = JSON.stringify({

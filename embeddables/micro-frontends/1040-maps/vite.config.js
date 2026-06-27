@@ -5,8 +5,8 @@
  *   src/                   ← shared library (components, composables, config, etc.)
  *   app-profiles/<name>/   ← bundle source folder
  *     ├── index.html       ← Vite html entry (staging page; loads index.js as a module in dev)
- *     ├── index.js         ← bundle entry — registers the custom element
- *     └── profiles/*.vue   ← profile components (auto-discovered via import.meta.glob)
+ *     ├── index.js         ← bundle entry — registers the custom element (globs ./*.vue)
+ *     └── *.vue            ← profile components at the bundle root (auto-discovered via import.meta.glob('./*.vue'))
  *   app/                   ← build outputs — exactly one <bundle>.js per app-profiles folder
  *
  * Build mode: each invocation builds ONE bundle (selected via BUNDLE env var) so we can
@@ -73,12 +73,23 @@ export default defineConfig(({ command }) => {
       chunkSizeWarningLimit: 2500,    // research-map is ~1.2 MB; tree-shaking already done
       rollupOptions: {
         input: buildEntries,
+        // Externalize jspdf — it is used ONLY by the lazy poster/packet export
+        // (`await import('jspdf')` in useMapPoster/useMapPacket). Because the IIFE
+        // build uses inlineDynamicImports, that "lazy" import was being INLINED,
+        // bloating every research/countries/upg bundle by ~0.6 MB (jspdf pulls in
+        // html2canvas + canvg). Marking it external + mapping it to a CDN ESM URL
+        // keeps it out of the bundle entirely; the browser fetches it at runtime
+        // ONLY when the user actually exports a poster/packet. (Build-only — dev
+        // still resolves jspdf from node_modules.)
+        external: isBuild ? ['jspdf'] : [],
         output: isBuild ? {
           format: 'iife',
           name: `MapForge_${(target || '').replace(/[^a-zA-Z0-9_]/g, '_')}`,
           entryFileNames: '[name].js',
           assetFileNames: () => `${target}.[ext]`,
           inlineDynamicImports: true,
+          // Resolve the externalized `import('jspdf')` to a CDN ESM module at runtime.
+          paths: { jspdf: 'https://esm.sh/jspdf@4.2.1' },
         } : {
           entryFileNames: '[name].js',
         },

@@ -3,50 +3,128 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>1040-maps · staging index</title>
+  <title>1040-maps · Map Forge · staging</title>
+  <link rel="icon" href="data:,">
+
+  <!-- Mapbox peer loaded ONCE here; map custom elements mount in this page and use
+       window.mapboxgl directly (same realm → no cross-realm container errors). -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.24.0/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.24.0/mapbox-gl.js"></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+
   <style>
+    :root {
+      --bg:#0a0e15; --surf:#121a27; --surf2:#0e1623; --line:#223047;
+      --ink:#eef2f7; --mut:#9aa7b8; --dim:#6b7787; --cy:#46d4ff; --vi:#b9a6f5; --gold:#ffc24b; --grn:#5ee0a0;
+      --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+      --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+    }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      background: #0b0f14; color: #e5e7eb; min-height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      padding: 48px 24px;
+    html { scroll-behavior: smooth; }
+    body {
+      background:
+        radial-gradient(1100px 480px at 82% -12%, rgba(70,212,255,.10), transparent 60%),
+        radial-gradient(820px 460px at -8% 112%, rgba(185,166,245,.10), transparent 60%),
+        var(--bg);
+      color: var(--ink); font-family: var(--sans); min-height: 100%; -webkit-font-smoothing: antialiased;
     }
-    .wrap { max-width: 720px; margin: 0 auto; }
-    h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.02em; }
-    .sub { color: #9ca3af; margin-bottom: 32px; font-size: 14px; }
-    .bundles { display: flex; flex-direction: column; gap: 12px; }
-    a.bundle {
-      display: block; padding: 18px 20px; border-radius: 10px;
-      background: #111827; border: 1px solid #1f2937;
-      color: inherit; text-decoration: none; transition: border-color 0.15s, background 0.15s;
-    }
-    a.bundle:hover { border-color: #374151; background: #1a2233; }
-    a.bundle .name { font-size: 16px; font-weight: 600; color: #e5e7eb; }
-    a.bundle .desc { font-size: 13px; color: #9ca3af; margin-top: 4px; }
-    .footer { margin-top: 32px; font-size: 12px; color: #6b7280; line-height: 1.6; }
-    code { background: #1f2937; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #d1d5db; }
+    code { font-family: var(--mono); background:#1f2937; padding:1px 5px; border-radius:4px; color:var(--gold); }
+
+    /* ── Architecture header: the single-build-process showcase ── */
+    header.forge { padding: 22px 28px 6px; }
+    header.forge h1 { font: 800 21px/1.2 var(--sans); letter-spacing:-.02em; }
+    header.forge h1 .ac { color: var(--cy); }
+    header.forge .sub { margin-top: 6px; font: 13px/1.55 var(--sans); color: var(--mut); max-width: 78ch; }
+    header.forge .sub b { color: var(--ink); }
+
+    /* build pipeline: one shared core → build → bundles → element tags → maps */
+    .pipe { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:14px; }
+    .pstep { display:flex; flex-direction:column; gap:2px; background:var(--surf); border:1px solid var(--line);
+      border-radius:10px; padding:9px 13px; min-width:120px; }
+    .pstep .pt { font:700 12px/1.2 var(--sans); }
+    .pstep .pd { font:10px/1.3 var(--mono); color:var(--mut); }
+    .pipe .arr { color:var(--cy); font-weight:800; }
+    #count { display:block; margin-top:10px; color:var(--cy); font:12px/1 var(--mono); }
+
+    /* ── Language bar ── */
+    .langbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+      margin: 14px 28px 0; padding:11px 15px; background:var(--surf); border:1px solid var(--line);
+      border-radius:10px; font:13px/1.4 var(--sans); color:var(--mut); }
+    .langbar select { background:var(--surf2); color:var(--ink); border:1px solid #2b3648;
+      border-radius:8px; padding:7px 10px; font:inherit; cursor:pointer; }
+    .langbar select:hover { border-color: var(--cy); }
+
+    /* ── Horizontal JS-bundle strip (slim sticky bar; the page scrolls normally) ── */
+    #bundleTabs { position: sticky; top: 0; z-index: 5; display:flex; gap:10px;
+      padding: 12px 28px; overflow-x:auto; scrollbar-width:thin;
+      background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px);
+      border-bottom:1px solid var(--surf2); }
+    #bundleTabs::-webkit-scrollbar { height:8px; }
+    #bundleTabs::-webkit-scrollbar-thumb { background:#243349; border-radius:8px; }
+    .btab { flex:0 0 auto; text-align:left; cursor:pointer; min-width:198px;
+      background:var(--surf); border:1px solid var(--line); border-radius:12px; padding:11px 14px; color:inherit; transition:.15s; }
+    .btab:hover { border-color:#33455f; transform:translateY(-1px); }
+    .btab.active { border-color:var(--gem,var(--cy));
+      background: color-mix(in srgb, var(--gem,var(--cy)) 12%, var(--surf));
+      box-shadow: 0 0 0 1px var(--gem,var(--cy)) inset, 0 6px 20px rgba(0,0,0,.3); }
+    .btab .bname { font:700 13px/1.1 var(--sans); display:flex; align-items:center; gap:8px; }
+    .btab .dot { width:9px; height:9px; border-radius:50%; background:var(--gem,var(--cy)); box-shadow:0 0 8px var(--gem,var(--cy)); }
+    .btab .btags { margin-top:6px; display:flex; flex-wrap:wrap; gap:4px; }
+    .btab .etag { font:9px/1 var(--mono); color:var(--vi); border:1px solid rgba(185,166,245,.4); border-radius:999px; padding:3px 7px; }
+    .btab .bfile { margin-top:6px; font:10px/1 var(--mono); color:var(--dim); }
+
+    /* ── Live showcase — gem frames, full document scroll (NOTHING frozen over them) ── */
+    #showcase { display:flex; flex-direction:column; gap:18px; padding: 18px 28px 28px; }
+    .empty { color:var(--dim); font:13px/1.6 var(--mono); padding: 30px 0; }
+    .tile { --gem:var(--cy); --gem-rgb:70,212,255; position:relative; display:flex; flex-direction:column;
+      height:82vh; min-height:480px; padding:10px; background:var(--surf);
+      border:1px solid var(--gem); border-radius:14px; box-shadow:0 0 26px rgba(var(--gem-rgb),.14); }
+    .tile-header { display:flex; align-items:center; gap:10px; padding:7px 11px 11px; }
+    .tile-header .sctag { font:800 14px/1 var(--mono); color:var(--gem); }
+    .tile-header .sckind { font:9px/1 var(--mono); color:var(--dim); border:1px solid var(--line); border-radius:999px; padding:3px 8px; }
+    .tile-header .idx { margin-left:auto; font:10px/1 var(--mono); color:var(--dim); }
+    .map-slot { flex:1 1 0; min-height:0; position:relative; border-radius:10px; border:1px solid var(--gem); background:#0d1622; overflow:hidden; }
+    /* the mounted map — custom element OR iframe — fills the gem frame */
+    .map-slot > iframe, .map-slot > :not(.tile-loading):not(.tile-error) {
+      position:absolute; inset:0; width:100%; height:100%; border:0; display:block; }
+    .map-slot .tile-loading { position:absolute; inset:0; display:grid; place-items:center; color:var(--dim); font:12px/1 var(--mono); }
+    .map-slot .tile-error { position:absolute; inset:0; display:grid; place-items:center; padding:16px; text-align:center; color:#f87171; font:12px/1.5 var(--mono); }
+
+    .foot { padding:14px 28px 20px; font:11.5px/1.5 var(--mono); color:var(--dim); border-top:1px solid var(--surf2); }
+    .foot .scr { color: var(--vi); }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>1040-maps · staging</h1>
-    <p class="sub">Vite dev server. Each link below loads a bundle from <code>app-profiles/&lt;name&gt;/</code>.</p>
-
-    <div class="bundles">
-      <a class="bundle" href="/app-profiles/doxa-simple-map/">
-        <div class="name">doxa-simple-map</div>
-        <div class="desc">Parameterized profile · prayer / adoption / engagement tabs · child-prop driven</div>
-      </a>
-      <a class="bundle" href="/app-profiles/doxa-research-map/">
-        <div class="name">doxa-research-map</div>
-        <div class="desc">Nested profile · prayer / adoption / engagement / doxa-regions / languages / affinity-blocks</div>
-      </a>
+  <header class="forge">
+    <h1>1040-maps · <span class="ac">Map Forge</span> · staging</h1>
+    <p class="sub"><b>One shared core, one build, many paste-anywhere maps.</b> The shared library
+      in <code>src/</code> is built once into a self-contained <code>&lt;name&gt;.js</code> bundle per
+      app-profile; each bundle registers its own custom-element tag(s). Scroll the strip to see every
+      JS bundle and the element tags it ships; click one to load its maps as live gem frames below.</p>
+    <div class="pipe">
+      <div class="pstep"><span class="pt">src/</span><span class="pd">one shared core</span></div>
+      <span class="arr">→</span>
+      <div class="pstep"><span class="pt">npm run build</span><span class="pd">Vite multi-entry</span></div>
+      <span class="arr">→</span>
+      <div class="pstep"><span class="pt">JS bundles</span><span class="pd">one .js per profile</span></div>
+      <span class="arr">→</span>
+      <div class="pstep"><span class="pt">element tags</span><span class="pd">&lt;custom-element&gt;</span></div>
+      <span class="arr">→</span>
+      <div class="pstep"><span class="pt">live maps</span><span class="pd">gem frames below</span></div>
     </div>
+    <span id="count">detecting…</span>
+  </header>
 
-    <div class="footer">
-      Build outputs land at <code>app/&lt;bundle&gt;.js</code> (CSS inlined). Production embed:<br>
-      <code>&lt;script src="…/&lt;bundle&gt;.js"&gt;&lt;/script&gt;</code> + <code>&lt;doxa-map profile-config='…'&gt;&lt;/doxa-map&gt;</code>.
-    </div>
+  <div id="langbar" class="langbar"></div>
+  <nav id="bundleTabs" aria-label="JS bundles"></nav>
+  <main id="showcase"></main>
+
+  <div class="foot">
+    Live proof of the forge · bundles auto-detected from <code>app-profiles/*/</code> · maps lazy-mounted, WebGL-context-safe.
+    <span class="scr">“Write the vision, and make it plain … that he may run that readeth it.” — Habakkuk 2:2</span>
   </div>
+
+  <script type="module" src="/src/staging.js"></script>
 </body>
 </html>

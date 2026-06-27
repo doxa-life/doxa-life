@@ -106,7 +106,7 @@ useTextHighlight()
           data-highlight-color="primary"
         >{{ t('DOXA people groups around the world') }}</h1>
       </div>
-      <DoxaMapSlot map-id="home-map" :profile-config="homeMapConfig" class="rounded-xlg">
+      <DoxaMapSlot map-id="home-map" :profile-config="homeMapConfig" class="rounded-md">
         <FeedbackWidgetSlot :profile-config="homeFeedbackConfig" />
       </DoxaMapSlot>
       <NuxtLink

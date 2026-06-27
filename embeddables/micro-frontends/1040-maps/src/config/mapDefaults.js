@@ -20,7 +20,21 @@ export const mapDefaults = {
   maxZoom:    18,
   pitch:      20,         // default tilt in degrees (0 = flat, 60 = steep); extra vertical space on mobile
   bearing:    0,          // rotation in degrees (0 = north up)
-  projection: 'mercator'
+  projection: 'mercator',
+  // Feedback #2+#4 REDO (/ and /pray): at full zoom-out the same continent used
+  // to appear on both edges (the world tiled). The PRIOR fix
+  // (renderWorldCopies:false + a maxBounds single-world cap) REGRESSED infinite
+  // maps — it collapsed to one non-wrapping world and cut Oceania in half.
+  // CORRECT FIX: KEEP renderWorldCopies:true (infinite left/right scroll so
+  // trans-antimeridian people groups stay continuous) and cap zoom-out with a
+  // DYNAMIC, aspect-aware minZoom FLOOR computed per-viewport in
+  // useMapInstance.js (see computeWorldMinZoom). The floor guarantees one world
+  // always at least fills the viewport width, so a location is never shown
+  // twice — without any maxBounds and without disabling world copies.
+  renderWorldCopies: true
+  // NO maxBounds: the map pans infinitely. computeWorldMinZoom is what stops
+  // zoom-out at one world copy. A profile may still pass an explicit maxBounds
+  // through profileConfig to cap a specific map.
 }
 
 /**

@@ -155,6 +155,11 @@ export default defineNuxtConfig({
     // Fonts/images use stable filenames, so avoid `immutable`: a 7-day cache
     // still lets an overwritten asset propagate within a week.
     '/assets/**': { headers: { 'cache-control': 'public, max-age=604800' } },
+    // Map web-component bundles use STABLE filenames (no content hash), so a
+    // browser-cached copy hid rebuilt fixes until a hard refresh. Revalidate on
+    // every load: the server returns 304 when unchanged (cheap) and the new bytes
+    // the moment a bundle is rebuilt — so a normal reload always runs the latest map.
+    '/js/**': { headers: { 'cache-control': 'public, max-age=0, must-revalidate' } },
     // Prerendered marketing pages (all enabled locales) — edge-cacheable HTML.
     ...marketingRouteRules,
     // Per-country pages — same cache policy; routes enumerated at build time.
@@ -277,7 +282,10 @@ export default defineNuxtConfig({
       statinatorUrl: process.env.NUXT_PUBLIC_STATINATOR_URL || 'https://statinator.doxa.life',
       statinatorProjectId: process.env.NUXT_PUBLIC_STATINATOR_PROJECT_ID || 'doxa',
       statinatorEnabled: process.env.NUXT_PUBLIC_STATINATOR_ENABLED === 'true',
-      statinatorCookieDomain: process.env.NUXT_PUBLIC_STATINATOR_COOKIE_DOMAIN || '.doxa.life'
+      statinatorCookieDomain: process.env.NUXT_PUBLIC_STATINATOR_COOKIE_DOMAIN || '.doxa.life',
+      // Feature flag: show the adoption-status map tab on /adopt. OFF by default;
+      // enable per-deploy with NUXT_PUBLIC_ENABLE_ADOPTION_MAP=true (runtime, no rebuild).
+      enableAdoptionMap: process.env.NUXT_PUBLIC_ENABLE_ADOPTION_MAP === 'true'
     }
   },
 
