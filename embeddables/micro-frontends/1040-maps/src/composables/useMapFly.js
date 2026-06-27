@@ -301,6 +301,15 @@ export function useMapFly(options = {}) {
     const LEGEND_FIT_DURATION_MS = 800;
     const LEGEND_FIT_MAX_ZOOM = 5;
     const LEGEND_SINGLE_PIN_ZOOM = 5;
+    // Globe-FILLING selections (e.g. "Islam" reaches every continent, span ~134°):
+    // a longitude span this wide can't be framed tightly without the camera
+    // animating the wrong way around the antimeridian (the snap). Past this
+    // threshold we ease to a stable world overview instead of a literal fitBounds.
+    // 110° is tuned from live data: catches Islam (134°) / Ethnoreligion (198°) /
+    // Europe (107°) but leaves every real continent a tight fit (Oceania 76°,
+    // Middle East 67°, Africa 58°, Asia 51°).
+    const LEGEND_WIDE_SPAN_DEG = 110;
+    const LEGEND_WORLD_ZOOM = 1.2;
 
     // Antimeridian-aware longitude span. For scopes that cross ±180° (Oceania,
     // east-Russia, Aleutians), naive min/max returns a span of ~360° because
@@ -331,6 +340,92 @@ export function useMapFly(options = {}) {
             return { minLng: minRaw, maxLng: minRaw + spanB };
         }
         return { minLng: aMin, maxLng: aMax };
+    }
+
+    // Robust, antimeridian-safe longitude extent + a STABLE deterministic center.
+    // A circular (atan2) mean is DEGENERATE for near-global sets: the unit vectors
+    // cancel, so the center collapses to an arbitrary angle and the camera "doesn't
+    // know where to zoom" (janky ease). Instead:
+    //   1) unwrap at the largest circular gap so a wrapping set becomes contiguous;
+    //   2) trim ~2.5% off each tail so a few far outliers (e.g. a "Europe" polygon's
+    //      far-east-Russia tail) don't blow up the extent — lets the dense cluster
+    //      frame tightly;
+    //   3) center = midpoint of the TRIMMED range → deterministic + stable, even for
+    //      globe-spanning sets, so the world-overview ease always lands predictably.
+    function _robustLngExtent(lngs) {
+        const xs = lngs.filter(Number.isFinite).slice().sort((a, b) => a - b);
+        const n = xs.length;
+        if (!n) return null;
+        let gap = -1, gapIdx = 0;
+        for (let i = 0; i < n; i++) {
+            const next = (i + 1 < n) ? xs[i + 1] : xs[0] + 360;
+            const g = next - xs[i];
+            if (g > gap) { gap = g; gapIdx = i; }
+        }
+        const start = (gapIdx + 1) % n;
+        const u = new Array(n);
+        for (let k = 0; k < n; k++) {
+            let v = xs[(start + k) % n];
+            if (k > 0 && v < u[k - 1]) v += 360;     // single unwrap across the seam
+            u[k] = v;
+        }
+        const loI = Math.floor(n * 0.025);
+        const hiI = Math.max(loI, Math.ceil(n * 0.975) - 1);
+        const lo = u[loI], hi = u[hiI];
+        const norm = (x) => (((x + 180) % 360) + 360) % 360 - 180;
+        const minLng = norm(lo);
+        // World-overview center = the DENSEST longitude bin (24 × 15°), not the
+        // trimmed midpoint: a wide set whose mass is in real Europe but whose extent
+        // is dragged east by a far-east-Russia tail would otherwise center mid-Asia.
+        // Densest-bin centers on where the data actually concentrates — deterministic
+        // and stable (no degenerate circular-mean wobble).
+        const BINS = 24, size = 360 / BINS;
+        const counts = new Array(BINS).fill(0);
+        for (const x of xs) { let b = Math.floor(((((x + 180) % 360) + 360) % 360) / size); if (b >= BINS) b = BINS - 1; counts[b]++; }
+        let bb = 0; for (let i = 1; i < BINS; i++) if (counts[i] > counts[bb]) bb = i;
+        const center = norm(-180 + (bb + 0.5) * size);
+        return { center, minLng, maxLng: minLng + (hi - lo), span: hi - lo };
+    }
+
+    // Zoom at which exactly ONE world fills the viewport width (worldPx = 512·2^z).
+    // The basemap keeps renderWorldCopies:true, so going BELOW this reveals repeated
+    // world copies. Clamp to the map's own min so we never request out of range.
+    function _noCopyZoom(map) {
+        try {
+            const W = (map.getContainer && map.getContainer().clientWidth) || 0;
+            const nz = W > 0 ? Math.log2(W / 512) : LEGEND_WORLD_ZOOM;
+            const mn = typeof map.getMinZoom === 'function' ? map.getMinZoom() : nz;
+            return Math.max(mn, nz);
+        } catch (_) { return LEGEND_WORLD_ZOOM; }
+    }
+
+    // Smoothly ease to a stable WORLD OVERVIEW for a selection too wide to frame
+    // without showing repeated world copies — globe-spanning rows ("Islam"), wide
+    // region polygons ("Europe" reaching into Russia), or any set whose fitBounds
+    // would clamp at/below the no-copy floor. Center = wrap-safe circular mean of
+    // longitudes; zoom = one-world-fills-width; easeTo (NOT flyTo) so the camera
+    // never arcs out past the floor and flashes the copies.
+    function _easeWorldOverview(map, centerLng, minLat, maxLat) {
+        map.easeTo({
+            center: [centerLng, (minLat + maxLat) / 2],
+            zoom: _noCopyZoom(map),
+            duration: LEGEND_FIT_DURATION_MS,
+            essential: true
+        });
+    }
+
+    // True when an extent is too wide to frame above the no-copy floor — i.e.
+    // fitBounds would clamp and/or wrap the wrong way (the snap). Fast path on the
+    // longitude span, precise check via viewport-aware cameraForBounds.
+    function _tooWideToFit(map, bounds, span) {
+        if (span > LEGEND_WIDE_SPAN_DEG) return true;
+        try {
+            const probe = typeof map.cameraForBounds === 'function'
+                ? map.cameraForBounds(bounds, { padding: LEGEND_FIT_PADDING_PX, maxZoom: LEGEND_FIT_MAX_ZOOM })
+                : null;
+            if (probe == null) return true;
+            return typeof probe.zoom === 'number' && probe.zoom <= _noCopyZoom(map) + 0.05;
+        } catch (_) { return false; }
     }
 
     // Why: map.querySourceFeatures(sourceId, {filter}) is viewport-clipped —
@@ -496,14 +591,26 @@ export function useMapFly(options = {}) {
                     }
                 };
                 if (match.geometry?.coordinates) visit(match.geometry.coordinates);
-                const lngBounds = _tightLngBounds(lngs);
-                if (lngBounds && Number.isFinite(pMinLat)) {
-                    map.fitBounds([[lngBounds.minLng, pMinLat], [lngBounds.maxLng, pMaxLat]], {
-                        padding: LEGEND_FIT_PADDING_PX,
-                        maxZoom: LEGEND_FIT_MAX_ZOOM,
-                        duration: LEGEND_FIT_DURATION_MS,
-                        essential: true
-                    });
+                // Robust extent: trims a wide polygon's sparse tail (e.g. "Europe"
+                // reaching into far-east Russia) so the DENSE cluster (real Europe)
+                // frames tightly instead of fitBounds-ing the antimeridian-crossing sprawl.
+                const ext = _robustLngExtent(lngs);
+                if (ext && Number.isFinite(pMinLat)) {
+                    const pBounds = [[ext.minLng, pMinLat], [ext.maxLng, pMaxLat]];
+                    // Normal region → fit the polygon tightly (zoom TO the region). A
+                    // too-wide polygon (e.g. "Europe (Region)", whose geometry is dominated
+                    // by far-east Russia) would snap/show copies — ease to a STABLE world
+                    // overview (densest-bin center) instead.
+                    if (_tooWideToFit(map, pBounds, ext.span)) {
+                        _easeWorldOverview(map, ext.center, pMinLat, pMaxLat);
+                    } else {
+                        map.fitBounds(pBounds, {
+                            padding: LEGEND_FIT_PADDING_PX,
+                            maxZoom: LEGEND_FIT_MAX_ZOOM,
+                            duration: LEGEND_FIT_DURATION_MS,
+                            essential: true
+                        });
+                    }
                     return;
                 }
             }
@@ -544,12 +651,6 @@ export function useMapFly(options = {}) {
         }
         if (pointCount === 0) return;
 
-        // Antimeridian-aware longitude bounds — prevents Oceania/east-Russia
-        // rows from "zooming out to fit both wrap-around copies."
-        const lngBounds = _tightLngBounds(lngs);
-        const minLng = lngBounds ? lngBounds.minLng : 0;
-        const maxLng = lngBounds ? lngBounds.maxLng : 0;
-
         if (pointCount === 1) {
             map.flyTo({
                 center: [firstLng, firstLat],
@@ -560,39 +661,26 @@ export function useMapFly(options = {}) {
             return;
         }
 
-        const bounds = [[minLng, minLat], [maxLng, maxLat]];
+        // Robust, antimeridian-safe extent with outlier trim + a STABLE center.
+        const ext = _robustLngExtent(lngs) || { center: 0, minLng: 0, maxLng: 0, span: 0 };
+        const bounds = [[ext.minLng, minLat], [ext.maxLng, maxLat]];
+        // Too wide to frame without revealing repeated world copies — a globe-spanning
+        // row ("Islam" reaches every continent) or any fit that would clamp at/below the
+        // no-copy floor (the old snap animated the wrong way and flashed the copies).
+        // Ease to a STABLE world overview (deterministic trimmed center — NOT a degenerate
+        // circular mean) so it always lands predictably. Regional rows (Africa, North-India
+        // cluster) frame tightly via the fitBounds below — no regression.
+        if (_tooWideToFit(map, bounds, ext.span)) {
+            _easeWorldOverview(map, ext.center, minLat, maxLat);
+            return;
+        }
         try {
-            // Why: when the legend row's scope spans a region wider than the
-            // mobile viewport can render at its effective minZoom, fitBounds
-            // animates toward a zoom < minZoom and Mapbox clamps mid-flight,
-            // causing a visible snap/jolt. Probe the would-be fit zoom first
-            // via cameraForBounds (no animation), and if it's tighter than
-            // the camera's minZoom (with 0.3 slack to absorb float rounding),
-            // flyTo the floor instead of fitBounds.
-            const probe = typeof map.cameraForBounds === 'function'
-                ? map.cameraForBounds(bounds, { padding: LEGEND_FIT_PADDING_PX, maxZoom: LEGEND_FIT_MAX_ZOOM })
-                : null;
-            const minZoom = typeof map.getMinZoom === 'function' ? map.getMinZoom() : null;
-            const wouldClamp = probe == null
-                || (typeof probe.zoom === 'number' && typeof minZoom === 'number'
-                    && probe.zoom < minZoom - 0.3);
-            if (wouldClamp && typeof minZoom === 'number') {
-                const cx = (minLng + maxLng) / 2;
-                const cy = (minLat + maxLat) / 2;
-                map.flyTo({
-                    center: [cx, cy],
-                    zoom: minZoom,
-                    duration: LEGEND_FIT_DURATION_MS,
-                    essential: true
-                });
-            } else {
-                map.fitBounds(bounds, {
-                    padding: LEGEND_FIT_PADDING_PX,
-                    maxZoom: LEGEND_FIT_MAX_ZOOM,
-                    duration: LEGEND_FIT_DURATION_MS,
-                    essential: true
-                });
-            }
+            map.fitBounds(bounds, {
+                padding: LEGEND_FIT_PADDING_PX,
+                maxZoom: LEGEND_FIT_MAX_ZOOM,
+                duration: LEGEND_FIT_DURATION_MS,
+                essential: true
+            });
         } catch (_) { /* fitBounds throws on degenerate bounds */ }
     }
 

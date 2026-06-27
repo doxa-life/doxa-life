@@ -9,7 +9,7 @@
          carets on tree rows). A matching trailing column on the right of
          the same width provides symmetric right padding without the card
          needing its own left/right padding. See docs/legend-spec.md. -->
-    <div class="lrg-items" :style="{ '--lrg-grid-cols': gridCols }">
+    <div class="lrg-items" :style="{ '--lrg-grid-cols': gridCols }" ref="itemsContainer">
 
       <!-- Title row — first row of the table. Caret slot in col 1, title in
            col 2, column headers auto-placed into remaining tracks. -->
@@ -23,7 +23,7 @@
            wrappers are present for LegendMobile.vue CSS compatibility; on
            desktop they are display:contents so the subgrid is flat. -->
       <template v-for="item in items" :key="item.key">
-        <div class="lrg-row">
+        <div class="lrg-row" :data-lrg-filter-key="item.filterKey">
           <button
             v-if="item.children && item.children.length && !disableCollapse"
             class="lrg-caret"
@@ -56,7 +56,7 @@
 
         <!-- Children rows -->
         <template v-if="item.children && item.children.length && !collapsed[item.key]">
-          <div v-for="child in item.children" :key="child.key" class="lrg-row lrg-row-child">
+          <div v-for="child in item.children" :key="child.key" class="lrg-row lrg-row-child" :data-lrg-filter-key="child.filterKey">
             <span class="lrg-caret-placeholder" aria-hidden="true"></span>
             <div
               class="lrg-item"
@@ -90,7 +90,7 @@
 </template>
 
 <script setup>
-import { reactive, computed } from 'vue'
+import { reactive, computed, ref, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useShadowStyles } from '../composables/useShadowStyles.js'
 
@@ -211,6 +211,51 @@ const props = defineProps({
 })
 
 defineEmits(['filter-click'])
+
+// Scroll-to-selected — universal across flat-legend tabs (prayer / engagement /
+// adoption / religion), mirroring SemanticTreeLegend's tree-legend scroll. When
+// the active filter changes (incl. from a search/geocoder result), bring the
+// matching row into view. Scoped to this component's own scroll container so
+// multiple legends on a page don't fight; retries across frames since the row
+// may render a frame later.
+const itemsContainer = ref(null)
+// Scroll EVERY scrollable ancestor of the row (mobile nests .lrg-items inside the
+// sheet's .legend-content) so the row lands ~8px below the top of whatever actually
+// scrolls. getBoundingClientRect deltas, NOT row.offsetTop — offsetTop is relative to
+// the nearest *positioned* ancestor, so when the container is static it included the
+// header height and the scroll overshot by ~3 rows (the reported bug). Walking
+// parentElement stays inside the shadow DOM, so this never scrolls the HOST page the
+// way row.scrollIntoView() did (regression 554bf10).
+function bringRowToTop(row) {
+  let n = row.parentElement
+  while (n) {
+    const oy = getComputedStyle(n).overflowY
+    if ((oy === 'auto' || oy === 'scroll') && n.scrollHeight > n.clientHeight + 1) {
+      const rr = row.getBoundingClientRect(), nr = n.getBoundingClientRect()
+      n.scrollTop += (rr.top - nr.top) - 8
+    }
+    n = n.parentElement
+  }
+}
+let lrgScrollGen = 0
+watch(() => props.activeFilter, async (filterKey) => {
+  if (!filterKey) return
+  const gen = ++lrgScrollGen            // cancel earlier runs if the filter changes again
+  const container = itemsContainer.value
+  if (!container) return
+  await nextTick()
+  // Re-run ACROSS the mobile sheet's open animation (~300ms): the first search after a
+  // collapsed-by-default page load fires this while the legend is still expanding, so an
+  // early measurement is against the wrong height. Re-running as it settles corrects it;
+  // when the legend is already open these passes are no-ops.
+  const tryScroll = (attempt = 0) => {
+    if (gen !== lrgScrollGen) return    // superseded by a newer filter
+    const row = container.querySelector(`[data-lrg-filter-key="${CSS.escape(String(filterKey))}"]`)
+    if (row) bringRowToTop(row)
+    if (attempt < 6) setTimeout(() => tryScroll(attempt + 1), 70)
+  }
+  tryScroll(0)
+})
 
 const collapsed = reactive({})
 function toggleCollapse(key) {

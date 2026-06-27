@@ -27,18 +27,61 @@
  */
 
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import langFamilyByLanguage from '../data/langFamilyByLanguage.json'
+// Religion search must group by FAMILY (same 10 families the Religion legend shows),
+// not by raw sub-type names — otherwise search surfaces 'Animism'/'Romanism' rows
+// the legend can't select. Reuse the legend's exact family logic.
+import { RELIGION_FAMILIES, getReligionFamily } from '../config/color-strategies/religion.js'
 
-// ── Emoji prefixes — make local results visually distinct from Mapbox ────────
-const EMOJI_PEOPLE   = '🗺️ '   // people group
-const EMOJI_COUNTRY  = '🌍 '   // country grouping
-const EMOJI_FAMILY   = '🌳 '   // language family
-const EMOJI_LANGUAGE = '🗣️ '   // language
-const EMOJI_DIALECT  = '💬 '   // dialect / variety
-const EMOJI_RELIGION = '🙏 '   // religion / religion family
-const EMOJI_BLOC     = '🧭 '   // affinity bloc (ROP1)
-const EMOJI_CLUSTER  = '🪢 '   // cluster (ROP2) — knot/binding
-const EMOJI_PG       = '👥 '   // people group (ROP2.5)
+// ── Result category ordering by active-tab context (Round 16) ────────────────
+// The search bar is unified — every category is always searched — but the
+// category that matches the active legend tab is surfaced FIRST so results feel
+// context-aware without being cluttered. People-groups are included in EVERY
+// context (coder spec: "All tabs: can still search people groups").
+const ALL_GROUPS = ['blocs', 'clusters', 'peopleGroups', 'families', 'languages', 'dialects', 'people', 'places', 'regions', 'wagfBlocks', 'religions']
+const ORDER_BY_CONTEXT = {
+  // People Groups tab → affinity bloc, cluster, people group, people group+country
+  'people-groups': ['blocs', 'clusters', 'peopleGroups', 'people', 'places', 'families', 'languages', 'dialects', 'regions', 'religions'],
+  // Language tab → language family, language, dialect
+  'language':      ['families', 'languages', 'dialects', 'people', 'blocs', 'clusters', 'peopleGroups', 'places', 'regions', 'religions'],
+  // Regions tab → region, block, country
+  'regions':       ['regions', 'wagfBlocks', 'places', 'blocs', 'clusters', 'peopleGroups', 'people', 'families', 'languages', 'dialects', 'religions'],
+  // Religion tab → religion
+  'religion':      ['religions', 'people', 'blocs', 'clusters', 'peopleGroups', 'places', 'families', 'languages', 'dialects', 'regions'],
+}
+function groupOrder(context) {
+  return ORDER_BY_CONTEXT[context] || ALL_GROUPS
+}
+// Per-category cap for the "All DOXA Data" section so one prolific category
+// (usually people-groups) can't bury the rest.
+const ALLDATA_CAPS = {
+  blocs: 3, clusters: 3, peopleGroups: 3, families: 3, languages: 3,
+  dialects: 3, people: 5, places: 2, regions: 3, wagfBlocks: 3, religions: 2,
+}
+
+// Parameterized search per tab (coder R42). The key is the geocoder context
+// string (TAB_SEARCH_CONTEXT in the profile .vue: 'regions'|'people-groups'|
+// 'language'|'religion'); the value is the subset of grouped-result keys to keep.
+// A context absent here (or '') = all categories (no regression).
+//
+// UNIVERSAL (every tab): People Group (peopleGroups+people), Country (places),
+// Default Language (languages), Religion (religions). Each tab then ADDS its own
+// domain categories:
+//   Regions tab       + WAGF Region/Block (regions)        — and NO blocs/clusters/families/dialects
+//   People Groups tab + Affinity Block (blocs) + Cluster (clusters)
+//   Languages tab     + Dialect (dialects) + Language Family (families)
+//   Religion tab      + (nothing beyond universal)
+// "ONLY the Regions tab shows Regions/Blocks; showing affinity blocks or people
+// clusters on the Regions tab is the reported bug." WAGF blocks (e.g. "South
+// Asia") fold into the `regions` aggregate (doxaRegion||wagfRegion).
+const UNIVERSAL_SEARCH = ['peopleGroups', 'people', 'places', 'languages', 'religions']
+const ALLOWED_BY_CONTEXT = {
+  'regions':       [...UNIVERSAL_SEARCH, 'regions', 'wagfBlocks'],
+  'people-groups': [...UNIVERSAL_SEARCH, 'blocs', 'clusters'],
+  'language':      [...UNIVERSAL_SEARCH, 'dialects', 'families'],
+  'religion':      [...UNIVERSAL_SEARCH],
+}
 
 // ── Score weights ────────────────────────────────────────────────────────────
 const SCORE_NAME     = 100
@@ -157,6 +200,7 @@ function buildIndex(features) {
     const countryHay  = norm(pg.countryName) + ' ' + norm(pg.country) + ' ' + norm(pg.countryIso) + ' ' + norm(pg.countryIsoLabel)
     const religionHay = norm(pg.religionName) + ' ' + norm(pg.religion) + ' ' + norm(pg.religionLabel) + ' ' + norm(pg.religionCode)
     const languageHay = norm(pg.language) + ' ' + norm(pg.languageFamily) + ' ' + norm(pg.languageCode)
+    const regionHay   = norm(pg.doxaRegion) + ' ' + norm(pg.wagfRegion) + ' ' + norm(pg.wagfBlock)
     const blocHay     = norm(pg.affinityBlock) + ' ' + norm(pg.affinityBlockLabel) + ' ' + norm(pg._raw?.rop1)
     const clusterHay  = norm(pg.cluster) + ' ' + norm(pg.clusterLabel) + ' ' + norm(pg._raw?.imb_reg_of_people_2)
     const pgHay       = norm(pg.peopleGroup) + ' ' + norm(pg.peopleGroupLabel) + ' ' + norm(pg._raw?.imb_reg_of_people_25)
@@ -174,7 +218,8 @@ function buildIndex(features) {
       countryHay,
       religionHay,
       languageHay,
-      haystack: nameHay + ' ' + countryHay + ' ' + religionHay + ' ' + languageHay + ' ' + blocHay + ' ' + clusterHay + ' ' + pgHay,
+      regionHay,
+      haystack: nameHay + ' ' + countryHay + ' ' + religionHay + ' ' + languageHay + ' ' + regionHay + ' ' + blocHay + ' ' + clusterHay + ' ' + pgHay,
       blocHay,
       clusterHay,
       pgHay,
@@ -270,9 +315,39 @@ function buildAggregates(entries) {
         }
       }
     ),
+    // Key + label by FAMILY (Christianity, Islam, Ethnoreligion, …) using the
+    // SAME extraction the legend uses (getReligionFamily on the religion code),
+    // so every search result corresponds to a selectable Religion-legend row.
+    // The raw sub-type names ('Animism') still MATCH via religionHay, but collapse
+    // into their family row. label = family name so selection can resolve the
+    // family letter back (see research-map onGeocoderAggregateResult religion branch).
     religions: aggregate(
-      (e) => norm(e.feature.religionName) || norm(e.feature.religion),
-      (e) => e.feature.religionName || e.feature.religion || ''
+      (e) => getReligionFamily(e.feature.religion || e.feature._raw?.religion?.value || e.feature._raw?.religion || ''),
+      (e) => RELIGION_FAMILIES[getReligionFamily(e.feature.religion || e.feature._raw?.religion?.value || e.feature._raw?.religion || '')] || 'Unknown'
+    ),
+    // WAGF / DOXA regions (doxaRegion) — keyed by the region value so a search
+    // for "Asia" collapses every pin in that region into one row. The click
+    // handler (onGeocoderAggregateResult) already maps kind 'region' →
+    // doxaRegion and dims pins to that region; the bbox auto-fits the camera.
+    regions: aggregate(
+      (e) => norm(e.feature.doxaRegion) || norm(e.feature.wagfRegion),
+      // DISPLAY label = the API's human/translated label (e.g. "North Asia"), NOT the
+      // raw slug ("north_asia"). Mirrors the legend's readRegionLabel so search rows and
+      // legend rows read identically. The underscore slug is only the last-ditch fallback.
+      // (coder 2026-06-25: underscores leaked because this labelled on the slug.)
+      (e) => e.feature.wagfRegionLabel || e.feature.doxaRegionLabel
+           || e.feature._raw?.wagf_region?.label || e.feature.doxaRegion || e.feature.wagfRegion || ''
+    ),
+    // WAGF Blocks must be their OWN aggregate, not folded into `regions` via `||` —
+    // a block pin (e.g. "South Asia") also has a doxaRegion, so `doxaRegion||…||wagfBlock`
+    // short-circuits to the region and the block never surfaces. Keyed separately so
+    // "South Asia" appears as its own search row. Mapped to kind 'region' downstream
+    // so it routes through the same region geocoder branch (which matches block: nodes).
+    wagfBlocks: aggregate(
+      (e) => norm(e.feature.wagfBlock),
+      // DISPLAY label = the API's human/translated label (e.g. "South East Asia"), NOT
+      // the raw slug ("south_east_asia"). Mirrors the legend's readBlockLabel.
+      (e) => e.feature.wagfBlockLabel || e.feature._raw?.wagf_block?.label || e.feature.wagfBlock || ''
     ),
     // Affinity blocs (rop1) — keyed by bloc label so a search for "Malay" matches "Malay Peoples"
     blocs: aggregate(
@@ -332,7 +407,10 @@ function makePeopleFeature(entry) {
 
   return {
     id: `doxa-pg-${slug}`,
-    place_name: `${EMOJI_PEOPLE}${label}`,
+    // No emoji — the renderer (GeocoderComponent.renderSuggestion) prepends a
+    // labeled category tag. A clean place_name also keeps the selected-result
+    // text in the input box free of emoji (Round 16).
+    place_name: label,
     text: name,
     center,
     place_type: ['people-group'],
@@ -349,17 +427,20 @@ function makePeopleFeature(entry) {
  * Build a Carmen-GeoJSON feature for a country / language / religion aggregate.
  */
 function makeAggregateFeature(kind, agg) {
-  let emoji, placeType, idPrefix
+  // No emoji — GeocoderComponent.renderSuggestion draws a labeled category tag
+  // from place_type (Round 16: "emojis replaced with clear labels or icons").
+  let placeType, idPrefix
   switch (kind) {
-    case 'country':         emoji = EMOJI_COUNTRY;  placeType = 'doxa-country';         idPrefix = 'doxa-country-';         break
-    case 'language-family': emoji = EMOJI_FAMILY;   placeType = 'doxa-language-family'; idPrefix = 'doxa-language-family-'; break
-    case 'language':        emoji = EMOJI_LANGUAGE; placeType = 'doxa-language';        idPrefix = 'doxa-language-';        break
-    case 'dialect':         emoji = EMOJI_DIALECT;  placeType = 'doxa-dialect';         idPrefix = 'doxa-dialect-';         break
-    case 'religion':        emoji = EMOJI_RELIGION; placeType = 'doxa-religion';        idPrefix = 'doxa-religion-';        break
-    case 'affinity-bloc':   emoji = EMOJI_BLOC;     placeType = 'doxa-affinity-bloc';   idPrefix = 'doxa-affinity-bloc-';   break
-    case 'cluster':         emoji = EMOJI_CLUSTER;  placeType = 'doxa-cluster';         idPrefix = 'doxa-cluster-';         break
-    case 'people-group':    emoji = EMOJI_PG;       placeType = 'doxa-people-group';    idPrefix = 'doxa-people-group-';    break
-    default:                emoji = '';             placeType = 'doxa';                 idPrefix = 'doxa-'
+    case 'country':         placeType = 'doxa-country';         idPrefix = 'doxa-country-';         break
+    case 'region':          placeType = 'doxa-region';          idPrefix = 'doxa-region-';          break
+    case 'language-family': placeType = 'doxa-language-family'; idPrefix = 'doxa-language-family-'; break
+    case 'language':        placeType = 'doxa-language';        idPrefix = 'doxa-language-';        break
+    case 'dialect':         placeType = 'doxa-dialect';         idPrefix = 'doxa-dialect-';         break
+    case 'religion':        placeType = 'doxa-religion';        idPrefix = 'doxa-religion-';        break
+    case 'affinity-bloc':   placeType = 'doxa-affinity-bloc';   idPrefix = 'doxa-affinity-bloc-';   break
+    case 'cluster':         placeType = 'doxa-cluster';         idPrefix = 'doxa-cluster-';         break
+    case 'people-group':    placeType = 'doxa-people-group';    idPrefix = 'doxa-people-group-';    break
+    default:                placeType = 'doxa';                 idPrefix = 'doxa-'
   }
   const label = strLabel(agg.label) || agg.key
   const slug = slugify(agg.key)
@@ -369,7 +450,7 @@ function makeAggregateFeature(kind, agg) {
   // same name appears at multiple levels (e.g. "Deaf" at bloc & cluster & PG,
   // "Arab, Yemeni" at cluster & PG). Non-affinity kinds keep their plain form.
   const TIER_SUFFIX = {
-    'affinity-bloc': 'Affinity Bloc',
+    'affinity-bloc': 'Affinity Block',
     'cluster':       'Cluster',
     'people-group':  'PG',
     // pgic isn't surfaced as a separate aggregate in v1, but reserved here for parity:
@@ -392,7 +473,7 @@ function makeAggregateFeature(kind, agg) {
 
   return {
     id: `${idPrefix}${slug}`,
-    place_name: `${emoji}${display}`,
+    place_name: display,
     text: label,
     center,
     bbox: [agg.minLng, agg.minLat, agg.maxLng, agg.maxLat],
@@ -424,7 +505,12 @@ function makeAggregateFeature(kind, agg) {
  * @returns {{ search: (query:string)=>Array, searchGrouped: (query:string)=>object }}
  */
 export function useDoxaSearch(opts = {}) {
-  const { dataStore, dataSourceId, getActiveFilter } = opts
+  const { dataStore, dataSourceId, getActiveFilter, getActiveContext } = opts
+
+  // Called during GeocoderComponent setup → useI18n() resolves the per-map
+  // i18n instance; the captured `t` localizes the dropdown's section headers
+  // ("Within …" / "All DOXA Data") per the active locale (loc-004).
+  const { t } = useI18n()
 
   // ── Select the active source's features reactively ─────────────────────────
   const features = computed(() => {
@@ -449,7 +535,7 @@ export function useDoxaSearch(opts = {}) {
    */
   function searchGrouped(query) {
     const q = String(query || '').trim().toLowerCase()
-    const empty = { people: [], places: [], families: [], languages: [], dialects: [], religions: [], blocs: [], clusters: [], peopleGroups: [] }
+    const empty = { people: [], places: [], regions: [], wagfBlocks: [], families: [], languages: [], dialects: [], religions: [], blocs: [], clusters: [], peopleGroups: [] }
     if (q.length < 2) return empty
 
     const tokens = q.split(/[\s,;]+/).filter(Boolean)
@@ -489,6 +575,11 @@ export function useDoxaSearch(opts = {}) {
         .slice(0, MAX_PER_CATEGORY)
 
     const places    = matchAgg(aggs.countries).map(a => makeAggregateFeature('country',         a))
+    const regions   = matchAgg(aggs.regions  ).map(a => makeAggregateFeature('region',          a))
+    // WAGF blocks ride the SAME 'region' kind so the geocoder region branch handles
+    // them (it matches both region: and block: legend nodes). Keeps 'South Asia' a
+    // first-class, selectable search row.
+    const wagfBlocks = matchAgg(aggs.wagfBlocks).map(a => makeAggregateFeature('region',         a))
     const families  = matchAgg(aggs.families ).map(a => makeAggregateFeature('language-family', a))
     const languages = matchAgg(aggs.languages).map(a => makeAggregateFeature('language',        a))
     const dialects  = matchAgg(aggs.dialects ).map(a => makeAggregateFeature('dialect',         a))
@@ -506,7 +597,7 @@ export function useDoxaSearch(opts = {}) {
     const clusterLabels = new Set(clusters.map(c => norm(c.text)))
     peopleGroups = peopleGroups.filter(p => !blocLabels.has(norm(p.text)) && !clusterLabels.has(norm(p.text)))
 
-    return { people: peopleFeatures, places, families, languages, dialects, religions, blocs, clusters, peopleGroups }
+    return { people: peopleFeatures, places, regions, wagfBlocks, families, languages, dialects, religions, blocs, clusters, peopleGroups }
   }
 
   /**
@@ -519,15 +610,26 @@ export function useDoxaSearch(opts = {}) {
    * geocoder handler knows to deselect the legend when they are clicked.
    */
   function search(query) {
-    const activeFilter = typeof getActiveFilter === 'function' ? getActiveFilter() : null
+    const activeFilter  = typeof getActiveFilter  === 'function' ? getActiveFilter()  : null
+    const activeContext = typeof getActiveContext === 'function' ? getActiveContext() : null
     const g = searchGrouped(query)
-    // Semantic-tree matches FIRST (families/languages/dialects), then people,
-    // places, religions. Earlier ordering put people first, which combined with
-    // MAX_PER_CATEGORY=5 buried the language entry when 5+ people-groups
-    // matched the same token (e.g. typing "arabic" returned 5 Arabic-speaking
-    // PGs and zero "Arabic" language row in the All-Data section, even though
-    // the language was searchable). qa: 2026-05-02.
-    const allFlat = [...g.blocs, ...g.clusters, ...g.peopleGroups, ...g.families, ...g.languages, ...g.dialects, ...g.people, ...g.places, ...g.religions]
+    // Context-aware ordering (Round 16): the active legend tab decides which
+    // category surfaces FIRST, while people-groups stay reachable from every
+    // tab. groupOrder() returns the category sequence for the active context
+    // (or the default order when no context is set). This replaces the fixed
+    // semantic-tree-first order; the same context drives the "All DOXA Data"
+    // section below so both halves of the dropdown agree. qa: 2026-05-02.
+    const order   = groupOrder(activeContext)
+    // Context-aware FILTERING (not just ordering): each tab's search should only
+    // surface result types relevant to that tab's legend domain — e.g. the
+    // Regions tab must NOT show affinity blocks / clusters / people groups, only
+    // countries + WAGF regions. groupOrder() already ranks; this restricts the
+    // category SET. Unknown/empty context → all categories (no regression).
+    const allowed = ALLOWED_BY_CONTEXT[activeContext]
+    const gFiltered = allowed
+      ? Object.fromEntries(allowed.filter(k => g[k]).map(k => [k, g[k]]))
+      : g
+    const allFlat = order.flatMap(k => gFiltered[k] || [])
 
     if (!activeFilter?.key || !allFlat.length) {
       return allFlat.slice(0, MAX_TOTAL)
@@ -554,26 +656,17 @@ export function useDoxaSearch(opts = {}) {
     const result = []
     const selectionLabel = activeFilter.key
     if (withinPeople.length) {
-      result.push(makeSectionHeader('Within ' + selectionLabel, false))
+      result.push(makeSectionHeader(t('search.sections.within', { selection: selectionLabel }), false))
       result.push(...withinPeople.slice(0, MAX_PER_CATEGORY))
     }
-    // "All DOXA Data" section: take a sampling from EACH kind so the language
-    // / dialect entries don't get buried by people-group hits. Earlier code
-    // sliced the flat list at MAX_PER_CATEGORY=5; with people first that
-    // ate every slot. Now: 3 each of families/languages/dialects + up to 5
-    // people + 2 each of places/religions, all tagged with _allDataSection.
-    const allTagged = [
-      ...g.blocs.slice(0,        3),
-      ...g.clusters.slice(0,     3),
-      ...g.peopleGroups.slice(0, 3),
-      ...g.families.slice(0,     3),
-      ...g.languages.slice(0, 3),
-      ...g.dialects.slice(0,  3),
-      ...g.people.slice(0,    5),
-      ...g.places.slice(0,    2),
-      ...g.religions.slice(0, 2),
-    ].map(f => ({ ...f, properties: { ...f.properties, _allDataSection: true } }))
-    result.push(makeSectionHeader('All DOXA Data', true))
+    // "All DOXA Data" section: take a capped sampling from EACH kind so one
+    // prolific category (usually people-groups) can't bury the rest, walked in
+    // the SAME context order as the flat list so the context-relevant category
+    // leads here too (Round 16). Per-kind caps live in ALLDATA_CAPS.
+    const allTagged = order
+      .flatMap(k => (gFiltered[k] || []).slice(0, ALLDATA_CAPS[k] ?? 3))
+      .map(f => ({ ...f, properties: { ...f.properties, _allDataSection: true } }))
+    result.push(makeSectionHeader(t('search.sections.allData'), true))
     result.push(...allTagged)
 
     return result.slice(0, MAX_TOTAL + 8) // extra room for 2 headers + extra all-data items

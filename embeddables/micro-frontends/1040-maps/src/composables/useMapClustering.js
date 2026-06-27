@@ -451,6 +451,9 @@ export function useMapClustering(options = {}) {
                     'circle-radius': DEFAULT_CLUSTER_RADIUS_RAMP,
                     'circle-stroke-width': 2,
                     'circle-stroke-color': '#ffffff',
+                    // Bypass Standard v3 scene-lighting so cluster bubbles keep their ramp
+                    // colour on the night preset instead of darkening (mirror useMapLayers.js:248).
+                    'circle-emissive-strength': 1,
                     'circle-opacity': 0.85
                 }
             });
@@ -538,6 +541,9 @@ export function useMapClustering(options = {}) {
                         'interpolate', ['linear'], ['zoom'],
                         0, 0.5, 4, 0.75, 8, 1, 12, 1.5
                     ],
+                    // Bypass Standard v3 scene-lighting so MST/network lines keep their colour
+                    // on the night preset instead of darkening (mirror useMapLayers.js:248).
+                    'line-emissive-strength': 1,
                     'line-opacity': 0.5
                 },
                 layout: {

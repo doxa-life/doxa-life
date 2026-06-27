@@ -8,6 +8,13 @@ import { ref, computed } from 'vue';
 // Used to derive `languageFamily` for pray-tools rows where the upstream returns
 // null for `imb_language_family` (true fo
 import langFamilyByLanguage from '../data/langFamilyByLanguage.json';
+// ISO 639-3 code → language family. The pray-tools API localizes
+// primary_language.label ("Telugu" → "Télugu" → "Télougou"), so deriving the
+// family from the display label silently fails in every non-English locale and
+// collapses pins onto the 'Unknown' bucket (one flat color). primary_language.value
+// is the stable ISO code, so we derive the family from the code first.
+// Generated from the EN API + langFamilyByLanguage.json — see data/README if regenerating.
+import langFamilyByIso from '../data/langFamilyByIso.json';
 import { DOXA_REGION_COLORS, canonicalFamilyName } from '../config/colors.js';
 
 // Normalize pray-tools wagf_region values ("asia", "latin_america_&_caribbean",
@@ -41,6 +48,16 @@ const FAMILY_SUFFIXES_DATA = [
 function deriveLanguageFamily(pg) {
     const existing = unwrapLabel(pg.languageFamily);
     if (existing) return existing;
+    // Stable ISO 639-3 code path (locale-independent). primary_language.value is
+    // the ISO code; its label is localized, so the family MUST be derived from the
+    // code, not the display label, or the languageFamily color strategy breaks on
+    // every non-English locale (qa: 2026-06-22 locale color bug).
+    const iso = String(
+        pg._raw?.primary_language?.value ||
+        (pg.language && typeof pg.language === 'object' ? pg.language.value : '') ||
+        ''
+    ).trim().toLowerCase();
+    if (iso && langFamilyByIso[iso]) return langFamilyByIso[iso];
     const langLabel = unwrapLabel(pg.language || pg.primary_language);
     if (!langLabel || typeof langLabel !== 'string') return '';
     const lbl = langLabel.trim();
@@ -465,9 +482,12 @@ export function useMapData(options) {
             for (const pg of pgs) {
                 const iso = pg.countryIso || pg._raw?.country_code?.value || ''
                 const _rawRegion = pg._raw?.wagf_region
-                const region = pg.wagfRegionLabel || pg.doxaRegionLabel ||
-                               (_rawRegion && typeof _rawRegion === 'object' ? _rawRegion.label : '') ||
-                               pg.doxaRegion || pg.wagfRegion || ''
+                // Map ISO → stable region SLUG (locale-independent), NOT the
+                // localized label. addRegionsLayer colors polygons from this map
+                // via a slug-keyed palette; using the label would grey out every
+                // region except "Asia" once the user switches language.
+                const region = pg.doxaRegion || pg.wagfRegion ||
+                               (_rawRegion && typeof _rawRegion === 'object' ? _rawRegion.value : '') || ''
                 if (iso && region && !isoToRegion[iso]) isoToRegion[iso] = region
             }
             // Wrap in the shape addRegionsLayer expects.
