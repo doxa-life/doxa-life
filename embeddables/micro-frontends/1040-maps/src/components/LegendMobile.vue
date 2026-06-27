@@ -239,15 +239,6 @@ const props = defineProps({
   disableCollapse: {
     type: Boolean,
     default: false
-  },
-  /**
-   * Show a totals footer below the legend rows (count + population sums).
-   * Opt-in — only doxa-simple-map enables it so the engagement/prayer/adoption
-   * tabs show e.g. Unengaged + Engaged = Total. Off for research-map.
-   */
-  showTotal: {
-    type: Boolean,
-    default: false
   }
 })
 
@@ -297,15 +288,15 @@ const LANG_TABS_MOBILE = [
   { id: 'dialect',  label: 'Dialect',     info: 'A dialect/variety is a regional or social form of a language.' },
 ]
 const AFFINITY_TABS_MOBILE = [
-  { id: 'bloc',    label: 'Bloc',    info: 'Affinity Bloc (rop1) — broadest grouping. 16 blocs total.' },
-  { id: 'cluster', label: 'Cluster', info: 'Cluster (imb_reg_of_people_2, ROP 2) — finer grouping inside a bloc. 194 total.' },
+  { id: 'bloc',    label: 'Block',   info: 'Affinity Block (rop1) — broadest grouping. 16 blocks total.' },
+  { id: 'cluster', label: 'Cluster', info: 'Cluster (imb_reg_of_people_2, ROP 2) — finer grouping inside a block. 194 total.' },
   { id: 'group',   label: 'PG',      info: 'People Group (imb_reg_of_people_25, ROP 2.5) — abstract identity. 1,736 PGs.' },
   { id: 'pgic',    label: 'PGIC',    info: 'PG in Country (imb_reg_of_people_3 + country_code) — one row per PG-country pair. 2,106 rows.' },
 ]
 const REGIONS_TABS_MOBILE = [
   { id: 'region',  label: 'Region',  info: 'WAGF macro-region (e.g. "Asia", "Africa"). Color-coded on the map.' },
-  { id: 'block',   label: 'Block',   info: 'WAGF block — organizational sub-grouping within each region (e.g. "South East Asia").' },
-  { id: 'country', label: 'Country', info: 'Individual countries, listed by unreached-population size within their block.' },
+  { id: 'block',   label: 'Bloc',    info: 'WAGF bloc — organizational sub-grouping within each region (e.g. "South East Asia").' },
+  { id: 'country', label: 'Country', info: 'Individual countries, listed by unreached-population size within their bloc.' },
 ]
 // Flat tabs (prayer/adoption/engagement/religion) → STL node conversion
 const _isFlatTabMobile = computed(() => ['prayer', 'engagement', 'adoption', 'religion'].includes(props.legendType))
@@ -619,9 +610,6 @@ onBeforeUnmount(() => {
           :hideTabs="_isFlatTabMobile"
           :columnLabel="treeColumnLabelForMobile"
           :columns="['count', 'pop']"
-          :total-label="showTotal && _isFlatTabMobile ? t('legend.footer.total') : ''"
-          :total-count="totalCount"
-          :total-pop="totalPopulation"
           @select="onSemanticTreeSelect"
         >
           <template #title-caret>

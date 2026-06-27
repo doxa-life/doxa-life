@@ -355,14 +355,15 @@ onBeforeUnmount(() => {
 
 <template>
   <MapControlButton :is-dark="isDark" :active="isFullscreen" :title="t('buttons.toggleFullscreen')" @click="toggle">
-    <!-- Expand SVG when not fullscreen; compress SVG when fullscreen -->
+    <!-- Native Mapbox FullscreenControl icons (bolder / clearer than the old ones).
+         enter-fullscreen when not fullscreen; shrink when fullscreen. viewBox 0 0 29 29. -->
     <svg v-if="!isFullscreen" xmlns="http://www.w3.org/2000/svg"
-         width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+         width="20" height="20" viewBox="0 0 29 29" fill="currentColor">
+      <path d="M24 16v5.5c0 1.75-.75 2.5-2.5 2.5H16v-1l3-1.5-4-5.5 1-1 5.5 4 1.5-3h1zM6 16l1.5 3 5.5-4 1 1-4 5.5 3 1.5v1H7.5C5.75 24 5 23.25 5 21.5V16h1zm7-11v1l-3 1.5 4 5.5-1 1-5.5-4L6 13H5V7.5C5 5.75 5.75 5 7.5 5H13zm11 2.5c0-1.75-.75-2.5-2.5-2.5H16v1l3 1.5-4 5.5 1 1 5.5-4 1.5 3h1V7.5z"/>
     </svg>
     <svg v-else xmlns="http://www.w3.org/2000/svg"
-         width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+         width="20" height="20" viewBox="0 0 29 29" fill="currentColor">
+      <path d="M18.5 16c-1.75 0-2.5.75-2.5 2.5V24h1l1.5-3 5.5 4 1-1-4-5.5 3-1.5v-1h-5.5zM13 18.5c0-1.75-.75-2.5-2.5-2.5H5v1l3 1.5L4 24l1 1 5.5-4 1.5 3h1v-5.5zm3-8c0 1.75.75 2.5 2.5 2.5H24v-1l-3-1.5L25 5l-1-1-5.5 4L17 5h-1v5.5zM10.5 13c1.75 0 2.5-.75 2.5-2.5V5h-1l-1.5 3L5 4 4 5l4 5.5L5 12v1h5.5z"/>
     </svg>
   </MapControlButton>
 </template>

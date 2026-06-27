@@ -24,12 +24,20 @@ useShadowStyles(`
   border:none;
   border-radius:50%;
   cursor:pointer;
+  /* Don't let a drag that starts near a button select its glyph (the old
+     "drag selects the emoji to copy" bug while grabbing the scroll edge). */
+  user-select:none;-webkit-user-select:none;
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 1px 4px rgba(0,0,0,0.14),0 2px 8px rgba(0,0,0,0.10);
+  /* Tight shadow only — the old 0 2px 8px spread bled to the map's clipped right
+     edge (overflow:hidden) and read as a "shadow wall" + made buttons look
+     over-padded. (coder 2026-06-24) */
+  box-shadow:0 1px 3px rgba(0,0,0,0.18);
   transition:background-color 0.2s,box-shadow 0.2s,transform 0.1s;
   color:#333;
   flex-shrink:0;
   outline:none;
+  /* No blue/grey selection box on click/tap (webkit tap highlight). */
+  -webkit-tap-highlight-color:transparent;
 }
 .mcb:hover:not(:disabled){background:#f0f0f0;box-shadow:0 2px 8px rgba(0,0,0,0.18),0 4px 16px rgba(0,0,0,0.12);}
 .mcb:active:not(:disabled){transform:scale(0.93);}

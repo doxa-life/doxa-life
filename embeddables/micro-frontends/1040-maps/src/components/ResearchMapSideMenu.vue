@@ -54,8 +54,11 @@ const pinOpacity = computed({
 useShadowStyles(`
   .rm-side-backdrop { position:absolute;inset:0;background:rgba(0,0,0,0.45);z-index:1500;opacity:0;pointer-events:none;transition:opacity .18s; }
   .rm-side-backdrop.open { opacity:1;pointer-events:auto; }
-  .rm-side-drawer { position:absolute;top:0;right:0;bottom:0;width:340px;max-width:100vw;background:#171c23;color:#e7ebf0;border-left:1px solid #232a33;box-shadow:-4px 0 16px rgba(0,0,0,0.4);z-index:1600;transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column;font:13px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
-  .rm-side-drawer.open { transform:translateX(0); }
+  /* box-shadow lives on .open ONLY: when closed the drawer is translateX(100%) off
+     the right edge, but a left-pointing shadow (-4px) bled back onto the map's right
+     edge — the mystery "shadow on the right side" (coder staging QA 2026-06-25). */
+  .rm-side-drawer { position:absolute;top:0;right:0;bottom:0;width:340px;max-width:100vw;background:#171c23;color:#e7ebf0;border-left:1px solid #232a33;z-index:1600;transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column;font:13px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+  .rm-side-drawer.open { transform:translateX(0); box-shadow:-4px 0 16px rgba(0,0,0,0.4); }
   .rm-side-header { display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #232a33;flex:0 0 auto; }
   .rm-side-title { font-size:14px;font-weight:600;color:#e7ebf0;margin:0; }
   .rm-side-close { background:none;border:none;color:#a8b2bd;font-size:22px;line-height:1;cursor:pointer;padding:2px 6px;border-radius:4px; }
