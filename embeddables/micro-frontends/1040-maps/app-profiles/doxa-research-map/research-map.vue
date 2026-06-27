@@ -419,6 +419,7 @@ const mapTheme  = useMapTheme(uiStore)
 const FEATURES = {
   doxaRegions:    true,
   adoption:       false,  // Adoption tab hidden per UX request; wiring kept warm (flip to true to restore)
+  share:          false,  // Share button hidden (glitch — PR gate); ALL share code kept warm (flip to true to restore)
   hamburgerMenu:  false,  // canonical default — emit/listen mismatch + drawer surplus
   // Per QA building-round-1 R3 A4: clear the geocoder text on tab switch by
   // default; flip to true to preserve the previous tab's query when returning.
@@ -2261,7 +2262,9 @@ onBeforeUnmount(() => {
         <LocationButton    :map="map"          :is-dark="isDark" />
         <FullscreenButton  :map-container="mapContainer" :is-dark="isDark" />
         <ThemeToggleButton :is-dark="isDark"    @toggle="handleToggleTheme" />
-        <ShareButton       :is-dark="isDark" />
+        <!-- Share button hidden behind FEATURES.share (glitch — PR gate). All
+             ShareButton code kept warm; flip FEATURES.share=true to restore. -->
+        <ShareButton       v-if="FEATURES.share" :is-dark="isDark" />
       </MapToolbar>
 
       <!-- Fly + Clusters floating toolbar — sibling of the legend card, mounted
