@@ -311,7 +311,7 @@ export function useLegendData(legendTypeRef, opts = {}) {
       })
     }
 
-    // ── Affinity Blocs (flat, no counts) ────────────────────────────────────
+    // ── Affinity Blocks (flat, no counts) ────────────────────────────────────
     if (t === 'affinity-blocs') {
       return Object.keys(AFFINITY_BLOC_COLORS).map(b => ({
         key: b, label: b, color: AFFINITY_BLOC_COLORS[b], filterKey: b, children: []

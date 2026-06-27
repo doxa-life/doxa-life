@@ -28,19 +28,24 @@
 import { computed } from 'vue'
 
 // ── Region color palette ──────────────────────────────────────────────────────
+// Keyed on the STABLE slug (wagf_region.value), NOT the localized label. The API
+// localizes the label per `lang` ("Africa" → "África" → "Afrique"), so a
+// label-keyed lookup falls back to grey for every region except "Asia" (spelled
+// identically across locales) once the user switches language. The slug is
+// locale-independent. Mirrors SLUG_PALETTE in color-strategies/doxa-region.js.
 const REGION_COLORS = {
-  'Africa':                                '#e74c3c',
-  'Asia':                                  '#3498db',
-  'Europe':                                '#2ecc71',
-  'Latin America & Caribbean':             '#f39c12',
-  'Middle East':                           '#9b59b6',
-  'North America & Non-Spanish Caribbean': '#1abc9c',
-  'Oceania':                               '#e67e22',
+  'africa':                                '#e74c3c',
+  'asia':                                  '#3498db',
+  'europe':                                '#2ecc71',
+  'latin_america_&_caribbean':             '#f39c12',
+  'middle_east':                           '#9b59b6',
+  'north_america_&_non-spanish_caribbean': '#1abc9c',
+  'oceania':                               '#e67e22',
 }
 const FALLBACK_COLOR = '#95a5a6'
 
-function regionColor(label) {
-  return REGION_COLORS[label] || FALLBACK_COLOR
+function regionColor(slug) {
+  return REGION_COLORS[String(slug || '').toLowerCase()] || FALLBACK_COLOR
 }
 
 function readProps(item) { return item?.properties || item || {} }
@@ -149,7 +154,8 @@ export function useWagfRegionsLegendData(peopleGroupsRef) {
     const out = []
 
     for (const region of regions.values()) {
-      const color = regionColor(region.label)
+      // Color by the stable slug (locale-independent), not the localized label.
+      const color = regionColor(region.slug)
       const regionIsoCodes = []
       const blockNodes = []
 
@@ -180,7 +186,7 @@ export function useWagfRegionsLegendData(peopleGroupsRef) {
 
         blockNodes.push({
           id:       `block:${region.slug}__${block.slug}`,
-          label:    `${block.label} (Block)`,
+          label:    `${block.label} (Bloc)`,
           color,
           count:    block.count,
           pop:      block.pop,
