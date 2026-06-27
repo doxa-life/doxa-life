@@ -12,7 +12,8 @@ import { useI18n } from 'vue-i18n'
 import { RTL_LOCALES } from '@map/i18n/index.js'
 import { useMapInstance } from '@map/composables/useMapInstance.js'
 import { useMapData } from '@map/composables/useMapData.js'
-import { useMapLayers } from '@map/composables/useMapLayers.js'
+import { useMapLayers, PIN_STROKE_WIDTH_LIGHT, buildDarkRingWidth } from '@map/composables/useMapLayers.js'
+import { useMapTheme } from '@map/composables/useMapTheme.js'
 import { useSelectedPin } from '@map/composables/useSelectedPin.js'
 import { useShadowStyles } from '@map/composables/useShadowStyles.js'
 import { DataSourceManager } from '@map/utils/DataSourceManager.js'
@@ -26,6 +27,7 @@ import SemanticTreeLegend from '@map/components/SemanticTreeLegend.vue'
 import { createPplrInstance, provideInstance } from '@map/composables/usePplrInstance.js'
 import { useLegendData as useFlatLegendData } from '@map/composables/useLegendData.js'
 import { useMapFly } from '@map/composables/useMapFly.js'
+import { useCountryOutline, resolveCountryIso } from '@map/composables/useCountryOutline.js'
 import SideMenuDrawer    from '@map/components/SideMenuDrawer.vue'
 // ─── Map control components ───────────────────────────────────────────────────
 // Each button is imported individually so the profile can compose any subset
@@ -72,6 +74,12 @@ useShadowStyles(`
      user tapped BACK into the input. :has + :not(:placeholder-shown) detects
      a non-empty input. */
   .mapboxgl-ctrl-geocoder:has(.mapboxgl-ctrl-geocoder--input:not(:placeholder-shown)) .mapboxgl-ctrl-geocoder--button { display:block!important; }
+  /* Clear (X) button — hidden until typing (sibling :has rule flips it on), no visible
+     box (stock gives it a white bg), and the X icon absolutely centred at a fixed 16px so
+     it's identical on mobile and desktop (stock uses 20px/margin-top:8px below 640px,
+     16px/margin-top:3px above — which left the X lower on mobile). */
+  .mapboxgl-ctrl-geocoder--button { display:none!important;top:50%!important;bottom:auto!important;transform:translateY(-50%)!important;margin:0!important;padding:0!important;width:24px!important;height:24px!important;background:transparent!important;border:none!important;box-shadow:none!important; }
+  .mapboxgl-ctrl-geocoder--button .mapboxgl-ctrl-geocoder--icon-close { position:absolute!important;top:50%!important;left:50%!important;transform:translate(-50%,-50%)!important;margin:0!important;width:16px!important;height:16px!important; }
   /* Suggestions dropdown — higher limit (20) can produce a tall list;
      cap height + add overflow-y so the user can scroll through all matches
      (e.g. many people-groups under "India"). Visible scrollbar styling. */
@@ -87,17 +95,27 @@ useShadowStyles(`
   /* ── DOXA custom suggestion rows — bold labels + compact meta ─────── */
   /* GeocoderComponent.renderSuggestion() produces <div class="dg-main">
      Name</div><div class="dg-meta"><span class="dg-field">…</span>…</div> */
-  .dg-main { font-weight:500;font-size:13px;color:#222;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-  .dg-main strong { font-weight:700; }
+  .dg-main { font-weight:500;font-size:13px;color:#222;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px; }
+  .dg-main strong { font-weight:700;overflow:hidden;text-overflow:ellipsis; }
   .dg-meta { margin-top:2px;display:flex;flex-wrap:wrap;gap:4px 10px;font-size:11px;color:#555;line-height:1.35; }
   .dg-field strong { font-weight:600;color:#333;margin-right:2px; }
+  /* Round 16 — labeled category tag replacing the old emoji prefixes. */
+  .dg-tag { flex:none;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#3b463d;background:rgba(59,70,61,0.10);border-radius:4px;padding:1px 5px;line-height:1.5;white-space:nowrap; }
+  .dg-agg-label { overflow:hidden;text-overflow:ellipsis; }
+  .dg-count { flex:none;font-size:11px;font-weight:600;color:#73a17f; }
   /* Dark theme variants */
   .dsm-dark .dg-main { color:#F3F3F1; }
   .dsm-dark .dg-meta { color:rgba(243,243,241,0.7); }
   .dsm-dark .dg-field strong { color:#F3F3F1; }
+  .dsm-dark .dg-tag { color:#cfe3d6;background:rgba(115,161,127,0.22); }
+  .dsm-dark .dg-count { color:#9fd0ab; }
   @media(max-width:767px){
-    /* Mobile: centered full-width pill, using native Mapbox geocoder height + icons. */
-    .mapboxgl-ctrl-top-left { top:10px!important;left:10px!important;right:10px!important;width:calc(100% - 20px)!important;max-width:none!important; }
+    /* Mobile: centered full-width pill. Pin the geocoder to the DESKTOP height so it
+       doesn't grow to the stock ~50px below 640px (bug-searchbar-mobile-height). */
+    .mapboxgl-ctrl-top-left { top:10px!important;left:3px!important;right:3px!important;width:calc(100% - 6px)!important;max-width:none!important; }
+    .mapboxgl-ctrl-geocoder--input { height:36px!important;padding:6px 35px!important; }
+    .mapboxgl-ctrl-geocoder--icon { top:8px!important; }
+    .mapboxgl-ctrl-geocoder--icon-search { left:7px!important; }
   }
 
   /* ── Dark mode: root class drives all child overrides ── */
@@ -307,11 +325,6 @@ const legendColumnLabel = computed(() => {
   if (t === 'adoption') return 'Adoption Status'
   return 'Status'
 })
-// Totals footer for the STL — sums the mutually-exclusive legend rows so the
-// panel shows e.g. Unengaged (2080) + Engaged (26) = Total (2106).
-const legendTotalLabel = computed(() => t('legend.footer.total'))
-const legendTotalCount = computed(() => flatLegend.totalCount.value)
-const legendTotalPop   = computed(() => flatLegend.totalPopulation.value)
 const _stlOpen = computed(() => uiStore.legendState !== 'collapsed')
 function _onStlOpenChange(open) {
   if (open) uiStore.openLegend()
@@ -339,6 +352,14 @@ function onSemanticTreeSelect(node) {
     mapFly.zoomToLegendRow?.(node, { matchExpr })
   }
 }
+
+// Provide the legend-select handler so the MOBILE legend wires to it too.
+// LegendMobile.vue injects 'onSemanticTreeSelect' with a NO-OP default
+// (inject('onSemanticTreeSelect', () => {})), so without this provide mobile
+// row-clicks never reached the dim/restore path — select/deselect was dead on
+// mobile while desktop (the explicit @select binding at the <SemanticTreeLegend>)
+// worked. Mirrors the working research-map.vue:885 pattern.
+provide('onSemanticTreeSelect', (node) => onSemanticTreeSelect(node))
 
 const mapContainer = ref(null)
 const dsmRoot = ref(null)
@@ -387,17 +408,29 @@ const appReady = ref(false)
 const mapStore  = inject('mapStore')
 const dataStore = inject('dataStore')
 const uiStore   = inject('uiStore')
-const dsm       = new DataSourceManager()
+const mapTheme  = useMapTheme(uiStore)
+// loc-012: feed the active locale into the bulk/list data fetch so the data the
+// search bar searches comes back in the selected language — the same `lang` param
+// the people-group detail fetch uses (PeopleGroupDetail.vue). null → API default.
+const _apiLocale = (() => { const v = inject('lang', null)?.value; return (v && v !== 'en') ? v : null })()
+const dsm       = new DataSourceManager({ locale: _apiLocale })
 
 // ─── Map instance ─────────────────────────────────────────────────────────────
 const { map, isMapReady, initializeMap, destroy } = useMapInstance({
   containerRef: mapContainer,
   accessToken: mapboxToken.value,
-  style: 'mapbox://styles/mapbox/light-v11',
+  // Boot the basemap on the persisted theme (shared useMapTheme) so a reload while
+  // dark doesn't paint a light map under a dark UI.
+  style: mapTheme.bootStyle(),
   center: [20, 10],
   zoom: 1.8,
   pitch:   profileConfig?.value?.pitch   ?? mapDefaults.pitch,
-  bearing: profileConfig?.value?.bearing ?? mapDefaults.bearing
+  bearing: profileConfig?.value?.bearing ?? mapDefaults.bearing,
+  // Per-map zoom constraints (feedback #1 /pray): each map (simple, prayer)
+  // defines its own min/max in profile-config so users don't get lost zooming
+  // too far, and precise locations stay obfuscated. Falls back to mapDefaults.
+  minZoom: profileConfig?.value?.minZoom ?? mapDefaults.minZoom,
+  maxZoom: profileConfig?.value?.maxZoom ?? mapDefaults.maxZoom
 })
 
 const mapData = useMapData({
@@ -424,8 +457,23 @@ const mapFly = useMapFly({
   defaultZoom:   1.8
 })
 
+// ─── Country-outline composable (geoBoundaries ADM0 on country search) ───────
+const countryOutline = useCountryOutline(() => map.value)
+
 // ─── GO marker (selected pin highlight) ───────────────────────────────────────
-const selectedPin = useSelectedPin({ getMap: () => map.value })
+const selectedPin = useSelectedPin({
+  getMap: () => map.value,
+  // Pass the active-tab colour resolver as an OPTION (not via inject). A Vue 3
+  // component cannot inject its own provide, so inject('getActivePinColor') was
+  // always null and the selected dot fell back to GO_ORANGE (#1a1a1a) black.
+  getActivePinColor: (properties) => {
+    const sk = activeTab.value?.colorStrategy
+    const mode = sk === 'engagement' ? COLOR_MODES.ENGAGEMENT
+              : sk === 'adoption'   ? COLOR_MODES.ADOPTION
+              : COLOR_MODES.PRAYER_PROGRESS
+    return getColorStrategy(mode)?.getColor?.(properties) ?? '#1a1a1a'
+  }
+})
 
 // Stored so theme-swap can re-add layers after setStyle() clears them
 let _lastNormalizedGroups = []
@@ -491,6 +539,9 @@ function preloadPeopleGroupImages(groups) {
 // ─── Map controls ─────────────────────────────────────────────────────────────
 const isDark = computed(() => uiStore.theme === 'dark')
 watch(isDark, (dark) => { pplrInstance.theme.value = dark ? 'dark' : 'light' }, { immediate: true })
+// SEAMLESS theme: the basemap lightPreset follows uiStore.theme reactively. NO setStyle
+// reload → pins/glow never wiped, no flash, instant toggle.
+watch(() => uiStore.theme, () => mapTheme.applyTheme(map.value))
 
 // Theme-aware data-pin outline (qa: 2026-05-06 user feedback — Joshua Project
 // uses a thin near-black outline that's barely visible; reverse-engineered).
@@ -498,39 +549,29 @@ watch(isDark, (dark) => { pplrInstance.theme.value = dark ? 'dark' : 'light' }, 
 // basemaps. Boot style is light-v11, so the initial circle-stroke-color
 // in addLanguageFamilyLayer is already 'rgba(0,0,0,0.45)' — this watcher
 // just flips it on theme toggle.
-watch(isDark, (dark) => {
+function _applyPinStroke() {
   const m = map.value
   if (!m || !m.getLayer('language-family-pins')) return
-  m.setPaintProperty('language-family-pins', 'circle-stroke-color',
-    dark ? '#ffffff' : 'rgba(0,0,0,0.45)')
-}, { immediate: false })
+  // Theme-aware subtle ring: DARK → white (all); LIGHT → has-prayer white, need-prayer dark.
+  const stroke = isDark.value
+    ? '#ffffff'
+    : ['case', ['>', ['to-number', ['get', 'peoplePraying'], 0], 0], '#ffffff', '#1f2937']
+  m.setPaintProperty('language-family-pins', 'circle-stroke-color', stroke)
+  // Thicken the white ring in DARK mode so intentionally-black pins (unmapped langs,
+  // Sign Language, Deaf, Unknown) stay visible on the night basemap; keep the light
+  // hairline. buildDarkRingWidth applies the active colour-strategy's exceptions
+  // (prayer RED no-prayer pins stay thin). Colours unchanged — width only.
+  m.setPaintProperty('language-family-pins', 'circle-stroke-width',
+    isDark.value ? buildDarkRingWidth(activeTab.value?.colorStrategy) : PIN_STROKE_WIDTH_LIGHT)
+}
+// Re-run on theme toggle AND tab switch (the prayer exception depends on the active tab).
+watch(isDark, _applyPinStroke, { immediate: false })
 
 /** Called by MapToolbar when the theme toggle button is clicked. */
 function handleToggleTheme() {
-  if (!map.value) return
-  uiStore.toggleTheme()
-  const newStyle = uiStore.theme === 'dark'
-    ? 'mapbox://styles/mapbox/dark-v11'
-    : 'mapbox://styles/mapbox/light-v11'
-  map.value.setStyle(newStyle)
-  // Re-add custom layers after style swap (setStyle wipes all custom layers)
-  map.value.once('style.load', () => {
-    if (_lastNormalizedGroups?.length) {
-      const firstTab = tabs.value[0]
-      const initMode =
-        firstTab?.colorStrategy === 'engagement' ? COLOR_MODES.ENGAGEMENT :
-        firstTab?.colorStrategy === 'adoption'   ? COLOR_MODES.ADOPTION :
-        COLOR_MODES.PRAYER_PROGRESS
-      mapLayers.addLanguageFamilyLayer(_lastNormalizedGroups, initMode)
-    }
-    selectedPin.initialize()
-    initActiveLayer()
-    // New style → its label layers are defaults ('name_en'). Re-apply locale.
-    applyBasemapLocale(locale.value)
-    if (activeTab.value?.id === 'prayer' || activeTab.value?.colorStrategy === 'prayer') {
-      mapLayers.startPrayerGlow()
-    }
-  })
+  // Seamless: flip the theme + re-light the Standard basemap (day↔night) via setConfigProperty.
+  // No setStyle reload, so nothing is torn down or re-added — the toggle is instant.
+  mapTheme.swapTheme(map.value)
 }
 
 // ─── Search: people-group result handler ─────────────────────────────────────
@@ -541,6 +582,8 @@ function handleToggleTheme() {
 // the pin-click UX in useMapEvents.attachPinClickHandler.
 function handlePeopleGroupResult(feature) {
   if (!feature || !uiStore) return
+  // A people-group pick is "clicking elsewhere" — drop any country outline.
+  countryOutline.clearCountry()
   uiStore.selectPeopleGroup(feature)
   if (uiStore.isMobile && uiStore.legendState === 'collapsed') {
     uiStore.setLegendState('open')
@@ -565,6 +608,8 @@ function handlePeopleGroupResult(feature) {
 // pin stayed highlighted and all other pins stayed dim + animated indefinitely.
 function handleSearchClear() {
   if (!uiStore) return
+  // Drop the country boundary outline drawn by a country search pick.
+  countryOutline.clearCountry()
   uiStore.selectPeopleGroup(null)   // closes popup + Go-pin highlight (via useSelectedPin watcher)
   try {
     const m = map.value
@@ -591,6 +636,16 @@ function handleAggregateResult(evt) {
   if (!Array.isArray(memberIds) || !memberIds.length) return
 
   const m = map.value
+
+  // Country pick → draw the country boundary OUTLINE (geoBoundaries ADM0) and
+  // fit to its bbox. Any other aggregate kind drops a prior outline so it only
+  // ever shows for the live country selection.
+  if (evt.kind === 'country') {
+    const iso = resolveCountryIso(evt, mapData.normalizedPeopleGroups.value || [])
+    if (iso) countryOutline.showCountry(iso)
+  } else {
+    countryOutline.clearCountry()
+  }
   // Clear any single-pin highlight from a prior people-group search
   if (m.getLayer(ACTIVE_LAYER)) {
     m.setFilter(ACTIVE_LAYER, ['==', 'uniqueId', ''])
@@ -628,18 +683,18 @@ function handleAggregateResult(evt) {
   }
   _aggregateFilterActive = true
 
-  // Fit bounds of the matching pins — padding leaves breathing room; maxZoom
-  // prevents over-zoom when the aggregate is tightly clustered (e.g. a small
-  // religion with only 3 members).
-  if (Array.isArray(bounds) && bounds.length === 4) {
+  // Camera. A COUNTRY pick keeps its outline + bbox fit. Any other aggregate
+  // (e.g. searching "Islam" → a globe-spanning religion) routes through the shared
+  // robust legend-row camera so it eases to a stable world overview instead of a
+  // snapping fitBounds — same fix (densest-bin center + no-copy zoom + easeTo) as
+  // the legend rows, via the matched member pins.
+  if (evt.kind === 'country' && Array.isArray(bounds) && bounds.length === 4) {
     const [minLng, minLat, maxLng, maxLat] = bounds
     try {
-      m.fitBounds([[minLng, minLat], [maxLng, maxLat]], {
-        padding: 60,
-        maxZoom: 6,
-        duration: 1200
-      })
+      m.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 60, maxZoom: 6, duration: 1200 })
     } catch (e) { /* fitBounds can throw on degenerate single-point bounds */ }
+  } else {
+    mapFly.zoomToLegendRow?.({}, { matchExpr: ['in', ['get', 'uniqueId'], ['literal', memberIds]] })
   }
 }
 
@@ -705,6 +760,9 @@ function switchTab(tabId) {
   activeTabId.value = tabId
   const tab = tabs.value.find(t => t.id === tabId)
   if (!tab || !map.value) return
+  // Re-assert the persisted theme's basemap lightPreset on every tab switch (defensive,
+  // config-prop only — keeps dark mode consistent across tabs). bug-dark-mode-multi-tab.
+  mapTheme.applyTheme(map.value)
   const strategyKey = tab.colorStrategy
   const colorMode =
     strategyKey === 'engagement' ? COLOR_MODES.ENGAGEMENT :
@@ -724,6 +782,9 @@ function switchTab(tabId) {
       }
     })
   }
+  // Re-apply the theme-aware ring for the NEW tab's colour-strategy (so the prayer
+  // RED-no-prayer thin-ring exception turns on/off as you enter/leave the prayer tab).
+  _applyPinStroke()
   if (tab.id === 'prayer' || tab.colorStrategy === 'prayer') mapLayers.startPrayerGlow()
   else mapLayers.stopPrayerGlow()
 }
@@ -846,12 +907,10 @@ function getFilterStrokeColor(filterType, filterKey) {
  * white — the pin stays visible without needing a dark ring in light mode.
  */
 function getStrokeColor() {
-  // Joshua-Project-inspired thin near-black outline in light mode; white in
-  // dark so pins stay visible against dark basemaps (qa: 2026-05-06 user
-  // feedback iter-9 — old code gated this behind FEATURES.darkPinBorder=false
-  // and always returned white, which left the ACTIVE_LAYER overlay with the
-  // bright white halo even after round 8 fixed the base pins).
-  return isDark.value ? '#ffffff' : 'rgba(0,0,0,0.45)'
+  // Theme-aware subtle ring: DARK → white (all); LIGHT → has-prayer white, need-prayer dark.
+  return isDark.value
+    ? '#ffffff'
+    : ['case', ['>', ['to-number', ['get', 'peoplePraying'], 0], 0], '#ffffff', '#1f2937']
 }
 
 /** Build the Mapbox filter expression for a given filter type + key */
@@ -1034,18 +1093,21 @@ function applyLegendFilter(filterType, filterKey) {
   startPulse(matchExpr, pulseColor)
 }
 
-// Resync stroke + muted-gray dim when user toggles dark/light mode
+// Re-apply the legend selection recolor when the user toggles dark/light mode.
+// BUG FIX (bug-legend-theme-swap-grey-pins): the old partial re-assert set the WHOLE
+// 'language-family-pins' layer to a flat mutedGray() whenever a filter was active. That
+// is only correct for the legacy overlay path (activeOverlayEmphasis ON), where the base
+// layer IS muted and matched pins are drawn on ACTIVE_LAYER. In the DEFAULT path
+// (activeOverlayEmphasis OFF — the live config) the base layer must keep
+// getBaseColorExpr() and dim NON-matched pins via circle-opacity; flattening it to
+// mutedGray() greyed the MATCHED pins too. So when a filter is active, re-run the FULL
+// applyLegendFilter() — it re-applies the complete, theme-correct recolor (base color +
+// opacity dim + matched ACTIVE_LAYER stroke + glow/hitbox/pulse) for whichever path is on.
 watch(isDark, () => {
   const m = map.value
   if (!m) return
-  if (m.getLayer(ACTIVE_LAYER)) {
-    m.setPaintProperty(ACTIVE_LAYER, 'circle-stroke-color',
-      getFilterStrokeColor(_currentFilter.type, _currentFilter.key))
-  }
-  // If a legend filter is currently active, re-apply the theme-appropriate gray
-  // so non-matched pins don't flip to an "almost white" shade on dark mode.
-  if (!FEATURES.overlapDensity && _currentFilter.key && m.getLayer('language-family-pins')) {
-    m.setPaintProperty('language-family-pins', 'circle-color', mutedGray())
+  if (_currentFilter.key) {
+    applyLegendFilter(_currentFilter.type, _currentFilter.key)
   }
 })
 
@@ -1057,6 +1119,10 @@ watch(() => uiStore.adoptionFilter,   (k) => applyLegendFilter('adoption',   k))
 async function onMapReady(normalizedPeopleGroups) {
   // Register map with store
   mapStore.registerMap(mapId, map.value)
+  // Apply the persisted theme's lightPreset now the Standard style has loaded, so a
+  // reload while dark was selected boots the NIGHT basemap (no light-under-dark desync).
+  // (bug-ghost-rings-standard-style — Option B.)
+  mapTheme.applyTheme(map.value)
 
   // Projection — safe guard
   try {
@@ -1073,6 +1139,11 @@ async function onMapReady(normalizedPeopleGroups) {
       firstTab?.colorStrategy === 'adoption'   ? COLOR_MODES.ADOPTION :
       COLOR_MODES.PRAYER_PROGRESS
     mapLayers.addLanguageFamilyLayer(normalizedPeopleGroups, initMode)
+    // On a DARK boot the theme-watcher (immediate:false) hasn't run — apply the dark
+    // ring (white colour + THICK width) now, else black pins are left with the light
+    // hairline on the night basemap. _applyPinStroke handles both themes + the prayer
+    // exception. (coder 2026-06-25 reload fix, extended to ring width.)
+    _applyPinStroke()
     // SHELVED: idle preloader caused slow startup — re-enable when pray-tools API is active
     // and only for groups that have confirmed valid image URLs
     // preloadPeopleGroupImages(normalizedPeopleGroups)
@@ -1216,21 +1287,25 @@ onBeforeUnmount(() => {
           :initially-collapsed="false"
           :is-dark="isDark"
         />
-        <SemanticTreeLegend
-          v-if="appReady"
-          v-show="!(uiStore.legendMode === 'detail' && uiStore.selectedPeopleGroup)"
-          :nodes="legendNodes"
-          :tabs="null"
-          :title="legendTitle"
-          :hideTabs="true"
-          :columnLabel="legendColumnLabel"
-          :total-label="legendTotalLabel"
-          :total-count="legendTotalCount"
-          :total-pop="legendTotalPop"
-          :open="_stlOpen"
-          @select="onSemanticTreeSelect"
-          @update:open="_onStlOpenChange"
-        />
+        <!-- v-show MUST sit on a wrapper <div> (element root), NOT on the
+             <SemanticTreeLegend> component: its template root is a fragment
+             (single .stl-panel + a trailing comment), so a runtime directive on
+             the component silently no-ops (Vue warn: "non-element root node") and
+             broke the legend select/deselect round-trip (pins never restored).
+             Mirrors the WORKING research-map pattern (research-map.vue:2282). -->
+        <div v-show="!(uiStore.legendMode === 'detail' && uiStore.selectedPeopleGroup)">
+          <SemanticTreeLegend
+            v-if="appReady"
+            :nodes="legendNodes"
+            :tabs="null"
+            :title="legendTitle"
+            :hideTabs="true"
+            :columnLabel="legendColumnLabel"
+            :open="_stlOpen"
+            @select="onSemanticTreeSelect"
+            @update:open="_onStlOpenChange"
+          />
+        </div>
       </div>
       <!-- Mobile legend: bottom-sheet with LegendMobile (matches research map) -->
       <div class="dsm-legend-mobile-slot">
@@ -1239,7 +1314,6 @@ onBeforeUnmount(() => {
           :legend-type="activeLegendType"
           :popup-action="activePopupAction"
           :is-dark="isDark"
-          :show-total="true"
         />
       </div>
 

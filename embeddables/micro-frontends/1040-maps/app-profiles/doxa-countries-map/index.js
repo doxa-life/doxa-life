@@ -1,14 +1,16 @@
 /**
- * doxa-research-map / index.js — Bundle entry
+ * doxa-countries-map / index.js — Bundle entry
  *
- * Vite multi-entry build target. Emits app/doxa-research-map.js.
+ * Vite multi-entry build target. Emits app/doxa-countries-map.js.
  *
- * Registers TWO custom-element tag names that mount the SAME ProfileLoader
- * (separate defineCustomElement calls — Vue's defineCustomElement returns a
- * class that registers with customElements.define exactly once per tag, so
- * reusing one class across two tags throws NotSupportedError):
- *   - <doxa-map>            legacy production tag (Q1 back-compat)
- *   - <doxa-research-map>   new explicit tag matching the bundle name
+ * Clone of the doxa-research-map bundle (see app-profiles/doxa-research-map/).
+ * Same ProfileLoader + framework; the only differences live in the
+ * countries-map.vue profile: it defaults to the Countries (WAGF Regions) tab,
+ * boots the legend on the Country tier, and surfaces the SemanticTreeLegend
+ * Export scaffold only while that tab is active.
+ *
+ * Registers ONE custom-element tag that mounts the ProfileLoader:
+ *   - <doxa-countries-map>   explicit tag matching the bundle name
  *
  * The profile-config attribute is parsed by ProfileLoader (in @map). `profile`
  * must match a .vue file in this bundle's folder.
@@ -46,7 +48,7 @@ if (typeof window !== 'undefined' && window.mapboxgl?.setRTLTextPlugin) {
  * Build a fresh defineCustomElement-wrapped class. Each instance gets its own
  * Pinia + i18n so multiple embeds on the same page don't bleed state.
  */
-function buildDoxaResearchMapElement() {
+function buildDoxaCountriesMapElement() {
   return defineCustomElement(ProfileLoader, {
     configureApp(app) {
       app.use(createPinia())
@@ -61,22 +63,19 @@ function buildDoxaResearchMapElement() {
   })
 }
 
-const DoxaResearchMapElement = buildDoxaResearchMapElement()
+const DoxaCountriesMapElement = buildDoxaCountriesMapElement()
 
-// ─── Register ONE tag — <doxa-research-map> ──────────────────────────────────
-// IMPORTANT: this bundle deliberately does NOT register <doxa-map>. The legacy
-// <doxa-map> tag is owned exclusively by the doxa-simple-map bundle. Why:
-// customElements.define() is one-shot per tag per page session; if BOTH bundles
-// registered <doxa-map>, an SPA user who visited /research first would have the
-// research bundle's profileModules stuck on <doxa-map>, then any subsequent
-// /home / /pray / /adopt navigation would render <doxa-map> with the research
-// bundle's profile registry — which has 'research-map' but not 'doxa-simple-map',
-// producing the "Profile not found" error. DoxaMapSlot already uses distinct
-// tags per bundle (<doxa-map> vs <doxa-research-map>) — keep them disjoint here.
+// ─── Register ONE tag — <doxa-countries-map> ─────────────────────────────────
+// IMPORTANT: this bundle deliberately does NOT register <doxa-map> (owned by
+// doxa-simple-map) or <doxa-research-map> (owned by the doxa-research-map
+// bundle). customElements.define() is one-shot per tag per page session — each
+// bundle must keep its tag disjoint so an SPA that mounts more than one map
+// bundle doesn't get a tag bound to the wrong bundle's profileModules. The new
+// tag is fed the 'countries-map' profile via the profile-config attribute.
 if (typeof customElements !== 'undefined') {
-  if (!customElements.get('doxa-research-map')) {
-    customElements.define('doxa-research-map', DoxaResearchMapElement)
+  if (!customElements.get('doxa-countries-map')) {
+    customElements.define('doxa-countries-map', DoxaCountriesMapElement)
   }
 }
 
-export default DoxaResearchMapElement
+export default DoxaCountriesMapElement

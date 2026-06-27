@@ -6,9 +6,9 @@
   <title>1040-maps · doxa-research-map staging</title>
   <link rel="icon" href="data:,">
 
-  <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.24.0/mapbox-gl.css" rel="stylesheet" />
   <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" rel="stylesheet" />
-  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.24.0/mapbox-gl.js"></script>
   <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
 
   <style>
@@ -179,7 +179,7 @@
      just by using a new value.
 
        profile  application profile name (must match
-                app-profiles/doxa-research-map/profiles/<name>.vue)
+                app-profiles/doxa-research-map/<name>.vue)
        label    header title shown on the gem-frame
        gem      amethyst | sapphire | aquamarine | emerald |
                 topaz | citrine | tourmaline. Omit to auto-cycle.
@@ -268,6 +268,11 @@
   }
 
   const TK       = window.DOXA_TOKEN || '';
+  // The parent staging index passes a language via ?locale=<code> on this page's
+  // URL (set by its top-level language selector). We forward it to every map as
+  // the `locale` prop (profile-config.locale) — the switch lives in staging, not
+  // on the map. Empty/absent → each map keeps its i18n-detected default.
+  const LOCALE   = new URLSearchParams(location.search).get('locale') || '';
   const SLOTS    = window.DOXA_SLOTS || [];
   const topbar   = document.getElementById('topbar');
   const showcase = document.getElementById('showcase');
@@ -297,7 +302,7 @@
     slotsForProfile.forEach((slot, i) => {
       const gem    = slot.gem ? gemByName(slot.gem) : gemForIndex(i);
       const gemRgb = hexToRgb(gem.hex);
-      const config = Object.assign({}, slot.config, { profile: slot.profile, tk: TK });
+      const config = Object.assign({}, slot.config, { profile: slot.profile, tk: TK }, LOCALE ? { locale: LOCALE } : {});
 
       const el = document.createElement('div');
       el.className = 'gem-frame';
