@@ -35,6 +35,33 @@ export const PALETTE = {
 
 export const DOXA_REGION_COLORS = PALETTE
 
+/**
+ * SLUG-keyed palette — the AUTHORITATIVE map for coloring.
+ *
+ * The pray-tools API returns wagf_region as { value: <slug>, label: <localized> }.
+ * DSM stores the stable slug in properties.doxaRegion (e.g. 'asia', 'middle_east').
+ * The label is localized per `lang` ("Africa" → "África" → "Afrique"), so keying
+ * colors on the display name silently breaks in every non-English locale (only
+ * "Asia" — spelled identically across es/fr — survives). Key on the slug instead.
+ * Slugs verified against the live API (2026-06-22).
+ */
+export const SLUG_PALETTE = {
+  'africa':                                '#e74c3c',
+  'asia':                                  '#3498db',
+  'europe':                                '#2ecc71',
+  'latin_america_&_caribbean':             '#f39c12',
+  'middle_east':                           '#9b59b6',
+  'north_america_&_non-spanish_caribbean': '#1abc9c',
+  'oceania':                               '#e67e22',
+  'na':                                    '#1a1a2e'  // No WAGF Region/Bloc
+}
+
+/** Color for a region by its stable slug (locale-independent). */
+export function getRegionColorBySlug(slug) {
+  if (!slug) return DEFAULT_COLOR
+  return SLUG_PALETTE[String(slug).toLowerCase()] || FALLBACK_COLOR
+}
+
 /** Extended region aliases for flexible matching */
 export const REGION_COLOR_ALIASES = {
   'Africa': '#e74c3c',
@@ -74,17 +101,22 @@ export function getRegionColor(regionName) {
 }
 
 export function getColor(properties) {
-  const region = properties.doxaRegion || properties._normalized?.doxaRegion
-  return PALETTE[region] || FALLBACK_COLOR
+  // properties.doxaRegion is the stable slug (e.g. 'asia'), NOT the localized
+  // label — color by slug so it survives language switches.
+  const slug = properties.doxaRegion || properties._normalized?.doxaRegion
+  return getRegionColorBySlug(slug)
 }
 
 /**
  * Build Mapbox color expression for DOXA regions.
+ *
+ * Matches on the stable slug stored in `doxaRegion` (e.g. 'asia') so the
+ * expression keeps coloring correctly when the API returns localized labels.
  */
 export function applyColor() {
   const colorExpression = ['match', ['get', PROPERTY_KEY]]
-  Object.entries(PALETTE).forEach(([region, color]) => {
-    colorExpression.push(region, color)
+  Object.entries(SLUG_PALETTE).forEach(([slug, color]) => {
+    colorExpression.push(slug, color)
   })
   colorExpression.push(FALLBACK_COLOR)
   return colorExpression
@@ -97,9 +129,12 @@ export default {
   propertyKey: PROPERTY_KEY,
   palette: PALETTE,
   colors: PALETTE,
+  slugColors: SLUG_PALETTE,
   aliases: REGION_COLOR_ALIASES,
+  fallback: FALLBACK_COLOR,
   getColor,
   applyColor,
   buildColorExpression,
-  getRegionColor
+  getRegionColor,
+  getRegionColorBySlug
 }

@@ -13,6 +13,62 @@ import { FULL_PRAYER_THRESHOLD, PALETTE as PRAYER_PALETTE } from '../config/colo
 import { useMapEvents } from './useMapEvents.js';
 import langFamilyByLanguage from '../data/langFamilyByLanguage.json';
 
+// ── Pin ring widths (theme-aware, parameterized) ─────────────────────────────
+// LIGHT = elegant data-driven hairline (need-prayer pins thinner than has-prayer).
+// DARK  = a noticeably THICKER white ring so BLACK / near-black pins stay visible on
+//         the Standard NIGHT basemap. Black is INTENTIONAL for several buckets —
+//         unmapped language families (#000000), 'Sign Language' (#212121), 'Unknown'
+//         (#000000) and the Deaf affinity block (#000000, accessibility) — and the
+//         hairline ring can't outline them in dark mode. Each profile's
+//         _updatePinStroke() swaps these on theme/tab change; pin COLOURS are NEVER
+//         changed — only the ring width, dark-mode only.
+const HAS_PRAYER        = ['>', ['to-number', ['get', 'peoplePraying'], 0], 0];
+const RING_HAIRLINE_HAS = { 0: 0.25, 8: 0.4,  14: 0.5  };  // light has-prayer hairline
+const RING_HAIRLINE_NO  = { 0: 0.1,  8: 0.18, 14: 0.22 };  // light need-prayer hairline (also the dark EXCEPTION width)
+const RING_THICK        = { 0: 1.2,  8: 1.6,  14: 2    };  // dark default — outlines black pins
+
+export const PIN_STROKE_WIDTH_LIGHT = [
+    'interpolate', ['linear'], ['zoom'],
+    0,  ['case', HAS_PRAYER, RING_HAIRLINE_HAS[0],  RING_HAIRLINE_NO[0]],
+    8,  ['case', HAS_PRAYER, RING_HAIRLINE_HAS[8],  RING_HAIRLINE_NO[8]],
+    14, ['case', HAS_PRAYER, RING_HAIRLINE_HAS[14], RING_HAIRLINE_NO[14]]
+];
+export const PIN_STROKE_WIDTH_DARK = [
+    'interpolate', ['linear'], ['zoom'], 0, RING_THICK[0], 8, RING_THICK[8], 14, RING_THICK[14]
+];
+
+// MODULAR dark-ring EXCEPTIONS, keyed by the active colour-strategy. A pin matching an
+// exception keeps the THIN hairline instead of the thick default. To add a future
+// exception (a pin type / legend row / colour that should stay thin), add a key + match
+// expression here — CONFIG ONLY, no code edits. (coder: the prayer map's RED no-prayer
+// pins MUST stay thin so RED vs YELLOW don't blur under a thick white ring.)
+const NO_PRAYER   = ['==', ['to-number', ['get', 'peoplePraying'], 0], 0];
+const NOT_ENGAGED = ['all', ['!=', ['get', 'engagementStatus'], true], ['!=', ['get', 'engagementStatus'], 1]];
+const NOT_ADOPTED = ['all', ['!=', ['get', 'adoptionStatus'], true], ['!=', ['get', 'adoptionStatus'], 1]];
+export const DARK_RING_EXCEPTIONS = {
+    // Negative-status pins are RED (#e74c3c) on every status map — already visible by
+    // colour, and a thick white ring blurs RED vs the positive GREEN/YELLOW. Keep them
+    // thin; positive (has-*) pins keep the thick white ring like every other pin.
+    prayer:         [NO_PRAYER],     // simple-map prayer colour-strategy: no-prayer (red) thin
+    prayerProgress: [NO_PRAYER],     // research / countries / clone prayer colour-strategy
+    engagement:     [NOT_ENGAGED],   // notEngaged (red) thin
+    adoption:       [NOT_ADOPTED],   // notAdopted (red) thin
+};
+
+// Build the dark-mode circle-stroke-width for the active colour-strategy: THICK by
+// default, but THIN (hairline) for any pin matching that strategy's exceptions.
+export function buildDarkRingWidth(colorStrategy) {
+    const excs = DARK_RING_EXCEPTIONS[colorStrategy] || [];
+    if (!excs.length) return PIN_STROKE_WIDTH_DARK;             // no exception → all thick
+    const anyExc = excs.length === 1 ? excs[0] : ['any', ...excs];
+    return [
+        'interpolate', ['linear'], ['zoom'],
+        0,  ['case', anyExc, RING_HAIRLINE_NO[0],  RING_THICK[0]],
+        8,  ['case', anyExc, RING_HAIRLINE_NO[8],  RING_THICK[8]],
+        14, ['case', anyExc, RING_HAIRLINE_NO[14], RING_THICK[14]]
+    ];
+}
+
 // ── Client-side language → family derivation ────────────────────────────────
 // API field `imb_language_family` is null for all 2,069 records (qa-feedback1
 // Round 5 A2). The legend bucketing (useLanguageFamilyLegendData.readFamily)
@@ -240,8 +296,27 @@ export function useMapLayers(options = {}) {
             paint: {
                 'circle-radius': getCircleRadiusInterpolation('standard'),
                 'circle-color': colorExpression,
-                'circle-stroke-width': getCircleStrokeWidthInterpolation('standard'),
-                'circle-stroke-color': 'rgba(0,0,0,0.2)',
+                // Mapbox Standard style v3 lights custom layers by the lightPreset — on the
+                // 'night' preset, circles WITHOUT an emissive strength get darkened to
+                // near-black. Setting it to 1 makes the pins render their OWN colour
+                // identically in day + night, so pins keep the same colour in dark mode
+                // (not black). (doxa dark-mode pin-colour fix on Standard style.)
+                'circle-emissive-strength': 1,
+                // Very thin / subtle hairline ring. Data-driven so the need-prayer (red) pins —
+                // the only ones that carry the DARK ring in light mode — get a noticeably THINNER
+                // hairline than the has-prayer (white-ring) pins (coder: "dark lines round the red
+                // pins are too thick"). Zoom interpolation is kept by putting the 'case' in the
+                // interpolate OUTPUTS (zoom-and-property — allowed); the reverse (zoom nested inside
+                // a 'case') is what breaks the layer, so don't do that.
+                'circle-stroke-width': PIN_STROKE_WIDTH_LIGHT,
+                // BOOT default = LIGHT-mode ring (has-prayer→white, need-prayer/red→subtle dark
+                // #1f2937). The profile's _updatePinStroke (theme-aware) overrides this on boot/
+                // toggle: DARK mode → subtle WHITE ring on ALL pins (no dark line in dark).
+                'circle-stroke-color': [
+                    'case',
+                    ['>', ['to-number', ['get', 'peoplePraying'], 0], 0], '#ffffff',
+                    '#1f2937'
+                ],
                 'circle-opacity': 1,
                 'circle-stroke-opacity': 1,
                 'circle-opacity-transition': { duration: 250 }
@@ -276,7 +351,7 @@ export function useMapLayers(options = {}) {
      * vector tileset (mapbox.country-boundaries-v1). No external fetch —
      * same CDN as the base map, vector tiles load only the visible viewport.
      *
-     * @param {Object} regionsData - { isoToRegion: { 'AF': 'Asia', … } }
+     * @param {Object} regionsData - { isoToRegion: { 'AFG': 'asia', … } } (region SLUGs)
      * @param {string} colorScheme - 'doxa-regions' | 'none'
      */
     function addRegionsLayer(regionsData, colorScheme = 'doxa-regions') {
@@ -288,14 +363,17 @@ export function useMapLayers(options = {}) {
         if (map.getLayer('regions-border')) map.removeLayer('regions-border');
         if (map.getSource('regions'))       map.removeSource('regions');
 
+        // Keyed on the STABLE region slug (wagf_region.value) — loadRegionsData
+        // builds isoToRegion as ISO → slug. A label-keyed palette greys out every
+        // region except "Asia" once the API returns localized labels (locale bug).
         const REGION_COLORS = {
-            'Africa':                                 '#e74c3c',
-            'Asia':                                   '#3498db',
-            'Europe':                                 '#2ecc71',
-            'Latin America & Caribbean':              '#f39c12',
-            'Middle East':                            '#9b59b6',
-            'North America & Non-Spanish Caribbean':  '#1abc9c',
-            'Oceania':                                '#e67e22',
+            'africa':                                 '#e74c3c',
+            'asia':                                   '#3498db',
+            'europe':                                 '#2ecc71',
+            'latin_america_&_caribbean':              '#f39c12',
+            'middle_east':                            '#9b59b6',
+            'north_america_&_non-spanish_caribbean':  '#1abc9c',
+            'oceania':                                '#e67e22',
         };
         const DEFAULT_COLOR = '#cccccc';
 
@@ -305,10 +383,10 @@ export function useMapLayers(options = {}) {
         // (e.g. 'MYS', 'SDN') so we match on the alpha-3 property to avoid a lookup table.
         const isoToRegion = (regionsData && regionsData.isoToRegion) ? regionsData.isoToRegion : {};
         const matchPairs = [];
-        // Build regionIsoMap: region label → array of ISO alpha-3 codes for that region.
+        // Build regionIsoMap: region slug → array of ISO alpha-3 codes for that region.
         const _regionIsoMap = {};
         for (const [iso, region] of Object.entries(isoToRegion)) {
-            const color = REGION_COLORS[region];
+            const color = REGION_COLORS[String(region).toLowerCase()];
             if (color) matchPairs.push(iso, color);
             if (!_regionIsoMap[region]) _regionIsoMap[region] = [];
             _regionIsoMap[region].push(iso);
@@ -342,6 +420,9 @@ export function useMapLayers(options = {}) {
                 'fill-color': fillColorExpr,
                 'fill-opacity': colorScheme === 'none' ? 0.1 : 0.20,
                 'fill-antialias': true,
+                // Standard-style night lighting darkens custom layers — emit full colour
+                // so region fills keep their colour in dark mode (doxa dark-mode fix).
+                'fill-emissive-strength': 1,
                 'fill-opacity-transition': { duration: 300 }
             }
         }, beforeId);
@@ -353,7 +434,9 @@ export function useMapLayers(options = {}) {
             'source-layer': 'country_boundaries',
             paint: {
                 'line-color': 'rgba(60,60,80,0.35)',
-                'line-width': 0.6
+                'line-width': 0.6,
+                // Emit full colour so the border stays visible on the night preset.
+                'line-emissive-strength': 1
             }
         }, beforeId);
 
@@ -444,7 +527,9 @@ export function useMapLayers(options = {}) {
             paint: {
                 'line-color': familyColor,
                 'line-width': 0.75,
-                'line-opacity': 0.5
+                'line-opacity': 0.5,
+                // Emit full colour so connection lines stay visible on the night preset.
+                'line-emissive-strength': 1
             }
         }, 'language-family-pins'); // Add below the pins layer
 
@@ -615,6 +700,10 @@ export function useMapLayers(options = {}) {
                 'circle-blur': 0.3,
                 'circle-opacity': 0.45,
                 'circle-stroke-width': 0,
+                // Standard-style night lighting darkens custom layers — emit full colour
+                // so the prayer glow stays visible in dark mode. (Lighting prop, NOT an
+                // animation value: opacity/radius/colour formulae are unchanged.)
+                'circle-emissive-strength': 1,
             }
         }, 'language-family-pins');
 
@@ -632,6 +721,10 @@ export function useMapLayers(options = {}) {
                     'circle-stroke-width': 2,
                     'circle-stroke-color': color,
                     'circle-stroke-opacity': 0,
+                    // Standard-style night lighting darkens custom layers — emit full
+                    // colour so the ring stroke stays visible in dark mode. (Lighting
+                    // prop, NOT an animation value.)
+                    'circle-emissive-strength': 1,
                 }
             }, 'language-family-pins');
         }

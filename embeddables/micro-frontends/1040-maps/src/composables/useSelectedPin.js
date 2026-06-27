@@ -76,7 +76,7 @@ function createGoMarkerElement(color = GO_ORANGE) {
  * @param {Function} options.getMap  - Returns the mapboxgl.Map instance (or null)
  */
 export function useSelectedPin(options = {}) {
-    const { getMap = () => null } = options;
+    const { getMap = () => null, getActivePinColor: getActivePinColorOpt = null } = options;
     const uiStore = inject('uiStore');
 
     let _markerEl  = null;
@@ -86,9 +86,16 @@ export function useSelectedPin(options = {}) {
     // dot color so a click on a green dot shows a green pin, red shows red,
     // etc.). Falls back to the literal GO_ORANGE constant if the parent
     // profile didn't provide a resolver.
-    const getActivePinColor = inject("getActivePinColor", null);
+    // Prefer the resolver passed in via options (from the profile's setup). A Vue 3
+    // component CANNOT inject('getActivePinColor') against its OWN provide — inject
+    // resolves against the parent/app provide chain, never the instance's own provides
+    // — and no ancestor (ProfileLoader) supplies this key, so the inject below always
+    // returned null. That made _currentColor fall through to GO_ORANGE ('#1a1a1a',
+    // black) on every selection (the dot/marker rendered black). Passing the resolver
+    // as an option (like getMap) is the only path that actually resolves at runtime;
+    // inject is kept purely as a no-op fallback for callers that don't pass it.
+    const getActivePinColor = getActivePinColorOpt ?? inject("getActivePinColor", null);
     let _currentColor = GO_ORANGE;
-    let _builtForColor = null;
 
     function _addHighlightLayer() {
         const map = getMap();
@@ -106,6 +113,14 @@ export function useSelectedPin(options = {}) {
                     0, 3, 2, 3.5, 4, 4, 5, 5, 6, 6.5, 7, 8, 8, 10, 10, 14, 12, 18, 14, 22
                 ],
                 'circle-color'         : _currentColor,
+                // Mapbox Standard v3 lights custom circle layers by the lightPreset; WITHOUT an
+                // emissive strength the circle is modulated by the scene light and gets darkened
+                // to near-black (night preset, and the not-yet-settled boot-time lighting right
+                // after a page reload). Setting it to 1 makes the selected-pin highlight render
+                // its OWN colour identically in day + night. Mirror of language-family-pins
+                // (useMapLayers.js:248) — without this the selected dot turned black on first
+                // click after a reload until a tab switch re-lit the layer.
+                'circle-emissive-strength': 1,
                 'circle-opacity'       : 1,
                 'circle-stroke-width'  : 2,
                 'circle-stroke-color'  : '#FFFFFF',
@@ -117,9 +132,12 @@ export function useSelectedPin(options = {}) {
     }
 
     function _ensureMarkerEl() {
-        if (!_markerEl || _builtForColor !== _currentColor) {
-            _markerEl = createGoMarkerElement(_currentColor);
-            _builtForColor = _currentColor;
+        // The floating GO / popup-indicator "plan" pin is ALWAYS black (coder wants the
+        // indicator pin black). ONLY the on-map selected-DOT highlight circle follows the
+        // active strategy colour (_currentColor, set in updateSelectedPin) — the marker
+        // deliberately does NOT, so it stays black regardless of the selected dot's colour.
+        if (!_markerEl) {
+            _markerEl = createGoMarkerElement(GO_ORANGE);
         }
     }
 
@@ -156,16 +174,29 @@ export function useSelectedPin(options = {}) {
         const map = getMap();
         if (!map) return;
 
-        // Resolve the pin color from the active tab strategy each call.
-        // When the user switches tabs and re-selects, color follows the dot.
-        const newColor = getActivePinColor?.(feature?.properties) ?? GO_ORANGE;
-        if (newColor !== _currentColor) {
-            _currentColor = newColor;
-            if (map.getLayer(HIGHLIGHT_LAYER_ID)) {
-                map.setPaintProperty(HIGHLIGHT_LAYER_ID, "circle-color", _currentColor);
-            }
+        // Resolve the pin color from the active tab strategy each call — but ONLY when
+        // there is a feature. On DESELECT (feature == null, e.g. closing the detail modal)
+        // the highlight is hidden below, so the colour is irrelevant; calling the strategy
+        // resolver with undefined properties throws (getPrayerLevel reads
+        // properties.peoplePraying), and that thrown error aborts the reactive update,
+        // which is what left the people-group detail modal unable to close (its X handler
+        // sets selectedPeopleGroup=null → this watcher → crash). Guarding here fixes that.
+        if (feature) {
+            _currentColor = getActivePinColor?.(feature.properties) ?? GO_ORANGE;
         }
+        // Ensure the layer exists, then ALWAYS (re)assert BOTH the colour and the
+        // emissive strength on every selection. circle-emissive-strength:1 is
+        // re-asserted defensively here (not only in _addHighlightLayer) because the
+        // layer is first added at boot under not-yet-settled Standard lighting; the
+        // first click after a page reload could otherwise render the emissive-less
+        // circle near-black until a tab switch re-lit it. Re-asserting on every
+        // selection makes the highlight show its own colour regardless of when the
+        // style finished loading. (selected-dot-turns-black-on-first-click fix.)
         _addHighlightLayer();
+        if (map.getLayer(HIGHLIGHT_LAYER_ID)) {
+            map.setPaintProperty(HIGHLIGHT_LAYER_ID, "circle-color", _currentColor);
+            map.setPaintProperty(HIGHLIGHT_LAYER_ID, "circle-emissive-strength", 1);
+        }
 
         if (!feature) {
             if (map.getLayer(HIGHLIGHT_LAYER_ID)) {

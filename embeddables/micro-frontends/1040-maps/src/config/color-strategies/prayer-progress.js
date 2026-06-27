@@ -2,9 +2,9 @@
  * Prayer Progress Color Strategy
  *
  * Three-tier coloring based on prayer coverage:
- *   RED    = No One Praying      (peoplePraying === 0 or null)
- *   ORANGE = 1+ People Praying   (0 < peoplePraying < FULL_PRAYER_THRESHOLD)
- *   GREEN  = 100+ People Praying (peoplePraying >= FULL_PRAYER_THRESHOLD)
+ *   RED    = Needs Prayer        (peoplePraying === 0 or null)
+ *   ORANGE = Has Prayer          (0 < peoplePraying < FULL_PRAYER_THRESHOLD)
+ *   GREEN  = Full Prayer Coverage (peoplePraying >= FULL_PRAYER_THRESHOLD)
  *
  * QA Session Round 2 A1: `people_praying` null = 0 = "not prayed for".
  * When someone prays, people_praying updates to a positive integer → orange.
@@ -17,23 +17,23 @@ export const PROPERTY_KEY = 'peoplePraying'
 
 /**
  * Number of people praying required for "Full Prayer Coverage".
- * Set to match the platform's prayer goal (100 people per people group).
+ * Set to match the platform's prayer goal (144 people per people group).
  * Adjust this constant to change the green threshold.
  */
-export const FULL_PRAYER_THRESHOLD = 100
+export const FULL_PRAYER_THRESHOLD = 144
 
 export const PALETTE = {
-  noPrayer: '#e74c3c', // Red — No One Praying (default)
-  hasPrayer: '#f39c12', // Orange — 1+ People Praying (partial)
-  fullPrayer: '#22c55e' // Green — 100+ People Praying
+  noPrayer:   '#e74c3c', // Red — Needs Prayer (default)
+  hasPrayer:  '#f39c12', // Orange — Has Prayer (partial)
+  fullPrayer: '#22c55e'  // Green — Full Prayer Coverage
 }
 
 export const PRAYER_COLORS = PALETTE
 
 export const LABELS = {
-  noPrayer: 'No One Praying',
-  hasPrayer: '1+ People Praying',
-  fullPrayer: '100+ People Praying'
+  noPrayer:   'Needs Prayer',
+  hasPrayer:  'Has Prayer',
+  fullPrayer: 'Has Full Prayer Coverage'
 }
 
 export const PRAYER_LABELS = LABELS
@@ -44,7 +44,7 @@ export const PRAYER_LABELS = LABELS
  * @returns {'noPrayer'|'hasPrayer'|'fullPrayer'}
  */
 export function getPrayerLevel(properties) {
-  const peoplePraying = properties.peoplePraying ?? properties._raw?.people_praying ?? null
+  const peoplePraying = properties?.peoplePraying ?? properties?._raw?.people_praying ?? null
   const count = Number(peoplePraying) || 0
   if (count >= FULL_PRAYER_THRESHOLD) return 'fullPrayer'
   if (count > 0) return 'hasPrayer'
@@ -66,7 +66,7 @@ export function getPrayerColor(properties) {
  * @returns {boolean}
  */
 export function checkHasPrayer(properties) {
-  const peoplePraying = properties.peoplePraying ?? properties._raw?.people_praying ?? null
+  const peoplePraying = properties?.peoplePraying ?? properties?._raw?.people_praying ?? null
   return peoplePraying !== null && peoplePraying > 0
 }
 

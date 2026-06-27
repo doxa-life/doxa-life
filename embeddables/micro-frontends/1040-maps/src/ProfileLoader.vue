@@ -14,7 +14,8 @@
  * never interfere with each other.
  */
 
-import { computed, defineAsyncComponent, provide, inject } from 'vue'
+import { computed, defineAsyncComponent, provide, inject, watchEffect } from 'vue'
+import { SUPPORTED_LOCALES } from './i18n/index.js'
 import { useUIStore }   from './stores/uiStore.js'
 import { useMapStore }  from './stores/mapStore.js'
 import { useDataStore } from './stores/dataStore.js'
@@ -49,6 +50,32 @@ const mapboxToken  = computed(() => config.value?.tk || '')
 const dataSource   = computed(() => config.value?.dataSource || 'doxa-csv')
 const colorSet     = computed(() => config.value?.colorSet || 'default')
 
+// ─── Per-map language override (single keystone for ALL profiles) ─────────────
+// `profile-config.locale` is the established contract — the host Nuxt page passes
+// its @nuxtjs/i18n locale this way (see research-map.vue), used for both UI chrome
+// and API `lang`. `lang` is accepted as an alias (the loc-002 card's wording).
+// Setting it HERE activates every existing t() string per-map — geocoder, tabs,
+// legend, search — for every profile, not just research-map. Validated against the
+// shipped catalogs; an unknown/absent value leaves the i18n-detected default
+// (document.documentElement.lang → 'en') untouched.
+const lang = computed(() => {
+  const raw = (config.value?.locale || config.value?.lang || '').split('-')[0].toLowerCase()
+  return SUPPORTED_LOCALES.includes(raw) ? raw : ''
+})
+// CRITICAL: this component is the ROOT of a defineCustomElement. vue-i18n's
+// useI18n() CANNOT resolve its injection at the custom-element root — it throws
+// "Need to install with `provide` function" and the entire map fails to mount
+// (blank gem frames on staging). This is true even though plain inject() works
+// at the root (profileModules below resolves fine). So instead of useI18n(), we
+// take the i18n INSTANCE the bundle entry installed — handed to us by reference
+// via provide('appI18n') — and drive its global locale directly. Descendant
+// components (geocoder, legend, tabs, LanguageSelector) are NOT the CE root, so
+// they keep using useI18n() normally. See docs/DIAGNOSIS-emergency-staging-fix.md.
+const appI18n = inject('appI18n', null)
+watchEffect(() => { if (lang.value && appI18n) appI18n.global.locale.value = lang.value })
+// Effective locale for non-i18n descendants (the geocoder reads useI18n directly).
+const effectiveLocale = computed(() => lang.value || appI18n?.global?.locale?.value || 'en')
+
 // ─── Instance ID ─────────────────────────────────────────────────────────────
 // Optional in profile-config: { "instanceId": "my-map" }
 // If not provided, a random ID is generated (stable for the element's lifetime).
@@ -59,20 +86,20 @@ const instanceId = computed(() =>
 
 // ─── Profile Registry — provided by bundle entry ────────────────────────────
 // The bundle entry (app-profiles/<bundle>/index.js) MUST run
-//   app.provide('profileModules', import.meta.glob('./profiles/*.vue'))
+//   app.provide('profileModules', import.meta.glob('./*.vue'))
 // because import.meta.glob cannot cross package boundaries — it must be
 // evaluated by the bundle that owns the profile .vue files.
 
 const profileModules = inject('profileModules', null)
 if (!profileModules) {
-  throw new Error('[ProfileLoader] No profileModules provided. Bundle entry must `app.provide("profileModules", import.meta.glob("./profiles/*.vue"))`')
+  throw new Error('[ProfileLoader] No profileModules provided. Bundle entry must `app.provide("profileModules", import.meta.glob("./*.vue"))`')
 }
 
 // ─── Async component — loads the resolved profile file ───────────────────────
 
 const ProfileComponent = computed(() => {
   if (!profileName.value) return null
-  const key = `./profiles/${profileName.value}.vue`
+  const key = `./${profileName.value}.vue`
   if (!profileModules[key]) {
     console.error(`[ProfileLoader] Profile not found: "${profileName.value}". Available:`, Object.keys(profileModules))
     return null
@@ -88,6 +115,7 @@ provide('dataSource',    dataSource)
 provide('colorSet',      colorSet)
 provide('profileConfig', config)
 provide('instanceId',    instanceId)
+provide('lang',          effectiveLocale)
 
 // ─── Instance-scoped Pinia stores ────────────────────────────────────────────
 // ProfileLoader runs inside the correct Vue app (each <doxa-map> gets its own
@@ -98,6 +126,21 @@ provide('instanceId',    instanceId)
 const uiStore   = useUIStore()
 const mapStore  = useMapStore()
 const dataStore = useDataStore()
+
+// Restore the persisted theme HERE — synchronously in setup, before any profile
+// renders or creates its map. This is the SHARED boot so every profile is fixed
+// at once (not each remembering to call uiStore.init() in onMounted). Without it,
+// a profile that doesn't call init() (e.g. doxa-simple-map) renders LIGHT while
+// the map's bootStyle() reads localStorage 'dark' directly → UI/map theme desync
+// on reload. Doing it pre-render also kills the brief light→dark flash on the
+// profiles that DO hydrate later in onMounted. init() (onMounted) still runs for
+// the ResizeObserver / matchMedia listeners; setTheme is idempotent so the re-apply
+// is harmless. (staging bug, coder 2026-06-25: dark selected + reload → map dark, UI light.)
+if (typeof localStorage !== 'undefined') {
+  const savedTheme = localStorage.getItem('theme')
+  if (savedTheme) uiStore.setTheme?.(savedTheme)
+}
+
 provide('uiStore',   uiStore)
 provide('mapStore',  mapStore)
 provide('dataStore', dataStore)
