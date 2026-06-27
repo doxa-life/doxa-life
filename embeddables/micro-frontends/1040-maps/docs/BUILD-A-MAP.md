@@ -1,6 +1,6 @@
 # You Can Make Real Maps — Without Code
 
-*A guide for people who build maps by **describing** them to a an AI coding agent — not by writing software.*
+*A guide for people who build maps by **describing** them to an AI coding agent — not by writing software.*
 
 Read this once. By the end, something about how you see yourself will have changed.
 
@@ -49,7 +49,7 @@ This is the rhythm of every map you'll ever make here. Most days you live in **s
 1. **Clone the repo** to your computer. *(Once, ever.)*
 2. **Go into the maps folder:** `embeddables/micro-frontends/1040-maps`.
 3. **Run `npm run dev`.** Your staging environment opens, showing **all** your maps.
-4. **Make changes** — or tell a an AI coding agent to — and watch them appear **instantly**.
+4. **Make changes** — or tell an AI coding agent to — and watch them appear **instantly**.
 5. **When you're happy, run `npm run build`.** This packages your maps into the website.
 6. **The website picks them up automatically** on the next page load.
 
@@ -338,5 +338,5 @@ for you to describe it.**
 ---
 
 *Want the technical details? See **`CONTRIBUTING.md`** (build vs dev, embedding, the two CDN
-modes), **`agent-config`** (the agent's build guide), and **`app-profiles/README.md`** (the full
+modes) and **`app-profiles/README.md`** (the full
 authoring reference).*

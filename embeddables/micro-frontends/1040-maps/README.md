@@ -3,7 +3,7 @@
 A Vite-powered monorepo + map forge for building embeddable Mapbox MFE bundles. Named after the 10/40 window — the geographic frame most of these maps serve.
 
 > ### ✨ New here, and you don't write code?
-> You can build real, embeddable maps by **describing them to a an AI coding agent** — no
+> You can build real, embeddable maps by **describing them to an AI coding agent** — no
 > programming required. Start with the friendly, zero-jargon guide:
 > **[docs/BUILD-A-MAP.md](./docs/BUILD-A-MAP.md)**.
 
