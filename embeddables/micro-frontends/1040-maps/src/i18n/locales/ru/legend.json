@@ -13,9 +13,9 @@
     "peopleGroupFallback": "Народная группа"
   },
   "prayer": {
-    "needsPrayer": "Никто не молится",
-    "hasPrayer": "1+ человек молится",
-    "fullPrayerCoverage": "100+ человек молятся"
+    "needsPrayer": "Нуждается в молитве",
+    "hasPrayer": "Есть молитва",
+    "fullPrayerCoverage": "Полное молитвенное покрытие"
   },
   "engagement": {
     "needsEngagement": "Нуждается в вовлечённости",
@@ -27,9 +27,25 @@
   },
   "columns": {
     "upgs": "UUPGs",
-    "population": "Население"
+    "population": "Население",
+    "name": "Название"
   },
   "footer": {
     "total": "Всего"
+  },
+  "sortByUpgs": "Сортировать по UUPG",
+  "sortByPop": "Сортировать по населению",
+  "colLabel": {
+    "religion": "Религии UUPG",
+    "prayer": "Статус молитвы",
+    "engagement": "Статус вовлечённости",
+    "adoption": "Статус усыновления",
+    "status": "Статус"
+  },
+  "titleBar": {
+    "legend": "Легенда",
+    "peopleGroups": "Народы",
+    "wagfRegions": "Регионы WAGF",
+    "languages": "Языки"
   }
 }

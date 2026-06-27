@@ -5,5 +5,17 @@
     "place": "المكان:",
     "language": "اللغة:",
     "religion": "الديانة:"
+  },
+  "kinds": {
+    "people": "الشعب + الدولة",
+    "peopleGroup": "الشعب",
+    "bloc": "كتلة التقارب",
+    "cluster": "مجموعة شعوب",
+    "country": "الدولة",
+    "region": "المنطقة",
+    "family": "عائلة اللغة",
+    "languageKind": "اللغة",
+    "dialect": "اللهجة",
+    "religionKind": "الدين"
   }
 }

@@ -1,0 +1,20 @@
+{
+  "prayer": "Prayer",
+  "adoption": "Adoption",
+  "engagement": "Engagement",
+  "affinity-blocks": "People Groups",
+  "regions": "Regions",
+  "countries": "Countries",
+  "language-families": "Languages",
+  "religion": "Religions",
+  "family": "Lang Family",
+  "language": "Language",
+  "dialect": "Dialect/Variety",
+  "bloc": "Affinity Block",
+  "cluster": "Cluster",
+  "group": "People Group",
+  "pgic": "PG in Country",
+  "region": "WAGF Region",
+  "block": "WAGF Bloc",
+  "country": "Country"
+}

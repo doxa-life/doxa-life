@@ -5,5 +5,17 @@
     "place": "Local:",
     "language": "Língua:",
     "religion": "Religião:"
+  },
+  "kinds": {
+    "people": "Povo + país",
+    "peopleGroup": "Povo",
+    "bloc": "Bloco de afinidade",
+    "cluster": "Agrupamento de povos",
+    "country": "País",
+    "region": "Região",
+    "family": "Família linguística",
+    "languageKind": "Idioma",
+    "dialect": "Dialeto",
+    "religionKind": "Religião"
   }
 }

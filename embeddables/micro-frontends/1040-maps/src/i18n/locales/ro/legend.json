@@ -13,9 +13,9 @@
     "peopleGroupFallback": "Grup de popoare"
   },
   "prayer": {
-    "needsPrayer": "Nimeni nu se roagă",
-    "hasPrayer": "1+ persoane se roagă",
-    "fullPrayerCoverage": "100+ persoane se roagă"
+    "needsPrayer": "Necesită rugăciune",
+    "hasPrayer": "Are rugăciune",
+    "fullPrayerCoverage": "Acoperire completă de rugăciune"
   },
   "engagement": {
     "needsEngagement": "Necesită implicare",

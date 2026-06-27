@@ -10,12 +10,12 @@
   },
   "header": {
     "collapsed": "Légende",
-    "peopleGroupFallback": "Peuple"
+    "peopleGroupFallback": "Groupe de personnes"
   },
   "prayer": {
-    "needsPrayer": "Personne ne prie",
-    "hasPrayer": "1+ personnes en prière",
-    "fullPrayerCoverage": "100+ personnes en prière"
+    "needsPrayer": "Besoin de prière",
+    "hasPrayer": "Prière en cours",
+    "fullPrayerCoverage": "Couverture de prière complète"
   },
   "engagement": {
     "needsEngagement": "Besoin d'engagement",
@@ -26,10 +26,26 @@
     "hasAdoption": "Adoption en cours"
   },
   "columns": {
-    "upgs": "UUPG",
-    "population": "Population"
+    "upgs": "UUPGs",
+    "population": "Population",
+    "name": "Nom"
   },
   "footer": {
     "total": "Total"
+  },
+  "sortByUpgs": "Trier par UUPG",
+  "sortByPop": "Trier par population",
+  "colLabel": {
+    "religion": "Religions UUPG",
+    "prayer": "Statut de prière",
+    "engagement": "Statut d'engagement",
+    "adoption": "Statut d'adoption",
+    "status": "Statut"
+  },
+  "titleBar": {
+    "legend": "Légende",
+    "peopleGroups": "Peuples",
+    "wagfRegions": "Régions WAGF",
+    "languages": "Langues"
   }
 }

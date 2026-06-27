@@ -13,9 +13,9 @@
     "peopleGroupFallback": "Grupo de personas"
   },
   "prayer": {
-    "needsPrayer": "Nadie orando",
-    "hasPrayer": "1+ personas orando",
-    "fullPrayerCoverage": "100+ personas orando"
+    "needsPrayer": "Necesita oración",
+    "hasPrayer": "Tiene oración",
+    "fullPrayerCoverage": "Cobertura de oración completa"
   },
   "engagement": {
     "needsEngagement": "Necesita implicación",
@@ -27,9 +27,25 @@
   },
   "columns": {
     "upgs": "UUPGs",
-    "population": "Población"
+    "population": "Población",
+    "name": "Nombre"
   },
   "footer": {
     "total": "Total"
+  },
+  "sortByUpgs": "Ordenar por UUPG",
+  "sortByPop": "Ordenar por población",
+  "colLabel": {
+    "religion": "Religiones UUPG",
+    "prayer": "Estado de oración",
+    "engagement": "Estado de compromiso",
+    "adoption": "Estado de adopción",
+    "status": "Estado"
+  },
+  "titleBar": {
+    "legend": "Leyenda",
+    "peopleGroups": "Pueblos",
+    "wagfRegions": "Regiones WAGF",
+    "languages": "Idiomas"
   }
 }

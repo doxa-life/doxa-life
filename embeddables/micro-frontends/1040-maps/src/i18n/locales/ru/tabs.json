@@ -1,0 +1,20 @@
+{
+  "prayer": "Молитва",
+  "adoption": "Усыновление",
+  "engagement": "Вовлечённость",
+  "affinity-blocks": "Народы",
+  "regions": "Регионы",
+  "countries": "Страны",
+  "language-families": "Языки",
+  "religion": "Религии",
+  "family": "Языковая семья",
+  "language": "Язык",
+  "dialect": "Диалект/вариант",
+  "bloc": "Блок родства",
+  "cluster": "Кластер",
+  "group": "Народ",
+  "pgic": "Народ в стране",
+  "region": "Регион WAGF",
+  "block": "Блок WAGF",
+  "country": "Страна"
+}

@@ -5,7 +5,7 @@
     "adoption": "Adoption Progress",
     "languageFamilies": "Language Families",
     "doxaRegions": "Doxa Regions",
-    "affinityBlocs": "Affinity Blocs",
+    "affinityBlocs": "Affinity Blocks",
     "gospelResources": "Gospel Resources"
   },
   "header": {
@@ -14,9 +14,9 @@
     "peopleGroupFallback": "People Group"
   },
   "prayer": {
-    "needsPrayer": "No One Praying",
-    "hasPrayer": "1+ People Praying",
-    "fullPrayerCoverage": "100+ People Praying"
+    "needsPrayer": "Needs Prayer",
+    "hasPrayer": "Has Prayer",
+    "fullPrayerCoverage": "Full Prayer Coverage"
   },
   "engagement": {
     "needsEngagement": "Unengaged",
@@ -28,9 +28,25 @@
   },
   "columns": {
     "upgs": "UUPGs",
-    "population": "Population"
+    "population": "Population",
+    "name": "Name"
   },
   "footer": {
     "total": "Total"
+  },
+  "sortByUpgs": "Sort by UUPGs",
+  "sortByPop": "Sort by Population",
+  "colLabel": {
+    "religion": "UUPG Religions",
+    "prayer": "Prayer Status",
+    "engagement": "Engagement Status",
+    "adoption": "Adoption Status",
+    "status": "Status"
+  },
+  "titleBar": {
+    "legend": "Legend",
+    "peopleGroups": "People Groups",
+    "wagfRegions": "WAGF Regions",
+    "languages": "Languages"
   }
 }

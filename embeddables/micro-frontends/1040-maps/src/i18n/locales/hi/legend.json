@@ -13,9 +13,9 @@
     "peopleGroupFallback": "जनजाति समूह"
   },
   "prayer": {
-    "needsPrayer": "कोई प्रार्थना नहीं कर रहा",
-    "hasPrayer": "1+ लोग प्रार्थना कर रहे हैं",
-    "fullPrayerCoverage": "100+ लोग प्रार्थना कर रहे हैं"
+    "needsPrayer": "प्रार्थना चाहिए",
+    "hasPrayer": "प्रार्थना है",
+    "fullPrayerCoverage": "पूर्ण प्रार्थना कवरेज"
   },
   "engagement": {
     "needsEngagement": "सहभागिता चाहिए",

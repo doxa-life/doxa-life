@@ -13,9 +13,9 @@
     "peopleGroupFallback": "Grupo de pessoas"
   },
   "prayer": {
-    "needsPrayer": "Ninguém orando",
-    "hasPrayer": "1+ pessoas orando",
-    "fullPrayerCoverage": "100+ pessoas orando"
+    "needsPrayer": "Precisa de oração",
+    "hasPrayer": "Tem oração",
+    "fullPrayerCoverage": "Cobertura de oração completa"
   },
   "engagement": {
     "needsEngagement": "Precisa de envolvimento",
@@ -27,9 +27,25 @@
   },
   "columns": {
     "upgs": "UUPGs",
-    "population": "População"
+    "population": "População",
+    "name": "Nome"
   },
   "footer": {
     "total": "Total"
+  },
+  "sortByUpgs": "Ordenar por UUPG",
+  "sortByPop": "Ordenar por população",
+  "colLabel": {
+    "religion": "Religiões UUPG",
+    "prayer": "Status de oração",
+    "engagement": "Status de engajamento",
+    "adoption": "Status de adoção",
+    "status": "Status"
+  },
+  "titleBar": {
+    "legend": "Legenda",
+    "peopleGroups": "Povos",
+    "wagfRegions": "Regiões WAGF",
+    "languages": "Idiomas"
   }
 }

@@ -13,9 +13,9 @@
     "peopleGroupFallback": "مجموعة الشعب"
   },
   "prayer": {
-    "needsPrayer": "لا أحد يصلّي",
-    "hasPrayer": "شخص واحد أو أكثر يصلّي",
-    "fullPrayerCoverage": "أكثر من 100 شخص يصلّون"
+    "needsPrayer": "يحتاج إلى صلاة",
+    "hasPrayer": "لديه صلاة",
+    "fullPrayerCoverage": "تغطية صلاة كاملة"
   },
   "engagement": {
     "needsEngagement": "يحتاج إلى انخراط",
@@ -27,9 +27,25 @@
   },
   "columns": {
     "upgs": "UUPGs",
-    "population": "السكان"
+    "population": "السكان",
+    "name": "الاسم"
   },
   "footer": {
     "total": "الإجمالي"
+  },
+  "sortByUpgs": "ترتيب حسب UUPG",
+  "sortByPop": "ترتيب حسب السكان",
+  "colLabel": {
+    "religion": "ديانات UUPG",
+    "prayer": "حالة الصلاة",
+    "engagement": "حالة المشاركة",
+    "adoption": "حالة التبني",
+    "status": "الحالة"
+  },
+  "titleBar": {
+    "legend": "مفتاح الخريطة",
+    "peopleGroups": "الشعوب",
+    "wagfRegions": "مناطق WAGF",
+    "languages": "اللغات"
   }
 }

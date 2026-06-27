@@ -5,5 +5,9 @@
     "place": "Ort:",
     "language": "Sprache:",
     "religion": "Religion:"
+  },
+  "sections": {
+    "within": "Innerhalb {selection}",
+    "allData": "Alle DOXA-Daten"
   }
 }

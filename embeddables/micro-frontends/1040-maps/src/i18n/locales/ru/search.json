@@ -5,5 +5,17 @@
     "place": "Место:",
     "language": "Язык:",
     "religion": "Религия:"
+  },
+  "kinds": {
+    "people": "Народ + страна",
+    "peopleGroup": "Народ",
+    "bloc": "Блок родства",
+    "cluster": "Кластер народов",
+    "country": "Страна",
+    "region": "Регион",
+    "family": "Языковая семья",
+    "languageKind": "Язык",
+    "dialect": "Диалект",
+    "religionKind": "Религия"
   }
 }

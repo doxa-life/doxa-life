@@ -1,0 +1,20 @@
+{
+  "prayer": "الصلاة",
+  "adoption": "التبني",
+  "engagement": "المشاركة",
+  "affinity-blocks": "الشعوب",
+  "regions": "المناطق",
+  "countries": "الدول",
+  "language-families": "اللغات",
+  "religion": "الأديان",
+  "family": "عائلة اللغة",
+  "language": "اللغة",
+  "dialect": "اللهجة/التنوع",
+  "bloc": "كتلة التقارب",
+  "cluster": "المجموعة",
+  "group": "الشعب",
+  "pgic": "الشعب في الدولة",
+  "region": "منطقة WAGF",
+  "block": "كتلة WAGF",
+  "country": "الدولة"
+}
