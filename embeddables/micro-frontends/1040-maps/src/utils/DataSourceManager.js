@@ -6,7 +6,7 @@
  *   - csv      → fetch + parse a local CSV file
  *   - api      → fetch a single JSON URL
  *   - rest-api → fetch a versioned REST endpoint (pray-tools shape) with
- *                live query params, no-store cache, and cache-buster
+ *                live query params
  *
  * Normalizes raw rows to system field names so map/legend/detail components
  * stay source-agnostic. Keeps a per-source cache so tab switches don't
@@ -233,9 +233,10 @@ export class DataSourceManager {
     /**
      * Load data from a REST API source (type: 'rest-api').
      * Reads the runtime base URL via getApiBaseUrl(); appends defaultFields and
-     * any static queryParams; busts intermediate caches with cache:'no-store'
-     * and a unique `_=Date.now()` query param. On HTTP/content-type failure,
-     * throws a descriptive error so callers can surface a usable banner.
+     * any static queryParams. The request URL is stable so the response is
+     * cacheable by the browser and any CDN edge in front of the API. On
+     * HTTP/content-type failure, throws a descriptive error so callers can
+     * surface a usable banner.
      */
     async loadRestApiData(sourceConfig) {
         const baseUrl = getApiBaseUrl();
@@ -248,12 +249,10 @@ export class DataSourceManager {
         for (const [k, v] of Object.entries(extraParams)) {
             queryParts.push(`${k}=${encodeURIComponent(v)}`);
         }
-        // Cache-buster — defeats any layered HTTP/CDN/SW cache between us and the API.
-        queryParts.push(`_=${Date.now()}`);
         const url = `${baseUrl}${bulkEndpoint}?${queryParts.join('&')}`;
 
         try {
-            const response = await fetch(url, { cache: 'no-store' });
+            const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
