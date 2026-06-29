@@ -1,23 +1,9 @@
 {
   "schema": "doxa-1040-maps-manifest@1",
-  "generatedFrom": "app-profiles/*/*.vue",
-  "bundleCount": 5,
-  "profileCount": 7,
+  "generatedFrom": "app-profiles/*/*.vue (+ vendored-bundles.json)",
+  "bundleCount": 6,
+  "profileCount": 8,
   "bundles": [
-    {
-      "bundle": "doxa-countries-map",
-      "output": "public/js/doxa-countries-map.js",
-      "elements": [
-        "doxa-countries-map"
-      ],
-      "profiles": [
-        {
-          "profile": "countries-map",
-          "file": "countries-map.vue",
-          "description": ""
-        }
-      ]
-    },
     {
       "bundle": "doxa-research-map",
       "output": "public/js/doxa-research-map.js",
@@ -48,25 +34,6 @@
       ]
     },
     {
-      "bundle": "my-upg-100-list",
-      "output": "public/js/my-upg-100-list.js",
-      "elements": [
-        "my-upg-100-list-map"
-      ],
-      "profiles": [
-        {
-          "profile": "research-map-clone",
-          "file": "research-map-clone.vue",
-          "description": ""
-        },
-        {
-          "profile": "upg-100-list",
-          "file": "upg-100-list.vue",
-          "description": ""
-        }
-      ]
-    },
-    {
       "bundle": "template-bundle",
       "output": "public/js/template-bundle.js",
       "elements": [
@@ -88,6 +55,54 @@
           "element": "template-bundle"
         }
       ]
+    },
+    {
+      "bundle": "pplr-data-maps",
+      "output": "public/js/pplr-data-maps.iife.js",
+      "elements": [
+        "doxa-map-pplr",
+        "doxa-map"
+      ],
+      "profiles": [
+        {
+          "profile": "pplr-coverage",
+          "file": "pplr-coverage.vue",
+          "description": "PPLR prayer/coverage choropleth (Mapbox)."
+        },
+        {
+          "profile": "pplr-pins",
+          "file": "pplr-pins.vue",
+          "description": "PPLR people-group pins map (Mapbox)."
+        },
+        {
+          "profile": "pplr-language-families",
+          "file": "pplr-language-families.vue",
+          "description": "PPLR language-family colored map (Mapbox)."
+        },
+        {
+          "profile": "pplr-religion",
+          "file": "pplr-religion.vue",
+          "description": "PPLR religion-colored map (Mapbox)."
+        }
+      ]
+    },
+    {
+      "bundle": "node-mapper",
+      "category": "tool",
+      "embed_type": "iframe",
+      "url": "apps/node-mapper/index.html",
+      "title": "Node Mapper",
+      "description": "Relationship / multiplication TREE mapping tool (D3/SVG). A non-map 'tool' plugin that renders standalone in an iframe tile (token-less), clustered alongside the maps.",
+      "profiles": []
+    },
+    {
+      "bundle": "people-groups-wall",
+      "category": "app",
+      "embed_type": "iframe",
+      "url": "apps/wall/index.html",
+      "title": "People Groups Wall",
+      "description": "A scrollable WALL of people-group cards (Vue + D3) sourced live from the Prayer.Tools API. A non-map 'app' plugin that renders standalone in an iframe tile, clustered alongside the maps.",
+      "profiles": []
     }
   ]
 }
