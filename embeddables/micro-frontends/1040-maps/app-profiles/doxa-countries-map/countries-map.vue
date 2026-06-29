@@ -246,12 +246,9 @@ useShadowStyles(`
   .dsm-dark .dg-section-header-item { color:rgba(243,243,241,0.45); }
   @media(max-width:767px){
     .mapboxgl-ctrl-top-left { top:10px!important;left:3px!important;right:3px!important;width:calc(100% - 6px)!important;max-width:none!important; }
-    /* bug-searchbar-mobile-height: the stock geocoder CSS enlarges its input to ~50px
-       below 640px. Force the desktop sizing (height 36px ≈ 35.99px) + the icon alignment
-       that goes with it, so the search-bar height matches desktop on mobile. */
-    .mapboxgl-ctrl-geocoder--input { height:36px!important;padding:6px 35px!important; }
-    .mapboxgl-ctrl-geocoder--icon { top:8px!important; }
-    .mapboxgl-ctrl-geocoder--icon-search { left:7px!important; }
+    /* Search-bar height (exactly 35px, desktop AND mobile) is now owned by the shared
+       GeocoderComponent.vue injection 'geocoder-height-35' — no per-profile @media
+       height hack needed (replaces bug-searchbar-mobile-height). */
   }
 
   /* ── Dark mode for the geocoder pill + suggestions dropdown — clone of
@@ -534,7 +531,13 @@ const appReady     = ref(false)
 // NOTE: this trades away some of the location-obfuscation the low cap provided
 // (street-level framing is now reachable) — accepted per explicit coder request.
 // The zoom-IN cap below is pinned to this value; profile-config canNOT override it.
-const RESEARCH_MAX_ZOOM = 18
+// Driver directive 2026-06-25 (PR checklist): REMOVE the hard zoom-in limit so
+// overlapping pins can ALWAYS be zoomed apart and clicked. 22 = Mapbox GL's engine
+// maximum, i.e. there is no effective hard limit. Still NOT overridable from
+// profile-config — a page must not re-impose a LOWER cap (that would re-block
+// declustering, the exact bug this pin prevents). Future feature: auto-scatter
+// overlapping pins so deep zoom isn't even required.
+const RESEARCH_MAX_ZOOM = 22
 
 // ─── Map instance (shadow-DOM safe — element ref, never string ID) ───────────
 const { map, isMapReady, initializeMap, destroy } = useMapInstance({

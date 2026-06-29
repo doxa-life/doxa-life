@@ -15,11 +15,12 @@
  * research-map-clone.vue is a byte-identical clone owned by this bundle.
  */
 
-import { inject, provide, ref, computed, onMounted, onBeforeUnmount, watch, defineAsyncComponent } from 'vue'
+import { inject, provide, ref, computed, onMounted, onBeforeUnmount, watch, defineAsyncComponent, unref } from 'vue'
 import { useShadowStyles } from '@map/composables/useShadowStyles.js'
 import { useMapInstance } from '@map/composables/useMapInstance.js'
 import { useMapTheme } from '@map/composables/useMapTheme.js'
 import { useMapData } from '@map/composables/useMapData.js'
+import { DataSourceManager } from '@map/utils/DataSourceManager.js'
 import { createPplrInstance, provideInstance } from '@map/composables/usePplrInstance.js'
 import SemanticTreeLegend from '@map/components/SemanticTreeLegend.vue'
 
@@ -125,14 +126,23 @@ function popOf(p)      { const n = parseInt(p?.population) || 0; return n }
 // ─── Map setup ────────────────────────────────────────────────────────────────
 const { map, isMapReady, initializeMap, destroy } = useMapInstance({
   containerRef: mapContainer,
-  accessToken: mapboxToken || (typeof window !== 'undefined' && window.MAP_APP_MAPBOX_TOKEN) || '',
+  // ProfileLoader provides mapboxToken/dataSource as computed REFS — unref before use
+  // (passing the ref object made useMapInstance's token check throw "t.startsWith is not
+  // a function", so initializeMap failed and no map rendered in the shadow-DOM tile).
+  accessToken: unref(mapboxToken) || (typeof window !== 'undefined' && window.MAP_APP_MAPBOX_TOKEN) || '',
   mapId: `my-upg-100-list-${instanceId}`,
   initialCenter: [20, 10],
   initialZoom: 1.6,
   style: mapTheme.bootStyle(),
 })
 
-const { peopleGroups, loadData } = useMapData({ dataSourceId: dataSource, mapboxToken })
+// useMapData REQUIRES a DataSourceManager (it can't ES-import one itself — see its
+// header). The other profiles in this bundle create one; upg-100-list was missing it,
+// so the map never initialised ("useMapData: dataSourceManager is required!") when the
+// bundle mounted as a web-component in a shadow-DOM tile (card 30ecf5db). dsm.init()
+// self-loads sources.json, so no constructor args are needed.
+const dsm = new DataSourceManager()
+const { peopleGroups, loadData } = useMapData({ dataSourceId: unref(dataSource), mapboxToken: unref(mapboxToken), dataSourceManager: dsm })
 
 // ─── Build the SemanticTreeLegend node tree from clusters + Doxa data ────────
 //

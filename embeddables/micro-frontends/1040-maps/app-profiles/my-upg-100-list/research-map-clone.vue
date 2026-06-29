@@ -227,12 +227,9 @@ useShadowStyles(`
   .dsm-dark .dg-section-header-item { color:rgba(243,243,241,0.45); }
   @media(max-width:767px){
     .mapboxgl-ctrl-top-left { top:10px!important;left:3px!important;right:3px!important;width:calc(100% - 6px)!important;max-width:none!important; }
-    /* bug-searchbar-mobile-height: the stock geocoder CSS enlarges its input to ~50px
-       below 640px. Force the desktop sizing (height 36px ≈ 35.99px) + the icon alignment
-       that goes with it, so the search-bar height matches desktop on mobile. */
-    .mapboxgl-ctrl-geocoder--input { height:36px!important;padding:6px 35px!important; }
-    .mapboxgl-ctrl-geocoder--icon { top:8px!important; }
-    .mapboxgl-ctrl-geocoder--icon-search { left:7px!important; }
+    /* Search-bar height (exactly 35px, desktop AND mobile) is now owned by the shared
+       GeocoderComponent.vue injection 'geocoder-height-35' — no per-profile @media
+       height hack needed (replaces bug-searchbar-mobile-height). */
   }
 
   /* ── Dark mode for the geocoder pill + suggestions dropdown — clone of
