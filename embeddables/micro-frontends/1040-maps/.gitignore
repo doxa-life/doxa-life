@@ -29,12 +29,12 @@ dist/
 app-profiles/doxa-research-dashboards/
 src/components/dashboards/
 
-# Internal engineering scratch — never commit
-.local-scratch/
-.lk10x/
-.agent-restricted
-build-status.md
-embeddables/**/intel/
+# Local build artifacts / deploy config — kept on disk, out of the map PR
+build-sizes-baseline.json
+vendored-bundles.json
+Dockerfile
+.dockerignore
+nginx.conf.template
 
 # Sub-project lockfile — root bun.lock is authoritative
 bun.lock

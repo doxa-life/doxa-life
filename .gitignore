@@ -55,6 +55,11 @@ package-lock.json
 plans
 .claude
 .vscode
+# 1040-maps — kept on disk but OUT of the map-only PR (own branches / later PRs)
+# Vendored external plugin tools (node-mapper, people-groups-wall) — harvest pattern
+public/js/apps/
+# Internal planning / deploy docs — not part of the public starter-kit
 embeddables/micro-frontends/1040-maps/docs/RAILWAY-DEPLOY.md
 embeddables/micro-frontends/1040-maps/docs/EMBED-CONTRACT-shell-wiring.md
 embeddables/micro-frontends/1040-maps/docs/VISION-PLATFORM-1040-MAPS.md
+embeddables/micro-frontends/1040-maps/railway.toml
