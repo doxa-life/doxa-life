@@ -49,6 +49,50 @@ in one `<script src>`, selected at runtime by the `profile` field). See
 
 ---
 
+## 1a. Component placement — the reusability rule (library vs profile folder)
+
+Section 1 says *what* the two kinds of source are. This is the rule for deciding *which
+kind a given component is* — the single most important call for keeping the library clean
+as the number of maps grows into the hundreds.
+
+**The rule:**
+
+| A component belongs in… | when… |
+|---|---|
+| **the shared library** (`src/`) | it is used by **2+ profiles** AND it is **truly reusable** — parameterized (options as props) / feature-flagged so each profile passes its own config. Examples: the semantic-tree legend, the map component itself, map controls, the search bar, poster/packet export. |
+| **the profile folder** (`app-profiles/<bundle>/`) | it is used by **one** profile, or it is **experimental / not-yet-proven reusable**, or it hard-codes one map's behaviour. Anything profile-specific lives with its profile. |
+
+Default to the profile folder. A component only **earns promotion** into `src/` once a
+*second* profile genuinely needs it and it has been generalized (config in, no hard-coded
+map identity). "It might be reusable someday" is not enough — keep it beside its profile
+until a real second consumer proves the abstraction.
+
+**Why the rule exists — it solves two problems at once:**
+
+1. **No orphan library components.** Because a profile's custom components live in its own
+   folder, *excluding or `.gitignore`-ing a profile removes its components with it.* You
+   never publish shared building-blocks that no visible map consumes — the first thing a
+   careful reviewer asks about ("what uses this?"). To audit an existing library, trace the
+   import graph (e.g. `dependency-cruiser` / `madge`): any `src/` component reachable from
+   only one profile is mis-placed and should move into that profile's folder.
+
+2. **Profiles don't break each other.** When many maps share one component, one map's edit
+   can silently break another. The rule is the guardrail: a component is allowed in `src/`
+   only if it is **truly parameterized**, so every dependent profile passes its own options
+   and keeps working. If a component *cannot* be generalized without one map fighting
+   another for it, **fork it into the profile folder** — a clean profile-specific copy
+   beats a brittle forced share. A staging environment that renders *every* map at once is
+   how you verify a shared-component change didn't regress the others.
+
+**Publishing a subset (per target / per branch).** Keep one local kit with every profile;
+to ship only some maps, `.gitignore` the profiles a given target should not receive. Their
+profile folders — and their profile-specific components — drop out cleanly, while the
+genuinely-shared library blocks remain (and stay useful for building new maps). Git
+worktrees make this ergonomic: one worktree per branch/target, each including a different
+set of profiles, each with its own auto-ported staging server.
+
+---
+
 ## 2. The build pipeline
 
 `package.json`:

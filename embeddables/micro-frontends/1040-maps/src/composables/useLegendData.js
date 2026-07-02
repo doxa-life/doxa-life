@@ -15,7 +15,8 @@
 
 import { computed, inject } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { PRAYER_COLORS, getPrayerLevel, FULL_PRAYER_THRESHOLD } from '../config/prayerColors.js'
+import { PRAYER_COLORS } from '../config/prayerColors.js'
+import { usePrayerStatistics } from './usePrayerStatistics.js'
 import { ENGAGEMENT_COLORS, ADOPTION_COLORS } from '../config/colorStrategies.js'
 import { LANGUAGE_FAMILY_COLORS, getLanguageFamilyColor, RESOURCE_COLORS, RESOURCE_NAMES } from '../config/colors.js'
 import { PALETTE as RELIGION_COLORS, RELIGION_FAMILIES, getReligionFamily } from '../config/color-strategies/religion.js'
@@ -55,6 +56,27 @@ function scanFeatures(dataStore, filterFn) {
       const p = item.properties || item
       return sum + (parseInt(p.population || p._raw?.Population || 0) || 0)
     }, 0)
+  }
+}
+
+// ─── Prayer coverage by the COMMITTED metric (matches the parent site) ────────
+// The prayer legend COUNTS come from usePrayerStatistics (/statistics aggregate over
+// the full dataset). Population has no per-bucket authoritative value, so it is summed
+// from the loaded set using the SAME `people_committed` metric — so a row's count and
+// population describe one thing. 100 = the parent's full-coverage threshold
+// (FULL_PRAYER_COVERAGE_COUNT in server/api/people-groups/statistics.get.ts).
+const FULL_PRAYER_COMMITTED = 100
+function committedOf(p) {
+  let v = p?.peopleCommitted ?? p?._raw?.people_committed ?? p?.people_committed ?? null
+  if (v && typeof v === 'object') v = v.value ?? v.label ?? 0
+  return Number(v) || 0
+}
+function committedLevel(level) {
+  return (p) => {
+    const c = committedOf(p)
+    if (level === 'fullPrayer') return c >= FULL_PRAYER_COMMITTED
+    if (level === 'hasPrayer')  return c > 0 && c < FULL_PRAYER_COMMITTED
+    return c <= 0   // noPrayer
   }
 }
 
@@ -121,6 +143,12 @@ export function useLegendData(legendTypeRef, opts = {}) {
   const mapStore  = inject('mapStore')
   const { t: $t } = useI18n()
 
+  // Authoritative prayer-coverage counts (single source of truth shared by every
+  // profile). Kick off the one /statistics fetch; the `items` computed reads its
+  // reactive `loaded` flag, so the legend updates to 601/1505/0 the moment it resolves.
+  const prayerStats = usePrayerStatistics()
+  prayerStats.load()
+
   // ── Title ─────────────────────────────────────────────────────────────────
   const title = computed(() => {
     const _t = normalizeLegendType(legendTypeRef.value)
@@ -179,17 +207,27 @@ export function useLegendData(legendTypeRef, opts = {}) {
 
     // ── Prayer (3-tier: parent + 2 children) ────────────────────────────────
     if (t === 'prayer') {
-      const no   = scanFeatures(dataStore, p => getPrayerLevel(p) === 'noPrayer')
-      const has  = scanFeatures(dataStore, p => getPrayerLevel(p) === 'hasPrayer')
-      const full = scanFeatures(dataStore, p => getPrayerLevel(p) === 'fullPrayer')
+      // COUNT = the authoritative /statistics aggregate (committed metric, full
+      // dataset) — the single source of truth the parent site uses, NOT a client
+      // scan of loaded pins (which under-counted to 435 vs the parent's 601).
+      // Population is summed from the loaded set on the SAME committed metric so
+      // each row's count + population agree. Until /statistics resolves, fall back
+      // to the committed scan so the legend is never blank.
+      const noScan   = scanFeatures(dataStore, committedLevel('noPrayer'))
+      const hasScan  = scanFeatures(dataStore, committedLevel('hasPrayer'))
+      const fullScan = scanFeatures(dataStore, committedLevel('fullPrayer'))
+      const ready = prayerStats.loaded.value
+      const noCount   = ready ? prayerStats.noPrayerCount()   : noScan.count
+      const hasCount  = ready ? prayerStats.hasPrayerCount()  : hasScan.count
+      const fullCount = ready ? prayerStats.fullPrayerCount() : fullScan.count
       return [{
         key: 'noPrayer', label: $t('legend.prayer.needsPrayer'), color: PRAYER_COLORS.noPrayer,
-        count: no.count, population: no.population, filterKey: 'noPrayer',
+        count: noCount, population: noScan.population, filterKey: 'noPrayer',
         children: [
           { key: 'hasPrayer', label: $t('legend.prayer.hasPrayer'), color: PRAYER_COLORS.hasPrayer,
-            count: has.count, population: has.population, filterKey: 'hasPrayer' },
+            count: hasCount, population: hasScan.population, filterKey: 'hasPrayer' },
           { key: 'fullPrayer', label: $t('legend.prayer.fullPrayerCoverage'), color: PRAYER_COLORS.fullPrayer,
-            count: full.count, population: full.population, filterKey: 'fullPrayer' }
+            count: fullCount, population: fullScan.population, filterKey: 'fullPrayer' }
         ]
       }]
     }
