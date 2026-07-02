@@ -24,6 +24,11 @@ dist/
 .env.*.local
 !.env.example
 
+# Research dashboard — developed on its own branch (research-dashboard),
+# excluded from the map-only bundle. Do not track dashboard files here.
+app-profiles/doxa-research-dashboards/
+src/components/dashboards/
+
 # Internal engineering scratch — never commit
 .local-scratch/
 .lk10x/

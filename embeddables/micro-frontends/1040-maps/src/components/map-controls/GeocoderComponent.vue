@@ -70,12 +70,39 @@ useShadowStyles(
   'geocoder-hide-loading'
 )
 
+// All search bars = EXACTLY 35px tall, desktop AND mobile. The stock
+// geocoder CSS sizes its input to 36px on desktop and ~50px below 640px; this single
+// breakpoint-free injection pins BOTH the outer pill and its input to exactly 35px.
+// `box-sizing:border-box` + zeroed vertical padding guarantee 35px (not 35.99px) — the
+// padding can't add to the box. line-height:35px centers the single-line text; the
+// search icon is re-centered for the shorter box (the clear/× button is already centered
+// at top:50% by each profile's base rule). Shared here so every profile inherits it —
+// this REPLACES the per-profile @media mobile-height hack (bug-searchbar-mobile-height).
+useShadowStyles(
+  '.mapboxgl-ctrl-geocoder{height:35px!important;min-height:35px!important;box-sizing:border-box!important;}'
+  + '.mapboxgl-ctrl-geocoder--input{height:35px!important;min-height:35px!important;box-sizing:border-box!important;'
+  + 'padding-top:0!important;padding-bottom:0!important;line-height:35px!important;}'
+  + '.mapboxgl-ctrl-geocoder--icon-search{top:50%!important;transform:translateY(-50%)!important;margin-top:0!important;left:7px!important;}',
+  'geocoder-height-35'
+)
+
 const { t, locale } = useI18n()
 
 const props = defineProps({
-  mapInstance:  { type: Object,  required: true },
+  // Required in the default (map-control) mode; OPTIONAL in standalone mode
+  // (the dashboard header search bars are search-only → bus, no map flyTo).
+  // The onMounted guard enforces "map mode needs a map"; map profiles always
+  // pass a live instance, so their behavior is unchanged.
+  mapInstance:  { type: Object,  required: false, default: null },
   accessToken:  { type: String,  required: true },
   isDark:       { type: Boolean, default: false },
+  /**
+   * When true, render the geocoder input into THIS component's own container
+   * element (header) via the geocoder's standalone `addTo()` mount, instead of
+   * `map.addControl()`. Map profiles leave this false (default) → unchanged
+   * `addControl` behavior. Standalone bars don't require a `mapInstance`.
+   */
+  standalone:   { type: Boolean, default: false },
   /**
    * Optional explicit placeholder. If omitted, falls back to the i18n key
    * `search.placeholder` — translated per active locale.
@@ -238,6 +265,9 @@ const { search: doxaLocalGeocoder } = useDoxaSearch({
 // Exposed so a parent can call geocoder.value.query('...') or add custom filters
 const geocoder = ref(null)
 
+// Standalone-mode mount target (the header). Only rendered when `standalone` is true.
+const standaloneContainer = ref(null)
+
 // ── CSS injection ─────────────────────────────────────────────────────────────
 // The geocoder stylesheet must live inside the shadow root; injecting it into
 // the document head has no effect because the widget renders inside a
@@ -258,12 +288,16 @@ onMounted(() => {
   }
 
   const map = props.mapInstance
-  if (!map) {
+  // Map mode requires a live map; standalone (header search bars) does not.
+  if (!props.standalone && !map) {
     return
   }
 
-  // Inject CSS into shadow root
-  const shadowRoot = map.getContainer?.()?.getRootNode?.()
+  // Inject CSS into the shadow root. In standalone mode the root is resolved from
+  // our own container element; in map mode from the map container (unchanged).
+  const shadowRoot = props.standalone
+    ? standaloneContainer.value?.getRootNode?.()
+    : map.getContainer?.()?.getRootNode?.()
   if (shadowRoot instanceof ShadowRoot) {
     injectGeocoderCSS(shadowRoot)
   }
@@ -286,6 +320,15 @@ onMounted(() => {
     accessToken:    props.accessToken,
     mapboxgl:       mapboxgl,   // CDN global — same reference used by the map instance
     marker:         false,
+    // Standalone (header) bars are search-only: results drive the selection bus,
+    // not a map flyTo — so disable flyTo (no map). Map-control mode keeps the
+    // default flyTo (byte-identical: !standalone === true).
+    flyTo:          !props.standalone,
+    // v5 defaults trackProximity:true, which makes onAdd() read map.getZoom()/
+    // getBounds() at mount — a map-less standalone bar has no such map, so disable
+    // it (else onAdd throws on the stub map and the input never attaches). Map
+    // mode keeps the default (byte-identical: !standalone === true).
+    trackProximity: !props.standalone,
     placeholder:    effectivePlaceholder.value,
     // Localize Mapbox's remote place results AND the geocoder's own UI strings.
     // Mapbox accepts ISO-639-1 codes (comma-separated); the active i18n locale
@@ -395,7 +438,37 @@ onMounted(() => {
   geocoder.value.on('clear',  ()   => emit('clear'))
   geocoder.value.on('error',  (e)  => emit('error', e))
 
-  map.addControl(geocoder.value, 'top-left')
+  if (props.standalone) {
+    // Standalone (header) mount — shadow-DOM safe. We CANNOT use addTo(): its
+    // in-document guard (document.body.contains) does NOT pierce the custom
+    // element's shadow root, so it throws "Element provided to #addTo() exists,
+    // but is not in the DOM". onAdd() has no such guard — it builds and returns
+    // the widget DOM, which we append into our shadow container ourselves.
+    // onAdd(map) wires map listeners only behind `if (this._map)` guards; with a
+    // no-op stub map (or a real one if provided) + flyTo:false this is a pure
+    // search box whose results drive the bus.
+    if (standaloneContainer.value) {
+      // Minimal no-op map: covers every method onAdd()/the geocoder's internals
+      // may touch when there is no real map (with flyTo + trackProximity off, none
+      // of these do anything meaningful — they just must not be undefined).
+      const stubMap = {
+        on() {}, off() {}, fire() {},
+        getContainer: () => standaloneContainer.value,
+        getZoom: () => 0, getCenter: () => ({ lng: 0, lat: 0 }),
+        getBounds: () => null, flyTo() {}, fitBounds() {},
+        addControl() {}, removeControl() {}, hasControl: () => false,
+      }
+      try {
+        const el = geocoder.value.onAdd(props.mapInstance || stubMap)
+        if (el) standaloneContainer.value.appendChild(el)
+      } catch (e) {
+        // Degrade to no bar rather than crash the host dashboard.
+        emit('error', e)
+      }
+    }
+  } else {
+    map.addControl(geocoder.value, 'top-left')
+  }
 })
 
 // Mapbox Geocoder sets `placeholder` once at construction; it has no public
@@ -423,25 +496,31 @@ watch(locale, (next) => {
 })
 
 onBeforeUnmount(() => {
-  if (geocoder.value && props.mapInstance) {
-    try {
+  if (!geocoder.value) return
+  try {
+    if (props.standalone) {
+      // Standalone teardown: the geocoder's own onRemove() detaches its DOM + listeners.
+      geocoder.value.onRemove?.()
+    } else if (props.mapInstance) {
       props.mapInstance.removeControl(geocoder.value)
-    } catch (e) {
-      // Map may already be destroyed; ignore
     }
-    geocoder.value = null
+  } catch (e) {
+    // Map may already be destroyed; ignore
   }
+  geocoder.value = null
 })
 
 defineExpose({ geocoder })
 </script>
 
 <!--
-  This component renders no DOM of its own — the geocoder widget is injected
-  directly into the map container by addControl(). The slot is provided as a
-  future extension point for rendering sibling search UI (e.g. recent searches,
-  filter chips) that you want to place adjacent to the geocoder input.
+  Default (map-control) mode renders no DOM of its own — the geocoder widget is
+  injected directly into the map container by addControl(); only the <slot /> is
+  rendered (a future extension point for sibling search UI). Standalone mode
+  renders a single container <div> and the geocoder input is appended into it via
+  addTo(), so the bar can live in a header (e.g. the dashboard search bars).
 -->
 <template>
-  <slot />
+  <div v-if="standalone" ref="standaloneContainer" class="dg-standalone-geocoder"></div>
+  <slot v-else />
 </template>

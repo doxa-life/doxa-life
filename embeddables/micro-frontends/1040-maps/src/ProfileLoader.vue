@@ -19,6 +19,7 @@ import { SUPPORTED_LOCALES } from './i18n/index.js'
 import { useUIStore }   from './stores/uiStore.js'
 import { useMapStore }  from './stores/mapStore.js'
 import { useDataStore } from './stores/dataStore.js'
+import sourcesConfig from './config/sources.json'
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -47,7 +48,14 @@ const config = computed(() => {
 
 const profileName  = computed(() => config.value?.profile || null)
 const mapboxToken  = computed(() => config.value?.tk || '')
-const dataSource   = computed(() => config.value?.dataSource || 'doxa-csv')
+// Default to the CONFIGURED active source from sources.json (e.g. 'pray-tools', the live API)
+// — NOT a hardcoded 'doxa-csv'. A host/gem-frame that embeds the bundle without an explicit
+// profile-config.dataSource (the platform case) was silently falling back to 'doxa-csv', whose
+// RELATIVE CSV path 404s off the CDN origin → the map loaded but NO data fetch fired (looked
+// like an "API access" problem; the API is actually CORS-open). Honoring sources.json's
+// activeSource makes the bundle render live data by default on any host, while still letting a
+// host override via profile-config.dataSource. (doxa-csv stays the final offline fallback.)
+const dataSource   = computed(() => config.value?.dataSource || sourcesConfig.activeSource || 'doxa-csv')
 const colorSet     = computed(() => config.value?.colorSet || 'default')
 
 // ─── Per-map language override (single keystone for ALL profiles) ─────────────

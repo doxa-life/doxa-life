@@ -6,6 +6,10 @@
 .cache
 dist
 
+# Research dashboard bundle — built on the research-dashboard branch, excluded
+# from the map-only publish (kept out of this branch's public/js).
+public/js/doxa-research-dashboards.js
+
 # Extended layers (downloaded by c12/giget)
 .layers
 
@@ -51,3 +55,6 @@ package-lock.json
 plans
 .claude
 .vscode
+embeddables/micro-frontends/1040-maps/docs/RAILWAY-DEPLOY.md
+embeddables/micro-frontends/1040-maps/docs/EMBED-CONTRACT-shell-wiring.md
+embeddables/micro-frontends/1040-maps/docs/VISION-PLATFORM-1040-MAPS.md

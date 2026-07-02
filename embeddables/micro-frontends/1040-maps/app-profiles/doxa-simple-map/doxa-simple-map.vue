@@ -110,12 +110,11 @@ useShadowStyles(`
   .dsm-dark .dg-tag { color:#cfe3d6;background:rgba(115,161,127,0.22); }
   .dsm-dark .dg-count { color:#9fd0ab; }
   @media(max-width:767px){
-    /* Mobile: centered full-width pill. Pin the geocoder to the DESKTOP height so it
-       doesn't grow to the stock ~50px below 640px (bug-searchbar-mobile-height). */
+    /* Mobile: centered full-width pill. Search-bar height (exactly 35px, desktop AND
+       mobile) is now owned by the shared GeocoderComponent.vue injection
+       'geocoder-height-35' — no per-profile @media height hack (replaces
+       bug-searchbar-mobile-height). */
     .mapboxgl-ctrl-top-left { top:10px!important;left:3px!important;right:3px!important;width:calc(100% - 6px)!important;max-width:none!important; }
-    .mapboxgl-ctrl-geocoder--input { height:36px!important;padding:6px 35px!important; }
-    .mapboxgl-ctrl-geocoder--icon { top:8px!important; }
-    .mapboxgl-ctrl-geocoder--icon-search { left:7px!important; }
   }
 
   /* ── Dark mode: root class drives all child overrides ── */

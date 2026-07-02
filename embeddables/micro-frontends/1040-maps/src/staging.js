@@ -1,12 +1,9 @@
 // staging.js — 1040-maps "Map Forge" staging showcase (dev only, no build step).
 //
-// loc-006. UX (per coder): the header showcases the single-build-process architecture (one
+// UX: the header showcases the single-build-process architecture (one
 // shared core → one build → JS bundles → element tags → maps). A horizontal-scroll strip lists
 // every JS bundle and the element tags it ships. Click a bundle → its profiles render as live
-// GEM-FRAME maps below, and the WHOLE PAGE scrolls (nothing frozen over the maps). Design
-// inspiration: the deprecated "Sovereign Map Forge" at
-//   FARFAST10-nameless-exploits/Map-Framework/1040-maps/ — we keep its gem-frame showcase and
-// PORT its WebGL-context discipline, but write fresh code.
+// GEM-FRAME maps below, and the WHOLE PAGE scrolls (nothing frozen over the maps).
 //
 // MAP MOUNT: the map's custom element is mounted DIRECTLY in this page (no iframe). index.html
 // loads the Mapbox peer once; importing a bundle's index.js registers its custom element, then we

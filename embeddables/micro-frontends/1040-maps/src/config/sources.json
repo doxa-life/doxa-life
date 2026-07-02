@@ -93,41 +93,6 @@
         "useSvgPlaceholder": true
       }
     },
-    "doxa-api": {
-      "id": "doxa-api",
-      "name": "DOXA API",
-      "type": "api",
-      "url": "https://uupg.doxa.life/wp-json/dt-public/disciple-tools-people-groups-api/v1/data/all/",
-      "description": "DOXA WordPress API with detailed descriptions and photos",
-      "fieldMappings": {
-        "uniqueId": "dt_id",
-        "peopleGroupId": "dt_id",
-        "peopleId3": "",
-        "name": "imb_display_name",
-        "slug": "slug",
-        "description": "imb_people_description",
-        "country": "imb_isoalpha3",
-        "countryIso": "imb_isoalpha3",
-        "region": "doxa_wagf_region",
-        "wagfRegion": "doxa_wagf_region",
-        "doxaRegion": "doxa_wagf_region",
-        "wagfBlock": "doxa_wagf_block",
-        "latitude": "imb_lat",
-        "longitude": "imb_lng",
-        "population": "imb_population",
-        "religion": "imb_reg_of_religion",
-        "religionCode": "imb_reg_of_religion_3",
-        "hasPhoto": "imb_has_photo",
-        "photoUrl": "imb_picture_url",
-        "photoCredit": "imb_picture_credit_html"
-      },
-      "imageConfig": {
-        "useField": "photoUrl",
-        "fallbackField": null,
-        "fallbackUrlTemplate": null,
-        "placeholderUrl": "https://www.peoplegroups.org/images/pgphotosearch/NoImageAvailable_search.jpg"
-      }
-    },
     "doxa-csv": {
       "id": "doxa-csv",
       "name": "DOXA People Groups CSV",

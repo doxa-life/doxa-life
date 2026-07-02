@@ -81,6 +81,17 @@ function build() {
       }
     })
 
+    // Representative-profile ordering: the app-shell plugin SCAN derives a bundle's
+    // default profile AND its production/prototype tag from profiles[0]. A dev-only
+    // profile whose name matches /template|example|starter|sample|demo|clone/ (e.g.
+    // "research-map-clone" inside the production my-upg-100-list bundle) would, if it
+    // sorted first alphabetically, mis-tag the whole bundle as a prototype. Sort those
+    // prototype-pattern profiles LAST (stable within each group) so the real production
+    // profile represents the bundle. Mirrors the SCAN's own regex.
+    const PROTOTYPE_RE = /template|example|starter|sample|demo|clone/i
+    profiles.sort((a, b) =>
+      (PROTOTYPE_RE.test(a.profile) ? 1 : 0) - (PROTOTYPE_RE.test(b.profile) ? 1 : 0))
+
     bundles.push({
       bundle: entry,
       output: `public/js/${entry}.js`,
@@ -89,11 +100,29 @@ function build() {
     })
   }
 
+  // ── Vendored (pre-built, harvested) bundles ──────────────────────────────
+  // Real map MFEs harvested from elsewhere ship as ready-made IIFE files in
+  // public/js (NOT generated from app-profiles/) — e.g. pplr-data-maps.iife.js.
+  // List them in vendored-bundles.json so the app-shell plugin SCAN catalogs
+  // them alongside the locally-built bundles. Same entry shape:
+  // { bundle, output, elements, profiles:[{profile,file,description}] }.
+  const VENDORED = resolve(__dirname, 'vendored-bundles.json')
+  if (existsSync(VENDORED)) {
+    try {
+      const vend = JSON.parse(readFileSync(VENDORED, 'utf8'))
+      for (const vb of (vend.bundles || [])) {
+        if (!bundles.some((b) => b.bundle === vb.bundle)) bundles.push(vb)
+      }
+    } catch (e) {
+      console.error('[generate-manifest] vendored-bundles.json parse error:', e.message)
+    }
+  }
+
   const manifest = {
     schema: 'doxa-1040-maps-manifest@1',
-    generatedFrom: 'app-profiles/*/*.vue',
+    generatedFrom: 'app-profiles/*/*.vue (+ vendored-bundles.json)',
     bundleCount: bundles.length,
-    profileCount: bundles.reduce((n, b) => n + b.profiles.length, 0),
+    profileCount: bundles.reduce((n, b) => n + (b.profiles?.length || 0), 0),
     bundles,
   }
 

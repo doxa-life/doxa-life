@@ -13,11 +13,20 @@
  */
 
 export const mapDefaults = {
-  style:      'mapbox://styles/mapbox/light-v11',
+  // SEAMLESS THEME default — the single Mapbox **Standard** style. Light/dark is a
+  // `lightPreset` config flip (useMapTheme.js), NOT a second style document. Booting on
+  // light-v11 here would force a setStyle() on the first dark toggle (Standard ≠ light-v11),
+  // which wipes/races the custom layers and leaves the prayer-glow "ghost rings" behind
+  // (the prayer-glow ghost-rings bug). Keep this Standard so any profile falling back to
+  // mapDefaults.style is seamless-safe by default. Profiles boot via mapTheme.bootStyle().
+  style:      'mapbox://styles/mapbox/standard',
   center:     [20, 10],   // [lng, lat] — centered on Africa/Middle East
   zoom:       1.8,
   minZoom:    0.5,
-  maxZoom:    18,
+  // No hard zoom-IN limit by design: overlapping
+  // pins must always be zoomable-apart and clickable. 22 = Mapbox GL's engine maximum
+  // (effectively uncapped). A profile may still pass a lower maxZoom via profileConfig.
+  maxZoom:    22,
   pitch:      20,         // default tilt in degrees (0 = flat, 60 = steep); extra vertical space on mobile
   bearing:    0,          // rotation in degrees (0 = north up)
   projection: 'mercator',

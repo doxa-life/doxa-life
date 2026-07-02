@@ -118,6 +118,10 @@ useShadowStyles(`
   .rm-filter input[type=number],
   .rm-filter select,
   .rm-filter input[type=search] { background:#0f1216;border:1px solid #2c343f;color:#e7ebf0;padding:6px 8px;border-radius:5px;font-size:12px;min-width:0;flex:1; }
+  /* ALL search bars = exactly 35px tall, desktop AND mobile. These side-menu
+     filter search inputs are "search bar instances" too.
+     box-sizing:border-box pins it to exactly 35px. */
+  .rm-filter input[type=search] { height:35px;box-sizing:border-box; }
   .rm-filter input:focus,
   .rm-filter select:focus { outline:none;border-color:#7c8cf8; }
   .rm-pop-row { display:grid;grid-template-columns:1fr 1fr;gap:8px; }

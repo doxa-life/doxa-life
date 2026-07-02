@@ -96,35 +96,52 @@ export function useAffinityBlockLegendData(peopleGroupsRef) {
       // Tier 1: bloc
       let bloc = blocs.get(blocCode || '__unknown__')
       if (!bloc) {
-        bloc = { code: blocCode, label: blocLabel, count: 0, pop: 0, clusters: new Map() }
+        bloc = { code: blocCode, label: blocLabel, count: 0, pop: 0, memberIds: [], clusters: new Map() }
         blocs.set(blocCode || '__unknown__', bloc)
       }
       bloc.count += 1
       bloc.pop   += pop
+      bloc.memberIds.push(pgicId)
 
       // Tier 2: cluster
       let cluster = bloc.clusters.get(clCode || '__unknown__')
       if (!cluster) {
-        cluster = { code: clCode, label: clLabel, count: 0, pop: 0, peopleGroups: new Map() }
+        cluster = { code: clCode, label: clLabel, count: 0, pop: 0, memberIds: [], peopleGroups: new Map() }
         bloc.clusters.set(clCode || '__unknown__', cluster)
       }
       cluster.count += 1
       cluster.pop   += pop
+      cluster.memberIds.push(pgicId)
 
       // Tier 3: people group (rop25)
       let pg = cluster.peopleGroups.get(pgCode || '__unknown__')
       if (!pg) {
-        pg = { code: pgCode, label: pgLabel, count: 0, pop: 0, instances: [] }
+        pg = { code: pgCode, label: pgLabel, count: 0, pop: 0, memberIds: [], instances: [] }
         cluster.peopleGroups.set(pgCode || '__unknown__', pg)
       }
       pg.count += 1
       pg.pop   += pop
+      pg.memberIds.push(pgicId)
 
       // Tier 4: people group in country (one entry per row)
       pg.instances.push({ id: pgicId, name: pgicName, country, pop })
     }
     return blocs
   })
+
+  // ── Row filter by MEMBER IDS (robust to code/label drift) ─────────────────
+  // The bloc/cluster/PG rows used to filter by CODE
+  // (['==',['get','affinityBlock'|'cluster'|'peopleGroup'], code]). That silently
+  // matched nothing on the map — the affinity tab DIMS via ['case', node.filter, 1, 0],
+  // so a non-matching filter drove EVERY pin to opacity 0 ("counts right, pins don't
+  // show"). The leaf (PGIC) rows already filter by uniqueId and worked, proving the
+  // per-pin uniqueId is the reliable key. So every tier now filters by the exact
+  // member uniqueIds we already aggregated — no dependency on which code/label form
+  // the pin properties happen to carry. (Card 674a91a0.)
+  const memberFilter = (ids) =>
+    (ids && ids.length)
+      ? ['in', ['get', 'uniqueId'], ['literal', ids]]
+      : ['==', ['get', 'uniqueId'], '__none__']   // matches nothing (never blanks all pins)
 
   // ── affinityTree — generic semantic-tree shape for SemanticTreeLegend ─────
   // Same shape contract as useLanguageFamilyLegendData.langTree:
@@ -140,9 +157,7 @@ export function useAffinityBlockLegendData(peopleGroupsRef) {
         color,
         count: bloc.count,
         pop:   bloc.pop,
-        filter: bloc.code
-          ? ['==', ['get', 'affinityBlock'], bloc.code]
-          : ['!', ['has', 'affinityBlock']],
+        filter: memberFilter(bloc.memberIds),
         children: [],
       }
       for (const cluster of bloc.clusters.values()) {
@@ -152,9 +167,7 @@ export function useAffinityBlockLegendData(peopleGroupsRef) {
           color,
           count: cluster.count,
           pop:   cluster.pop,
-          filter: cluster.code
-            ? ['==', ['get', 'cluster'], cluster.code]
-            : ['==', ['get', 'affinityBlock'], bloc.code],
+          filter: memberFilter(cluster.memberIds),
           children: [],
         }
         for (const pg of cluster.peopleGroups.values()) {
@@ -164,11 +177,7 @@ export function useAffinityBlockLegendData(peopleGroupsRef) {
             color,
             count: pg.count,
             pop:   pg.pop,
-            filter: pg.code
-              ? ['==', ['get', 'peopleGroup'], pg.code]
-              : ['all',
-                  ['==', ['get', 'affinityBlock'], bloc.code],
-                  ['==', ['get', 'cluster'], cluster.code]],
+            filter: memberFilter(pg.memberIds),
             children: [],
           }
           // Tier 4: each row = one people-group-in-country instance.

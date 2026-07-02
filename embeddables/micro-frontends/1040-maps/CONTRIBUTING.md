@@ -65,6 +65,25 @@ common to everyone; your application profiles are private and uniquely yours.
 When this guide says "the template," it means exactly this Apache-2.0 shared
 library + build tooling + bundle pattern — nothing host-specific.
 
+### The reuse rule (reusable → `src/`, unique → profile config)
+
+The same rule governs **dashboards** (config-driven CMV kit) and **maps**:
+
+- **Reusable across profiles → `src/` (`@map`).** Logic that more than one profile would
+  copy lives in the library, declared ONCE. Examples: the dashboard panels and search
+  header (`src/components/dashboards/`), the geocoder **kind-switch** (`src/composables/
+  useGeocoderSearch.js` — `KIND_PROPERTY` + the filter-expression builder), the selection
+  bus, the CSV exporter. If you are about to paste a `FACET_ACC` / kind→property map /
+  filter loop into a 2nd file: **STOP** — that is the smell the library exists to kill.
+- **Unique to one profile → config, not code.** A dashboard's facets / columns / charts /
+  KPIs / data source / the 4 search-bar definitions live in its `dashboard.config.js`; a
+  map's colors / data connection / i18n live in its `app-profiles/<map>/` folder.
+
+The headline proof: a dashboard's 4 search bars reuse the SAME `useGeocoderSearch`
+composable the map profiles use, swapping only the **sink** (a `busAdapter` that lands the
+result on the dashboard's `selectionBus`) — the kind-switch is never re-implemented. See
+`src/components/dashboards/README.md` for how a new dashboard reuses the kit.
+
 ---
 
 ## Two patterns for multiple maps from one bundle
