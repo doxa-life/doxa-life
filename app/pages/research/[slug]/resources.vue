@@ -140,7 +140,7 @@ async function handleDownloadClick(e: MouseEvent) {
   <div v-else-if="uupg" class="uupg-detail-page" @click="handleDownloadClick">
     <div class="surface-brand-light py-xl color-secondary">
       <div class="container">
-        <h1 class="text-center">{{ t('Adoption Resources') }}</h1>
+        <h1 class="text-center">{{ t('Resources') }}</h1>
       </div>
     </div>
     <div class="surface-white py-xl stack-spacing-none">
@@ -195,7 +195,7 @@ async function handleDownloadClick(e: MouseEvent) {
     </section>
 
     <section class="container stack stack--3xl">
-      <h2 class="text-center">{{ t('Your Adoption Resources') }}</h2>
+      <h2 class="text-center">{{ t('Your Resources') }}</h2>
 
       <div class="grid" data-width-md>
         <div

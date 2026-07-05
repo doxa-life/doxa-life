@@ -94,6 +94,9 @@ useTextHighlight()
       <p class="text-center color-primary uppercase font-button font-weight-medium">
         {{ t('The DOXA Vision: Click image to watch the video') }}
       </p>
+      <NuxtLink :to="localePath('/pray')" class="button mx-auto">
+        {{ t('Sign up to pray') }}
+      </NuxtLink>
     </section>
 
     <section class="stack stack--md container">
