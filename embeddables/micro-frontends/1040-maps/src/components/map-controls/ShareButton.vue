@@ -19,7 +19,7 @@
     - Re-click the share button
 -->
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, inject, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useShadowStyles } from '../../composables/useShadowStyles.js'
 import MapControlButton from './MapControlButton.vue'
@@ -385,13 +385,20 @@ const sizePresets = {
 }
 
 /* ---- computed ---- */
-const embedPath = '/research/doxa-research-map.html'
+/* The standalone embed page this map is shared/iframed as. Read from the
+   map's app-profile config (provided by ProfileLoader as 'profileConfig'), so
+   each map declares its OWN embed page via profile-config.shareEmbedPath and a
+   NEW map needs no edit here. Falls back to the research-map page when unset. */
+const profileConfig = inject('profileConfig', null)
+const embedPath = computed(() =>
+  profileConfig?.value?.shareEmbedPath || '/maps/doxa-research-map.html'
+)
 
 const shareUrl = computed(() => {
   if (typeof window !== 'undefined') {
-    return window.location.origin + embedPath
+    return window.location.origin + embedPath.value
   }
-  return 'https://doxa.life' + embedPath
+  return 'https://doxa.life' + embedPath.value
 })
 
 const embedSnippet = computed(() => {

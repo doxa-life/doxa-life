@@ -1,8 +1,8 @@
 {
   "schema": "doxa-1040-maps-manifest@1",
   "generatedFrom": "app-profiles/*/*.vue (+ vendored-bundles.json)",
-  "bundleCount": 6,
-  "profileCount": 8,
+  "bundleCount": 3,
+  "profileCount": 4,
   "bundles": [
     {
       "bundle": "doxa-research-map",
@@ -55,54 +55,6 @@
           "element": "template-bundle"
         }
       ]
-    },
-    {
-      "bundle": "pplr-data-maps",
-      "output": "public/js/pplr-data-maps.iife.js",
-      "elements": [
-        "doxa-map-pplr",
-        "doxa-map"
-      ],
-      "profiles": [
-        {
-          "profile": "pplr-coverage",
-          "file": "pplr-coverage.vue",
-          "description": "PPLR prayer/coverage choropleth (Mapbox)."
-        },
-        {
-          "profile": "pplr-pins",
-          "file": "pplr-pins.vue",
-          "description": "PPLR people-group pins map (Mapbox)."
-        },
-        {
-          "profile": "pplr-language-families",
-          "file": "pplr-language-families.vue",
-          "description": "PPLR language-family colored map (Mapbox)."
-        },
-        {
-          "profile": "pplr-religion",
-          "file": "pplr-religion.vue",
-          "description": "PPLR religion-colored map (Mapbox)."
-        }
-      ]
-    },
-    {
-      "bundle": "node-mapper",
-      "category": "tool",
-      "embed_type": "iframe",
-      "url": "apps/node-mapper/index.html",
-      "title": "Node Mapper",
-      "description": "Relationship / multiplication TREE mapping tool (D3/SVG). A non-map 'tool' plugin that renders standalone in an iframe tile (token-less), clustered alongside the maps.",
-      "profiles": []
-    },
-    {
-      "bundle": "people-groups-wall",
-      "category": "app",
-      "embed_type": "iframe",
-      "url": "apps/wall/index.html",
-      "title": "People Groups Wall",
-      "description": "A scrollable WALL of people-group cards (Vue + D3) sourced live from the Prayer.Tools API. A non-map 'app' plugin that renders standalone in an iframe tile, clustered alongside the maps.",
-      "profiles": []
     }
   ]
 }

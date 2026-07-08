@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prayer Map — Doxa.life</title>
+  <link rel="icon" href="/favicon.ico">
+
+  <!--
+    Standalone embed page for the doxa-simple-map MFE bundle (Prayer view).
+    Partners can iframe this URL or link to it directly.
+
+    Mapbox token: fetched at runtime from /api/maps/token (Nuxt server
+    endpoint). Token NEVER lands in this file — secret-scanning safe.
+
+    base href="/" so the bundle's asset fetches resolve against site root.
+  -->
+  <base href="/">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.24.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.24.0/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%;
+      background: #0b0f14;
+      overflow: hidden;
+    }
+    doxa-simple-map {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+    .token-error {
+      padding: 20px;
+      max-width: 600px;
+      margin: 40px auto;
+      background: #2a1014;
+      border: 1px solid #ff5e5e;
+      color: #ffc9c9;
+      font: 13px/1.5 ui-monospace, monospace;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<!--
+  Point the MFE data layer at the prayer API BEFORE the bundle loads.
+  This page is HOSTED from doxa.life/public but its people-groups DATA API
+  lives ONLY on pray.doxa.life. getApiBaseUrl() (inside the bundle) reads
+  window.MAP_APP_API_URL first; without this the fetch goes relative to the
+  hosting origin (doxa.life) and 404s. pray.doxa.life sends
+  Access-Control-Allow-Origin:* so any embedding site works too.
+-->
+<script>window.MAP_APP_API_URL = 'https://pray.doxa.life';</script>
+
+<script>
+  (async function init() {
+    // ── Fetch Mapbox token from server endpoint ──────────────────────────
+    let token;
+    try {
+      const res = await fetch('/api/maps/token');
+      if (!res.ok) throw new Error('Token endpoint returned ' + res.status);
+      const data = await res.json();
+      token = data.token;
+      if (!token) throw new Error('Token endpoint returned empty token');
+    } catch (err) {
+      console.error('[prayer-map] Failed to fetch Mapbox token:', err);
+      document.body.innerHTML =
+        '<div class="token-error">' +
+        '<strong>Could not load Mapbox token from <code>/api/maps/token</code>.</strong><br><br>' +
+        'Check that <code>NUXT_MAPBOX_KEY</code> or <code>NUXT_PUBLIC_MAPBOX_TOKEN</code> ' +
+        'is set in the host environment. Error: ' + err.message +
+        '</div>';
+      return;
+    }
+
+    // ── Render the custom element ────────────────────────────────────────
+    const config = JSON.stringify({
+      profile: 'doxa-simple-map',
+      tk: token,
+      dataSource: 'pray-tools',
+      instanceId: 'embed-prayer',
+      tabs: [{ id: 'prayer', colorStrategy: 'prayer', legend: 'prayer', popup: 'prayer' }],
+      shareEmbedPath: '/maps/prayer.html'
+    });
+    const el = document.createElement('doxa-simple-map');
+    el.setAttribute('profile-config', config);
+    document.body.appendChild(el);
+
+    // ── Load the MFE bundle (registers <doxa-simple-map>) ────────────────
+    const s = document.createElement('script');
+    s.src = '/js/doxa-simple-map.js';
+    document.head.appendChild(s);
+  })();
+</script>
+
+</body>
+</html>
