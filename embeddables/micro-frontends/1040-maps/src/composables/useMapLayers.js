@@ -367,13 +367,13 @@ export function useMapLayers(options = {}) {
         // builds isoToRegion as ISO → slug. A label-keyed palette greys out every
         // region except "Asia" once the API returns localized labels (locale bug).
         const REGION_COLORS = {
-            'africa':                                 '#e74c3c',
-            'asia':                                   '#3498db',
-            'europe':                                 '#2ecc71',
-            'latin_america_&_caribbean':              '#f39c12',
-            'middle_east':                            '#9b59b6',
-            'north_america_&_non-spanish_caribbean':  '#1abc9c',
-            'oceania':                                '#e67e22',
+            'africa':                                 '#ff2e2e',
+            'asia':                                   '#1a8cff',
+            'europe':                                 '#1ee05f',
+            'latin_america_&_caribbean':              '#FFEB3B',
+            'middle_east':                            '#a83dff',
+            'north_america_&_non-spanish_caribbean':  '#00e0bd',
+            'oceania':                                '#ff7f11',
         };
         const DEFAULT_COLOR = '#cccccc';
 
@@ -418,7 +418,7 @@ export function useMapLayers(options = {}) {
             'source-layer': 'country_boundaries',
             paint: {
                 'fill-color': fillColorExpr,
-                'fill-opacity': colorScheme === 'none' ? 0.1 : 0.20,
+                'fill-opacity': colorScheme === 'none' ? 0.1 : 0.7,
                 'fill-antialias': true,
                 // Standard-style night lighting darkens custom layers — emit full colour
                 // so region fills keep their colour in dark mode (doxa dark-mode fix).
@@ -433,8 +433,14 @@ export function useMapLayers(options = {}) {
             source: 'regions',
             'source-layer': 'country_boundaries',
             paint: {
-                'line-color': 'rgba(60,60,80,0.35)',
-                'line-width': 0.6,
+                // Crisp per-region outline: each country border is drawn in its own
+                // region hue at full opacity. Internal (same-region) borders blend
+                // into the fill; region-to-region boundaries read as sharp saturated
+                // edges — this is what makes the fills look vibrant/sharp rather than
+                // washed-out. Falls back to the same grey as the fill for unmapped ISOs.
+                'line-color': fillColorExpr,
+                'line-width': 1,
+                'line-opacity': 0.9,
                 // Emit full colour so the border stays visible on the night preset.
                 'line-emissive-strength': 1
             }

@@ -23,14 +23,14 @@ const FALLBACK_COLOR = '#95a5a6'
  * DOXA Region Color Palette — defines colors for the 8 DOXA regions.
  */
 export const PALETTE = {
-  'Africa': '#e74c3c',
-  'Asia': '#3498db',
-  'Europe': '#2ecc71',
-  'Latin America & Caribbean': '#f39c12',
-  'Middle East': '#9b59b6',
+  'Africa': '#ff2e2e',
+  'Asia': '#1a8cff',
+  'Europe': '#1ee05f',
+  'Latin America & Caribbean': '#FFEB3B',
+  'Middle East': '#a83dff',
   'No WAGF Region/Bloc': '#1a1a2e',
-  'North America & Non-Spanish Caribbean': '#1abc9c',
-  'Oceania': '#e67e22'
+  'North America & Non-Spanish Caribbean': '#00e0bd',
+  'Oceania': '#ff7f11'
 }
 
 export const DOXA_REGION_COLORS = PALETTE
@@ -46,13 +46,13 @@ export const DOXA_REGION_COLORS = PALETTE
  * Slugs verified against the live API (2026-06-22).
  */
 export const SLUG_PALETTE = {
-  'africa':                                '#e74c3c',
-  'asia':                                  '#3498db',
-  'europe':                                '#2ecc71',
-  'latin_america_&_caribbean':             '#f39c12',
-  'middle_east':                           '#9b59b6',
-  'north_america_&_non-spanish_caribbean': '#1abc9c',
-  'oceania':                               '#e67e22',
+  'africa':                                '#ff2e2e',
+  'asia':                                  '#1a8cff',
+  'europe':                                '#1ee05f',
+  'latin_america_&_caribbean':             '#FFEB3B',
+  'middle_east':                           '#a83dff',
+  'north_america_&_non-spanish_caribbean': '#00e0bd',
+  'oceania':                               '#ff7f11',
   'na':                                    '#1a1a2e'  // No WAGF Region/Bloc
 }
 
@@ -64,21 +64,21 @@ export function getRegionColorBySlug(slug) {
 
 /** Extended region aliases for flexible matching */
 export const REGION_COLOR_ALIASES = {
-  'Africa': '#e74c3c',
-  'East Asia': '#3498db',
-  'Asia': '#3498db',
-  'Eurasia': '#2ecc71',
-  'Europe': '#2ecc71',
-  'Latin America': '#f39c12',
-  'Latin America & Caribbean': '#f39c12',
-  'Caribbean': '#f39c12',
-  'Middle East': '#9b59b6',
-  'North America': '#1abc9c',
-  'North America (non-spanish)': '#1abc9c',
-  'North America & Non-Spanish Caribbean': '#1abc9c',
-  'Pacific': '#e67e22',
-  'Oceania': '#e67e22',
-  'South Asia': '#e67e22',
+  'Africa': '#ff2e2e',
+  'East Asia': '#1a8cff',
+  'Asia': '#1a8cff',
+  'Eurasia': '#1ee05f',
+  'Europe': '#1ee05f',
+  'Latin America': '#FFEB3B',
+  'Latin America & Caribbean': '#FFEB3B',
+  'Caribbean': '#FFEB3B',
+  'Middle East': '#a83dff',
+  'North America': '#00e0bd',
+  'North America (non-spanish)': '#00e0bd',
+  'North America & Non-Spanish Caribbean': '#00e0bd',
+  'Pacific': '#ff7f11',
+  'Oceania': '#ff7f11',
+  'South Asia': '#ff7f11',
   'No WAGF Region/Bloc': '#1a1a2e',
   'Unknown': '#0098FF'
 }

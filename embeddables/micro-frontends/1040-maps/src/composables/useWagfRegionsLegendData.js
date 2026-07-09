@@ -34,13 +34,13 @@ import { computed } from 'vue'
 // identically across locales) once the user switches language. The slug is
 // locale-independent. Mirrors SLUG_PALETTE in color-strategies/doxa-region.js.
 const REGION_COLORS = {
-  'africa':                                '#e74c3c',
-  'asia':                                  '#3498db',
-  'europe':                                '#2ecc71',
-  'latin_america_&_caribbean':             '#f39c12',
-  'middle_east':                           '#9b59b6',
-  'north_america_&_non-spanish_caribbean': '#1abc9c',
-  'oceania':                               '#e67e22',
+  'africa':                                '#ff2e2e',
+  'asia':                                  '#1a8cff',
+  'europe':                                '#1ee05f',
+  'latin_america_&_caribbean':             '#FFEB3B',
+  'middle_east':                           '#a83dff',
+  'north_america_&_non-spanish_caribbean': '#00e0bd',
+  'oceania':                               '#ff7f11',
 }
 const FALLBACK_COLOR = '#95a5a6'
 

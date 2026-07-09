@@ -28,10 +28,10 @@ const COLUMNS_SIMPLE = [] // e.g. affinity-blocs — no numeric columns
 // TODO: domain-specific. Override these palettes via config injection if your
 // app uses different region or affinity-bloc names.
 const DOXA_REGION_COLORS = {
-  'Africa': '#e74c3c', 'Asia': '#3498db', 'Europe': '#2ecc71',
-  'Latin America & Caribbean': '#f39c12', 'Middle East': '#9b59b6',
-  'No WAGF Region/Bloc': '#95a5a6', 'North America & Non-Spanish Caribbean': '#1abc9c',
-  'Oceania': '#e67e22'
+  'Africa': '#ff2e2e', 'Asia': '#1a8cff', 'Europe': '#1ee05f',
+  'Latin America & Caribbean': '#FFEB3B', 'Middle East': '#a83dff',
+  'No WAGF Region/Bloc': '#95a5a6', 'North America & Non-Spanish Caribbean': '#00e0bd',
+  'Oceania': '#ff7f11'
 }
 
 const AFFINITY_BLOC_COLORS = {

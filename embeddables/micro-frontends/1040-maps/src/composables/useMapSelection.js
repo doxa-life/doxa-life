@@ -53,12 +53,12 @@ export function useMapSelection(options = {}) {
             map.setPaintProperty('regions-fill', 'fill-opacity', [
                 'case',
                 ['==', ['get', 'region'], region],
-                0.6,
+                0.85,
                 0.15
             ]);
         } else {
             // Show all at normal opacity
-            const opacity = colorScheme.value === 'none' ? 0.2 : 0.5;
+            const opacity = colorScheme.value === 'none' ? 0.2 : 0.7;
             map.setPaintProperty('regions-fill', 'fill-opacity', opacity);
         }
     }
