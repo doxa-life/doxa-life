@@ -389,7 +389,7 @@ const mapTheme  = useMapTheme(uiStore)
 const FEATURES = {
   doxaRegions:    true,
   adoption:       false,  // Adoption tab hidden per UX request; wiring kept warm (flip to true to restore)
-  share:          false,  // Share button hidden (glitch — PR gate); ALL share code kept warm (flip to true to restore)
+  share:          true,   // Share button enabled — parameterized share control on every map
   hamburgerMenu:  false,  // canonical default — emit/listen mismatch + drawer surplus
   // Per QA building-round-1 R3 A4: clear the geocoder text on tab switch by
   // default; flip to true to preserve the previous tab's query when returning.

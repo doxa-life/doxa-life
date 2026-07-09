@@ -42,6 +42,7 @@ import ThemeToggleButton from '@map/components/map-controls/ThemeToggleButton.vu
 import HelpButton        from '@map/components/map-controls/HelpButton.vue'
 import HamburgerButton   from '@map/components/map-controls/HamburgerButton.vue'
 import GeocoderComponent from '@map/components/map-controls/GeocoderComponent.vue'
+import ShareButton       from '@map/components/map-controls/ShareButton.vue'
 
 // ─── Shadow DOM style injection ──────────────────────────────────────────────
 useShadowStyles(`
@@ -1334,6 +1335,10 @@ onBeforeUnmount(() => {
         <LocationButton    :map="map"          :is-dark="isDark" />
         <FullscreenButton  :map-container="mapContainer" :is-dark="isDark" />
         <ThemeToggleButton :is-dark="isDark"   @toggle="handleToggleTheme" />
+        <!-- Share / embed control. Reads its own embed page from the injected
+             profileConfig.shareEmbedPath (set per map in the embed HTML), so
+             prayer/engagement/adoption each share their own standalone page. -->
+        <ShareButton       :is-dark="isDark" />
         <!-- "About this map" info button — feature-flagged off on this profile -->
         <HelpButton v-if="FEATURES.infoButton" :is-dark="isDark" @open-help="showHelpPopup = true" />
       </MapToolbar>
