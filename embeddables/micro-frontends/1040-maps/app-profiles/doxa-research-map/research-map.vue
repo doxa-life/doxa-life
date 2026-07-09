@@ -949,7 +949,7 @@ function onSemanticTreeSelect(node) {
     }
     // Reset region polygon highlight when deselecting on the WAGF Regions tab.
     if (m && m.getLayer('regions-fill')) {
-      m.setPaintProperty('regions-fill', 'fill-opacity', 0.20)
+      m.setPaintProperty('regions-fill', 'fill-opacity', 0.7)
       m.setPaintProperty('regions-border', 'line-color', 'rgba(60,60,80,0.35)')
       m.setPaintProperty('regions-border', 'line-width', 0.6)
     }
@@ -1036,7 +1036,7 @@ function onSemanticTreeSelect(node) {
       if (isoCodes.length) {
         const isoArr = ['literal', isoCodes]
         m.setPaintProperty('regions-fill', 'fill-opacity', [
-          'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], 0.30, 0.02
+          'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], 0.85, 0.15
         ])
         m.setPaintProperty('regions-border', 'line-color', [
           'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], '#111827', 'rgba(60,60,80,0.15)'
@@ -1045,7 +1045,7 @@ function onSemanticTreeSelect(node) {
           'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], 2.5, 0.3
         ])
       } else {
-        m.setPaintProperty('regions-fill', 'fill-opacity', 0.20)
+        m.setPaintProperty('regions-fill', 'fill-opacity', 0.7)
         m.setPaintProperty('regions-border', 'line-color', 'rgba(60,60,80,0.35)')
         m.setPaintProperty('regions-border', 'line-width', 0.6)
       }
@@ -1383,7 +1383,7 @@ function clearAllHighlights(m) {
   _syncHitboxFilter(m, null)
   mapLayers.syncGlowFilter(null)
   if (m.getLayer('regions-fill')) {
-    m.setPaintProperty('regions-fill', 'fill-opacity', 0.20)
+    m.setPaintProperty('regions-fill', 'fill-opacity', 0.7)
     m.setPaintProperty('regions-fill', 'fill-outline-color', null)
   }
   if (m.getLayer('regions-border')) {
@@ -1513,7 +1513,7 @@ function applyDimFilter(detail) {
       if (isoCodes.length) {
         const isoArr = ['literal', isoCodes]
         m.setPaintProperty('regions-fill', 'fill-opacity', [
-          'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], 0.30, 0.02
+          'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], 0.85, 0.15
         ])
         m.setPaintProperty('regions-border', 'line-color', [
           'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], '#111827', 'rgba(60,60,80,0.15)'
@@ -1522,7 +1522,7 @@ function applyDimFilter(detail) {
           'case', ['in', ['get', 'iso_3166_1_alpha_3'], isoArr], 2.5, 0.3
         ])
       } else {
-        m.setPaintProperty('regions-fill', 'fill-opacity', 0.20)
+        m.setPaintProperty('regions-fill', 'fill-opacity', 0.7)
         m.setPaintProperty('regions-border', 'line-color', 'rgba(60,60,80,0.35)')
         m.setPaintProperty('regions-border', 'line-width', 0.6)
       }

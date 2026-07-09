@@ -17,6 +17,7 @@ import { getCircleRadiusInterpolation } from '../config/zoom.js';
  * @param {Object} options.mapStore - Pinia mapStore for shared state
  * @param {Function} options.addFamilyConnectionLines - Function to add connection lines
  * @param {Function} options.removeFamilyConnectionLines - Function to remove connection lines
+ * @param {Function} options.getRegionIsoMap - Returns region-slug → array of iso_3166_1_alpha_3 codes
  *
  * @returns {Object} Selection management functions and state
  */
@@ -26,7 +27,12 @@ export function useMapSelection(options = {}) {
         mapId = 'unknown',
         mapStore = null,
         addFamilyConnectionLines = () => {},
-        removeFamilyConnectionLines = () => {}
+        removeFamilyConnectionLines = () => {},
+        // regionIsoMap is built in useMapLayers.addRegionsLayer (region slug →
+        // array of alpha-3 ISO codes). The regions-fill features come from the
+        // country-boundaries-v1 tileset which exposes iso_3166_1_alpha_3 (NOT a
+        // `region` property), so selection highlighting must match on ISO.
+        getRegionIsoMap = () => ({})
     } = options;
 
     // Local state for color scheme
@@ -49,15 +55,31 @@ export function useMapSelection(options = {}) {
         const region = selectedRegion.value;
 
         if (region) {
-            // Highlight selected region, fade others
+            // Resolve the selected region's ISO alpha-3 codes. selectedRegion may
+            // arrive as a display label ('Asia') while regionIsoMap is keyed by
+            // slug ('asia'); normalize (lowercase, strip non-alpha) for a robust
+            // match without re-keying the map.
+            const rMap = getRegionIsoMap() || {};
+            const norm = (s) => String(s).toLowerCase().replace(/[^a-z]/g, '');
+            let isos = rMap[region] || [];
+            if (!isos.length) {
+                const target = norm(region);
+                for (const [k, v] of Object.entries(rMap)) {
+                    if (norm(k) === target) { isos = v; break; }
+                }
+            }
+
+            // Highlight selected region (0.85, vibrant), fade others (0.15, dim).
+            // Match on iso_3166_1_alpha_3 — the country-boundaries-v1 tileset has
+            // no `region` property.
             map.setPaintProperty('regions-fill', 'fill-opacity', [
                 'case',
-                ['==', ['get', 'region'], region],
+                ['in', ['get', 'iso_3166_1_alpha_3'], ['literal', isos]],
                 0.85,
                 0.15
             ]);
         } else {
-            // Show all at normal opacity
+            // Deselect → restore the vibrant base for all regions.
             const opacity = colorScheme.value === 'none' ? 0.2 : 0.7;
             map.setPaintProperty('regions-fill', 'fill-opacity', opacity);
         }

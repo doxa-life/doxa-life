@@ -1,7 +1,0 @@
-{
-  "profile": "doxa-simple-map",
-  "tk": "pk.eyJ...REPLACE_WITH_YOUR_MAPBOX_TOKEN",
-  "instanceId": "my-team-map",
-  "dataSource": "pray-tools",
-  "colorSet": "default"
-}
