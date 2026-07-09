@@ -262,6 +262,17 @@ const showTabBar = computed(() => tabs.value.length > 1)
 const activeTabId = ref(null)
 const activeTab   = computed(() => tabs.value.find(t => t.id === activeTabId.value) ?? tabs.value[0])
 
+// ─── Share embed path (ID→URL table owned by this profile) ────────────────────
+// This is ONE parameterized profile rendering 3 maps chosen by tab id, so the
+// share/embed URL must resolve from the ACTIVE tab — otherwise every simple map
+// would share the same page. Passed to ShareButton via :embed-path.
+const SHARE_EMBED_BY_ID = {
+  prayer:     '/maps/prayer.html',
+  engagement: '/maps/engagement.html',
+  adoption:   '/maps/adoption.html'
+}
+const shareEmbedPath = computed(() => SHARE_EMBED_BY_ID[activeTab.value?.id] || '/maps/doxa-research-map.html')
+
 // Maps tab legend key → LegendComponent legendType prop
 const legendTypeMap = { prayer: 'prayer', engagement: 'engagement', adoption: 'adoption' }
 const activeLegendType = computed(() => legendTypeMap[activeTab.value?.legend] ?? 'prayer')
@@ -1338,7 +1349,7 @@ onBeforeUnmount(() => {
         <!-- Share / embed control. Reads its own embed page from the injected
              profileConfig.shareEmbedPath (set per map in the embed HTML), so
              prayer/engagement/adoption each share their own standalone page. -->
-        <ShareButton       :is-dark="isDark" />
+        <ShareButton       :is-dark="isDark" :embed-path="shareEmbedPath" />
         <!-- "About this map" info button — feature-flagged off on this profile -->
         <HelpButton v-if="FEATURES.infoButton" :is-dark="isDark" @open-help="showHelpPopup = true" />
       </MapToolbar>

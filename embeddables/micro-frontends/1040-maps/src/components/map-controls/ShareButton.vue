@@ -366,7 +366,8 @@ useShadowStyles(`
 const { t } = useI18n()
 
 const props = defineProps({
-  isDark: { type: Boolean, default: false }
+  isDark: { type: Boolean, default: false },
+  embedPath: { type: String, default: '' }
 })
 
 /* ---- state ---- */
@@ -385,13 +386,15 @@ const sizePresets = {
 }
 
 /* ---- computed ---- */
-/* The standalone embed page this map is shared/iframed as. Read from the
-   map's app-profile config (provided by ProfileLoader as 'profileConfig'), so
-   each map declares its OWN embed page via profile-config.shareEmbedPath and a
-   NEW map needs no edit here. Falls back to the research-map page when unset. */
+/* The standalone embed page this map is shared/iframed as. Resolution order:
+   (1) the `embedPath` prop — the PROFILE owns an ID→URL table and passes the
+       active instance's URL (parameterized profiles keyed by active tab id);
+   (2) the map's app-profile config (provided by ProfileLoader as
+       'profileConfig') via profile-config.shareEmbedPath;
+   (3) the research-map page as a final fallback. */
 const profileConfig = inject('profileConfig', null)
 const embedPath = computed(() =>
-  profileConfig?.value?.shareEmbedPath || '/maps/doxa-research-map.html'
+  props.embedPath || profileConfig?.value?.shareEmbedPath || '/maps/doxa-research-map.html'
 )
 
 const shareUrl = computed(() => {

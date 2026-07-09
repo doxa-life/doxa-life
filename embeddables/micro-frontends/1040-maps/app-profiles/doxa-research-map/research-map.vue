@@ -2014,7 +2014,7 @@ onBeforeUnmount(() => {
         <ThemeToggleButton :is-dark="isDark"    @toggle="handleToggleTheme" />
         <!-- Share button hidden behind FEATURES.share (glitch — PR gate). All
              ShareButton code kept warm; flip FEATURES.share=true to restore. -->
-        <ShareButton       v-if="FEATURES.share" :is-dark="isDark" />
+        <ShareButton       v-if="FEATURES.share" :is-dark="isDark" :embed-path="'/maps/doxa-research-map.html'" />
       </MapToolbar>
 
       <!-- Fly + Clusters floating toolbar — sibling of the legend card, mounted
