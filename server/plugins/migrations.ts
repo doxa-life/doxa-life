@@ -1,8 +1,14 @@
 import { Migrator, type Migration, type MigrationProvider } from 'kysely'
 import { promises as fs } from 'fs'
 import * as path from 'path'
-import { pathToFileURL } from 'url'
+import { createJiti } from 'jiti'
 import { getDb } from '../utils/database'
+
+// Migration files are raw `.ts`. Native `import()` of a `file://…/*.ts` URL
+// only works under Bun (the production runtime); the Node-based `nuxt dev`
+// server throws "Unknown file extension .ts". jiti compiles TS on import under
+// both runtimes, so load every migration through it.
+const jiti = createJiti(import.meta.url)
 
 // Reads migration files from multiple folders (consumer + each layer's migrations/).
 // Filenames are sorted globally for a stable order. Each layer prefixes its files
@@ -26,7 +32,7 @@ class MultiFolderMigrationProvider implements MigrationProvider {
           throw new Error(`Migration name collision: "${name}" appears in multiple layers. Rename one (use a layer prefix like \`oauth_001_*\`).`)
         }
         const fullPath = path.join(folder, file)
-        const mod = await import(pathToFileURL(fullPath).href)
+        const mod = await jiti.import<Migration>(fullPath)
         all[name] = mod
       }
     }
