@@ -619,7 +619,7 @@ function readDestinations() {
   // Each entry in vite.1040-maps-build-config.json `paths` is a folder that should CONTAIN
   // the <name>/ tree (so the full path is <entry>/<name>/).
   for (const p of DEST_CONFIG.paths) {
-    dests.push(resolve(__dirname, p, TREE_NAME))
+    dests.push(resolve(__dirname, '..', p, TREE_NAME))   // paths are relative to the BUNDLER ROOT (this script lives in internal/)
   }
   return dests
 }
