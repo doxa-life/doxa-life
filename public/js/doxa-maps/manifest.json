@@ -1,0 +1,184 @@
+{
+  "schema": "doxa-maps-manifest@1",
+  "generatedFrom": "app-profiles/*/*.vue",
+  "embedBase": ".",
+  "bundleCount": 4,
+  "profileCount": 5,
+  "bundles": [
+    {
+      "bundle": "demo-map",
+      "scriptUrl": "./demo-map/demo-map.js",
+      "output": "doxa-maps/demo-map/demo-map.js",
+      "elements": [
+        "demo-map"
+      ],
+      "profiles": [
+        {
+          "profile": "demo-map",
+          "file": "demo-map.vue",
+          "description": "Simple two-tab demo map. Tab 1 colors pins by religion (shared",
+          "element": "demo-map",
+          "iframeUrl": "./demo-map/demo-map/index.html",
+          "scriptUrl": "./demo-map/demo-map.js",
+          "embed": {
+            "iframe": "<iframe src=\"./demo-map/demo-map/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
+            "script": "<script src=\"./demo-map/demo-map.js\"></script>\n<demo-map profile-config='{\"profile\":\"demo-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></demo-map>"
+          },
+          "bundle": "demo-map"
+        }
+      ]
+    },
+    {
+      "bundle": "doxa-research-map",
+      "scriptUrl": "./doxa-research-map/doxa-research-map.js",
+      "output": "doxa-maps/doxa-research-map/doxa-research-map.js",
+      "elements": [
+        "doxa-research-map"
+      ],
+      "profiles": [
+        {
+          "profile": "research-map",
+          "file": "research-map.vue",
+          "description": "",
+          "element": "doxa-research-map",
+          "iframeUrl": "./doxa-research-map/research-map/index.html",
+          "scriptUrl": "./doxa-research-map/doxa-research-map.js",
+          "embed": {
+            "iframe": "<iframe src=\"./doxa-research-map/research-map/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
+            "script": "<script src=\"./doxa-research-map/doxa-research-map.js\"></script>\n<doxa-research-map profile-config='{\"profile\":\"research-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></doxa-research-map>"
+          }
+        }
+      ]
+    },
+    {
+      "bundle": "doxa-simple-map",
+      "scriptUrl": "./doxa-simple-map/doxa-simple-map.js",
+      "output": "doxa-maps/doxa-simple-map/doxa-simple-map.js",
+      "elements": [
+        "doxa-map",
+        "doxa-simple-map"
+      ],
+      "profiles": [
+        {
+          "profile": "doxa-simple-map",
+          "file": "doxa-simple-map.vue",
+          "description": "",
+          "element": "doxa-map",
+          "iframeUrl": "./doxa-simple-map/doxa-simple-map/index.html",
+          "scriptUrl": "./doxa-simple-map/doxa-simple-map.js",
+          "embed": {
+            "iframe": "<iframe src=\"./doxa-simple-map/doxa-simple-map/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
+            "script": "<script src=\"./doxa-simple-map/doxa-simple-map.js\"></script>\n<doxa-map profile-config='{\"profile\":\"doxa-simple-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></doxa-map>"
+          },
+          "instances": [
+            {
+              "id": "prayer",
+              "title": "Prayer Map",
+              "apiBaseUrl": "https://pray.doxa.life",
+              "props": {
+                "profile": "doxa-simple-map",
+                "instanceId": "embed-prayer",
+                "dataSource": "pray-tools",
+                "tabs": [
+                  {
+                    "id": "prayer",
+                    "colorStrategy": "prayer",
+                    "legend": "prayer",
+                    "popup": "prayer"
+                  }
+                ]
+              },
+              "element": "doxa-map",
+              "iframeUrl": "./doxa-simple-map/doxa-simple-map/prayer/index.html",
+              "embed": {
+                "iframe": "<iframe src=\"./doxa-simple-map/doxa-simple-map/prayer/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>"
+              }
+            },
+            {
+              "id": "engagement",
+              "title": "Engagement Map",
+              "apiBaseUrl": "https://pray.doxa.life",
+              "props": {
+                "profile": "doxa-simple-map",
+                "instanceId": "embed-engagement",
+                "dataSource": "pray-tools",
+                "tabs": [
+                  {
+                    "id": "engagement",
+                    "colorStrategy": "engagement",
+                    "legend": "engagement",
+                    "popup": "engagement"
+                  }
+                ]
+              },
+              "element": "doxa-map",
+              "iframeUrl": "./doxa-simple-map/doxa-simple-map/engagement/index.html",
+              "embed": {
+                "iframe": "<iframe src=\"./doxa-simple-map/doxa-simple-map/engagement/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>"
+              }
+            },
+            {
+              "id": "adoption",
+              "title": "Adoption Map",
+              "apiBaseUrl": "https://pray.doxa.life",
+              "props": {
+                "profile": "doxa-simple-map",
+                "instanceId": "embed-adoption",
+                "dataSource": "pray-tools",
+                "tabs": [
+                  {
+                    "id": "adoption",
+                    "colorStrategy": "adoption",
+                    "legend": "adoption",
+                    "popup": "adoption"
+                  }
+                ]
+              },
+              "element": "doxa-map",
+              "iframeUrl": "./doxa-simple-map/doxa-simple-map/adoption/index.html",
+              "embed": {
+                "iframe": "<iframe src=\"./doxa-simple-map/doxa-simple-map/adoption/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "bundle": "template-bundle",
+      "scriptUrl": "./template-bundle/template-bundle.js",
+      "output": "doxa-maps/template-bundle/template-bundle.js",
+      "elements": [
+        "template-bundle"
+      ],
+      "profiles": [
+        {
+          "profile": "template-map-a",
+          "file": "template-map-a.vue",
+          "description": "Minimal example profile A — a colored placeholder, no Mapbox or data.",
+          "element": "template-bundle",
+          "iframeUrl": "./template-bundle/template-map-a/index.html",
+          "scriptUrl": "./template-bundle/template-bundle.js",
+          "embed": {
+            "iframe": "<iframe src=\"./template-bundle/template-map-a/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
+            "script": "<script src=\"./template-bundle/template-bundle.js\"></script>\n<template-bundle profile-config='{\"profile\":\"template-map-a\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></template-bundle>"
+          },
+          "bundle": "template-bundle"
+        },
+        {
+          "profile": "template-map-b",
+          "file": "template-map-b.vue",
+          "description": "Minimal example profile B — a second profile in the same bundle.",
+          "element": "template-bundle",
+          "iframeUrl": "./template-bundle/template-map-b/index.html",
+          "scriptUrl": "./template-bundle/template-bundle.js",
+          "embed": {
+            "iframe": "<iframe src=\"./template-bundle/template-map-b/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
+            "script": "<script src=\"./template-bundle/template-bundle.js\"></script>\n<template-bundle profile-config='{\"profile\":\"template-map-b\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></template-bundle>"
+          },
+          "bundle": "template-bundle"
+        }
+      ]
+    }
+  ]
+}

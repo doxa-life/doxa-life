@@ -65,7 +65,21 @@ const CLIENT_SCOPES = [
   'styles:tiles',    // serve tile requests
 ]
 
-export default defineEventHandler(async (event): Promise<TokenResponse> => {
+export default defineEventHandler(async (event): Promise<TokenResponse | ''> => {
+  // CORS: this token is designed for public, cross-origin use — the whole point
+  // of the multi-MFE tree is that a map dropped on ANY host (Cloudflare, Vercel,
+  // Android webview) can fetch its token here. The returned token is already safe
+  // to expose (pk.* is public; tk.* is read-only, 1-hour, revocable). Referer
+  // restrictions on the Mapbox dashboard remain the real access control.
+  setHeader(event, 'Access-Control-Allow-Origin', '*')
+  setHeader(event, 'Access-Control-Allow-Methods', 'GET, OPTIONS')
+  setHeader(event, 'Vary', 'Origin')
+  // Preflight (browsers send OPTIONS before a cross-origin GET with custom headers).
+  if (event.method === 'OPTIONS') {
+    setResponseStatus(event, 204)
+    return ''
+  }
+
   const config = useRuntimeConfig(event)
   // Prefer the server-only key if present; fall back to the public token
   // so existing setups (just NUXT_PUBLIC_MAPBOX_TOKEN) keep working.

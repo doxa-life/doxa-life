@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sovereign Map Forge · doxa-simple-map</title>
+  <link rel="icon" href="data:,">
+  <style>/* staging-forge.css — the ONE-PAGE semantic staging theme (root + bundle pages).
+   Driver design brief 2026-07-11: tree sidebar left on desktop, tree-top + scroll-to-map
+   on mobile, GEM FRAMES as the hero (each map in its colored jewel frame), quiet
+   architectural dark, zero folder-hopping. Sovereign Map Forge design language. */
+:root {
+  --bg:#0a0e15; --surf:#121a27; --surf2:#0e1623; --line:#223047;
+  --ink:#eef2f7; --mut:#9aa7b8; --dim:#6b7787;
+  --cy:#46d4ff; --vi:#b9a6f5; --gold:#ffc24b; --grn:#5ee0a0;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background:
+    radial-gradient(1100px 480px at 82% -12%, rgba(70,212,255,.10), transparent 60%),
+    radial-gradient(820px 460px at -8% 112%, rgba(185,166,245,.10), transparent 60%),
+    var(--bg);
+  color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased;
+}
+code { font-family: var(--mono); }
+.hidden { display: none !important; }
+.empty { color: var(--dim); font: 12px/1.5 var(--mono); padding: 18px; }
+
+/* ── Shell: header strip, then sidebar|stage grid (desktop) ── */
+header.top { padding: 14px 18px 10px; border-bottom: 1px solid var(--surf2); }
+header.top h1 { font: 800 15px/1.2 var(--sans); letter-spacing: -.01em; }
+header.top h1 .ac { color: var(--cy); font-weight: 600; }
+header.top .sub { margin-top: 3px; font: 12px/1.4 var(--sans); color: var(--mut); }
+.strip { padding: 7px 18px; font: 11px/1.4 var(--mono); color: var(--mut);
+  border-bottom: 1px solid var(--surf2); background: rgba(255,255,255,.012); }
+.strip .pat { color: var(--cy); } .strip .err { color: #f87171; } .strip strong { color: var(--ink); }
+
+/* token bar — visible only while no token resolves */
+#tokenBar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  padding: 9px 18px; font: 12px/1.4 var(--sans); color: var(--gold);
+  border-bottom: 1px solid var(--surf2); background: rgba(255,194,75,.06); }
+#tokenBar input { flex: 1 1 220px; max-width: 420px; font: 12px/1 var(--mono);
+  color: var(--ink); background: var(--surf2); border: 1px solid var(--line);
+  border-radius: 8px; padding: 8px 10px; }
+#tokenBar button { font: 700 11px/1 var(--mono); color: #0a0e15; cursor: pointer;
+  background: linear-gradient(90deg, var(--cy), var(--vi)); border: 0;
+  border-radius: 999px; padding: 8px 14px; }
+
+/* ── The one-page layout ── */
+#shell { display: grid; grid-template-columns: minmax(280px, 340px) 1fr;
+  height: calc(100vh - 118px); min-height: 420px; }
+
+/* sidebar: THE semantic tree — navigation and architecture in one */
+#treeNav { overflow-y: auto; border-right: 1px solid var(--surf2);
+  padding: 12px 10px 28px; background: rgba(255,255,255,.008); }
+.bgroup { margin-bottom: 8px; border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surf); overflow: hidden; }
+.bgroup summary { list-style: none; cursor: pointer; display: flex; align-items: baseline;
+  gap: 8px; padding: 10px 12px; font: 700 13px/1.2 var(--sans); }
+.bgroup summary::-webkit-details-marker { display: none; }
+.bgroup summary .bdot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto;
+  align-self: center; background: var(--gem, var(--cy)); box-shadow: 0 0 8px var(--gem, var(--cy)); }
+.bgroup summary .bmeta { margin-left: auto; font: 10px/1.3 var(--mono); color: var(--dim); font-weight: 400; }
+.bgroup[open] summary { border-bottom: 1px solid var(--surf2); }
+
+.node { display: block; width: 100%; text-align: left; cursor: pointer; color: inherit;
+  background: transparent; border: 0; border-left: 2px solid transparent;
+  padding: 8px 12px 8px 22px; transition: background .12s; }
+.node:hover { background: rgba(255,255,255,.03); }
+.node.active { background: color-mix(in srgb, var(--gem, var(--cy)) 10%, transparent);
+  border-left-color: var(--gem, var(--cy)); }
+.node .nlabel { display: block; font: 600 12.5px/1.3 var(--sans); }
+.node .nsub { display: block; font: 10.5px/1.4 var(--mono); color: var(--mut); margin-top: 1px; }
+.node .nedit { display: block; font: 9.5px/1.4 var(--mono); color: var(--dim); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* kind glyphs */
+.node.k-instance .nlabel::before { content: "◇ "; color: var(--grn); }
+.node.k-profile .nlabel::before { content: "● "; color: var(--vi); }
+.node.k-nested .nlabel::before { content: "◉ "; color: var(--gold); }
+
+/* ── Stage: the ONE live map inside its GEM FRAME (the recurring hero theme) ── */
+#stage { display: flex; flex-direction: column; min-width: 0; padding: 12px 16px 16px; }
+.stage-head { display: flex; align-items: center; gap: 10px; padding: 0 2px 9px; }
+.stage-head .sctag { font: 800 13px/1 var(--mono); color: var(--gem, var(--cy)); }
+.stage-head .sckind { font: 8.5px/1 var(--mono); color: var(--dim); border: 1px solid var(--line);
+  border-radius: 999px; padding: 3px 8px; text-transform: uppercase; letter-spacing: .08em; }
+.stage-head .popout { margin-left: auto; font: 600 11px/1 var(--mono); color: var(--mut);
+  text-decoration: none; border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; }
+.stage-head .popout:hover { color: var(--ink); border-color: #3a4a63; }
+/* the gem frame: colored jewel border + inner ring + soft glow in the node's gem color */
+.map-slot { flex: 1 1 0; min-height: 0; position: relative; border-radius: 12px;
+  border: 1px solid var(--gem, var(--cy));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--gem, var(--cy)) 45%, transparent) inset,
+              0 0 26px rgba(var(--gem-rgb, 70,212,255), .16),
+              0 8px 30px rgba(0,0,0,.35);
+  background: #0d1622; overflow: hidden; padding: 8px; }
+.map-slot iframe { position: absolute; inset: 8px; width: calc(100% - 16px);
+  height: calc(100% - 16px); border: 0; border-radius: 8px; }
+
+/* ── Mobile: single column — tree on top, the map takes the FULL SCREEN below ──
+   (Driver 2026-07-11: mobile map = pretty much full screen; scroll must reach it.
+   100dvh = dynamic viewport height, tracks the mobile URL bar; 100vh = fallback.) */
+@media (max-width: 899px) {
+  html, body { height: auto; }                   /* let the page actually scroll */
+  #shell { display: block; height: auto; }
+  #treeNav { border-right: 0; border-bottom: 1px solid var(--surf2); max-height: 44vh; }
+  #stage { height: 100vh; height: 100dvh; padding: 8px; }   /* full-screen map pane */
+  .stage-head { padding-bottom: 6px; }
+  .map-slot { padding: 4px; border-radius: 10px; }          /* slimmer gem frame = max map */
+  .map-slot iframe { inset: 4px; width: calc(100% - 8px); height: calc(100% - 8px); }
+  .node .nedit { display: none; }   /* edit paths are a desktop affordance */
+}
+</style>
+</head>
+<body>
+  <header class="top">
+    <h1>Sovereign Map Forge · doxa-simple-map<span class="ac"> / doxa-simple-map</span></h1>
+    <div class="sub">doxa-simple-map — one bundle, its profiles as paste-anywhere maps</div>
+  </header>
+  <div class="strip" id="frameInfo">loading…</div>
+  <div id="tokenBar" class="hidden"></div>
+  <div id="shell">
+    <nav id="treeNav" aria-label="semantic tree"></nav>
+    <main id="stage"></main>
+  </div>
+
+  <script>window.FORGE = {"mode":"built","scope":"bundle","manifestUrl":"../manifest.json","bundle":"doxa-simple-map","hrefBase":"../"};
+  /* file:// contract: manifest inlined at build — no fetch needed to render. */
+  window.FORGE.manifest = {"schema":"doxa-maps-manifest@1","generatedFrom":"app-profiles/*/*.vue","embedBase":".","bundleCount":4,"profileCount":5,"bundles":[{"bundle":"doxa-simple-map","scriptUrl":"./doxa-simple-map/doxa-simple-map.js","output":"doxa-maps/doxa-simple-map/doxa-simple-map.js","elements":["doxa-map","doxa-simple-map"],"profiles":[{"profile":"doxa-simple-map","file":"doxa-simple-map.vue","description":"","element":"doxa-map","iframeUrl":"./doxa-simple-map/doxa-simple-map/index.html","scriptUrl":"./doxa-simple-map/doxa-simple-map.js","embed":{"iframe":"\u003ciframe src=\"./doxa-simple-map/doxa-simple-map/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen>\u003c/iframe>","script":"\u003cscript src=\"./doxa-simple-map/doxa-simple-map.js\">\u003c/script>\n\u003cdoxa-map profile-config='{\"profile\":\"doxa-simple-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'>\u003c/doxa-map>"},"instances":[{"id":"prayer","title":"Prayer Map","apiBaseUrl":"https://pray.doxa.life","props":{"profile":"doxa-simple-map","instanceId":"embed-prayer","dataSource":"pray-tools","tabs":[{"id":"prayer","colorStrategy":"prayer","legend":"prayer","popup":"prayer"}]},"element":"doxa-map","iframeUrl":"./doxa-simple-map/doxa-simple-map/prayer/index.html","embed":{"iframe":"\u003ciframe src=\"./doxa-simple-map/doxa-simple-map/prayer/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen>\u003c/iframe>"}},{"id":"engagement","title":"Engagement Map","apiBaseUrl":"https://pray.doxa.life","props":{"profile":"doxa-simple-map","instanceId":"embed-engagement","dataSource":"pray-tools","tabs":[{"id":"engagement","colorStrategy":"engagement","legend":"engagement","popup":"engagement"}]},"element":"doxa-map","iframeUrl":"./doxa-simple-map/doxa-simple-map/engagement/index.html","embed":{"iframe":"\u003ciframe src=\"./doxa-simple-map/doxa-simple-map/engagement/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen>\u003c/iframe>"}},{"id":"adoption","title":"Adoption Map","apiBaseUrl":"https://pray.doxa.life","props":{"profile":"doxa-simple-map","instanceId":"embed-adoption","dataSource":"pray-tools","tabs":[{"id":"adoption","colorStrategy":"adoption","legend":"adoption","popup":"adoption"}]},"element":"doxa-map","iframeUrl":"./doxa-simple-map/doxa-simple-map/adoption/index.html","embed":{"iframe":"\u003ciframe src=\"./doxa-simple-map/doxa-simple-map/adoption/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen>\u003c/iframe>"}}]}]}]};</script>
+  <script>/**
+ * staging-forge.js — the ONE-PAGE semantic staging environment (root + bundle pages).
+ *
+ * Driver design brief (2026-07-11, the merger of all prior staging files):
+ *   - ONE page. No folder-hopping: the semantic tree IS the navigation.
+ *   - Desktop: hierarchical tree SIDEBAR on the left (bundle → profile → instance,
+ *     kind-badged, "where do I edit" hints) · selected map fills the stage on the right.
+ *   - Mobile: tree on top, map below — scroll down to the map. Native responsive,
+ *     no simulator toggle.
+ *   - Token UX: resolve ?tk= → localStorage → none. If none, show a token bar
+ *     (paste once, stored locally in the browser, never in files/links unless you
+ *     use ?tk= on purpose). Maps must Just Work after one paste.
+ *   - Auto-generated: whatever app-profiles exist, the tree detects and shows them.
+ *
+ * file:// contract: classic script, manifest inlined at build (window.FORGE.manifest),
+ * fetch only as dev fallback. No import/export. The DEV-HMR block at the bottom is
+ * stripped by generate-tree.mjs for built pages.
+ */
+
+/* global window, document */
+const FORGE = window.FORGE || {}
+const SCOPE = FORGE.scope || 'root'
+const MODE = FORGE.mode || 'built'
+const MANIFEST_URL = FORGE.manifestUrl || './manifest.json'
+const HREF_BASE = FORGE.hrefBase || './'
+
+const GEMS = ['#46d4ff', '#b9a6f5', '#ffc24b', '#5ee0a0', '#f97fb5', '#8ef0e4']
+const $ = (sel) => document.querySelector(sel)
+
+let tree = null
+let flat = []          // flat list of selectable map nodes (profiles + instances)
+let activeKey = null   // selected node key
+
+// ── Token resolution (Driver ladder: ?tk= → localStorage → ask once) ─────────
+const TK_STORE = 'MAPS_STAGING_TK'
+function resolveToken() {
+  const qp = new URLSearchParams(location.search).get('tk')
+  if (qp) { try { localStorage.setItem(TK_STORE, qp) } catch (e) {} return qp }
+  try { return localStorage.getItem(TK_STORE) || '' } catch (e) { return '' }
+}
+let TK = resolveToken()
+
+function withTk(href) {
+  if (!TK) return href
+  return href + (href.includes('?') ? '&' : '?') + 'tk=' + encodeURIComponent(TK)
+}
+
+// ── Load the semantic tree (inline-first; fetch = dev fallback) ──────────────
+async function loadTree() {
+  if (FORGE.manifest) return FORGE.manifest
+  const res = await fetch(MANIFEST_URL, { cache: 'no-cache' })
+  if (!res.ok) throw new Error('manifest ' + res.status + ' from ' + MANIFEST_URL)
+  return res.json()
+}
+
+const treeHref = (rel) => HREF_BASE + rel
+const hexRgb = (hex) => {
+  const h = hex.replace('#', '')
+  return parseInt(h.slice(0,2),16) + ',' + parseInt(h.slice(2,4),16) + ',' + parseInt(h.slice(4,6),16)
+}
+
+function profileKind(p) {
+  if (Array.isArray(p.instances) && p.instances.length) return 'parameterized'
+  if (p.nested || /nested|tabs|web components/i.test(p.description || '')) return 'nested'
+  return 'individual'
+}
+
+// ── Build the flat selectable list + the sidebar tree ────────────────────────
+// Selectable = anything that renders as ONE map page: individual/nested profiles
+// and each instance of a parameterized profile.
+function buildFlat() {
+  flat = []
+  ;(tree.bundles || []).forEach((b, bi) => { b.__gem = GEMS[bi % GEMS.length] })
+  for (const b of tree.bundles || []) {
+    for (const p of b.profiles || []) {
+      const kind = profileKind(p)
+      if (kind === 'parameterized') {
+        for (const inst of p.instances) {
+          flat.push({
+            key: b.bundle + '/' + p.profile + '/' + inst.id,
+            kind: 'instance', label: inst.title || inst.id,
+            sub: p.profile + ' · preset "' + inst.id + '"',
+            edit: b.bundle + '/' + p.profile + '.instances.json',
+            href: treeHref(b.bundle + '/' + p.profile + '/' + inst.id + '/index.html'),
+            bundle: b.bundle, element: p.element || (b.elements || [])[0], gem: b.__gem,
+          })
+        }
+      } else {
+        flat.push({
+          key: b.bundle + '/' + p.profile,
+          kind: kind === 'nested' ? 'nested' : 'profile',
+          label: p.profile,
+          sub: p.description || (kind === 'nested' ? 'embeds child web components' : 'one web component = one map'),
+          edit: 'app-profiles/' + b.bundle + '/' + (p.file || p.profile + '.vue'),
+          href: treeHref(b.bundle + '/' + p.profile + '/index.html'),
+          bundle: b.bundle, element: p.element || (b.elements || [])[0], gem: b.__gem,
+        })
+      }
+    }
+  }
+}
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+}
+
+// Sidebar: bundles are <details> groups (open by default), each map node a row.
+function renderSidebar() {
+  const el = $('#treeNav')
+  if (!el) return
+  const parts = []
+  const bundles = tree.bundles || []
+  bundles.forEach((b, bi) => {
+    const gem = b.__gem || GEMS[bi % GEMS.length]
+    const rows = flat.filter((n) => n.bundle === b.bundle).map((n) => `
+      <button class="node k-${n.kind}${n.key === activeKey ? ' active' : ''}" data-key="${esc(n.key)}" style="--gem:${gem}">
+        <span class="nlabel">${esc(n.label)}</span>
+        <span class="nsub">${esc(n.sub)}</span>
+        <code class="nedit">${esc(n.edit)}</code>
+      </button>`).join('')
+    parts.push(`
+      <details class="bgroup" open style="--gem:${gem}">
+        <summary><span class="bdot"></span>${esc(b.bundle)}
+          <span class="bmeta">${(b.profiles || []).length} profile${(b.profiles || []).length === 1 ? '' : 's'} · one .js</span>
+        </summary>
+        ${rows}
+      </details>`)
+  })
+  el.innerHTML = parts.join('') || '<p class="empty">no bundles built yet</p>'
+  el.querySelectorAll('.node').forEach((btn) =>
+    btn.addEventListener('click', () => select(btn.dataset.key)))
+}
+
+// ── Stage: the ONE live map (iframe of the node's self-contained page) ───────
+function renderStage() {
+  const st = $('#stage')
+  if (!st) return
+  const nd = flat.find((n) => n.key === activeKey) || flat[0]
+  if (!nd) { st.innerHTML = '<p class="empty">no maps in this tree</p>'; return }
+  activeKey = nd.key
+  const gem = nd.gem || '#46d4ff'
+  st.style.setProperty('--gem', gem)
+  st.style.setProperty('--gem-rgb', hexRgb(gem))
+  st.innerHTML = `
+    <div class="stage-head">
+      <span class="sctag">&lt;${esc(nd.element || nd.label)}&gt;</span>
+      <span class="sckind">${esc(nd.kind)}</span>
+      <a class="popout" href="${esc(withTk(nd.href))}" target="_blank" rel="noopener">open ↗</a>
+    </div>
+    <div class="map-slot"><iframe allowfullscreen src="${esc(withTk(nd.href))}"></iframe></div>`
+  // keep the sidebar highlight in sync
+  document.querySelectorAll('#treeNav .node').forEach((b) =>
+    b.classList.toggle('active', b.dataset.key === activeKey))
+}
+
+function select(key) {
+  activeKey = key
+  renderStage()
+  // Mobile: after picking from the tree, bring the map into view (scroll down to it).
+  if (window.matchMedia('(max-width: 899px)').matches) {
+    $('#stage')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}
+
+// ── Token bar: shown only while no token resolves; paste once, stored locally ─
+function renderTokenBar() {
+  const bar = $('#tokenBar')
+  if (!bar) return
+  if (TK) { bar.classList.add('hidden'); return }
+  bar.classList.remove('hidden')
+  bar.innerHTML = `
+    <span>maps need a Mapbox token —</span>
+    <input id="tkInput" type="password" placeholder="paste pk.… (stays in this browser only)" autocomplete="off" />
+    <button id="tkSave">use it</button>`
+  $('#tkSave').addEventListener('click', () => {
+    const v = $('#tkInput').value.trim()
+    if (!v) return
+    TK = v
+    try { localStorage.setItem(TK_STORE, v) } catch (e) {}
+    bar.classList.add('hidden')
+    renderStage()
+  })
+}
+
+// ── Boot ─────────────────────────────────────────────────────────────────────
+async function boot() {
+  const info = $('#frameInfo')
+  try {
+    tree = await loadTree()
+    buildFlat()
+    if (info) {
+      info.innerHTML = '<span class="pat">semantic tree</span> — '
+        + (tree.bundles || []).length + ' bundle(s) · ' + flat.length + ' map(s) · '
+        + '<strong>' + esc(MODE) + '</strong>'
+    }
+    renderSidebar()
+    renderTokenBar()
+    if (flat.length) { activeKey = flat[0].key; renderStage() }
+  } catch (e) {
+    if (info) info.innerHTML = '<span class="err">failed to load semantic tree: ' + esc(e.message) + '</span>'
+  }
+}
+
+boot()
+
+/* dev-hmr stripped for built pages */
+</script>
+</body>
+</html>
