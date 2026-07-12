@@ -38,3 +38,5 @@ nginx.conf.template
 
 # Sub-project lockfile — root bun.lock is authoritative
 bun.lock
+
+_archive

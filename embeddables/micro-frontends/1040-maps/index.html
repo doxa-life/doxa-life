@@ -99,11 +99,11 @@
   <header class="forge">
     <h1>1040-maps · <span class="ac">Map Forge</span> · staging</h1>
     <p class="sub"><b>One shared core, one build, many paste-anywhere maps.</b> The shared library
-      in <code>src/</code> is built once into a self-contained <code>&lt;name&gt;.js</code> bundle per
+      in <code>library/</code> is built once into a self-contained <code>&lt;name&gt;.js</code> bundle per
       app-profile; each bundle registers its own custom-element tag(s). Scroll the strip to see every
       JS bundle and the element tags it ships; click one to load its maps as live gem frames below.</p>
     <div class="pipe">
-      <div class="pstep"><span class="pt">src/</span><span class="pd">one shared core</span></div>
+      <div class="pstep"><span class="pt">library/</span><span class="pd">one shared core</span></div>
       <span class="arr">→</span>
       <div class="pstep"><span class="pt">npm run build</span><span class="pd">Vite multi-entry</span></div>
       <span class="arr">→</span>
@@ -125,6 +125,6 @@
     <span class="scr">“Write the vision, and make it plain … that he may run that readeth it.” — Habakkuk 2:2</span>
   </div>
 
-  <script type="module" src="/src/staging.js"></script>
+  <script type="module" src="/internal/staging.js"></script>
 </body>
 </html>

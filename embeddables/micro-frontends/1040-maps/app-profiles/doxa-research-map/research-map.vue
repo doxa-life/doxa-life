@@ -39,12 +39,11 @@ import { useMapFly }       from '@map/composables/useMapFly.js'
 import { useSelectedPin }  from '@map/composables/useSelectedPin.js'
 import { useShadowStyles } from '@map/composables/useShadowStyles.js'
 import { useCountryOutline, resolveCountryIso } from '@map/composables/useCountryOutline.js'
-import { FULL_PRAYER_THRESHOLD } from '@map/config/prayerColors.js'
+import { FULL_PRAYER_THRESHOLD } from '@map/colors/prayer-progress.js'
 import { useI18n } from 'vue-i18n'
 import { SUPPORTED_LOCALES } from '@map/i18n/index.js'
 
-// TODO(Wave 3): useMapData lives in doxa-map-mfe; not yet ported to template.
-// Parallel agent ports it to template/src/composables/useMapData.js.
+// Shared data pipeline — lives in the library (@map/composables/useMapData.js).
 import { useMapData }      from '@map/composables/useMapData.js'
 import { useGeocoderSearch } from '@map/composables/useGeocoderSearch.js'
 
@@ -80,7 +79,7 @@ function _syncHitboxFilter(m, filter) {
 }
 function loadPoster() {
   if (!_posterPromise) {
-    _posterPromise = import('@map/composables/useMapPoster.js')
+    _posterPromise = import('@map/composables/poster/useMapPoster.js')
       .then(m => m.useMapPoster({
         sourceMap:   () => map.value,
         mapboxToken: mapboxToken.value,
@@ -90,26 +89,25 @@ function loadPoster() {
   return _posterPromise
 }
 
-// TODO(Wave 3): useLegendData lives in doxa-map-mfe; parallel agent ports it
-// to template/src/composables/useLegendData.js.
-import { useLegendData }   from '@map/composables/useLegendData.js'
+// Shared legend pipeline — lives in the library (@map/composables/legends/useLegendData.js).
+import { useLegendData }   from '@map/composables/legends/useLegendData.js'
 
 // ─── Config + utils ──────────────────────────────────────────────────────────
-import { mapDefaults }            from '@map/config/mapConfig.js'
-import { getColorStrategy }       from '@map/config/colorStrategies.js'
-import { RELIGION_FAMILIES }      from '@map/config/color-strategies/religion.js'
+import { mapDefaults }            from '@map/constants/mapDefaults.js'
+import { getColorStrategy }       from '@map/colors/_registry.js'
+import { RELIGION_FAMILIES }      from '@map/colors/religion.js'
 import { DataSourceManager }      from '@map/utils/DataSourceManager.js'
-import sourcesConfig              from '@map/config/sources.json'
+import sourcesConfig              from '@map/api/sources.json'
 
 // ─── Components ──────────────────────────────────────────────────────────────
-import LegendDesktop  from '@map/components/LegendDesktop.vue'
+import LegendDesktop  from '@map/components/legends/LegendDesktop.vue'
 // LegendTools — Fly + Clusters floating toolbar. Mounted as a SIBLING of the
 // legend (not a child) so its CSS lives in its own useShadowStyles namespace
 // and doesn't fight the legend card's selectors. Per UX 2026-04-27.
-import LegendTools    from '@map/components/LegendTools.vue'
+import LegendTools    from '@map/components/legends/LegendTools.vue'
 // PERF: LegendMobile only renders below the @media(max-width:767px) breakpoint.
 // Defer the import so desktop users never load it.
-const LegendMobile = defineAsyncComponent(() => import('@map/components/LegendMobile.vue'))
+const LegendMobile = defineAsyncComponent(() => import('@map/components/legends/LegendMobile.vue'))
 
 // Map toolbar — canonical modular pattern from the read-only simple-map mfe.
 // MapToolbar is the slot-wrapper; the individual button components are children.
@@ -125,7 +123,6 @@ import HamburgerButton   from '@map/components/map-controls/HamburgerButton.vue'
 import GeocoderComponent from '@map/components/map-controls/GeocoderComponent.vue'
 import ShareButton       from '@map/components/map-controls/ShareButton.vue'
 
-// TODO(Wave 3): SideMenuDrawer ports from doxa-map-mfe.
 // PERF: SideMenuDrawer is unused in the current research-map template (the
 // ResearchMapSideMenu sibling renders the actual menu). Removed entirely from
 // the boot path until something needs it.
@@ -138,7 +135,7 @@ const PeopleGroupDetail = defineAsyncComponent(() => import('@map/components/Peo
 // New components written in this same wave:
 import ResearchMapSideMenu    from '@map/components/ResearchMapSideMenu.vue'
 import ResearchMapFilterPanel from '@map/components/ResearchMapFilterPanel.vue'
-import SemanticTreeLegend     from '@map/components/SemanticTreeLegend.vue'
+import SemanticTreeLegend     from '@map/components/legends/SemanticTreeLegend.vue'
 // Per-app-profile feature flag: surface the SemanticTreeLegend Export
 // affordance (Poster/Packet) for this profile. UX scaffold only — the menu
 // options are locked "coming soon" stubs. Flip to false to hide it here.
@@ -148,14 +145,14 @@ const EXPORT_FEATURE_ENABLED = true
 import { createPplrInstance, provideInstance } from '@map/composables/usePplrInstance.js'
 // langTree adapter — converts our normalized people-groups into the generic
 // {id,label,color,count,pop,filter,children} shape SemanticTreeLegend takes.
-import { useLanguageFamilyLegendData } from '@map/composables/useLanguageFamilyLegendData.js'
+import { useLanguageFamilyLegendData } from '@map/composables/legends/useLanguageFamilyLegendData.js'
 // affinityTree adapter — parallel to langTree, produces the same {id,label,color,count,pop,filter,children}
 // shape from rop1 (affinity bloc) + imb_reg_of_people_2 (cluster) + people group, so the SAME
 // SemanticTreeLegend instance can render either depending on activeLegendType.
-import { useAffinityBlockLegendData } from '@map/composables/useAffinityBlockLegendData.js'
-import { useWagfRegionsLegendData }   from '@map/composables/useWagfRegionsLegendData.js'
-import { useLegendData as useFlatLegendData } from '@map/composables/useLegendData.js'
-import { RESEARCH_LEGEND_OPTIONS } from '@map/composables/researchLegendOptions.js'
+import { useAffinityBlockLegendData } from '@map/composables/legends/useAffinityBlockLegendData.js'
+import { useWagfRegionsLegendData }   from '@map/composables/legends/useWagfRegionsLegendData.js'
+import { useLegendData as useFlatLegendData } from '@map/composables/legends/useLegendData.js'
+import { RESEARCH_LEGEND_OPTIONS } from '@map/composables/legends/researchLegendOptions.js'
 
 // PERF: PosterDialog only renders when the user opens the poster export
 // flow. Async-import it so the dialog's deps don't load on every map boot.
@@ -367,22 +364,16 @@ const mapTheme  = useMapTheme(uiStore)
 // inject('tabs'). The host's profile-config shrinks to { profile, tk,
 // dataSource, instanceId }. To change the tabs, edit this constant.
 //
-// SOURCE OF TRUTH — these tabs mirror the OLD research map verbatim:
-//   /DOXA/doxa-map-app-widget/src/config/mapConfig.js
-//     - tabOrder    (line 434):  ['prayer', 'doxa-regions', 'affinity-blocks',
-//                                  'language-families', 'gospel-resources']
-//     - per-tab cfg (lines 138-429): legendType, colorMode, popup.template
+// SOURCE OF TRUTH — this ALL_TABS constant IS the tab config for this profile.
 //
-// VERIFIED KEY MATCHES against framework:
-//   colorStrategy: keys come from COLOR_MODES (template/src/config/colors.js:20-30).
-//     prayerProgress, doxaRegion, affinityBlock, languageFamily, resource — all defined.
-//     (NOTE: the OLD app's "prayer" tab was a literal alias of doxa-regions —
-//      same colorMode/legend. The framework has a richer prayerProgress
-//      strategy + dedicated `prayer` legend, so we use those for the prayer tab.
-//      This is the only intentional upgrade vs. a strict 1:1 mirror.)
-//   legend: keys come from useLegendData switch arms (template/src/composables/
-//     useLegendData.js:156-262). All five — prayer, doxa-regions, affinity-blocs,
-//     language-families, gospel-resources — are present.
+// KEY CONTRACTS:
+//   colorStrategy: keys come from the strategy registry (@map/colors/_registry.js),
+//     auto-derived from filenames — library/colors/*.js supplies prayerProgress,
+//     adoption, engagement, languageFamily, religion; this bundle's src/colors/*.js
+//     adds affinityBlock, doxaRegion, resource (see index.js registerStrategies call).
+//   legend: keys are the legendType values handled by
+//     @map/composables/legends/useLegendData.js (TITLE_KEYS + normalizeLegendType) —
+//     prayer, adoption, engagement, affinity-block, doxa-regions, language-family.
 // FEATURES — flip to true to re-enable a tab. The Doxa Regions tab is
 // feature-flagged OFF per UX request 2026-04-27 (kept in code so the wiring
 // stays warm; flip `doxaRegions: true` to bring it back).
@@ -1171,7 +1162,7 @@ async function openPacket() {
       groups = groups.slice(0, 50)
     }
 
-    const { defaultPosterSpec } = await import('@map/config/posterDefaults.js')
+    const { defaultPosterSpec } = await import('@map/constants/posterDefaults.js')
     const spec = defaultPosterSpec({ widthIn: 8.27, heightIn: 11.69, dpi: 150, orientation: 'portrait' })
     spec.slots.title = { ...spec.slots.title, text: legendTitle.value || 'Doxa Map' }
     spec.slots.legend = { ...spec.slots.legend, rows: legend?.rows?.value || [] }
@@ -2014,7 +2005,7 @@ onBeforeUnmount(() => {
         <ThemeToggleButton :is-dark="isDark"    @toggle="handleToggleTheme" />
         <!-- Share button hidden behind FEATURES.share (glitch — PR gate). All
              ShareButton code kept warm; flip FEATURES.share=true to restore. -->
-        <ShareButton       v-if="FEATURES.share" :is-dark="isDark" :embed-path="'/maps/doxa-research-map.html'" />
+        <ShareButton       v-if="FEATURES.share" :is-dark="isDark" :embed-path="'/js/doxa-maps/doxa-research-map/research-map/index.html'" />
       </MapToolbar>
 
       <!-- Fly + Clusters floating toolbar — sibling of the legend card, mounted

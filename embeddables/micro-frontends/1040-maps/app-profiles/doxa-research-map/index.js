@@ -1,14 +1,12 @@
 /**
  * doxa-research-map / index.js — Bundle entry
  *
- * Vite multi-entry build target. Emits app/doxa-research-map.js.
+ * Vite multi-entry build target. Emits app/doxa-maps/doxa-research-map/doxa-research-map.js.
  *
- * Registers TWO custom-element tag names that mount the SAME ProfileLoader
- * (separate defineCustomElement calls — Vue's defineCustomElement returns a
- * class that registers with customElements.define exactly once per tag, so
- * reusing one class across two tags throws NotSupportedError):
- *   - <doxa-map>            legacy production tag (Q1 back-compat)
- *   - <doxa-research-map>   new explicit tag matching the bundle name
+ * Registers ONE custom-element tag that mounts ProfileLoader:
+ *   - <doxa-research-map>   explicit tag matching the bundle name
+ * The legacy <doxa-map> tag is owned by the doxa-simple-map bundle — this
+ * bundle deliberately does not register it (see the registration comment below).
  *
  * The profile-config attribute is parsed by ProfileLoader (in @map). `profile`
  * must match a .vue file in this bundle's folder.
@@ -23,11 +21,21 @@ import { defineCustomElement } from 'vue'
 import { createPinia } from 'pinia'
 import ProfileLoader from '@map/ProfileLoader.vue'
 import { createAppI18n } from '@map/i18n/index.js'
+import { registerStrategies } from '@map/colors/_registry.js'
 
 // ─── Bundle-private profile registry ─────────────────────────────────────────
 // import.meta.glob is evaluated by Vite at build time relative to THIS file —
 // so it captures only this bundle's profiles.
 const profileModules = import.meta.glob('./*.vue')
+
+// ─── Bundle-private color strategies ─────────────────────────────────────────
+// Same seam as profileModules, for colors. Any `<name>.js` a contributor drops in
+// this bundle's `src/colors/` folder is merged OVER the shared library set
+// (same mode key = override; new key = profile-private). This bundle inlines its own
+// copy of the registry (IIFE build), so registering here affects THIS bundle only.
+// This bundle ships THREE research-only strategies: affinity-block.js,
+// doxa-region.js, resource.js (shared modes like religion stay in the library).
+registerStrategies(import.meta.glob('./src/colors/*.js', { eager: true }))
 
 // ─── Mapbox RTL text plugin — load ONCE before any map instance ──────────────
 if (typeof window !== 'undefined' && window.mapboxgl?.setRTLTextPlugin) {

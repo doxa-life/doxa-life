@@ -1,17 +1,19 @@
 {
-  "name": "1040-maps",
+  "name": "doxa-maps",
   "version": "0.1.0",
   "private": true,
-  "description": "Map Forge — Vite monorepo for embeddable Mapbox MFE bundles. One library, N bundles.",
+  "description": "Map Forge \u2014 Vite monorepo for embeddable Mapbox MFE bundles. One library, N bundles.",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "npm run clean && for d in app-profiles/*/; do BUNDLE=$(basename \"$d\") vite build || exit 1; done && npm run manifest",
-    "build:watch": "vite build --watch",
-    "preview": "vite preview",
-    "clean": "mkdir -p ../../../public/js",
-    "build:bundle": "vite build",
-    "manifest": "node generate-manifest.mjs"
+    "dev": "bun x vite",
+    "build": "bun run clean && for d in app-profiles/*/; do BUNDLE=$(basename \"$d\") bun x vite build || exit 1; done && bun run tree && bun run check:drop && bun run check:drop && bun run check:parse",
+    "build:watch": "bun x vite build --watch",
+    "preview": "bun x vite preview",
+    "clean": "node internal/clean.mjs",
+    "build:bundle": "bun x vite build",
+    "tree": "node internal/generate-tree.mjs",
+    "check:drop": "node internal/drop-portability-check.mjs",
+    "check:parse": "node internal/inline-parse-check.mjs"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",

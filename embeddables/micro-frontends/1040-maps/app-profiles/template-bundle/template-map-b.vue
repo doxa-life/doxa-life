@@ -9,7 +9,8 @@
  *
  * A SECOND profile living in the SAME bundle folder, alongside
  * template-map-a.vue (both flat, no profiles/ subfolder). Both compile into the
- * single output file public/js/template-bundle.js — one bundle, two profiles.
+ * single output file app/doxa-maps/template-bundle/template-bundle.js — one
+ * bundle, two profiles.
  * The host chooses which one to show with the `profile` field:
  *
  *   <template-bundle profile-config='{"profile":"template-map-b"}'></template-bundle>

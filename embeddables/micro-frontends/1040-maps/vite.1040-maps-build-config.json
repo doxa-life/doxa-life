@@ -1,0 +1,10 @@
+{
+  "//": "THE single build-config for this 1040-maps multi-MFE bundler. Edit this ONE file, then run `bun run build`. Committed on purpose — other developers need it. FIELDS: 'name' = the output folder name the tree is written as (independent of this bundler folder's own name). 'paths' = extra folders to copy the whole tree into (relative to this bundler folder); the tree is always written to ./app/<name>/ plus each <path>/<name>/. 'embedBaseUrl' = public URL where the <name>/ tree is served, used to build ABSOLUTE paste-anywhere embed snippets in manifest.json for known hosts / external partner sites ('' = RELATIVE-to-tree-root ./bundle/profile/... URLs, so the dropped folder is position-independent — Cloudflare-Drop/subpath/file:// all work; drop-portability gate stays green). 'tokenUrl' = the endpoint every generated map page fetches its Mapbox token from — a URL, NOT a secret key. Set it ABSOLUTE (https://your-host/api/maps/token) so a folder dropped on Cloudflare/Vercel works out-of-the-box (token stays remote, only the URL ships). '' = fall back to same-origin /api/maps/token. window.MAP_TOKEN_URL overrides tokenUrl at runtime. Your token endpoint must return {\"token\":\"pk...\"} (or plain text) and send CORS headers if maps are hosted on a different domain than the API. 'token' = OPT-IN literal Mapbox token baked into every generated page (token-ladder rung 3) — '' by default; prefer 'tokenUrl'. Full token ladder (precedence): per-map prop > ?tk= URL param > baked 'token' > window.MAP_TOKEN_URL > 'tokenUrl' > same-origin /api/maps/token.",
+  "name": "doxa-maps",
+  "paths": [
+    "../../../public/js"
+  ],
+  "embedBaseUrl": "",
+  "tokenUrl": "",
+  "token": ""
+}

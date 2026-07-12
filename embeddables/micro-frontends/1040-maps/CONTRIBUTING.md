@@ -5,10 +5,10 @@ WordPress → Nuxt → whatever comes next, the maps come along unchanged. Embed
 anywhere with a single script tag.
 
 > **TL;DR — the one rule that surprises everyone:**
-> To see your map changes in the parent Nuxt app, run **`npm run build`** inside
-> this folder — **NOT `npm run dev`**. The build is what copies your JS bundle
+> To see your map changes in the parent Nuxt app, run **`bun run build`** inside
+> this folder — **NOT `bun run dev`**. The build is what copies your JS bundle
 > into the parent app's static assets. There is no HMR across that boundary.
-> `npm run dev` is the fast HMR loop for working on a map **in isolation**.
+> `bun run dev` is the fast HMR loop for working on a map **in isolation**.
 
 ## The mental model
 
@@ -27,7 +27,7 @@ ways without modification.
 ```
 1040-maps/  (standalone Vite build)
    │
-   │   npm run build
+   │   bun run build
    │   ───────────────►   writes <bundle>.js into ──►   <parent-app>/public/js/
    │                                                        │
    │                                                        │ served as a static asset
@@ -47,7 +47,7 @@ Editing `.vue`/`.js` files here does nothing to the parent until the build runs.
 This project is built on **the 1040 maps template** — an **Apache-2.0**, open-source
 base that anyone can use. The template is the **shared half** of the repo:
 
-- `src/` (aliased `@map`) — the shared component library: legends, toolbars,
+- `library/` (aliased `@map`) — the shared component library: legends, toolbars,
   composables, color strategies, i18n, the data-source engine.
 - `vite.config.js` and the build tooling — the multi-bundle build pipeline.
 - the **bundle pattern** itself — one folder per map under `app-profiles/`, each
@@ -65,13 +65,13 @@ common to everyone; your application profiles are private and uniquely yours.
 When this guide says "the template," it means exactly this Apache-2.0 shared
 library + build tooling + bundle pattern — nothing host-specific.
 
-### The reuse rule (reusable → `src/`, unique → profile config)
+### The reuse rule (reusable → `library/`, unique → profile config)
 
 The same rule governs **dashboards** (config-driven CMV kit) and **maps**:
 
-- **Reusable across profiles → `src/` (`@map`).** Logic that more than one profile would
+- **Reusable across profiles → `library/` (`@map`).** Logic that more than one profile would
   copy lives in the library, declared ONCE. Examples: the dashboard panels and search
-  header (`src/components/dashboards/`), the geocoder **kind-switch** (`src/composables/
+  header (`library/components/dashboards/`), the geocoder **kind-switch** (`library/composables/
   useGeocoderSearch.js` — `KIND_PROPERTY` + the filter-expression builder), the selection
   bus, the CSV exporter. If you are about to paste a `FACET_ACC` / kind→property map /
   filter loop into a 2nd file: **STOP** — that is the smell the library exists to kill.
@@ -82,7 +82,7 @@ The same rule governs **dashboards** (config-driven CMV kit) and **maps**:
 The headline proof: a dashboard's 4 search bars reuse the SAME `useGeocoderSearch`
 composable the map profiles use, swapping only the **sink** (a `busAdapter` that lands the
 result on the dashboard's `selectionBus`) — the kind-switch is never re-implemented. See
-`src/components/dashboards/README.md` for how a new dashboard reuses the kit.
+`library/components/dashboards/README.md` for how a new dashboard reuses the kit.
 
 ---
 
@@ -188,7 +188,7 @@ not configured anywhere in this project — they are simply *where the page load
 
 ### Internal CDN mode (the parent host serves it)
 
-`npm run build` writes the bundle into the **parent Nuxt host's own static
+`bun run build` writes the bundle into the **parent Nuxt host's own static
 directory** (`../../../public/js/`). The host then serves it from its own domain,
 e.g. `/js/<bundle>.js`. The host *is* the CDN — same origin, no third party.
 
@@ -247,10 +247,10 @@ the only difference is the URL the partner points their script tag at.
 There are two commands, and they do **different jobs**. Knowing which is which is
 the whole game.
 
-### `npm run dev` — HMR staging (work on a map in isolation)
+### `bun run dev` — HMR staging (work on a map in isolation)
 
 ```bash
-npm run dev        # Vite dev server for THIS project, with HMR
+bun run dev        # Vite dev server for THIS project, with HMR
 ```
 
 `dev` serves every bundle at its own staging page **inside this project**, with
@@ -261,17 +261,17 @@ for building and styling a map **on its own**, away from the host.
 `../../../public/js/`. If you only ever run `dev`, the parent host keeps showing
 the **old** bundle.
 
-### `npm run build` — bundle to `../../../public/js/`
+### `bun run build` — bundle to `../../../public/js/`
 
 ```bash
-npm run build      # build every bundle → ../../../public/js/<name>.js
+bun run build      # build every bundle → ../../../public/js/<name>.js
 ```
 
 `build` compiles each bundle and writes it into the parent host's static
 directory. **This is the only command that updates what the parent (or a CDN)
 serves.** After a build, refresh the parent page to see the change.
 
-| | `npm run dev` | `npm run build` |
+| | `bun run dev` | `bun run build` |
 |---|---|---|
 | Purpose | iterate on a map in isolation | publish the bundle for hosts/CDNs |
 | HMR | yes — instant on save | n/a (one-shot compile) |
@@ -279,8 +279,8 @@ serves.** After a build, refresh the parent page to see the change.
 | Updates the parent app | **no** | **yes** (after a page refresh) |
 | Updates a partner/CDN copy | no | yes (it produces the file to publish) |
 
-> Both `npm` and `pnpm` work — the scripts are identical. Use whichever the rest
-> of your environment uses.
+> Bun is the primary toolchain (see `bun.lock`); `npm` works identically — the
+> scripts are the same. Use whichever the rest of your environment uses.
 
 ---
 
@@ -292,9 +292,9 @@ For day-to-day work you want **two terminal tabs** open at once:
 
 ```bash
 # in embeddables/micro-frontends/1040-maps
-npm run dev          # HMR staging: iterate on the map in isolation
+bun run dev          # HMR staging: iterate on the map in isolation
 #   — or, when you want the parent to update on every save —
-npm run build:watch  # rebuild into ../../../public/js/ on every change
+bun run build:watch  # rebuild into ../../../public/js/ on every change
 ```
 
 **Tab 2 — the parent Nuxt host.** Run the host's own dev server (from the host
@@ -302,14 +302,14 @@ root), and keep its page open in the browser:
 
 ```bash
 # in the parent app root
-npm run dev          # the host dev server; open the page that embeds the map
+bun run dev          # the host dev server; open the page that embeds the map
 ```
 
 The split is deliberate:
 
-- **Tab 1 with `npm run dev`** is for *building the map* — fast HMR, no host
-  involved. When it looks right, run `npm run build` once to push it across.
-- **Tab 1 with `npm run build:watch`** is for *integration work* — every save
+- **Tab 1 with `bun run dev`** is for *building the map* — fast HMR, no host
+  involved. When it looks right, run `bun run build` once to push it across.
+- **Tab 1 with `bun run build:watch`** is for *integration work* — every save
   rebuilds into the host's `public/js/`, and the **Tab 2** host page picks up the
   new bundle on refresh. This is the closest you get to a live loop across the
   boundary.
@@ -339,16 +339,16 @@ build: {
   bundles untouched. You can rebuild a single map without breaking the rest.
 
 Each folder under `app-profiles/<bundle>/` produces exactly one file:
-`<parent-app>/public/js/<bundle>.js`. `npm run build` loops over every
+`<parent-app>/public/js/<bundle>.js`. `bun run build` loops over every
 `app-profiles/*/` folder and builds them all.
 
 ### Build just one bundle (faster iteration)
 
-`npm run build` rebuilds every bundle. To rebuild only the one you're editing:
+`bun run build` rebuilds every bundle. To rebuild only the one you're editing:
 
 ```bash
-BUNDLE=<bundle-name> npm run build:bundle
-# e.g. BUNDLE=my-map npm run build:bundle  →  ../../../public/js/my-map.js
+BUNDLE=<bundle-name> bun run build:bundle
+# e.g. BUNDLE=my-map bun run build:bundle  →  ../../../public/js/my-map.js
 ```
 
 (`<bundle-name>` is the folder name under `app-profiles/`.)
@@ -359,8 +359,8 @@ BUNDLE=<bundle-name> npm run build:bundle
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| Changed a `.vue`, parent shows old map | You ran `dev`, or didn't rebuild | Run `npm run build`, then refresh the parent page |
-| Build error: `Set BUNDLE=<name> for build` | Ran `vite build` directly with no bundle selected | Use `npm run build` (loops all) or `BUNDLE=<name> npm run build:bundle` |
+| Changed a `.vue`, parent shows old map | You ran `dev`, or didn't rebuild | Run `bun run build`, then refresh the parent page |
+| Build error: `Set BUNDLE=<name> for build` | Ran `vite build` directly with no bundle selected | Use `bun run build` (loops all) or `BUNDLE=<name> bun run build:bundle` |
 | New bundle doesn't appear in parent | Missing `index.html` or `index.js` in the `app-profiles/<bundle>/` folder | Vite auto-discovers a bundle only when both files exist |
 | Old bundle still loads after a hard build | Browser cached the static `.js` | Hard-refresh / disable cache in devtools |
 | Partner/CDN copy is stale | The CDN still serves the old file | Re-publish the freshly built `<bundle>.js` to the CDN (and bust its cache) |
@@ -370,7 +370,7 @@ BUNDLE=<bundle-name> npm run build:bundle
 
 ## One-line recap
 
-**Edit here → `npm run dev` to shape it → `npm run build` to ship it.** The build
+**Edit here → `bun run dev` to shape it → `bun run build` to ship it.** The build
 *is* the bridge: it writes the same portable bundle that the parent host serves
 (internal CDN) and that partner sites load from a CDN URL (external CDN). `dev`
 only runs this project in isolation.

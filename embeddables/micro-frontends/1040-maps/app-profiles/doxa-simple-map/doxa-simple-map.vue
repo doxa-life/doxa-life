@@ -17,15 +17,15 @@ import { useMapTheme } from '@map/composables/useMapTheme.js'
 import { useSelectedPin } from '@map/composables/useSelectedPin.js'
 import { useShadowStyles } from '@map/composables/useShadowStyles.js'
 import { DataSourceManager } from '@map/utils/DataSourceManager.js'
-import { getLanguageFamilyColor, COLOR_MODES } from '@map/config/colors.js'
-import { buildColorExpression, getColorStrategy } from '@map/config/colorStrategies.js'
-import { FULL_PRAYER_THRESHOLD } from '@map/config/prayerColors.js'
-import { mapDefaults } from '@map/config/mapConfig.js'
-import LegendDesktop   from '@map/components/LegendDesktop.vue'
-const LegendMobile = defineAsyncComponent(() => import('@map/components/LegendMobile.vue'))
-import SemanticTreeLegend from '@map/components/SemanticTreeLegend.vue'
+import { getLanguageFamilyColor } from '@map/colors/language-family.js'
+import { buildColorExpression, getColorStrategy, COLOR_MODES } from '@map/colors/_registry.js'
+import { FULL_PRAYER_THRESHOLD } from '@map/colors/prayer-progress.js'
+import { mapDefaults } from '@map/constants/mapDefaults.js'
+import LegendDesktop   from '@map/components/legends/LegendDesktop.vue'
+const LegendMobile = defineAsyncComponent(() => import('@map/components/legends/LegendMobile.vue'))
+import SemanticTreeLegend from '@map/components/legends/SemanticTreeLegend.vue'
 import { createPplrInstance, provideInstance } from '@map/composables/usePplrInstance.js'
-import { useLegendData as useFlatLegendData } from '@map/composables/useLegendData.js'
+import { useLegendData as useFlatLegendData } from '@map/composables/legends/useLegendData.js'
 import { useMapFly } from '@map/composables/useMapFly.js'
 import { useCountryOutline, resolveCountryIso } from '@map/composables/useCountryOutline.js'
 import SideMenuDrawer    from '@map/components/SideMenuDrawer.vue'
@@ -266,12 +266,17 @@ const activeTab   = computed(() => tabs.value.find(t => t.id === activeTabId.val
 // This is ONE parameterized profile rendering 3 maps chosen by tab id, so the
 // share/embed URL must resolve from the ACTIVE tab — otherwise every simple map
 // would share the same page. Passed to ShareButton via :embed-path.
+// These point at the preconfigured-INSTANCE pages the build emits from
+// simple-map.instances.json, at /js/doxa-maps/doxa-simple-map/doxa-simple-map/<id>/.
+// (Replaces the old hand-authored /maps/*.html — the bundles now live in the tree.)
 const SHARE_EMBED_BY_ID = {
-  prayer:     '/maps/prayer.html',
-  engagement: '/maps/engagement.html',
-  adoption:   '/maps/adoption.html'
+  prayer:     '/js/doxa-maps/doxa-simple-map/doxa-simple-map/prayer/index.html',
+  engagement: '/js/doxa-maps/doxa-simple-map/doxa-simple-map/engagement/index.html',
+  adoption:   '/js/doxa-maps/doxa-simple-map/doxa-simple-map/adoption/index.html'
 }
-const shareEmbedPath = computed(() => SHARE_EMBED_BY_ID[activeTab.value?.id] || '/maps/doxa-research-map.html')
+const shareEmbedPath = computed(() =>
+  SHARE_EMBED_BY_ID[activeTab.value?.id]
+  || '/js/doxa-maps/doxa-research-map/research-map/index.html')
 
 // Maps tab legend key → LegendComponent legendType prop
 const legendTypeMap = { prayer: 'prayer', engagement: 'engagement', adoption: 'adoption' }

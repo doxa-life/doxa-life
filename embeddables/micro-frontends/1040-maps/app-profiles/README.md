@@ -1,7 +1,7 @@
 # app-profiles/ — where YOUR maps live
 
 > **Zero-context summary:** the `1040-maps` repo is a **shared Apache template**
-> in `../src/` (aliased `@map`). You never edit it per-map. Instead, you make a
+> in `../library/` (aliased `@map`). You never edit it per-map. Instead, you make a
 > folder **here**, in `app-profiles/<your-map>/`, and build *your* map by
 > composing the template's building blocks. Your folder is **yours** — your
 > color strategy, your API connections, your i18n. The template is **shared** —
@@ -106,20 +106,21 @@ index needed. See `../CONTRIBUTING.md` for the build-vs-dev distinction.
 
 ---
 
-## The model — two halves, never mixed
+## The model — three zones, never mixed
 
 ```
 1040-maps/
-├── src/   (alias @map)   ← THE SHARED APACHE TEMPLATE — do not customize per-map
+├── library/   (alias @map)   ← THE SHARED APACHE TEMPLATE — do not customize per-map
 │   ├── components/        reusable map UI (legends, toolbar, buttons, drawers)
 │   ├── composables/       useMapInstance, useMapData, useMapLayers, …
-│   ├── config/
-│   │   ├── color-strategies/   the menu of ways to color pins (pick or extend)
-│   │   ├── colors.js · colorStrategies.js · mapConfig.js
-│   ├── api-connections/   DataSourceManager (csv | api | rest-api), registry
+│   ├── colors/            the menu of ways to color pins (one strategy per file)
+│   ├── config/            posterDefaults.js · posterSizes.js (map defaults: constants/mapDefaults.js)
+│   ├── api/               DataSourceManager (csv | api | rest-api), sources.json, registry
 │   ├── i18n/locales/      11 base languages: ar de en es fr hi it pt ro ru zh
 │   ├── utils/             shared helpers
 │   └── stores/            Pinia stores (map / data / ui)
+│
+├── internal/                  ← THE BUNDLER'S OWN BUILD SCRIPTS — never edited by map builders
 │
 └── app-profiles/<your-map>/   ← YOUR PRIVATE APP PROFILE — everything here is yours
     ├── index.js                bundle entry (registers the web component)
@@ -127,7 +128,7 @@ index needed. See `../CONTRIBUTING.md` for the build-vs-dev distinction.
     └── data/*.json  (optional) your own bundled data
 ```
 
-**Shared template (`src/`, `@map`)** is the Apache-2.0 base everyone shares. Fix a
+**Shared template (`library/`, `@map`)** is the Apache-2.0 base everyone shares. Fix a
 bug or improve a legend *once* here and **every** map gets it on the next build.
 Because it is shared, never bake one map's private choices into it.
 
@@ -140,22 +141,24 @@ identity lives. Nothing here leaks to anyone else's map.
 
 ### 1. Your color strategy
 A *color strategy* decides how pins get colored (by language family, progress,
-religion, …). The shared menu lives in `@map/config/color-strategies/` — one
-strategy per file, registered in `_registry.js` (see that folder's README for the
+religion, …). The shared menu lives in `@map/colors/` — one
+strategy per file, auto-registered by `_registry.js` (see that folder's README for the
 contract).
 
 - **Pick one** the template already ships — your profile selects it by color
   mode (e.g. `getColorStrategy('language-family')`).
-- **Add your own** — drop `my-strategy.js` into `@map/config/color-strategies/`
-  following the strategy contract, then select it from your profile. (It lives in
-  the shared folder so the build can see it, but it is *your* strategy to author.)
+- **Add your own** — drop `my-strategy.js` into your own
+  `app-profiles/<your-map>/src/colors/` folder following the strategy
+  contract (start from `template-bundle/src/colors/example-mode.js`). It
+  merges over the shared set for **your map only** — never edit `@map/colors/`
+  to recolor your own map.
 
 ### 2. Your API connections
 Your map gets its data through the **`profile-config`** attribute on the host
 page — so the *same* bundle can point at different data without a rebuild (see the
 embed template above). Inside your `.vue` profile you read it via
 `inject('profileConfig')`, `inject('mapboxToken')`, `inject('dataSource')`, and
-hand the source to `@map/api-connections/DataSourceManager`, which supports three
+hand the source to `@map/api/DataSourceManager`, which supports three
 shapes:
 
 | `type` | What | Source |
@@ -202,20 +205,20 @@ in your bundle folder (the design is flat — no `profiles/` subfolder). See
 
 ## License & provenance
 
-The shared template (`src/` / `@map`, build tooling, this scaffold) is
+The shared template (`library/` / `@map`, build tooling, this scaffold) is
 **Apache-2.0** — a permissive base everyone shares. Your **app profiles** under
 `app-profiles/<your-map>/` are **yours**: your color strategy, API connections,
 and i18n. Building on the shared Apache template is exactly what lets you keep
 your own maps private, custom, and uniquely yours.
 
-## See also — the shared `src/` (`@map`) components you build from
+## See also — the shared `library/` (`@map`) components you build from
 
-- `../src/components/` — reusable map UI: legends, toolbars, buttons, drawers
-- `../src/composables/` — `useMapInstance`, `useMapData`, `useMapLayers`, …
-- `../src/config/color-strategies/README.md` — the color-strategy contract
-- `../src/api-connections/` — `DataSourceManager` + the source registry
-- `../src/i18n/` — base locales and RTL handling
-- `../src/ProfileLoader.vue` — parses `profile-config`, mounts the right profile
+- `../library/components/` — reusable map UI: legends, toolbars, buttons, drawers
+- `../library/composables/` — `useMapInstance`, `useMapData`, `useMapLayers`, …
+- `../library/colors/README.md` — the color-strategy contract
+- `../library/api/` — `DataSourceManager` + the source registry
+- `../library/i18n/` — base locales and RTL handling
+- `../library/ProfileLoader.vue` — parses `profile-config`, mounts the right profile
 - `../README.md` — repo overview & build pipeline
 - `../CONTRIBUTING.md` — build vs dev, the two CDN modes, partner-site embedding
 - `doxa-simple-map/index.js` — fully commented reference bundle entry

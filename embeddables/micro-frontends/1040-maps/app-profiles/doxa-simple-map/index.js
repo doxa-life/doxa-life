@@ -32,12 +32,21 @@ import { defineCustomElement } from 'vue'
 import { createPinia } from 'pinia'
 import ProfileLoader from '@map/ProfileLoader.vue'
 import { createAppI18n } from '@map/i18n/index.js'
+import { registerStrategies } from '@map/colors/_registry.js'
 
 // ─── Bundle-private profile registry ─────────────────────────────────────────
 // import.meta.glob is evaluated by Vite at build time relative to THIS file —
 // so it captures only this bundle's profiles. Handed to ProfileLoader via
 // app.provide('profileModules', ...) below.
 const profileModules = import.meta.glob('./*.vue')
+
+// ─── Bundle-private color strategies ─────────────────────────────────────────
+// Same seam as profileModules, for colors. Any `<name>.js` a contributor drops in
+// this bundle's `src/colors/` folder is merged OVER the shared library set
+// (same mode key = override; new key = profile-private). This bundle inlines its own
+// copy of the registry (IIFE build), so registering here affects THIS bundle only.
+// No-op today: doxa-simple-map ships no local strategies (empty glob).
+registerStrategies(import.meta.glob('./src/colors/*.js', { eager: true }))
 
 // ─── Mapbox RTL text plugin — load ONCE before any map instance ──────────────
 // Required for proper rendering of Arabic text on the basemap.

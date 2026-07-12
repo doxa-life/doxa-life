@@ -23,6 +23,7 @@ import { defineCustomElement } from 'vue'
 import { createPinia } from 'pinia'
 import ProfileLoader from '@map/ProfileLoader.vue'
 import { createAppI18n } from '@map/i18n/index.js'
+import { registerStrategies } from '@map/colors/_registry.js'
 
 // ─── Bundle-private profile registry ─────────────────────────────────────────
 // import.meta.glob is evaluated by Vite at build time relative to THIS file, so
@@ -32,6 +33,16 @@ import { createAppI18n } from '@map/i18n/index.js'
 // ProfileLoader (in @map) cannot run this glob itself — it lives in a different
 // folder — so the bundle hands the result over via app.provide('profileModules').
 const profileModules = import.meta.glob('./*.vue')
+
+// ─── Bundle-private color strategies (the copy-me reference) ─────────────────
+// The SAME seam as profileModules, for colors. Any `<name>.js` in this bundle's
+// `src/colors/` folder is merged OVER the shared library set at init: a file
+// whose derived mode matches a shared one OVERRIDES it; a new mode ADDS a private
+// strategy. This bundle inlines its own registry copy (IIFE build), so this affects
+// THIS bundle only — it can't leak into another map. This template ships
+// `src/colors/example-mode.js` so you have a working pattern to copy. The glob is
+// `*.js`, so `src/colors/colors.json` (plain color VALUES) is ignored by design.
+registerStrategies(import.meta.glob('./src/colors/*.js', { eager: true }))
 
 // ─── Register the custom element ─────────────────────────────────────────────
 // One tag per bundle, named after the bundle. The guard prevents an
