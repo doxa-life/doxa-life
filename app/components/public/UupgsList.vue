@@ -182,7 +182,7 @@ function toggleEngaged() {
 
 function toggleExact() {
   if (activeFilters.value.exact) return removeFilter('exact')
-  activeFilters.value = { ...activeFilters.value, exact: { value: 'yes', label: props.t.exact_filter || 'Exact' } }
+  activeFilters.value = { ...activeFilters.value, exact: { value: 'yes', label: props.t.exact_filter || 'Exact Search' } }
   page.value = 1
   filterUUPGs()
 }
@@ -471,7 +471,7 @@ const showMore = computed(() => hasMore())
             :data-active="activeFilters.exact ? '' : undefined"
             @click="toggleExact"
           >
-            {{ t.exact_filter || 'Exact' }}
+            {{ t.exact_filter || 'Exact Search' }}
           </button>
         </div>
       </div>
@@ -556,7 +556,7 @@ const showMore = computed(() => hasMore())
             type="button"
             :data-active="activeFilters.exact ? '' : undefined"
             @click="toggleExact"
-          >{{ t.exact_filter || 'Exact' }}</button>
+          >{{ t.exact_filter || 'Exact Search' }}</button>
         </div>
       </template>
 

@@ -27,7 +27,7 @@ export function buildUupgListTranslations(t: (key: string) => string) {
     clear_all: t('Clear All'),
     adopted_filter: t('Adopted'),
     engaged_filter: t('Engaged'),
-    exact_filter: t('Exact'),
+    exact_filter: t('Exact Search'),
     type_to_search: t('Type to search...'),
     no_options: t('No options found')
   }
