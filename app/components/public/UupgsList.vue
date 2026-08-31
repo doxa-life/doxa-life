@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Port of marketing-theme/js/components/src/uupgs-list.ts (Lit → Vue).
-// Preserves class names, markup structure, fetch endpoints, search
-// algorithm, and filter logic verbatim so the source SCSS
+// Preserves class names, markup structure, fetch endpoints, and filter
+// logic verbatim so the source SCSS
 // (blocks/_filters.scss, blocks/_cards.scss) applies unchanged.
 
 import Fuse from 'fuse.js'
@@ -261,6 +261,12 @@ function updateFilterOptionCounts() {
   filterOptions.value = next
 }
 
+// Search compares with combining diacritics stripped, so "Mexico" matches "México".
+// Safe for highlighting: stripping marks from NFC data preserves string indices.
+function stripDiacritics(value: string): string {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+}
+
 function filterUUPGs() {
   // Reset per-item highlighting state
   uupgs.value = uupgs.value.map((u) => {
@@ -292,6 +298,12 @@ function filterUUPGs() {
     ignoreLocation: true,
     minMatchCharLength: 3,
     threshold: activeFilters.value.exact ? 0 : 0.4,
+    getFn: (obj, path) => {
+      const value = Fuse.config.getFn(obj, path)
+      if (typeof value === 'string') return stripDiacritics(value)
+      if (Array.isArray(value)) return value.map(v => (typeof v === 'string' ? stripDiacritics(v) : v))
+      return value
+    },
     keys: [
       'name',
       'imb_alternate_name',
@@ -303,7 +315,7 @@ function filterUUPGs() {
     ]
   })
 
-  const result = fuse.search(searchTerm.value)
+  const result = fuse.search(stripDiacritics(searchTerm.value))
   filteredUUPGs.value = result.map((res) => {
     const newItem: Uupg = { ...res.item }
     if (!res.matches) return newItem
