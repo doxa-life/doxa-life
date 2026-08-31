@@ -22,6 +22,10 @@ function openVideo() {
 const { unengagedPeopleGroupsFormatted, totalPeopleGroupsFormatted, unengagedPopulationMillionsFormatted, ensureLoaded } = usePrayerStatistics()
 await ensureLoaded()
 
+// Locale separators with Latin digits, matching usePrayerStatistics — for the
+// bullseye's static figures (e.g. 3.9 → "3,9" and 6602 → "6.602" in pt).
+const formatNumber = (n: number) => n.toLocaleString(`${locale.value}-u-nu-latn`)
+
 const mapboxToken = config.public.mapboxToken as string
 
 // Preload the heading font (Bebas Neue) for the homepage hero h1 (the LCP text)
@@ -164,8 +168,8 @@ useTextHighlight()
             <div class="info-card color-brand-dark justify-center">
               <div class="stack stack--lg | info-card__content">
                 <h3 class="color-brand-lighter">{{ t('Unreached') }}</h3>
-                <span>{{ t('{0} Billion', ['3.9']) }}</span>
-                <span class="color-brand-lighter">{{ t('{0} People Groups', ['6,602']) }}</span>
+                <span>{{ t('{0} Billion', [formatNumber(3.9)]) }}</span>
+                <span class="color-brand-lighter">{{ t('{0} People Groups', [formatNumber(6602)]) }}</span>
               </div>
             </div>
           </div>
@@ -173,8 +177,8 @@ useTextHighlight()
             <div class="info-card color-secondary-very-light justify-center">
               <div class="stack stack--lg | info-card__content">
                 <h3>{{ t('Under-Engaged') }}</h3>
-                <span class="color-secondary-light">{{ t('{0} Billion', ['3.3']) }}</span>
-                <span>{{ t('{0} People Groups', ['5,119']) }}</span>
+                <span class="color-secondary-light">{{ t('{0} Billion', [formatNumber(3.3)]) }}</span>
+                <span>{{ t('{0} People Groups', [formatNumber(5119)]) }}</span>
               </div>
             </div>
           </div>
@@ -182,8 +186,8 @@ useTextHighlight()
             <div class="info-card color-secondary-very-light justify-center">
               <div class="stack stack--lg | info-card__content">
                 <h3>{{ t('Frontier People') }}</h3>
-                <span class="color-secondary-light">{{ t('{0} Billion', ['2']) }}</span>
-                <span>{{ t('{0} People Groups', ['4,788']) }}</span>
+                <span class="color-secondary-light">{{ t('{0} Billion', [formatNumber(2)]) }}</span>
+                <span>{{ t('{0} People Groups', [formatNumber(4788)]) }}</span>
               </div>
             </div>
           </div>
