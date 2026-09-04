@@ -53,61 +53,97 @@ useTextHighlight()
       </p>
     </div>
 
-    <section
-      v-for="region in regions"
-      :key="region.slug"
-      class="stack stack--sm"
-    >
-      <div class="region-heading">
-        <h2>
-          <NuxtLink
-            :to="localePath(`/regions/${region.slug}`)"
-            class="region-heading__link"
-          >
-            {{ region.label || t('Other') }} <span aria-hidden="true">&rarr;</span>
-          </NuxtLink>
-        </h2>
-        <p class="color-brand-lighter">
-          {{ summaryLine(region) }}
-        </p>
+    <div class="stack stack--lg">
+      <div
+        v-for="region in regions"
+        :key="region.slug"
+        class="region-card"
+      >
+        <div class="region-card__header">
+          <h2 class="region-card__title">
+            <NuxtLink
+              :to="localePath(`/regions/${region.slug}`)"
+              class="region-card__link | with-icon"
+            >
+              {{ region.label || t('Other') }}
+              <svg
+                class="icon | rotate-90 right"
+                aria-hidden="true"
+              >
+                <use href="/assets/icons/arrow-chevron.svg#chevron-up" />
+              </svg>
+            </NuxtLink>
+          </h2>
+          <p class="region-card__summary">
+            {{ summaryLine(region) }}
+          </p>
+        </div>
+        <div class="region-card__body">
+          <ul class="countries-grid">
+            <li
+              v-for="c in region.countries"
+              :key="c.slug"
+            >
+              <NuxtLink :to="localePath(`/regions/${c.slug}`)">
+                {{ c.name }} <span class="color-brand-lighter">({{ c.count }})</span>
+              </NuxtLink>
+            </li>
+          </ul>
+        </div>
       </div>
-      <ul class="countries-grid">
-        <li
-          v-for="c in region.countries"
-          :key="c.slug"
-        >
-          <NuxtLink :to="localePath(`/regions/${c.slug}`)">
-            {{ c.name }} <span class="color-brand-lighter">({{ c.count }})</span>
-          </NuxtLink>
-        </li>
-      </ul>
-    </section>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.region-heading {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.25rem 1rem;
+/* Card with a brand-coloured header band (region name + count) above the
+   white country list, following the site's two-tone card pattern. Plain divs
+   rather than <section>, which carries the page-level section padding. */
+.region-card {
+  border-radius: var(--border-radius-xlg);
+  overflow: hidden;
+  background-color: var(--color-surface-white);
 }
 
-.region-heading__link {
+.region-card__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-2xs) var(--spacing-lg);
+  padding: var(--spacing-md) clamp(var(--spacing-md), 4vw, var(--spacing-2xl));
+  background-color: var(--color-surface-brand);
+  color: var(--color-text-on-brand);
+}
+
+.region-card__title {
+  font-size: clamp(var(--font-size-xl), 4vw, var(--font-size-3xl));
+}
+
+.region-card__link {
+  color: inherit;
   text-decoration: none;
 }
 
-.region-heading__link:hover {
-  text-decoration: underline;
+.region-card__link:hover {
+  color: var(--color-brand-primary);
 }
 
+.region-card__summary {
+  font-size: var(--font-size-md);
+  opacity: 0.85;
+}
+
+.region-card__body {
+  padding: var(--spacing-lg) clamp(var(--spacing-md), 4vw, var(--spacing-2xl)) var(--spacing-xl);
+}
+
+/* Keeps the site's list bullets (global ul padding + ::before dot) and lays
+   the countries out in responsive columns. */
 .countries-grid {
-  list-style: none;
-  padding: 0;
   margin: 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 0.5rem 1.5rem;
+  gap: var(--spacing-xs) var(--spacing-xl);
 }
 
 .countries-grid a {
