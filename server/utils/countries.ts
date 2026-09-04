@@ -1,34 +1,47 @@
-// Server-side accessor for the per-country summary used by /api/countries.
-// Fetches the full people-groups list from the prayer API and reduces it to one
-// CountrySummary per country (see config/countries-meta.ts).
+// Server-side accessor for the per-country and per-region summaries used by
+// /api/countries and /api/regions. Fetches the full people-groups list from the
+// prayer API and reduces it with config/countries-meta.ts.
 //
-// The result is cached per language for an hour: every prerendered country page
-// (175 countries × 8 locales) calls this during build, and the upstream list is
-// ~2,100 rows. Without caching each page would re-fetch the whole list.
+// The list is cached per language for an hour: every prerendered region and
+// country page (~185 pages × 8 locales) calls this during build, and the
+// upstream list is ~2,100 rows. Without caching each page would re-fetch it.
 
-import { summarizeCountries, type CountrySummary } from '~~/config/countries-meta'
+import {
+  PEOPLE_GROUP_LIST_FIELDS,
+  summarizeCountries,
+  summarizeRegions,
+  type CountrySummary,
+  type PeopleGroupLite,
+  type RegionSummary
+} from '~~/config/countries-meta'
 import { LANGUAGE_CODES } from '~~/config/languages'
 
-const LIST_FIELDS = 'country_code,wagf_region,latitude,longitude'
-
-async function fetchCountriesSummary(lang: string): Promise<CountrySummary[]> {
+async function fetchPeopleGroups(lang: string): Promise<PeopleGroupLite[]> {
   const base = useRuntimeConfig().prayBaseUrl as string
-  const data = await $fetch<{ posts?: unknown[] }>(`${base}/api/people-groups/list`, {
-    query: { fields: LIST_FIELDS, lang }
+  const data = await $fetch<{ posts?: PeopleGroupLite[] }>(`${base}/api/people-groups/list`, {
+    query: { fields: PEOPLE_GROUP_LIST_FIELDS, lang }
   })
-  return summarizeCountries((data?.posts ?? []) as never[])
+  return data?.posts ?? []
 }
 
 // In dev, skip caching so data changes show up immediately. In production/build
-// the per-language result is cached for an hour.
-export const getCountriesSummary: (lang: string) => Promise<CountrySummary[]>
+// the per-language list is cached for an hour.
+const getPeopleGroups: (lang: string) => Promise<PeopleGroupLite[]>
   = import.meta.dev
-    ? fetchCountriesSummary
-    : defineCachedFunction(fetchCountriesSummary, {
+    ? fetchPeopleGroups
+    : defineCachedFunction(fetchPeopleGroups, {
         maxAge: 60 * 60,
-        name: 'countries-summary',
+        name: 'people-groups-list',
         getKey: (lang: string) => lang
       })
+
+export async function getCountriesSummary(lang: string): Promise<CountrySummary[]> {
+  return summarizeCountries(await getPeopleGroups(lang))
+}
+
+export async function getRegionsSummary(lang: string): Promise<RegionSummary[]> {
+  return summarizeRegions(await getPeopleGroups(lang))
+}
 
 // Validate a query `lang` against the known languages, defaulting to English.
 export function resolveLang(input: unknown): string {

@@ -1,10 +1,9 @@
 /**
  * GET /api/countries
  * Returns one summary per country that has people groups (slug, code, localized
- * name, WAGF region, count, and a map center/zoom framed on the country).
- * Supports translated names via ?lang=.
- *
- * Powers the /countries index and each /countries/[country] page.
+ * name, WAGF region, progress stats, and a map center/zoom framed on the
+ * country). Supports translated names via ?lang=. The region pages read the
+ * same countries nested under /api/regions.
  */
 import { getCountriesSummary, resolveLang } from '../utils/countries'
 
