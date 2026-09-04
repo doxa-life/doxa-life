@@ -1,33 +1,42 @@
 <script setup lang="ts">
-// Dedicated map for a country page. Highlights the focus country (filled +
-// outlined polygon from Mapbox's country-boundaries tileset) and plots every
-// people group as a pin — the focus country's groups in a bright brand green,
-// groups in surrounding countries muted — so the viewer sees both the country's
-// people groups and the general area around it. Clicking a pin opens a popup
-// with that people group's details (photo, country, population, religion,
-// description) plus links to its full profile and prayer page, mirroring the
-// research map's detail panel.
+// Map for the region and country pages. Highlights the focus countries (filled
+// + outlined polygons from Mapbox's country-boundaries tileset) and plots every
+// people group as a pin — groups inside the focus countries in a bright brand
+// green, groups elsewhere muted — so the viewer sees both the area's people
+// groups and its surroundings. With `colorByPrayer`, pins inside the focus
+// countries are instead coloured by prayer coverage (100+ committed, 1+, none)
+// using the same colours as the prayer-coverage card, and a legend explains
+// them. Clicking a pin opens a popup with that people group's details (photo,
+// country, population, religion, intercessors, description) plus links to its
+// full profile and prayer page, mirroring the research map's detail panel.
 //
 // Self-contained (uses the npm mapbox-gl directly, not the shared embed bundle):
-// the country page is the only map on the page, so there's no second copy to
-// clash with. mapbox-gl is loaded client-side only.
+// this is the only map on the page, so there's no second copy to clash with.
+// mapbox-gl is loaded client-side only.
 
 import 'mapbox-gl/dist/mapbox-gl.css'
+import { FULL_PRAYER_COVERAGE_COUNT, type MapBounds } from '~~/config/countries-meta'
 
 const props = withDefaults(defineProps<{
-  /** ISO-3 code of the country to highlight (e.g. "IND"). */
-  countryCode: string
-  /** Initial map center [lng, lat]. */
+  /** ISO-3 codes of the countries to highlight (e.g. ["IND"]). */
+  countryCodes: string[]
+  /** Initial map center [lng, lat]; used when no bounds are given. */
   center: [number, number]
-  /** Initial map zoom. */
+  /** Initial map zoom; used when no bounds are given. */
   zoom: number
+  /** Bounds [[west, south], [east, north]] to frame with padding instead of center/zoom. */
+  bounds?: MapBounds | null
   /** Language for people-group names in pin popups. */
   languageCode?: string
   /** Base path for "view profile" links, e.g. "/research/". */
   researchUrl?: string
+  /** Colour pins inside the focus countries by prayer coverage and show a legend. */
+  colorByPrayer?: boolean
 }>(), {
+  bounds: null,
   languageCode: 'en',
-  researchUrl: '/research/'
+  researchUrl: '/research/',
+  colorByPrayer: false
 })
 
 const config = useRuntimeConfig()
@@ -40,30 +49,50 @@ const container = ref<HTMLElement | null>(null)
 let map: any = null
 
 // Map colours:
-//  - brand: dark brand green (#3b463d) — the highlighted country's fill + outline.
+//  - brand: dark brand green (#3b463d) — the highlighted countries' fill + outline.
 //  - inCountry: brighter brand green (#73A17F, green-100) — pins inside the focus
-//    country, kept distinct from the dark outline and the muted neighbour pins.
+//    countries, kept distinct from the dark outline and the muted neighbour pins.
 //  - muted: grey-green — pins in surrounding countries.
-// brand/muted resolve from the design tokens (theme-aware); the pin accent is
-// fixed so it always reads as a clear, non-dark green against the country fill.
+//  - prayerFull / prayerPartial / prayerNone: the prayer-coverage card's colours
+//    (brand primary, yellow, brand light) for pins inside the focus countries
+//    when colouring by prayer.
+//  - outside: warm grey (brand secondary dark) — pins in surrounding countries
+//    when colouring by prayer, so they don't compete with the dark "no one
+//    praying" pins.
+// Token-backed colours resolve from the design tokens (theme-aware); the fixed
+// accents always read clearly against the country fill.
+const FALLBACK_COLORS = {
+  brand: '#3b463d',
+  muted: '#b8bdb9',
+  inCountry: '#73A17F',
+  prayerFull: '#92b195',
+  prayerPartial: '#f0c64a',
+  prayerNone: '#4e594f',
+  outside: '#a59d92'
+}
+const colors = ref({ ...FALLBACK_COLORS })
+
 function mapColors() {
-  const fallback = { brand: '#3b463d', muted: '#b8bdb9' }
-  const inCountry = '#73A17F'
-  if (typeof document === 'undefined') return { ...fallback, inCountry }
+  if (typeof document === 'undefined') return { ...FALLBACK_COLORS }
   const s = getComputedStyle(document.documentElement)
+  const token = (name: string, fallback: string) => s.getPropertyValue(name).trim() || fallback
   return {
-    brand: s.getPropertyValue('--color-brand').trim() || fallback.brand,
-    muted: s.getPropertyValue('--color-brand-lighter').trim() || fallback.muted,
-    inCountry
+    ...FALLBACK_COLORS,
+    brand: token('--color-brand', FALLBACK_COLORS.brand),
+    muted: token('--color-brand-lighter', FALLBACK_COLORS.muted),
+    prayerFull: token('--color-brand-primary', FALLBACK_COLORS.prayerFull),
+    prayerNone: token('--color-brand-light', FALLBACK_COLORS.prayerNone),
+    outside: token('--color-brand-secondary-dark', FALLBACK_COLORS.outside)
   }
 }
 
-const PIN_FIELDS = 'name,slug,country_code,rop1,religion,population,location_description,image_url,has_photo,latitude,longitude'
+const PIN_FIELDS = 'name,slug,country_code,rop1,religion,population,location_description,image_url,has_photo,latitude,longitude,people_committed'
 
 async function loadPins() {
   const url = `${prayBaseUrl}/api/people-groups/list?fields=${PIN_FIELDS}&lang=${props.languageCode}`
   const res = await fetch(url)
   const data = await res.json()
+  const focus = new Set(props.countryCodes)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const features = (data.posts ?? [])
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -76,7 +105,8 @@ async function loadPins() {
       properties: {
         name: p.name,
         slug: p.slug,
-        inCountry: p.country_code?.value === props.countryCode,
+        inCountry: focus.has(p.country_code?.value),
+        committed: Number(p.people_committed) || 0,
         country: p.country_code?.label ?? '',
         rop1: p.rop1?.label ?? '',
         religion: p.religion?.label ?? '',
@@ -100,7 +130,9 @@ function formatPopulation(pop: number): string {
 
 // Build the pin popup's inner HTML from a feature's properties. Mirrors the
 // research map's detail panel: photo, name, country · people-group, the
-// population/religion stats, a short description, and Pray / Full Profile links.
+// population/religion stats and intercessor count (out of the full-coverage
+// goal, as on the people-group cards), a short description, and Pray / Full
+// Profile links.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function popupHtml(p: any): string {
   const name = escapeHtml(p.name || '')
@@ -112,6 +144,7 @@ function popupHtml(p: any): string {
   const rows: string[] = []
   if (pop) rows.push(`<div><dt>${escapeHtml(t('Population'))}</dt><dd>${pop}</dd></div>`)
   if (p.religion) rows.push(`<div><dt>${escapeHtml(t('Religion'))}</dt><dd>${escapeHtml(p.religion)}</dd></div>`)
+  rows.push(`<div><dt>${escapeHtml(t('Intercessors'))}</dt><dd>${Number(p.committed) || 0}/${FULL_PRAYER_COVERAGE_COUNT}</dd></div>`)
 
   return `<div class="cm-popup">
       ${p.imageUrl ? `<img class="cm-popup__img" src="${escapeHtml(p.imageUrl)}" alt="${name}" loading="lazy">` : ''}
@@ -134,13 +167,16 @@ async function initMap() {
   const mapboxgl = (await import('mapbox-gl')).default
   mapboxgl.accessToken = mapboxToken
 
-  const { brand, muted, inCountry } = mapColors()
+  const { brand, muted, inCountry, prayerFull, prayerPartial, prayerNone, outside } = colors.value
 
   map = new mapboxgl.Map({
     container: container.value,
     style: 'mapbox://styles/mapbox/light-v11',
     center: props.center,
-    zoom: props.zoom
+    zoom: props.zoom,
+    // Bounds take precedence over center/zoom so the frame fits the real
+    // viewport rather than the build-time approximation.
+    ...(props.bounds ? { bounds: props.bounds, fitBoundsOptions: { padding: 40, maxZoom: 6 } } : {})
   })
   map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right')
   map.addControl(new mapboxgl.FullscreenControl(), 'top-right')
@@ -151,7 +187,7 @@ async function initMap() {
     // to a single worldview so the highlight isn't drawn two or three times.
     const countryFilter = [
       'all',
-      ['==', ['get', 'iso_3166_1_alpha_3'], props.countryCode],
+      ['in', ['get', 'iso_3166_1_alpha_3'], ['literal', props.countryCodes]],
       ['any', ['==', ['get', 'worldview'], 'all'], ['in', 'US', ['get', 'worldview']]]
     ]
     map.addSource('country-boundaries', { type: 'vector', url: 'mapbox://mapbox.country-boundaries-v1' })
@@ -173,19 +209,30 @@ async function initMap() {
     })
 
     // ── People-group pins ──────────────────────────────────────────────────
+    // Prayer mode colours focus-country pins by committed intercessors (full
+    // coverage, some, none) and draws the better-covered pins on top; the
+    // default mode is a single focus colour.
+    const outsideFocus = ['!', ['get', 'inCountry']]
+    const fullCoverage = ['>=', ['get', 'committed'], FULL_PRAYER_COVERAGE_COUNT]
+    const someCoverage = ['>', ['get', 'committed'], 0]
+    const pinColor = props.colorByPrayer
+      ? ['case', outsideFocus, outside, fullCoverage, prayerFull, someCoverage, prayerPartial, prayerNone]
+      : ['case', ['get', 'inCountry'], inCountry, muted]
+    const pinSortKey = props.colorByPrayer
+      ? ['case', outsideFocus, 0, fullCoverage, 3, someCoverage, 2, 1]
+      : ['case', ['get', 'inCountry'], 1, 0]
     const geojson = await loadPins()
     map.addSource('people-groups', { type: 'geojson', data: geojson })
     map.addLayer({
       id: 'people-group-pins',
       type: 'circle',
       source: 'people-groups',
-      // Focus-country pins (sort key 1) draw on top of the muted ones (0).
-      layout: { 'circle-sort-key': ['case', ['get', 'inCountry'], 1, 0] },
+      layout: { 'circle-sort-key': pinSortKey },
       paint: {
         'circle-radius': ['interpolate', ['linear'], ['zoom'], 2, 3, 6, 6.5],
-        'circle-color': ['case', ['get', 'inCountry'], inCountry, muted],
+        'circle-color': pinColor,
         // Surrounding/border people groups stay visible (so they can be seen on
-        // the map) but a touch dimmer than the focus country's groups.
+        // the map) but a touch dimmer than the focus countries' groups.
         'circle-opacity': ['case', ['get', 'inCountry'], 1, 0.75],
         'circle-stroke-width': 1,
         'circle-stroke-color': '#ffffff'
@@ -207,12 +254,23 @@ async function initMap() {
   })
 }
 
-onMounted(() => { initMap() })
+onMounted(() => {
+  colors.value = mapColors()
+  initMap()
+})
 onBeforeUnmount(() => { if (map) { map.remove(); map = null } })
 </script>
 
 <template>
-  <div ref="container" class="country-map" />
+  <div class="country-map">
+    <div ref="container" class="country-map__canvas" />
+    <div v-if="colorByPrayer" class="country-map__legend">
+      <span><i :style="{ background: colors.prayerFull }" />{{ t('100+ People Praying') }}</span>
+      <span><i :style="{ background: colors.prayerPartial }" />{{ t('1+ People Praying') }}</span>
+      <span><i :style="{ background: colors.prayerNone }" />{{ t('No One Praying') }}</span>
+      <span><i :style="{ background: colors.outside }" />{{ t('Outside this region') }}</span>
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -231,6 +289,45 @@ onBeforeUnmount(() => { if (map) { map.remove(); map = null } })
     min-height: 0;
     aspect-ratio: 1 / 2;
   }
+}
+
+.country-map__canvas {
+  position: absolute;
+  inset: 0;
+}
+
+/* Colour key, overlaid on the map's bottom-left corner above the canvas. */
+.country-map__legend {
+  position: absolute;
+  left: 10px;
+  bottom: 28px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-size: 12px;
+  font-weight: 600;
+  color: #1f1f1f;
+  pointer-events: none;
+}
+
+.country-map__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.country-map__legend i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 100px;
+  border: 1px solid #ffffff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
 }
 </style>
 
