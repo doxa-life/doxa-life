@@ -607,7 +607,7 @@ const showMore = computed(() => hasMore())
               <p v-if="uupg.country_code" class="uupg__country font-size-sm">
                 <a
                   class="uupg__country-link light-link"
-                  :href="localePath(`/countries/${countrySlug(uupg.country_code.value, uupg.country_code.label)}`)"
+                  :href="localePath(`/regions/${countrySlug(uupg.country_code.value, uupg.country_code.label)}`)"
                 ><span v-html="uupg.country_label ? uupg.country_label : uupg.country_code.label" /></a>
               </p>
               <template v-if="uupg.matches">
@@ -634,7 +634,7 @@ const showMore = computed(() => hasMore())
               <p class="uupg__country">
                 <a
                   class="uupg__country-link light-link"
-                  :href="localePath(`/countries/${countrySlug(uupg.country_code.value, uupg.country_code.label)}`)"
+                  :href="localePath(`/regions/${countrySlug(uupg.country_code.value, uupg.country_code.label)}`)"
                 ><span v-html="uupg.country_label ? uupg.country_label : uupg.country_code.label" /></a> (<span v-html="uupg.rop1_label ? uupg.rop1_label : uupg.rop1.label" />)
               </p>
               <template v-if="uupg.matches">

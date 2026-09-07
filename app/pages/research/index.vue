@@ -48,7 +48,7 @@ useTextHighlight()
   <div class="container page-content uupgs-page stack stack--3xl">
     <div class="stack stack--xs text-center">
       <h1 class="highlight" data-highlight-last>{{ t('Find a UUPG') }}</h1>
-      <p><NuxtLink class="light-link" :to="localePath('/countries')">{{ t('By Country') }} &rarr;</NuxtLink></p>
+      <p><NuxtLink class="light-link" :to="localePath('/regions')">{{ t('By Region') }} &rarr;</NuxtLink></p>
     </div>
 
     <!-- Research map embed — sits directly under the H1, above the UUPG

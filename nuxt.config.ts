@@ -38,14 +38,18 @@ const marketingRouteRules = Object.fromEntries(
   )
 )
 
-// Cache headers for the per-country pages (/countries and /countries/<slug>).
-// The actual prerender route list is enumerated in modules/country-routes.ts
-// (the country set is data-driven, so it can't be a static glob); these rules
-// just apply the marketing HTML cache policy across all enabled locales.
-const countryRouteRules = Object.fromEntries(
+// Cache headers for the region and country pages (/regions, /regions/<region>,
+// /regions/<country>). The actual prerender route list is enumerated in
+// modules/region-routes.ts (the region/country set is data-driven, so it can't
+// be a static glob); these rules just apply the marketing HTML cache policy
+// across all enabled locales. The former /countries URLs redirect permanently
+// to their /regions equivalents (same slugs) so old links keep working.
+const regionRouteRules = Object.fromEntries(
   MARKETING_LOCALE_PREFIXES.flatMap(prefix => [
-    [`${prefix}/countries`, { headers: { 'cache-control': MARKETING_HTML_CACHE } }],
-    [`${prefix}/countries/**`, { headers: { 'cache-control': MARKETING_HTML_CACHE } }]
+    [`${prefix}/regions`, { headers: { 'cache-control': MARKETING_HTML_CACHE } }],
+    [`${prefix}/regions/**`, { headers: { 'cache-control': MARKETING_HTML_CACHE } }],
+    [`${prefix}/countries`, { redirect: { to: `${prefix}/regions`, statusCode: 301 } }],
+    [`${prefix}/countries/**`, { redirect: { to: `${prefix}/regions/**`, statusCode: 301 } }]
   ])
 )
 
@@ -84,7 +88,7 @@ export default defineNuxtConfig({
 
   modules: [
     './modules/migrations',
-    './modules/country-routes',
+    './modules/region-routes',
     '@nuxt/eslint',
     '@nuxt/ui',
     '@nuxtjs/i18n',
@@ -157,8 +161,8 @@ export default defineNuxtConfig({
     '/assets/**': { headers: { 'cache-control': 'public, max-age=604800' } },
     // Prerendered marketing pages (all enabled locales) — edge-cacheable HTML.
     ...marketingRouteRules,
-    // Per-country pages — same cache policy; routes enumerated at build time.
-    ...countryRouteRules,
+    // Region + country pages — same cache policy; routes enumerated at build time.
+    ...regionRouteRules,
     '/login': { ssr: false, prerender: false },
     '/register': { ssr: false, prerender: false },
     '/reset-password': { ssr: false, prerender: false },
