@@ -33,15 +33,6 @@ const prayMapConfig = JSON.stringify({
   tabs: [{ id: 'prayer', colorStrategy: 'prayer', legend: 'prayer', popup: 'prayer' }]
 })
 
-const prayFeedbackConfig = JSON.stringify({
-  profile: 'chat-bubble',
-  apiBase: 'https://support.gospelambition.org',
-  enabled: true,
-  showByDefault: false,
-  instanceId: 'fb-pray-map',
-  projectId: '809ee16b-46e2-4bcd-a93d-b7ea0879d93d'
-})
-
 const DEMO_PRAYER_COVERAGE = {
   enabled: false,
   complete: 100,
@@ -128,9 +119,7 @@ useTextHighlight()
     <section>
       <div class="container stack stack--lg">
         <h2>{{ t('Prayer Progress') }}</h2>
-        <DoxaMapSlot map-id="pray-map" :profile-config="prayMapConfig" class="rounded-md">
-          <FeedbackWidgetSlot :profile-config="prayFeedbackConfig" />
-        </DoxaMapSlot>
+        <DoxaMapSlot map-id="pray-map" :profile-config="prayMapConfig" class="rounded-md" />
       <NuxtLink
         :to="localePath('/research')"
         class="research-map-link"

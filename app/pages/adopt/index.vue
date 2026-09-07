@@ -36,15 +36,6 @@ const adoptMapConfig = JSON.stringify({
   tabs: [{ id: 'adoption', colorStrategy: 'adoption', legend: 'adoption', popup: 'adoption' }]
 })
 
-const adoptFeedbackConfig = JSON.stringify({
-  profile: 'chat-bubble',
-  apiBase: 'https://support.gospelambition.org',
-  enabled: true,
-  showByDefault: false,
-  instanceId: 'fb-adopt-map',
-  projectId: 'dd1d9144-3da9-4a3b-87e8-7c17d9e94af0'
-})
-
 useTextHighlight()
 </script>
 
@@ -96,9 +87,7 @@ useTextHighlight()
           data-highlight-color="primary"
         >{{ t('Adoption Progress') }}</h1>
       </div>
-      <DoxaMapSlot map-id="adopt-map" :profile-config="adoptMapConfig" class="rounded-md">
-        <FeedbackWidgetSlot :profile-config="adoptFeedbackConfig" />
-      </DoxaMapSlot>
+      <DoxaMapSlot map-id="adopt-map" :profile-config="adoptMapConfig" class="rounded-md" />
       <NuxtLink
         :to="localePath('/research')"
         class="research-map-link"

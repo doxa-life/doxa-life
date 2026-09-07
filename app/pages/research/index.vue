@@ -31,16 +31,6 @@ const researchProfileConfig = computed(() => JSON.stringify({
   instanceId: 'research-page'
 }))
 
-// Feedback widget — mirrors the pray.vue pattern (qa.md R5 status flag).
-const researchFeedbackConfig = JSON.stringify({
-  profile: 'chat-bubble',
-  apiBase: 'https://support.gospelambition.org',
-  enabled: true,
-  showByDefault: false,
-  instanceId: 'fb-research-map',
-  projectId: '1be56abd-60fd-4366-ad4f-178dddef657d'
-})
-
 useTextHighlight()
 </script>
 
@@ -59,9 +49,7 @@ useTextHighlight()
       bundle="research-map"
       :profile-config="researchProfileConfig"
       class="rounded-xlg"
-    >
-      <FeedbackWidgetSlot :profile-config="researchFeedbackConfig" />
-    </DoxaMapSlot>
+    />
 
     <UupgsList
       :language-code="locale"

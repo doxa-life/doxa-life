@@ -48,15 +48,6 @@ const homeMapConfig = JSON.stringify({
   tabs: [{ id: 'engagement', colorStrategy: 'engagement', legend: 'engagement', popup: 'engagement' }]
 })
 
-const homeFeedbackConfig = JSON.stringify({
-  profile: 'chat-bubble',
-  apiBase: 'https://support.gospelambition.org',
-  enabled: true,
-  showByDefault: false,
-  instanceId: 'fb-home-map',
-  projectId: '7bb8f5ba-eb45-4933-89de-bc93fcda09b2'
-})
-
 useTextHighlight()
 </script>
 
@@ -113,9 +104,7 @@ useTextHighlight()
           data-highlight-color="primary"
         >{{ t('DOXA people groups around the world') }}</h1>
       </div>
-      <DoxaMapSlot map-id="home-map" :profile-config="homeMapConfig" class="rounded-xlg">
-        <FeedbackWidgetSlot :profile-config="homeFeedbackConfig" />
-      </DoxaMapSlot>
+      <DoxaMapSlot map-id="home-map" :profile-config="homeMapConfig" class="rounded-xlg" />
       <NuxtLink
         :to="localePath('/research')"
         class="research-map-link"
