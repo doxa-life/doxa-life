@@ -28,9 +28,9 @@ export const FOOTER_NAV: NavItem[] = [
 export const SECONDARY_NAV: NavItem[] = [
   { key: 'About', to: '/about' },
   { key: 'Research', to: '/research' },
-  { key: 'Regions', to: '/regions' },
   { key: 'Pray', to: '/pray' },
   { key: 'Adopt', to: '/adopt' },
   { key: 'Resources', to: '/resources' },
+  { key: 'Regions', to: '/regions' },
   { key: 'Give', href: 'https://giving.ag.org/donate/600001-6C2327?utm_source=direct_link' }
 ]

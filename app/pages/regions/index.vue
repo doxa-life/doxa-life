@@ -31,6 +31,10 @@ function summaryLine(region: RegionSummary): string {
     .replace('%countries%', formatNumber(region.countryCount))
 }
 
+function dashboardLink(region: RegionSummary): string {
+  return t('See %region% dashboard').replace('%region%', region.label || t('Other'))
+}
+
 useSeoMeta({
   title: () => `${t('Regions')} — Doxa`,
   description: () => t('Find unreached people groups by region and country.')
@@ -89,6 +93,20 @@ useTextHighlight()
               </NuxtLink>
             </li>
           </ul>
+          <p class="region-card__footer">
+            <NuxtLink
+              :to="localePath(`/regions/${region.slug}`)"
+              class="with-icon"
+            >
+              {{ dashboardLink(region) }}
+              <svg
+                class="icon | rotate-90 right"
+                aria-hidden="true"
+              >
+                <use href="/assets/icons/arrow-chevron.svg#chevron-up" />
+              </svg>
+            </NuxtLink>
+          </p>
         </div>
       </div>
     </div>
@@ -107,9 +125,8 @@ useTextHighlight()
 
 .region-card__header {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--spacing-2xs) var(--spacing-lg);
+  flex-direction: column;
+  gap: var(--spacing-2xs);
   padding: var(--spacing-md) clamp(var(--spacing-md), 4vw, var(--spacing-2xl));
   background-color: var(--color-surface-brand);
   color: var(--color-text-on-brand);
@@ -152,5 +169,11 @@ useTextHighlight()
 
 .countries-grid a:hover {
   text-decoration: underline;
+}
+
+.region-card__footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--spacing-lg);
 }
 </style>
