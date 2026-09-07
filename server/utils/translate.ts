@@ -26,6 +26,16 @@ export async function translateText(
   return translated[0] ?? ''
 }
 
+// Restore the source fragment's leading/trailing whitespace on a translation.
+// No model reliably reproduces edge whitespace, and formatting splits sentences
+// mid-phrase, so a dropped edge space glues two words together in the rendered
+// output. The source fragment is authoritative for the edges.
+function restoreEdgeWhitespace(source: string, translated: string): string {
+  const leading = source.match(/^\s*/)![0]
+  const trailing = source.match(/\s*$/)![0]
+  return leading + translated.trim() + trailing
+}
+
 export async function translateTexts(
   texts: string[],
   targetLanguage: string,
@@ -49,7 +59,9 @@ export async function translateTexts(
   const translated = await openrouterTranslateTexts(translatable, targetLanguage, sourceLanguage)
 
   const out = [...texts]
-  indexes.forEach((target, i) => { out[target] = translated[i]! })
+  indexes.forEach((target, i) => {
+    out[target] = restoreEdgeWhitespace(texts[target]!, translated[i]!)
+  })
   return out
 }
 
