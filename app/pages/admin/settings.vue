@@ -6,6 +6,7 @@ definePageMeta({
 
 interface SettingsResponse {
   'auth.public_registration_enabled'?: boolean
+  'translation.model'?: string
 }
 
 const { hasPermission } = usePermissions()
@@ -30,6 +31,42 @@ const registrationEnabled = computed({
 })
 
 const saving = ref(false)
+
+// Empty means "no override" — the server falls back to TRANSLATION_MODEL and
+// then the code default, so the placeholder shows what an empty box resolves to.
+const DEFAULT_TRANSLATION_MODEL = 'anthropic/claude-opus-5'
+const translationModel = ref('')
+const savingModel = ref(false)
+
+watch(data, (val) => {
+  translationModel.value = val?.['translation.model'] ?? ''
+}, { immediate: true })
+
+const handleSaveModel = async () => {
+  if (!canEdit.value || savingModel.value) return
+  const next = translationModel.value.trim()
+  savingModel.value = true
+  try {
+    await $fetch('/api/admin/settings/translation.model', {
+      method: 'PATCH',
+      body: { value: next }
+    })
+    translationModel.value = next
+    data.value = { ...(data.value ?? {}), 'translation.model': next }
+    toast.add({
+      title: next ? `Translation model set to ${next}` : 'Translation model reset to the default',
+      color: 'success'
+    })
+  } catch (err: any) {
+    toast.add({
+      title: 'Update failed',
+      description: err?.data?.statusMessage || err?.message || 'Failed to update setting',
+      color: 'error'
+    })
+  } finally {
+    savingModel.value = false
+  }
+}
 
 const handleToggleRegistration = async (next: boolean) => {
   if (!canEdit.value || saving.value) return
@@ -99,6 +136,40 @@ const handleToggleRegistration = async (next: boolean) => {
               :loading="saving"
               @update:model-value="handleToggleRegistration"
             />
+          </div>
+        </UCard>
+
+        <UCard>
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-languages" class="size-4 text-(--ui-text-muted)" />
+              <h2 class="text-sm font-semibold uppercase tracking-wide text-(--ui-text-muted)">Translation</h2>
+            </div>
+          </template>
+
+          <div>
+            <h3 class="font-medium">OpenRouter model</h3>
+            <p class="text-sm text-(--ui-text-muted) mt-1 mb-3">
+              Model used to auto-translate CMS pages. Any
+              <ULink to="https://openrouter.ai/models" target="_blank" class="underline">OpenRouter model id</ULink>
+              works — leave it blank to use the default.
+            </p>
+            <div class="flex items-center gap-2">
+              <UInput
+                v-model="translationModel"
+                :placeholder="DEFAULT_TRANSLATION_MODEL"
+                :disabled="!canEdit || savingModel"
+                class="flex-1 font-mono text-xs"
+                @keyup.enter="handleSaveModel"
+              />
+              <UButton
+                color="primary"
+                variant="outline"
+                :disabled="!canEdit || translationModel.trim() === (data?.['translation.model'] ?? '')"
+                :loading="savingModel"
+                @click="handleSaveModel"
+              >Save</UButton>
+            </div>
           </div>
         </UCard>
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 // Admin: CMS page editor. Per-locale tabs, Tiptap editor, featured
 // image + OG image uploaders, meta_title / meta_description, and
-// Save / Publish / Unpublish actions. A DeepL button fan-outs English
-// into the other enabled locales.
+// Save / Publish / Unpublish actions. An auto-translate button fan-outs
+// English into the other enabled locales.
 
 definePageMeta({
   layout: 'admin',
@@ -325,7 +325,7 @@ async function deletePage() {
   }
 }
 
-// DeepL translate modal
+// Auto-translate modal
 const translateModalOpen = ref(false)
 const translateSource = ref('en')
 const translateTargets = ref<string[]>([])
@@ -397,7 +397,7 @@ interface VersionSummary {
   id: string
   created: string
   status: 'draft' | 'published'
-  source: 'admin-ui' | 'mcp' | 'deepl'
+  source: 'admin-ui' | 'mcp' | 'auto-translate' | 'deepl'
   title: string
   created_by: { id: string; name: string } | null
 }
@@ -495,6 +495,7 @@ function loadVersionIntoEditor() {
 const SOURCE_LABELS: Record<string, string> = {
   'admin-ui': 'Admin',
   mcp: 'MCP',
+  'auto-translate': 'Auto-translate',
   deepl: 'DeepL'
 }
 
@@ -879,7 +880,7 @@ function formatVersionTime(iso: string): string {
       </template>
     </USlideover>
 
-    <UModal v-model:open="translateModalOpen" title="Translate with DeepL">
+    <UModal v-model:open="translateModalOpen" title="Auto-translate">
       <template #body>
         <div class="space-y-3">
           <UFormField label="Source locale">

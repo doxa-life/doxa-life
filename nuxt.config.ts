@@ -264,8 +264,10 @@ export default defineNuxtConfig({
     // unset, the endpoint falls back to public.mapboxToken below so
     // existing setups keep working with no config change.
     mapboxKey: process.env.NUXT_MAPBOX_KEY || '',
-    deeplApiKey: process.env.DEEPL_API_KEY || '',
-    deeplApiUrl: process.env.DEEPL_API_URL || 'https://api.deepl.com',
+    // OpenRouter — LLM content translation. TRANSLATION_MODEL overrides the
+    // code default; the `translation.model` site setting overrides both.
+    openrouterApiKey: process.env.OPENROUTER_API_KEY || '',
+    translationModel: process.env.TRANSLATION_MODEL || '',
     // Cloudflare cache purge on deploy (server/plugins/cloudflare-purge.ts).
     // Token needs only Zone → Cache Purge for the doxa.life zone.
     cfApiToken: process.env.CF_API_TOKEN || '',

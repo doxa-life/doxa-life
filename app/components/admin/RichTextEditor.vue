@@ -89,7 +89,7 @@ const editor = useEditor({
   }
 })
 
-// External updates (DeepL translation refresh, locale tab switch) —
+// External updates (auto-translation refresh, locale tab switch) —
 // replace editor content when the prop drifts from the editor state.
 watch(
   () => props.modelValue,

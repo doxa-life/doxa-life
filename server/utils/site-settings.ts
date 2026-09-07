@@ -10,6 +10,16 @@ const settingDefs = {
     default: true,
     public: true,
   },
+  // OpenRouter model id used for CMS auto-translation. Empty means "no
+  // override" — resolution then falls through to TRANSLATION_MODEL and the
+  // code default in server/utils/openrouter.ts. Free-text on purpose: the
+  // value is passed straight to the OpenRouter API, so a newly released model
+  // can be adopted by typing its id.
+  'translation.model': {
+    schema: z.string(),
+    default: '',
+    public: false,
+  },
 } as const
 
 export type SettingKey = keyof typeof settingDefs

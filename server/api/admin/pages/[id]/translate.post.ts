@@ -1,11 +1,11 @@
 // Admin: one-click translate an EN (or other source) translation of a
-// CMS page into one or more target locales. Uses DeepL for title,
-// excerpt, meta_title, meta_description, and body_json. Each target
-// translation is upserted with the caller-chosen `status` (draft or
-// published, default draft). `overwrite` controls whether to replace
-// translations that already exist for a given locale.
+// CMS page into one or more target locales. Translates title, excerpt,
+// meta_title, meta_description, and body_json. Each target translation is
+// upserted with the caller-chosen `status` (draft or published, default
+// draft). `overwrite` controls whether to replace translations that
+// already exist for a given locale.
 //
-// All workflow logic — DeepL calls, body walking, upsert with
+// All workflow logic — translation calls, body walking, upsert with
 // validation, per-locale cache purge — lives in cmsTranslate.translatePage.
 // This route stays thin.
 

@@ -87,7 +87,9 @@ export interface PageTranslationsTable {
   updated: ColumnType<Date, Date | string | undefined, Date | string>
 }
 
-export type PageTranslationVersionSource = 'admin-ui' | 'mcp' | 'deepl'
+// 'deepl' is retained for snapshots written by the previous translation
+// provider; new machine translations are recorded as 'auto-translate'.
+export type PageTranslationVersionSource = 'admin-ui' | 'mcp' | 'auto-translate' | 'deepl'
 
 export interface PageTranslationVersionsTable {
   id: Generated<string>

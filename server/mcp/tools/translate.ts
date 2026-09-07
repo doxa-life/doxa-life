@@ -1,16 +1,15 @@
-// DeepL text-translation tool. Generic primitive — Claude composes
+// LLM text-translation tool. Generic primitive — Claude composes
 // with upsert_page_translation when applying translations to pages.
 //
-// The configured DeepL glossary for each target locale is always
-// applied (the translateText service consults config/languages.ts),
-// keeping MCP-driven translations terminologically consistent with
-// admin auto-translates.
+// The vendored glossary for each target locale is always injected into
+// the translation prompt, keeping MCP-driven translations terminologically
+// consistent with admin auto-translates.
 
 import { defineMcpTool, mcpLog } from '#mcp-layer'
 import { translateTextInput, translatePageInput } from '../schemas'
 import { translateText, translatePage } from '../../services/cmsTranslate'
 
-const DESCRIPTION = `Translate a piece of text into one or more locales using DeepL.
+const DESCRIPTION = `Translate a piece of text into one or more locales.
 
 Use this when you've authored a section in one language (typically English) and need versions in the site's other locales — for example, "translate this paragraph then add it to each page in every locale."
 
@@ -35,7 +34,7 @@ export const translateTextTool = defineMcpTool({
       target_locales: input.target_locales
     })
 
-    // Audit the call so the activity log records when DeepL spend
+    // Audit the call so the activity log records when translation spend
     // happened on Claude's behalf. Don't include the full text in
     // metadata — keep the audit row small and non-PII-leaky.
     await mcpLog('CREATE', 'translations.cache', `${result.source_locale}->${result.translations.map(t => t.locale).join(',')}`, ctx, {
@@ -59,20 +58,20 @@ export const translateTextTool = defineMcpTool({
 
 // ── Page-level translate ────────────────────────────────────────────
 
-const PAGE_DESCRIPTION = `Translate an entire CMS page (title, excerpt, meta_title, meta_description, body) from one locale into one or more target locales using DeepL.
+const PAGE_DESCRIPTION = `Translate an entire CMS page (title, excerpt, meta_title, meta_description, body) from one locale into one or more target locales.
 
 Use this for the "make this page exist in all locales" workflow. For surgical edits — translating one new section and inserting it into existing translations — prefer translate_text composed with upsert_page_translation.
 
 Inputs:
 - \`page_id\`: the CMS page id.
 - \`source_locale\`: defaults to "en". Must be an enabled locale with an existing translation row.
-- \`target_locales\`: array of enabled locale codes. Per-locale failures don't abort the batch — DeepL flaking on one locale lets the rest proceed.
-- \`overwrite\`: defaults to false. When false, locales that already have a translation row are silently skipped (no DeepL call). Set true to replace.
+- \`target_locales\`: array of enabled locale codes. Per-locale failures don't abort the batch — the model flaking on one locale lets the rest proceed. A failure no retry can fix (no credits, bad key, rejected model) does stop the run, reporting the same reason for the untried locales.
+- \`overwrite\`: defaults to false. When false, locales that already have a translation row are silently skipped (no model call). Set true to replace.
 - \`status\`: \`draft\` (default) or \`published\` for the new translation rows.
 
 Output: \`{source_locale, results: [{locale, ok? | skipped? | error?}]}\`. Each result entry reports one of three outcomes; \`ok\` means a row was written and the public cache was purged for that locale.
 
-Cost note: this triggers up to 5 DeepL calls per target locale (4 metadata strings batched into one call + 1 body call). A "translate to all 9 locales" run on a typical page is ~18 DeepL requests.`
+Cost note: this triggers one model call for the metadata plus one per 40 body fragments, per target locale. A "translate to all 9 locales" run on a typical page is ~20-30 model requests.`
 
 export const translatePageTool = defineMcpTool({
   name: 'translate_page',

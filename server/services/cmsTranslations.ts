@@ -39,7 +39,7 @@ export interface UpsertTranslationInput {
   // optional because some background paths may not have a user; the
   // snapshot still gets written, just with NULLs.
   actor_user_id?: string | null
-  source?: 'admin-ui' | 'mcp' | 'deepl'
+  source?: 'admin-ui' | 'mcp' | 'auto-translate' | 'deepl'
   user_agent?: string | null
 }
 

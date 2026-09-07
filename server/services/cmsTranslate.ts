@@ -1,15 +1,14 @@
-// DeepL text-translation service — the canonical primitive both the
-// MCP translate_text tool and any future admin batch-translate flow
-// share.
+// LLM text-translation service — the canonical primitive both the
+// MCP translate_text tool and the admin batch-translate flow share.
 //
-// Always uses the per-locale DeepL glossary configured in
-// config/languages.ts (via translateTexts()'s built-in lookup), so
-// the terminology stays consistent with admin auto-translates and
-// with the translation/ glossaries repo.
+// The per-locale glossary vendored in config/glossaries.ts is injected
+// into every translation prompt, so the terminology stays consistent
+// with admin auto-translates and with the translation/ glossaries repo.
 
 import type { H3Error } from 'h3'
-import { translateTexts, translateTiptapContent, isDeepLConfigured } from '../utils/deepl'
-import { ENABLED_LANGUAGE_CODES, getLanguage } from '~~/config/languages'
+import { translateTexts, translateTiptapContent, isTranslationConfigured } from '../utils/translate'
+import { OpenRouterError, hasGlossary } from '../utils/openrouter'
+import { ENABLED_LANGUAGE_CODES } from '~~/config/languages'
 import { db } from '../utils/database'
 import {
   upsertCmsPageTranslation,
@@ -41,12 +40,12 @@ export interface TranslateTextResult {
   translations: TranslateTextResultEntry[]
 }
 
-const MAX_TEXT_BYTES = 100 * 1024 // DeepL's per-request soft limit; large bodies
-                                  // should be split client-side and translated piece by piece
+const MAX_TEXT_BYTES = 100 * 1024 // Per-request ceiling; large bodies should be
+                                  // split client-side and translated piece by piece
 
 export async function translateText(input: TranslateTextInput): Promise<TranslateTextResult> {
-  if (!isDeepLConfigured()) {
-    throw err(503, 'DeepL is not configured on this server')
+  if (!isTranslationConfigured()) {
+    throw err(503, 'Translation is not configured on this server')
   }
 
   const text = input.text ?? ''
@@ -77,17 +76,15 @@ export async function translateText(input: TranslateTextInput): Promise<Translat
   // Dedupe — Claude might list the same locale twice
   const targets = Array.from(new Set(input.target_locales))
 
-  // One DeepL call per target locale (DeepL only translates to a single
-  // target per request). The /translate endpoint applies the configured
-  // glossary automatically based on the target locale.
+  // One model call per target locale — each prompt is built around a single
+  // target language and carries that locale's glossary.
   const results = await Promise.all(
     targets.map(async (locale) => {
       const out = await translateTexts([text], locale, source)
-      const lang = getLanguage(locale)
       return {
         locale,
         text: out[0] ?? '',
-        glossary_used: Boolean(lang?.glossaryId)
+        glossary_used: hasGlossary(locale)
       }
     })
   )
@@ -116,7 +113,7 @@ export interface TranslatePageInput {
 export interface TranslatePageResultEntry {
   locale: string
   // Mutually exclusive: either ok=true (translation written), skipped=true
-  // (existing row preserved, no DeepL call), or error set (translation
+  // (existing row preserved, no model call), or error set (translation
   // failed for this locale only — other locales still proceed).
   ok?: true
   skipped?: true
@@ -130,15 +127,17 @@ export interface TranslatePageResult {
 
 // Translate a whole CMS page (title, excerpt, meta_title,
 // meta_description, body_json) from a source locale into one or more
-// targets. Per-locale failures don't abort the batch — DeepL flaking
-// on one locale shouldn't block the others.
+// targets. Per-locale failures don't abort the batch — the model flaking
+// on one locale shouldn't block the others. The exception is a failure no
+// retry can fix (no credits, bad key, rejected model): the remaining
+// locales are marked with the same reason instead of repeating the call.
 //
 // Each successful translation is written via upsertCmsPageTranslation,
 // so the standard validator + cache-invalidation path runs on every
 // translated row (consistent with hand-edited translations).
 export async function translatePage(input: TranslatePageInput): Promise<TranslatePageResult> {
-  if (!isDeepLConfigured()) {
-    throw err(503, 'DeepL is not configured on this server')
+  if (!isTranslationConfigured()) {
+    throw err(503, 'Translation is not configured on this server')
   }
 
   const sourceLocale = input.source_locale ?? 'en'
@@ -170,7 +169,7 @@ export async function translatePage(input: TranslatePageInput): Promise<Translat
 
   const results: TranslatePageResultEntry[] = []
 
-  for (const target of targets) {
+  for (const [i, target] of targets.entries()) {
     if (!input.overwrite) {
       const existing = await db
         .selectFrom('page_translations')
@@ -207,7 +206,7 @@ export async function translatePage(input: TranslatePageInput): Promise<Translat
         og_image: source.og_image,
         status,
         actor_user_id: input.actor_user_id ?? null,
-        source: 'deepl'
+        source: 'auto-translate'
       })
 
       // Per-locale cache purge after each successful upsert. This
@@ -221,6 +220,15 @@ export async function translatePage(input: TranslatePageInput): Promise<Translat
       const msg = e instanceof Error ? e.message : 'translation failed'
       console.error(`[cmsTranslate] page ${input.page_id} → ${target} failed:`, msg)
       results.push({ locale: target, error: msg })
+
+      if (e instanceof OpenRouterError && !e.retryable) {
+        // Every remaining locale would hit the same wall, so report one
+        // reason rather than burning a call per locale to rediscover it.
+        for (const remaining of targets.slice(i + 1)) {
+          results.push({ locale: remaining, error: msg })
+        }
+        break
+      }
     }
   }
 
