@@ -73,6 +73,9 @@ const adoptUrl = computed(() => {
   return `${base.endsWith('/') ? base : base + '/'}${slug.value}`
 })
 
+// Updates form on pray.doxa.life, keyed by people group slug.
+const updatesUrl = computed(() => `${config.public.prayBaseUrl}/updates?id=${encodeURIComponent(slug.value)}`)
+
 const infoOpen = ref(false)
 const FULL_PRAYER_COVERAGE_COUNT = 100
 
@@ -316,6 +319,11 @@ const mapSrc = computed(() => {
             </p>
           </div>
         </div>
+
+        <a
+          class="button mx-auto"
+          :href="updatesUrl"
+        >{{ t('Submit Updates') }}</a>
       </div>
     </div>
   </div>
