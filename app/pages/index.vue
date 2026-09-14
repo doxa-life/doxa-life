@@ -19,8 +19,11 @@ function openVideo() {
   videoModalRef.value?.open()
 }
 
-const { unengagedPeopleGroupsFormatted, totalPeopleGroupsFormatted, unengagedPopulationMillionsFormatted, ensureLoaded } = usePrayerStatistics()
+const { unengagedPeopleGroupsFormatted, totalPeopleGroupsFormatted, unengagedPopulationMillionsFormatted, ensureLoaded, reload } = usePrayerStatistics()
 await ensureLoaded()
+// This page is prerendered, so its payload carries build-time counts; refetch
+// on the client so the figures track the live API between deploys.
+onMounted(() => reload())
 
 // Locale separators with Latin digits, matching usePrayerStatistics — for the
 // bullseye's static figures (e.g. 3.9 → "3,9" and 6602 → "6.602" in pt).
