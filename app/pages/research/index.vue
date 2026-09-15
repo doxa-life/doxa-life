@@ -8,7 +8,7 @@
 // Below the UupgsList we embed the 5-tab `research-map` IIFE built from
 // the upstream DOXA-MAPS module — exposes Engagement / Prayer
 // / Adoption (clones of doxa-simple-map) plus Language Families. The
-// 1040-maps build now publishes /js/doxa-research-map.js (canonical name).
+// the doxa-maps build now publishes /js/doxa-research-map.js (canonical name).
 // via the publishToDoxaLife() plugin.
 
 import { buildUupgListTranslations } from '~/utils/uupgListTranslations'
