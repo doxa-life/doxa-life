@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex" />
+  <title>Doxa map</title>
+  <link rel="icon" href="/favicon.ico">
+
+  <!--
+    Embeddable map page. Renders one Doxa map with no site chrome so any
+    website can drop it in an iframe:
+
+      <iframe src="https://doxa.life/embed/map?tab=prayer"
+              width="100%" height="600" style="border:none"
+              allowfullscreen loading="lazy"></iframe>
+
+    Query parameters (all optional):
+      tab   prayer | engagement | adoption. A comma list renders a tab bar
+            with the first entry open; "all" is every tab. Default: prayer.
+      lang  UI language: ar de en es fr hi it pt ro ru zh. Default: en.
+      map   "research" loads the multi-layer research map instead of the
+            simple map (tab is then ignored).
+      utm_source
+            Appended as utm_source to the people-group sign-up links the
+            popup opens on the prayer site, so sign-ups can be attributed
+            to the embedding website.
+
+    The Mapbox token is fetched from /api/maps/token at load so it never
+    lands in this file. People-group data comes from the prayer API, whose
+    origin is set on window.MAP_APP_API_URL before the bundle loads.
+    base href="/" so bundle asset fetches resolve against the site root,
+    not /embed/map/.
+  -->
+  <base href="/">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%;
+      background: #f3f3f1;
+      overflow: hidden;
+    }
+    doxa-map, doxa-research-map {
+      display: block;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    doxa-map:fullscreen, doxa-map:-webkit-full-screen,
+    doxa-research-map:fullscreen, doxa-research-map:-webkit-full-screen {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+    .embed-error {
+      padding: 20px;
+      max-width: 600px;
+      margin: 40px auto;
+      background: #fff3f3;
+      border: 1px solid #e05a5a;
+      color: #7a1f1f;
+      font: 13px/1.5 ui-monospace, monospace;
+      border-radius: 4px;
+    }
+    .embed-error code { background: #fde3e3; padding: 1px 5px; border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<script>
+  (async function init() {
+    const params = new URLSearchParams(window.location.search);
+
+    // ── Language ─────────────────────────────────────────────────────────
+    // The bundle's i18n reads <html lang> when the element is created, so
+    // it must be set before the custom element is appended.
+    const LOCALES = ['ar', 'de', 'en', 'es', 'fr', 'hi', 'it', 'pt', 'ro', 'ru', 'zh'];
+    const requestedLang = (params.get('lang') || 'en').split('-')[0].toLowerCase();
+    const lang = LOCALES.includes(requestedLang) ? requestedLang : 'en';
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+    // ── Tabs ─────────────────────────────────────────────────────────────
+    const TAB_IDS = ['prayer', 'engagement', 'adoption'];
+    const rawTab = (params.get('tab') || 'prayer').toLowerCase();
+    const wanted = rawTab === 'all' ? TAB_IDS : rawTab.split(',').map(s => s.trim());
+    const tabIds = [...new Set(wanted.filter(id => TAB_IDS.includes(id)))];
+    if (tabIds.length === 0) tabIds.push('prayer');
+    const tabs = tabIds.map(id => ({ id, colorStrategy: id, legend: id, popup: id }));
+
+    const isResearch = params.get('map') === 'research';
+
+    // ── Prayer API origin ────────────────────────────────────────────────
+    // Read by the bundle's getApiBaseUrl(); without it the map fetches
+    // relative /api/people-groups/* paths, which this site does not serve.
+    window.MAP_APP_API_URL = 'https://pray.doxa.life';
+
+    // ── Sign-up link attribution ─────────────────────────────────────────
+    // The popup opens its Pray links with window.open, so links bound for
+    // the prayer site are rewritten before the bundle loads: the bundle's
+    // own source=doxalife tag is dropped and, when this page was given a
+    // utm_source, that is set instead.
+    const utmSource = (params.get('utm_source') || '').trim().slice(0, 100);
+    const prayHost = new URL(window.MAP_APP_API_URL).hostname;
+    const nativeOpen = window.open.bind(window);
+    window.open = function (url, ...rest) {
+      try {
+        const target = new URL(url, window.location.href);
+        if (target.hostname === prayHost) {
+          target.searchParams.delete('source');
+          if (utmSource) target.searchParams.set('utm_source', utmSource);
+          url = target.toString();
+        }
+      } catch (_) {
+        // Not a URL: pass through unchanged.
+      }
+      return nativeOpen(url, ...rest);
+    };
+
+    function showError(message) {
+      const box = document.createElement('div');
+      box.className = 'embed-error';
+      box.innerHTML = message;
+      document.body.appendChild(box);
+    }
+
+    // ── Mapbox token ─────────────────────────────────────────────────────
+    let token;
+    try {
+      const res = await fetch('/api/maps/token');
+      if (!res.ok) throw new Error('Token endpoint returned ' + res.status);
+      token = (await res.json()).token;
+      if (!token) throw new Error('Token endpoint returned an empty token');
+      // The map bundles only accept public keys.
+      if (!token.startsWith('pk.')) throw new Error('Expected a pk. token, got ' + token.slice(0, 3) + '…');
+    } catch (err) {
+      console.error('[embed-map] Failed to fetch Mapbox token:', err);
+      showError(
+        '<strong>Could not load the Mapbox token from <code>/api/maps/token</code>.</strong><br><br>' +
+        'Check that <code>NUXT_PUBLIC_MAPBOX_TOKEN</code> is set to a public (pk.) token ' +
+        'in the host environment. Error: ' + err.message
+      );
+      return;
+    }
+
+    // ── Render the custom element ────────────────────────────────────────
+    const config = isResearch
+      ? { profile: 'research-map', tk: token, dataSource: 'pray-tools', instanceId: 'embed-research' }
+      : { profile: 'doxa-simple-map', tk: token, dataSource: 'pray-tools', instanceId: 'embed-map', tabs };
+    const el = document.createElement(isResearch ? 'doxa-research-map' : 'doxa-map');
+    el.setAttribute('profile-config', JSON.stringify(config));
+    document.body.appendChild(el);
+
+    // ── Load the bundle (registers the custom element) ───────────────────
+    const s = document.createElement('script');
+    s.src = isResearch ? '/js/doxa-research-map.js' : '/js/doxa-simple-map.js';
+    s.onerror = () => showError('<strong>Could not load the map bundle</strong> <code>' + s.src + '</code>.');
+    document.head.appendChild(s);
+  })();
+</script>
+
+</body>
+</html>
