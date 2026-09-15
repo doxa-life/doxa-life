@@ -10,13 +10,13 @@ const MAPBOX_JS = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js'
 const MAPBOX_GEOCODER_JS = 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js'
 
 // Map of bundle keys → CDN drop-in URLs. The built maps live under
-// public/doxa-maps-build/ (the doxa-maps bundler's output folder, dropped in here),
-// served at /doxa-maps-build/doxa-maps/<bundle>/<bundle>.js. Each IIFE bundle
+// public/js/doxa-maps-build/ (the doxa-maps bundler's output folder, dropped in here),
+// served at /js/doxa-maps-build/doxa-maps/<bundle>/<bundle>.js. Each IIFE bundle
 // registers its own custom element (doxa-map / doxa-research-map), so only one
 // bundle should load per page.
 const BUNDLES = {
-  'simple-map':   '/doxa-maps-build/doxa-maps/doxa-simple-map/doxa-simple-map.js',
-  'research-map': '/doxa-maps-build/doxa-maps/doxa-research-map/doxa-research-map.js'
+  'simple-map':   '/js/doxa-maps-build/doxa-maps/doxa-simple-map/doxa-simple-map.js',
+  'research-map': '/js/doxa-maps-build/doxa-maps/doxa-research-map/doxa-research-map.js'
 } as const
 type BundleKey = keyof typeof BUNDLES
 
