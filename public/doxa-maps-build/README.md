@@ -1,17 +1,17 @@
-# doxa-maps-cdn — embeddable maps (drop-in)
+# doxa-maps-build — embeddable maps (drop-in)
 
 Pre-built, self-contained map web components. Drop this folder onto any static host and
 every map is embeddable via a `<script>` tag or an `<iframe>` — no build step on the host.
 
 ## Embed a map (web component)
 ```html
-<script src="/doxa-maps-cdn/doxa-maps/<bundle>/<bundle>.js"></script>
+<script src="/doxa-maps-build/doxa-maps/<bundle>/<bundle>.js"></script>
 <bundle-tag profile-config='{"profile":"<profile>","tk":"YOUR_MAPBOX_TOKEN"}'></bundle-tag>
 ```
 
 ## Or embed via iframe (the generated page)
 ```html
-<iframe src="/doxa-maps-cdn/doxa-maps/<bundle>/<profile>/index.html"
+<iframe src="/doxa-maps-build/doxa-maps/<bundle>/<profile>/index.html"
         width="100%" height="600" style="border:none;border-radius:12px;" allowfullscreen></iframe>
 ```
 
