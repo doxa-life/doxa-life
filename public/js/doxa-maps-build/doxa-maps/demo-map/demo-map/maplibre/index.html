@@ -27,7 +27,7 @@
 
   <script>window.MAP_APP_API_URL = "https://pray.doxa.life";</script>
   <!-- Bundle IIFE — registers the <demo-map> custom element. -->
-  <script src="../../demo-map.js" integrity="sha384-3K61vrZb7gtpShtG7dujt+zboQee344tTZT2e55FPLS2tKyjWSbOT/dA70FxQi4Y" crossorigin="anonymous"></script>
+  <script src="../../demo-map.js" integrity="sha384-EuKDnpD25gMABfF1IRtK/7nEvH/VCxhI2+YGbpKwOmSCOdv1Z1FRpAyAXXtslM69" crossorigin="anonymous"></script>
 
   <script>
     // Mapbox token resolution — the A3 ladder, in precedence order:
@@ -46,7 +46,7 @@
       var BASE_CONFIG = {"assetsBase":"../../../../assets","profile":"demo-map","provider":"maplibre","instanceId":"demo-maplibre"};
       // MapLibre pages need NO token: the ladder below is skipped entirely.
       var TOKEN_FREE = true;
-      var TOKEN_SRC = "/api/maps/token.json";
+      var TOKEN_SRC = "https://doxa.life/api/maps/token";
       var BAKED_TOKEN = "";
       var DEFAULT_TOKEN_URL = '/api/maps/token';
 
@@ -103,21 +103,47 @@
       if (TOKEN_FREE) { return mount(''); }
       if (directToken) { return mount(directToken); }
 
-      // Rungs 4-6: resolve a token endpoint and fetch it.
-      var tokenUrl =
-        (window.MAP_TOKEN_URL) ||
-        (TOKEN_SRC && TOKEN_SRC !== 'window.MAP_TOKEN_URL' ? TOKEN_SRC : '') ||
-        DEFAULT_TOKEN_URL;
+      // Rungs 4-6: resolve the token ENDPOINT candidates and try them IN ORDER — the first
+      // one that answers with a token wins. Order: window.MAP_TOKEN_URL override → the
+      // configured TOKEN_SRC (an ABSOLUTE url, so a tree hosted on a CDN away from the API
+      // still finds it) → same-origin /api/maps/token (dev, or the site hosting both).
+      // A single hard-coded pick used to kill the page when its one url 404'd or was
+      // blocked by CORS; a shared link must work wherever the tree is hosted.
+      var candidates = [];
+      function addCandidate(u) { if (u && candidates.indexOf(u) === -1) candidates.push(u); }
+      addCandidate(window.MAP_TOKEN_URL);
+      addCandidate(TOKEN_SRC && TOKEN_SRC !== 'window.MAP_TOKEN_URL' ? TOKEN_SRC : '');
+      addCandidate(DEFAULT_TOKEN_URL);
 
-      fetch(tokenUrl)
-        .then(function (r) {
-          var ct = r.headers.get('content-type') || '';
-          return ct.indexOf('json') !== -1 ? r.json() : r.text();
-        })
-        .then(function (data) { mount(extractToken(data)); })
-        .catch(function (e) {
-          fail('Token fetch failed from ' + tokenUrl + ' — set window.MAP_TOKEN_URL or pass ?tk=. (' + (e && e.message ? e.message : e) + ')');
-        });
+      function fetchToken(i, errors) {
+        if (i >= candidates.length) {
+          // Every endpoint failed: say which, and still offer the paste-once box (no dead ends).
+          askToken();
+          if (status) {
+            var d = document.createElement('div');
+            d.textContent = '⚠ Token fetch failed from ' + candidates.join(', ') + ' — set window.MAP_TOKEN_URL or pass ?tk=. (' + errors.join(' | ') + ')';
+            status.insertBefore(d, status.firstChild);
+          }
+          return;
+        }
+        var url = candidates[i];
+        return fetch(url)
+          .then(function (r) {
+            if (!r.ok) throw new Error(url + ' → HTTP ' + r.status);
+            var ct = r.headers.get('content-type') || '';
+            return ct.indexOf('json') !== -1 ? r.json() : r.text();
+          })
+          .then(function (data) {
+            var tk = extractToken(data);
+            if (!tk) throw new Error(url + ' → no token in response');
+            mount(tk);
+          })
+          .catch(function (e) {
+            errors.push(e && e.message ? e.message : String(e));
+            return fetchToken(i + 1, errors);
+          });
+      }
+      fetchToken(0, []);
     })();
   </script>
 </body>

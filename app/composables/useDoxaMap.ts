@@ -6,7 +6,7 @@
 // connectedCallback calls `new mapboxgl.Map(…)` before the global exists.
 // The <feedback-widget> bundle is loaded globally via nuxt.config.ts.
 
-const MAPBOX_JS = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js'
+const MAPBOX_JS = 'https://api.mapbox.com/mapbox-gl-js/v3.24.0/mapbox-gl.js'
 const MAPBOX_GEOCODER_JS = 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js'
 
 // Map of bundle keys → CDN drop-in URLs. The built maps live under
@@ -60,7 +60,7 @@ export function useDoxaMap(bundle: BundleKey = 'simple-map') {
 
   useHead({
     link: [
-      { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css' },
+      { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/v3.24.0/mapbox-gl.css' },
       { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css' }
     ]
   })

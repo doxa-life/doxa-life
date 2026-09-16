@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>research-dashboard · research-dashboard</title>
+  <title>upg-100-mfe · my-upg-100-list</title>
   <link rel="icon" href="data:,">
   <!-- Mapbox peer loaded ONCE here; the map custom element mounts in this page and
        uses window.mapboxgl directly (same realm → no cross-realm container errors). -->
@@ -16,7 +16,7 @@
     /* BARE full-page map — no chrome. The custom element IS the page, so the
        browser URL shares the map itself (design note: "Share shares THE MAP"). */
     html, body { height: 100%; margin: 0; background: #0a0e15; }
-    #slot, research-dashboard-map { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+    #slot, my-upg-100-list-map { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
     #status { position: fixed; inset: 0; z-index: 2; display: grid; place-items: center;
       padding: 24px; text-align: center; color: #9aa7b8;
       font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; }
@@ -28,8 +28,8 @@
   <div id="status">loading token…</div>
 
   <script>window.MAP_APP_API_URL = "https://pray.doxa.life";</script>
-  <!-- Bundle IIFE — registers the <research-dashboard-map> custom element. -->
-  <script src="../research-dashboard.js" integrity="sha384-BHZ25fzYe0jD3pRXnpDZQNiRn8kmraxudx6Q+jJTIwa4JmC+p9T/7BRkW+p1uWdu" crossorigin="anonymous"></script>
+  <!-- Bundle IIFE — registers the <my-upg-100-list-map> custom element. -->
+  <script src="../my-upg-100-list.js" integrity="sha384-ngxPyToFOU8/+p1tReUDfGDbMP5TLvgOj8+dHatij7H07c0S6tmQK5xbE171wGGY" crossorigin="anonymous"></script>
 
   <script>
     // Mapbox token resolution — the A3 ladder, in precedence order:
@@ -45,7 +45,7 @@
     (function () {
       var slot = document.getElementById('slot');
       var status = document.getElementById('status');
-      var BASE_CONFIG = {"profile":"research-dashboard","dataSource":"pray-tools","instanceId":"research-dashboard-research-dashboard","assetsBase":"../../../assets"};
+      var BASE_CONFIG = {"profile":"upg-100-mfe","dataSource":"pray-tools","instanceId":"my-upg-100-list-upg-100-mfe","assetsBase":"../../../assets"};
       // MapLibre pages need NO token: the ladder below is skipped entirely.
       var TOKEN_FREE = false;
       var TOKEN_SRC = "https://doxa.life/api/maps/token";
@@ -75,7 +75,7 @@
         if (!token && !TOKEN_FREE) { return askToken(); }
         try {
           var cfg = token ? Object.assign({}, BASE_CONFIG, { tk: token }) : BASE_CONFIG;
-          var el = document.createElement("research-dashboard-map");
+          var el = document.createElement("my-upg-100-list-map");
           el.setAttribute('profile-config', JSON.stringify(cfg));
           slot.innerHTML = '';
           slot.appendChild(el);

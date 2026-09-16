@@ -66,6 +66,15 @@ const CLIENT_SCOPES = [
 ]
 
 export default defineEventHandler(async (event): Promise<TokenResponse> => {
+  // CORS: the built map pages fetch this from wherever the doxa-maps tree is hosted
+  // (a CDN, a partner site, localhost) — a foreign origin without this header is
+  // blocked by the browser and the map never gets a token. Safe to open: pk tokens
+  // are public by design and tk tokens are minted read-only (see notes above).
+  setResponseHeaders(event, {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Cache-Control': 'no-store',
+  })
   const config = useRuntimeConfig(event)
   // Prefer the server-only key if present; fall back to the public token
   // so existing setups (just NUXT_PUBLIC_MAPBOX_TOKEN) keep working.
