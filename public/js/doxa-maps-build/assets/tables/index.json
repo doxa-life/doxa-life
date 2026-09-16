@@ -1,6 +1,6 @@
 {
  "generated": "2026-08-01",
- "method": "IEMV — extraction by the fetch/derive scripts, MODELING + VALIDATION here",
+ "method": "IEMV \u2014 extraction by the fetch/derive scripts, MODELING + VALIDATION here",
  "tables": [
   {
    "name": "people-group-resources",
@@ -57,10 +57,6 @@
   {
    "name": "platform-reachability",
    "rows": 2625
-  },
-  {
-   "name": "field-access-visas",
-   "rows": 1146
   },
   {
    "name": "gaps-and-opportunities",
