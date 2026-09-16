@@ -336,7 +336,7 @@ useTextHighlight()
   display: block;
   margin-top: 0.75rem;
   text-align: right;
-  font-size: 1.2rem;
+  font-size: inherit; /* same size as the "By Region →" link (body size), not 12px */
   color: var(--color-brand-primary, #3b463d);
   text-decoration: underline;
   text-underline-offset: 3px;
