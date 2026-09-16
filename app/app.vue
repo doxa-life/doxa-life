@@ -7,6 +7,11 @@
 // Destination comes from NUXT_PUBLIC_FEEDBACK_API_BASE / _PROJECT_ID. With no
 // project id there is nowhere to post, so the widget and its bundle are skipped.
 const { public: pub } = useRuntimeConfig()
+// Bare pages (layout:false — e.g. /doxa-maps, the full-page maps SPA) get NO
+// site chrome at all: the fixed feedback bubble lives outside NuxtLayout, so it
+// must opt out here or it floats over the map.
+const route = useRoute()
+const isBarePage = computed(() => route.meta.layout === false)
 const feedbackEnabled = Boolean(pub.feedbackProjectId)
 
 if (feedbackEnabled) useFeedbackScript()
@@ -27,7 +32,7 @@ const siteFeedbackConfig = JSON.stringify({
   </NuxtLayout>
   <ClientOnly>
     <div
-      v-if="feedbackEnabled"
+      v-if="feedbackEnabled && !isBarePage"
       class="site-feedback-widget"
     >
       <feedback-web-component :profile-config="siteFeedbackConfig" />
