@@ -1,28 +1,23 @@
 import nodemailer from 'nodemailer'
 import type { Transporter } from 'nodemailer'
-import mailgunTransport from 'nodemailer-mailgun-transport'
+import { sendViaSendgrid } from './sendgrid'
 import { renderEmailTemplate, type EmailTemplateData } from './email-templates'
 
 const isDevelopment = (process.env.NODE_ENV || 'development') === 'development'
 
+// MailHog transporter, development only. Production sends go through SendGrid.
 let transporter: Transporter | null = null
 
 function getEmailConfig() {
   try {
     const config = useRuntimeConfig()
     return {
-      mailgunApiKey: config.mailgunApiKey || process.env.MAILGUN_API_KEY,
-      mailgunDomain: config.mailgunDomain || process.env.MAILGUN_DOMAIN,
-      mailgunHost: config.mailgunHost || process.env.MAILGUN_HOST,
       smtpFrom: config.smtpFrom || process.env.SMTP_FROM,
       smtpFromName: config.smtpFromName || process.env.SMTP_FROM_NAME,
       appName: config.appName || process.env.APP_NAME
     }
   } catch {
     return {
-      mailgunApiKey: process.env.MAILGUN_API_KEY,
-      mailgunDomain: process.env.MAILGUN_DOMAIN,
-      mailgunHost: process.env.MAILGUN_HOST,
       smtpFrom: process.env.SMTP_FROM,
       smtpFromName: process.env.SMTP_FROM_NAME,
       appName: process.env.APP_NAME
@@ -30,39 +25,16 @@ function getEmailConfig() {
   }
 }
 
-function getTransporter(): Transporter {
+function getDevTransporter(): Transporter {
   if (transporter) return transporter
 
-  const config = getEmailConfig()
-
-  if (isDevelopment) {
-    console.log('[Email] Using MailHog (development mode)')
-    transporter = nodemailer.createTransport({
-      host: 'localhost',
-      port: 1025,
-      secure: false,
-      tls: { rejectUnauthorized: false }
-    })
-    return transporter
-  }
-
-  if (!config.mailgunApiKey || !config.mailgunDomain) {
-    throw new Error('Mailgun configuration incomplete. Set MAILGUN_API_KEY and MAILGUN_DOMAIN.')
-  }
-
-  console.log('[Email] Using Mailgun HTTP API')
-  const mailgunOptions: any = {
-    auth: {
-      api_key: config.mailgunApiKey,
-      domain: config.mailgunDomain
-    }
-  }
-
-  if (config.mailgunHost) {
-    mailgunOptions.host = config.mailgunHost
-  }
-
-  transporter = nodemailer.createTransport(mailgunTransport(mailgunOptions))
+  console.log('[Email] Using MailHog (development mode)')
+  transporter = nodemailer.createTransport({
+    host: 'localhost',
+    port: 1025,
+    secure: false,
+    tls: { rejectUnauthorized: false }
+  })
   return transporter
 }
 
@@ -95,16 +67,31 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       fromEmail = fromName ? `${fromName} <${fromAddress}>` : fromAddress
     }
 
-    const mailOptions = {
-      from: fromEmail,
-      to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
-      subject: options.subject,
-      html: options.html,
-      text: options.text || options.html.replace(/<[^>]*>/g, '')
-    }
+    const text = options.text || options.html.replace(/<[^>]*>/g, '')
 
-    const info = await getTransporter().sendMail(mailOptions)
-    console.log('[Email] Sent successfully:', info.messageId)
+    let messageId: string | undefined
+    if (isDevelopment) {
+      const info = await getDevTransporter().sendMail({
+        from: fromEmail,
+        to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
+        subject: options.subject,
+        html: options.html,
+        text
+      })
+      messageId = info.messageId
+    } else {
+      // Recipient arrays go through as-is: SendGrid takes one address object per
+      // recipient, and a comma-joined string would be read as a single address.
+      const info = await sendViaSendgrid({
+        from: fromEmail,
+        to: options.to,
+        subject: options.subject,
+        html: options.html,
+        text
+      })
+      messageId = info.messageId
+    }
+    console.log('[Email] Sent successfully:', messageId)
     return true
   } catch (error) {
     if (!process.env.VITEST) {

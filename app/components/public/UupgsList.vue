@@ -600,7 +600,7 @@ const showMore = computed(() => hasMore())
           <div v-if="useSelectCard" class="stack stack--sm | card | highlighted-uupg__card">
             <div class="repel align-start">
               <img :src="uupg.image_url" :alt="uupg.name">
-              <p class="color-brand-lighter uppercase text-end overflow-wrap-anywhere" v-html="uupg.wagf_region_label ? uupg.wagf_region_label : uupg.wagf_region.label" />
+              <p class="color-brand-lighter uppercase text-end overflow-wrap-anywhere" v-html="uupg.wagf_region_label ? uupg.wagf_region_label : uupg.wagf_region?.label" />
             </div>
             <div>
               <p class="line-height-tight" v-html="uupg.name" />
@@ -633,9 +633,10 @@ const showMore = computed(() => hasMore())
               <h3 class="uupg__name line-height-tight" v-html="uupg.name" />
               <p class="uupg__country">
                 <a
+                  v-if="uupg.country_code"
                   class="uupg__country-link light-link"
                   :href="localePath(`/regions/${countrySlug(uupg.country_code.value, uupg.country_code.label)}`)"
-                ><span v-html="uupg.country_label ? uupg.country_label : uupg.country_code.label" /></a> (<span v-html="uupg.rop1_label ? uupg.rop1_label : uupg.rop1.label" />)
+                ><span v-html="uupg.country_label ? uupg.country_label : uupg.country_code.label" /></a> (<span v-html="uupg.rop1_label ? uupg.rop1_label : uupg.rop1?.label" />)
               </p>
               <template v-if="uupg.matches">
                 <p v-for="(match, mi) in uupg.matches" :key="mi" class="font-size-sm color-brand-lighter">
