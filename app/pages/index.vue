@@ -331,16 +331,4 @@ useTextHighlight()
 </template>
 
 <style scoped>
-.research-map-link {
-  display: block;
-  margin-top: 0.75rem;
-  text-align: right;
-  font-size: inherit; /* same size as the "By Region →" link (body size), not 12px */
-  color: var(--color-brand-primary, #3b463d);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-.research-map-link:hover {
-  color: var(--color-brand-primary-darker, #1f2328);
-}
 </style>

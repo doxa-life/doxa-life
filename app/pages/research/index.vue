@@ -52,7 +52,7 @@ useTextHighlight()
     />
     <!-- Invitation to the full map collection sits under the map's bottom-right corner,
          where the eye lands after exploring it (moved from the header, 2026-09-16). -->
-    <p class="research-see-all"><NuxtLink class="light-link" to="/doxa-maps">{{ t("See all our research maps, there's more!") }} &rarr;</NuxtLink></p>
+    <NuxtLink class="research-map-link" to="/doxa-maps">{{ t("See all our research maps, there's more!") }} &rarr;</NuxtLink>
 
     <UupgsList
       :language-code="locale"
@@ -63,11 +63,3 @@ useTextHighlight()
     />
   </div>
 </template>
-
-<style scoped>
-/* "See all our research maps" — under the map's bottom-right corner, right-aligned. */
-.research-see-all {
-  text-align: right;
-  margin-top: 0.5rem;
-}
-</style>
