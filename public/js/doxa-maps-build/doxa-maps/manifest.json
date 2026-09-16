@@ -91,7 +91,7 @@
       "bundle": "demo-map",
       "scriptUrl": "./demo-map/demo-map.js",
       "output": "doxa-maps/demo-map/demo-map.js",
-      "integrity": "sha384-fHNJEJ1hvqeG9zn0s3CkvL85RqNCORSeS1oO0SQ8DMPGG/3Ijiqh0I102n0UPNCo",
+      "integrity": "sha384-B+SyViDxVGRi34FHMkYac/xvZ43ATdtjC581+MYPyim2Z8wk+6uAWj7DNt6GA+C2",
       "elements": [
         "demo-map"
       ],
@@ -105,8 +105,25 @@
           "scriptUrl": "./demo-map/demo-map.js",
           "embed": {
             "iframe": "<iframe src=\"./demo-map/demo-map/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./demo-map/demo-map.js\" integrity=\"sha384-fHNJEJ1hvqeG9zn0s3CkvL85RqNCORSeS1oO0SQ8DMPGG/3Ijiqh0I102n0UPNCo\" crossorigin=\"anonymous\"></script>\n<demo-map profile-config='{\"profile\":\"demo-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></demo-map>"
+            "script": "<script src=\"./demo-map/demo-map.js\" integrity=\"sha384-B+SyViDxVGRi34FHMkYac/xvZ43ATdtjC581+MYPyim2Z8wk+6uAWj7DNt6GA+C2\" crossorigin=\"anonymous\"></script>\n<demo-map profile-config='{\"profile\":\"demo-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></demo-map>"
           },
+          "instances": [
+            {
+              "id": "maplibre",
+              "title": "Demo map — MapLibre (token-free)",
+              "apiBaseUrl": "",
+              "props": {
+                "profile": "demo-map",
+                "provider": "maplibre",
+                "instanceId": "demo-maplibre"
+              },
+              "element": "demo-map",
+              "iframeUrl": "./demo-map/demo-map/maplibre/index.html",
+              "embed": {
+                "iframe": "<iframe src=\"./demo-map/demo-map/maplibre/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>"
+              }
+            }
+          ],
           "bundle": "demo-map"
         }
       ]

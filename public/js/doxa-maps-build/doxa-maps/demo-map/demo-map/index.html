@@ -29,7 +29,7 @@
 
   <script>window.MAP_APP_API_URL = "https://pray.doxa.life";</script>
   <!-- Bundle IIFE — registers the <demo-map> custom element. -->
-  <script src="../demo-map.js" integrity="sha384-fHNJEJ1hvqeG9zn0s3CkvL85RqNCORSeS1oO0SQ8DMPGG/3Ijiqh0I102n0UPNCo" crossorigin="anonymous"></script>
+  <script src="../demo-map.js" integrity="sha384-B+SyViDxVGRi34FHMkYac/xvZ43ATdtjC581+MYPyim2Z8wk+6uAWj7DNt6GA+C2" crossorigin="anonymous"></script>
 
   <script>
     // Mapbox token resolution — the A3 ladder, in precedence order:
@@ -46,6 +46,8 @@
       var slot = document.getElementById('slot');
       var status = document.getElementById('status');
       var BASE_CONFIG = {"profile":"demo-map","dataSource":"pray-tools","instanceId":"demo-map-demo-map","assetsBase":"../../../assets","qa":true};
+      // MapLibre pages need NO token: the ladder below is skipped entirely.
+      var TOKEN_FREE = false;
       var TOKEN_SRC = "/api/maps/token.json";
       var BAKED_TOKEN = "";
       var DEFAULT_TOKEN_URL = '/api/maps/token';
@@ -70,9 +72,9 @@
       function done() { if (status && status.parentNode) { status.parentNode.removeChild(status); } }
 
       function mount(token) {
-        if (!token) { return askToken(); }
+        if (!token && !TOKEN_FREE) { return askToken(); }
         try {
-          var cfg = Object.assign({}, BASE_CONFIG, { tk: token });
+          var cfg = token ? Object.assign({}, BASE_CONFIG, { tk: token }) : BASE_CONFIG;
           var el = document.createElement("demo-map");
           el.setAttribute('profile-config', JSON.stringify(cfg));
           slot.innerHTML = '';
@@ -100,6 +102,7 @@
       var urlTk = qp('tk');
       if (urlTk) { try { localStorage.setItem('MAPS_STAGING_TK', urlTk); } catch (e) {} }
       var directToken = (BASE_CONFIG && BASE_CONFIG.tk) || urlTk || stored || BAKED_TOKEN;
+      if (TOKEN_FREE) { return mount(''); }
       if (directToken) { return mount(directToken); }
 
       // Rungs 4-6: resolve a token endpoint and fetch it.

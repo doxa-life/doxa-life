@@ -46,6 +46,8 @@
       var slot = document.getElementById('slot');
       var status = document.getElementById('status');
       var BASE_CONFIG = {"profile":"charts","dataSource":"pray-tools","instanceId":"gospel-resources-charts","assetsBase":"../../../assets","qa":true};
+      // MapLibre pages need NO token: the ladder below is skipped entirely.
+      var TOKEN_FREE = false;
       var TOKEN_SRC = "/api/maps/token.json";
       var BAKED_TOKEN = "";
       var DEFAULT_TOKEN_URL = '/api/maps/token';
@@ -70,9 +72,9 @@
       function done() { if (status && status.parentNode) { status.parentNode.removeChild(status); } }
 
       function mount(token) {
-        if (!token) { return askToken(); }
+        if (!token && !TOKEN_FREE) { return askToken(); }
         try {
-          var cfg = Object.assign({}, BASE_CONFIG, { tk: token });
+          var cfg = token ? Object.assign({}, BASE_CONFIG, { tk: token }) : BASE_CONFIG;
           var el = document.createElement("gospel-resources-map");
           el.setAttribute('profile-config', JSON.stringify(cfg));
           slot.innerHTML = '';
@@ -100,6 +102,7 @@
       var urlTk = qp('tk');
       if (urlTk) { try { localStorage.setItem('MAPS_STAGING_TK', urlTk); } catch (e) {} }
       var directToken = (BASE_CONFIG && BASE_CONFIG.tk) || urlTk || stored || BAKED_TOKEN;
+      if (TOKEN_FREE) { return mount(''); }
       if (directToken) { return mount(directToken); }
 
       // Rungs 4-6: resolve a token endpoint and fetch it.
