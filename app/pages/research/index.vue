@@ -39,6 +39,7 @@ useTextHighlight()
     <div class="stack stack--xs text-center">
       <h1 class="highlight" data-highlight-last>{{ t('Find a UUPG') }}</h1>
       <p><NuxtLink class="light-link" :to="localePath('/regions')">{{ t('By Region') }} &rarr;</NuxtLink></p>
+      <p><NuxtLink class="light-link" to="/doxa-maps">{{ t('See all DOXA maps') }} &rarr;</NuxtLink></p>
     </div>
 
     <!-- Research map embed — sits directly under the H1, above the UUPG
