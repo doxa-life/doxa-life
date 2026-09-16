@@ -107,7 +107,9 @@ useTextHighlight()
           data-highlight-color="primary"
         >{{ t('DOXA people groups around the world') }}</h1>
       </div>
-      <DoxaMapSlot map-id="home-map" :profile-config="homeMapConfig" class="rounded-xlg" />
+      <!-- Same slot shape as the prayer page (pray.vue): rounded-md gives the map the symmetric
+           corners that match its own legend/controls; rounded-xlg did not. -->
+      <DoxaMapSlot map-id="home-map" :profile-config="homeMapConfig" class="rounded-md" />
       <NuxtLink
         :to="localePath('/research')"
         class="research-map-link"
