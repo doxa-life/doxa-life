@@ -39,7 +39,6 @@ useTextHighlight()
     <div class="stack stack--xs text-center">
       <h1 class="highlight" data-highlight-last>{{ t('Find a UUPG') }}</h1>
       <p><NuxtLink class="light-link" :to="localePath('/regions')">{{ t('By Region') }} &rarr;</NuxtLink></p>
-      <p><NuxtLink class="light-link" to="/doxa-maps">{{ t('See all DOXA maps') }} &rarr;</NuxtLink></p>
     </div>
 
     <!-- Research map embed — sits directly under the H1, above the UUPG
@@ -51,6 +50,9 @@ useTextHighlight()
       :profile-config="researchProfileConfig"
       class="rounded-xlg"
     />
+    <!-- Invitation to the full map collection sits under the map's bottom-right corner,
+         where the eye lands after exploring it (moved from the header, 2026-09-16). -->
+    <p class="research-see-all"><NuxtLink class="light-link" to="/doxa-maps">{{ t("See all our research maps, there's more!") }} &rarr;</NuxtLink></p>
 
     <UupgsList
       :language-code="locale"
@@ -61,3 +63,11 @@ useTextHighlight()
     />
   </div>
 </template>
+
+<style scoped>
+/* "See all our research maps" — under the map's bottom-right corner, right-aligned. */
+.research-see-all {
+  text-align: right;
+  margin-top: 0.5rem;
+}
+</style>
