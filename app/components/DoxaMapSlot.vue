@@ -47,6 +47,10 @@ const isSimple = props.bundle === 'simple-map'
   --slot-radius: 0px;
   clip-path: inset(0 round var(--slot-radius));
   isolation: isolate;
+  /* Own compositor layer from the first frame: the rounded clip is then applied on the
+     compositor side before the WebGL canvas ever arrives (Chrome, real GPU). */
+  will-change: transform;
+  transform: translateZ(0);
 }
 .doxa-map-slot.rounded-md  { --slot-radius: var(--border-radius-lg); }
 .doxa-map-slot.rounded-xlg { --slot-radius: var(--border-radius-xlg); }
