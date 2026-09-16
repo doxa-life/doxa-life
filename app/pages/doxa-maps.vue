@@ -5,9 +5,16 @@
 // drop-in at public/js/doxa-maps-build/ — every map, table and dashboard the
 // bundler ships, composed into one lazy-loaded app, always exactly as current
 // as the build in this repo. Pointed to from the research page
-// ("See all DOXA maps →"). The shell resolves its Mapbox token from
-// ./api/maps/token.json, which this site serves from its own runtime config
-// (see server/routes/js/doxa-maps-build/api/maps/token.json.get.ts).
+// ("See all DOXA maps →").
+//
+// TOKEN: one spot, no new endpoints. The shell's own ladder accepts ?tk= (rung
+// 2), so we pass the SAME public.mapboxToken every map page on this site
+// already uses (NUXT_PUBLIC_MAPBOX_TOKEN).
+const config = useRuntimeConfig()
+const frameSrc = computed(() => {
+  const tk = (config.public as { mapboxToken?: string }).mapboxToken || ''
+  return '/js/doxa-maps-build/index.html' + (tk ? `?tk=${encodeURIComponent(tk)}` : '')
+})
 useHead({
   title: 'All DOXA Maps',
   meta: [{ name: 'robots', content: 'noindex' }],
@@ -17,7 +24,7 @@ useHead({
 <template>
   <div class="maps-room">
     <iframe
-      src="/js/doxa-maps-build/index.html"
+      :src="frameSrc"
       title="The DOXA maps app"
       class="maps-room-frame"
       loading="eager"
