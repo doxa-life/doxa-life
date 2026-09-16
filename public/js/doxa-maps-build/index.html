@@ -23,6 +23,7 @@
     'upg-100-list':'./doxa-maps/my-upg-100-list/my-upg-100-list.js',
     'countries-map':'./doxa-maps/country-posters/country-posters.js',
     'key-city-posters':'./doxa-maps/key-cities/key-cities.js',
+    'all-people-groups':'./doxa-maps/all-people-groups/all-people-groups.js',
     'cities-with-internet':'./doxa-maps/cities-internet/cities-internet.js',
     'gospel-resources':'./doxa-maps/gospel-resources/gospel-resources.js',
     'research-map':'./doxa-maps/doxa-research-map/doxa-research-map.js',
@@ -877,6 +878,15 @@ const PROFILES = {
   // The nav has carried this id as a placeholder since 2026-07-29; this entry is
   // what turns it into a real app. `profile` is the .vue FILENAME, not the folder.
   // Ships WITH `panes` (map/list/operators below) — the pane grid is live.
+  // ALL PEOPLE GROUPS — every group on earth (peoplegroups.org) around the DOXA
+  // set: black doxa · red frontier · yellow unreached · green reached. Replaces
+  // the long-standing placeholder.
+  'all-people-groups': {
+    tag:    'all-people-groups',
+    src:    './doxa-maps/all-people-groups/all-people-groups.js',
+    config: { profile:'all-people-groups', instanceId:'wrapper-all-people-groups' },
+  },
+
   'cities-with-internet': {
     tag:    'cities-internet-map',
     src:    './doxa-maps/cities-internet/cities-internet.js',

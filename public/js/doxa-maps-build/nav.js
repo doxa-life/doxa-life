@@ -54,7 +54,7 @@ export const NAV = [
       // keep them straight. (The "15k" suffix was dropped from the label at the
       // maintainer's request 2026-07-29; the distinction is recorded here instead.)
       // ⚠ NO BUNDLE YET — renders the placeholder card.
-      { kind: 'item', id: 'all-people-groups', label: 'All People Groups', badge: 'soon', icon: 'globe', target: 'both' },
+      { kind: 'item', id: 'all-people-groups', label: 'All People Groups', icon: 'globe', target: 'both' },
       // REMOVED 'Reached People Groups' (2026-07-29) — added and withdrawn the
       // same round; do not re-add without an explicit ask.
       // REMOVED 'Simple Map' (2026-07-29). REASON WORTH KEEPING: the
