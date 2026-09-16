@@ -130,7 +130,7 @@ header.top .sub { margin-top: 3px; font: 12px/1.4 var(--sans); color: var(--mut)
 
   <script>window.FORGE = {"mode":"built","scope":"bundle","manifestUrl":"../manifest.json","bundle":"template-bundle","hrefBase":"../"};
   /* file:// contract: manifest inlined at build — no fetch needed to render. */
-  window.FORGE.manifest = {"schema":"doxa-maps-manifest@1","generatedFrom":"app-profiles/*/*.vue","embedBase":".","bundleCount":9,"profileCount":17,"bundles":[{"bundle":"template-bundle","scriptUrl":"./template-bundle/template-bundle.js","output":"doxa-maps/template-bundle/template-bundle.js","integrity":"sha384-ThNZrcpzvq928ggsPM27BNm0El0/e8ZLi2Gf8XdzQFWUPxdiP/LmBbq9np5+SZDI","elements":["template-bundle"],"profiles":[{"profile":"template-map-a","file":"template-map-a.vue","description":"Minimal example profile A — a colored placeholder, no Mapbox or data.","element":"template-bundle","iframeUrl":"./template-bundle/template-map-a/index.html","scriptUrl":"./template-bundle/template-bundle.js","embed":{"iframe":"\u003ciframe src=\"./template-bundle/template-map-a/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen>\u003c/iframe>","script":"\u003cscript src=\"./template-bundle/template-bundle.js\" integrity=\"sha384-ThNZrcpzvq928ggsPM27BNm0El0/e8ZLi2Gf8XdzQFWUPxdiP/LmBbq9np5+SZDI\" crossorigin=\"anonymous\">\u003c/script>\n\u003ctemplate-bundle profile-config='{\"profile\":\"template-map-a\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'>\u003c/template-bundle>"},"bundle":"template-bundle"},{"profile":"template-map-b","file":"template-map-b.vue","description":"Minimal example profile B — a second profile in the same bundle.","element":"template-bundle","iframeUrl":"./template-bundle/template-map-b/index.html","scriptUrl":"./template-bundle/template-bundle.js","embed":{"iframe":"\u003ciframe src=\"./template-bundle/template-map-b/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen>\u003c/iframe>","script":"\u003cscript src=\"./template-bundle/template-bundle.js\" integrity=\"sha384-ThNZrcpzvq928ggsPM27BNm0El0/e8ZLi2Gf8XdzQFWUPxdiP/LmBbq9np5+SZDI\" crossorigin=\"anonymous\">\u003c/script>\n\u003ctemplate-bundle profile-config='{\"profile\":\"template-map-b\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'>\u003c/template-bundle>"},"bundle":"template-bundle"}]}]};</script>
+  window.FORGE.manifest = {"schema":"doxa-maps-manifest@1","generatedFrom":"app-profiles/*/*.vue","embedBase":".","bundleCount":9,"profileCount":17,"bundles":[{"bundle":"template-bundle","scriptUrl":"./template-bundle/template-bundle.js","output":"doxa-maps/template-bundle/template-bundle.js","integrity":"sha384-7oKMpdhxEwHZk1lLpNS5+8FNfK7CEv2BAlgmw65N5F6CkNhduVcSVgIshYLDKYhJ","elements":["template-bundle"],"profiles":[{"profile":"template-map-a","file":"template-map-a.vue","description":"Minimal example profile A — a colored placeholder, no Mapbox or data.","element":"template-bundle","iframeUrl":"./template-bundle/template-map-a/index.html","scriptUrl":"./template-bundle/template-bundle.js","embed":{"iframe":"\u003ciframe src=\"./template-bundle/template-map-a/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen>\u003c/iframe>","script":"\u003cscript src=\"./template-bundle/template-bundle.js\" integrity=\"sha384-7oKMpdhxEwHZk1lLpNS5+8FNfK7CEv2BAlgmw65N5F6CkNhduVcSVgIshYLDKYhJ\" crossorigin=\"anonymous\">\u003c/script>\n\u003ctemplate-bundle profile-config='{\"profile\":\"template-map-a\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'>\u003c/template-bundle>"},"bundle":"template-bundle"},{"profile":"template-map-b","file":"template-map-b.vue","description":"Minimal example profile B — a second profile in the same bundle.","element":"template-bundle","iframeUrl":"./template-bundle/template-map-b/index.html","scriptUrl":"./template-bundle/template-bundle.js","embed":{"iframe":"\u003ciframe src=\"./template-bundle/template-map-b/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen>\u003c/iframe>","script":"\u003cscript src=\"./template-bundle/template-bundle.js\" integrity=\"sha384-7oKMpdhxEwHZk1lLpNS5+8FNfK7CEv2BAlgmw65N5F6CkNhduVcSVgIshYLDKYhJ\" crossorigin=\"anonymous\">\u003c/script>\n\u003ctemplate-bundle profile-config='{\"profile\":\"template-map-b\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'>\u003c/template-bundle>"},"bundle":"template-bundle"}]}]};</script>
   <script>/**
  * staging-forge.js — the ONE-PAGE semantic staging environment (root + bundle pages).
  *
@@ -285,8 +285,31 @@ function renderStage() {
       <span class="sctag">&lt;${esc(nd.element || nd.label)}&gt;</span>
       <span class="sckind">${esc(nd.kind)}</span>
       <a class="popout" href="${esc(withProvider(withTk(nd.href)))}" target="_blank" rel="noopener">open ↗</a>
+      <button class="popout" id="copyEmbed" type="button" title="Copy an iframe snippet with this host's full URL">copy embed</button>
     </div>
     <div class="map-slot"><iframe allowfullscreen src="${esc(withProvider(withTk(nd.href)))}"></iframe></div>`
+  // COPY EMBED — the partner handoff. The snippet is built AT CLICK TIME from
+  // location.href, so it always carries the FULL URL of whatever host serves
+  // this tree (localhost, doxa.life/js/doxa-maps-build/…, any CDN) — embeds
+  // work no matter where the build folder lives. utm_source placeholder =
+  // per-partner traffic attribution (see the manifest snippets).
+  const copyBtn = $('#copyEmbed')
+  if (copyBtn) copyBtn.addEventListener('click', async () => {
+    const abs = new URL(nd.href, location.href)
+    abs.searchParams.set('utm_source', 'YOUR_SOURCE')
+    const snip = '<iframe src="' + abs.href + '" width="100%" height="600" '
+      + 'style="border:none;border-radius:12px;" allowfullscreen></iframe>'
+    let ok = false
+    try { await navigator.clipboard.writeText(snip); ok = true } catch (_) {
+      try {
+        const ta = document.createElement('textarea')
+        ta.value = snip; document.body.appendChild(ta); ta.select()
+        ok = document.execCommand('copy'); ta.remove()
+      } catch (_) {}
+    }
+    copyBtn.textContent = ok ? 'copied ✓' : 'copy failed'
+    setTimeout(() => { copyBtn.textContent = 'copy embed' }, 1800)
+  })
   // keep the sidebar highlight in sync
   document.querySelectorAll('#treeNav .node').forEach((b) =>
     b.classList.toggle('active', b.dataset.key === activeKey))

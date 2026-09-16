@@ -29,7 +29,7 @@
 
   <script>window.MAP_APP_API_URL = "https://pray.doxa.life";</script>
   <!-- Bundle IIFE — registers the <my-upg-100-list-map> custom element. -->
-  <script src="../my-upg-100-list.js" integrity="sha384-RW4eL0ddwRv7cC3GbCaImAGGDlgmymYlPF6EPjmum6kp2aUST/12N0UaJQUXnu6G" crossorigin="anonymous"></script>
+  <script src="../my-upg-100-list.js" integrity="sha384-2glb9WoqMp/D9ngfM8IPoKE8ysdaR0oTiHKtaNoi2bYVtDjJpO4rwKfVv3hYwfmj" crossorigin="anonymous"></script>
 
   <script>
     // Mapbox token resolution — the A3 ladder, in precedence order:
@@ -45,7 +45,7 @@
     (function () {
       var slot = document.getElementById('slot');
       var status = document.getElementById('status');
-      var BASE_CONFIG = {"profile":"poster-wall","dataSource":"pray-tools","instanceId":"my-upg-100-list-poster-wall","assetsBase":"../../../assets","qa":true};
+      var BASE_CONFIG = {"profile":"poster-wall","dataSource":"pray-tools","instanceId":"my-upg-100-list-poster-wall","assetsBase":"../../../assets"};
       // MapLibre pages need NO token: the ladder below is skipped entirely.
       var TOKEN_FREE = false;
       var TOKEN_SRC = "/api/maps/token.json";

@@ -29,7 +29,7 @@
 
   <script>window.MAP_APP_API_URL = "https://pray.doxa.life";</script>
   <!-- Bundle IIFE — registers the <doxa-map> custom element. -->
-  <script src="../doxa-simple-map.js" integrity="sha384-MOCXLAI5Kvp+9NrDyR+YWkolkd8QOnBELgqHCKGYvnZtPIiI/yaoT7qxKPackT07" crossorigin="anonymous"></script>
+  <script src="../doxa-simple-map.js" integrity="sha384-vvuDU7leqbJ6T8jJkoAX9A7tHfZmRwiDdja6fthbXB3zxtA9XEZGQrvu12io7KbB" crossorigin="anonymous"></script>
 
   <script>
     // Mapbox token resolution — the A3 ladder, in precedence order:
@@ -45,7 +45,7 @@
     (function () {
       var slot = document.getElementById('slot');
       var status = document.getElementById('status');
-      var BASE_CONFIG = {"profile":"doxa-simple-map","dataSource":"pray-tools","instanceId":"doxa-simple-map-doxa-simple-map","assetsBase":"../../../assets","qa":true};
+      var BASE_CONFIG = {"profile":"doxa-simple-map","dataSource":"pray-tools","instanceId":"doxa-simple-map-doxa-simple-map","assetsBase":"../../../assets"};
       // MapLibre pages need NO token: the ladder below is skipped entirely.
       var TOKEN_FREE = false;
       var TOKEN_SRC = "/api/maps/token.json";

@@ -1025,7 +1025,7 @@ async function mount(id){
     // so hand each bundle an ABSOLUTE base derived from THIS shell's own document — correct at any depth.
     if (!cfg.assetsBase) cfg.assetsBase = new URL('assets', document.baseURI).href.replace(/\/+$/, '')
     // QA corner widget ON for the go-base SPA surface (opt-in flag; off for partner embeds).
-    cfg.qa = true; cfg.qaLabel = spec.label || cfg.profile
+    cfg.qa = (new URLSearchParams(location.search).get('qa') === '1') /* QA opt-in via ?qa=1; widget exists only in DOXA_QA=1 builds */; cfg.qaLabel = spec.label || cfg.profile
     el.setAttribute('profile-config', JSON.stringify(cfg))
 
     // ── PANE COLUMN vs SINGLE MOUNT ─────────────────────────────────────────
@@ -1049,7 +1049,7 @@ async function mount(id){
         if (SHELL_TOKEN) pcfg.tk = SHELL_TOKEN
         pcfg.locale = locale
         if (!pcfg.assetsBase) pcfg.assetsBase = new URL('assets', document.baseURI).href.replace(/\/+$/, '')
-        pcfg.qa = true; pcfg.qaLabel = spec.label || pcfg.profile
+        pcfg.qa = (new URLSearchParams(location.search).get('qa') === '1') /* QA opt-in via ?qa=1; widget exists only in DOXA_QA=1 builds */; pcfg.qaLabel = spec.label || pcfg.profile
         pel.setAttribute('profile-config', JSON.stringify(pcfg))
         column.mountEl(pane.id)?.appendChild(pel)
         extras.push(pel)

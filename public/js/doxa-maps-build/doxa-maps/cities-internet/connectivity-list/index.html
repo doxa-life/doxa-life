@@ -29,7 +29,7 @@
 
   <script>window.MAP_APP_API_URL = "https://pray.doxa.life";</script>
   <!-- Bundle IIFE — registers the <cities-internet-map> custom element. -->
-  <script src="../cities-internet.js" integrity="sha384-rJEeD6vD8BPEh2Ab2sprUPjIYzkledq5jMjNzpVXJNDlnDzX8ejRbACR4xRQaxAg" crossorigin="anonymous"></script>
+  <script src="../cities-internet.js" integrity="sha384-KjP9vcYgXqhfXYxNS9D2sy5IlDpI18BdqjdBqr0nJ/qGWxb/KkP25DjbWbZfcZpD" crossorigin="anonymous"></script>
 
   <script>
     // Mapbox token resolution — the A3 ladder, in precedence order:
@@ -45,7 +45,7 @@
     (function () {
       var slot = document.getElementById('slot');
       var status = document.getElementById('status');
-      var BASE_CONFIG = {"profile":"connectivity-list","dataSource":"pray-tools","instanceId":"cities-internet-connectivity-list","assetsBase":"../../../assets","qa":true};
+      var BASE_CONFIG = {"profile":"connectivity-list","dataSource":"pray-tools","instanceId":"cities-internet-connectivity-list","assetsBase":"../../../assets"};
       // MapLibre pages need NO token: the ladder below is skipped entirely.
       var TOKEN_FREE = false;
       var TOKEN_SRC = "/api/maps/token.json";

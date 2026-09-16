@@ -130,7 +130,7 @@ header.top .sub { margin-top: 3px; font: 12px/1.4 var(--sans); color: var(--mut)
 
   <script>window.FORGE = {"mode":"built","scope":"bundle","manifestUrl":"../manifest.json","bundle":"my-upg-100-list","hrefBase":"../"};
   /* file:// contract: manifest inlined at build — no fetch needed to render. */
-  window.FORGE.manifest = {"schema":"doxa-maps-manifest@1","generatedFrom":"app-profiles/*/*.vue","embedBase":".","bundleCount":9,"profileCount":17,"bundles":[{"bundle":"my-upg-100-list","scriptUrl":"./my-upg-100-list/my-upg-100-list.js","output":"doxa-maps/my-upg-100-list/my-upg-100-list.js","integrity":"sha384-RW4eL0ddwRv7cC3GbCaImAGGDlgmymYlPF6EPjmum6kp2aUST/12N0UaJQUXnu6G","elements":["my-upg-100-list-map"],"profiles":[{"profile":"poster-wall","file":"poster-wall.vue","description":"","element":"my-upg-100-list-map","iframeUrl":"./my-upg-100-list/poster-wall/index.html","scriptUrl":"./my-upg-100-list/my-upg-100-list.js","embed":{"iframe":"\u003ciframe src=\"./my-upg-100-list/poster-wall/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen>\u003c/iframe>","script":"\u003cscript src=\"./my-upg-100-list/my-upg-100-list.js\" integrity=\"sha384-RW4eL0ddwRv7cC3GbCaImAGGDlgmymYlPF6EPjmum6kp2aUST/12N0UaJQUXnu6G\" crossorigin=\"anonymous\">\u003c/script>\n\u003cmy-upg-100-list-map profile-config='{\"profile\":\"poster-wall\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'>\u003c/my-upg-100-list-map>"}},{"profile":"upg-100-list","file":"upg-100-list.vue","description":"","element":"my-upg-100-list-map","iframeUrl":"./my-upg-100-list/upg-100-list/index.html","scriptUrl":"./my-upg-100-list/my-upg-100-list.js","embed":{"iframe":"\u003ciframe src=\"./my-upg-100-list/upg-100-list/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen>\u003c/iframe>","script":"\u003cscript src=\"./my-upg-100-list/my-upg-100-list.js\" integrity=\"sha384-RW4eL0ddwRv7cC3GbCaImAGGDlgmymYlPF6EPjmum6kp2aUST/12N0UaJQUXnu6G\" crossorigin=\"anonymous\">\u003c/script>\n\u003cmy-upg-100-list-map profile-config='{\"profile\":\"upg-100-list\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'>\u003c/my-upg-100-list-map>"}}]}]};</script>
+  window.FORGE.manifest = {"schema":"doxa-maps-manifest@1","generatedFrom":"app-profiles/*/*.vue","embedBase":".","bundleCount":9,"profileCount":17,"bundles":[{"bundle":"my-upg-100-list","scriptUrl":"./my-upg-100-list/my-upg-100-list.js","output":"doxa-maps/my-upg-100-list/my-upg-100-list.js","integrity":"sha384-2glb9WoqMp/D9ngfM8IPoKE8ysdaR0oTiHKtaNoi2bYVtDjJpO4rwKfVv3hYwfmj","elements":["my-upg-100-list-map"],"profiles":[{"profile":"poster-wall","file":"poster-wall.vue","description":"","element":"my-upg-100-list-map","iframeUrl":"./my-upg-100-list/poster-wall/index.html","scriptUrl":"./my-upg-100-list/my-upg-100-list.js","embed":{"iframe":"\u003ciframe src=\"./my-upg-100-list/poster-wall/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen>\u003c/iframe>","script":"\u003cscript src=\"./my-upg-100-list/my-upg-100-list.js\" integrity=\"sha384-2glb9WoqMp/D9ngfM8IPoKE8ysdaR0oTiHKtaNoi2bYVtDjJpO4rwKfVv3hYwfmj\" crossorigin=\"anonymous\">\u003c/script>\n\u003cmy-upg-100-list-map profile-config='{\"profile\":\"poster-wall\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'>\u003c/my-upg-100-list-map>"}},{"profile":"upg-100-list","file":"upg-100-list.vue","description":"","element":"my-upg-100-list-map","iframeUrl":"./my-upg-100-list/upg-100-list/index.html","scriptUrl":"./my-upg-100-list/my-upg-100-list.js","embed":{"iframe":"\u003ciframe src=\"./my-upg-100-list/upg-100-list/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen>\u003c/iframe>","script":"\u003cscript src=\"./my-upg-100-list/my-upg-100-list.js\" integrity=\"sha384-2glb9WoqMp/D9ngfM8IPoKE8ysdaR0oTiHKtaNoi2bYVtDjJpO4rwKfVv3hYwfmj\" crossorigin=\"anonymous\">\u003c/script>\n\u003cmy-upg-100-list-map profile-config='{\"profile\":\"upg-100-list\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'>\u003c/my-upg-100-list-map>"}}]}]};</script>
   <script>/**
  * staging-forge.js — the ONE-PAGE semantic staging environment (root + bundle pages).
  *
@@ -285,8 +285,31 @@ function renderStage() {
       <span class="sctag">&lt;${esc(nd.element || nd.label)}&gt;</span>
       <span class="sckind">${esc(nd.kind)}</span>
       <a class="popout" href="${esc(withProvider(withTk(nd.href)))}" target="_blank" rel="noopener">open ↗</a>
+      <button class="popout" id="copyEmbed" type="button" title="Copy an iframe snippet with this host's full URL">copy embed</button>
     </div>
     <div class="map-slot"><iframe allowfullscreen src="${esc(withProvider(withTk(nd.href)))}"></iframe></div>`
+  // COPY EMBED — the partner handoff. The snippet is built AT CLICK TIME from
+  // location.href, so it always carries the FULL URL of whatever host serves
+  // this tree (localhost, doxa.life/js/doxa-maps-build/…, any CDN) — embeds
+  // work no matter where the build folder lives. utm_source placeholder =
+  // per-partner traffic attribution (see the manifest snippets).
+  const copyBtn = $('#copyEmbed')
+  if (copyBtn) copyBtn.addEventListener('click', async () => {
+    const abs = new URL(nd.href, location.href)
+    abs.searchParams.set('utm_source', 'YOUR_SOURCE')
+    const snip = '<iframe src="' + abs.href + '" width="100%" height="600" '
+      + 'style="border:none;border-radius:12px;" allowfullscreen></iframe>'
+    let ok = false
+    try { await navigator.clipboard.writeText(snip); ok = true } catch (_) {
+      try {
+        const ta = document.createElement('textarea')
+        ta.value = snip; document.body.appendChild(ta); ta.select()
+        ok = document.execCommand('copy'); ta.remove()
+      } catch (_) {}
+    }
+    copyBtn.textContent = ok ? 'copied ✓' : 'copy failed'
+    setTimeout(() => { copyBtn.textContent = 'copy embed' }, 1800)
+  })
   // keep the sidebar highlight in sync
   document.querySelectorAll('#treeNav .node').forEach((b) =>
     b.classList.toggle('active', b.dataset.key === activeKey))
