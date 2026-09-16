@@ -333,7 +333,7 @@
       "bundle": "my-upg-100-list",
       "scriptUrl": "./my-upg-100-list/my-upg-100-list.js",
       "output": "doxa-maps/my-upg-100-list/my-upg-100-list.js",
-      "integrity": "sha384-mbEjNg2czbPNcbsd8yqtppwFymur3/+1roDf54PmZCO11f6ekERchOH+F7J10+Px",
+      "integrity": "sha384-/96bD/kJ7nIFNvPIef48hwqqJiaOeQYUJNTgDTR0WwtXU0kyYPLl1iFKx+KJcl6g",
       "elements": [
         "my-upg-100-list-map"
       ],
@@ -347,7 +347,7 @@
           "scriptUrl": "./my-upg-100-list/my-upg-100-list.js",
           "embed": {
             "iframe": "<iframe src=\"./my-upg-100-list/poster-wall/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./my-upg-100-list/my-upg-100-list.js\" integrity=\"sha384-mbEjNg2czbPNcbsd8yqtppwFymur3/+1roDf54PmZCO11f6ekERchOH+F7J10+Px\" crossorigin=\"anonymous\"></script>\n<my-upg-100-list-map profile-config='{\"profile\":\"poster-wall\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></my-upg-100-list-map>"
+            "script": "<script src=\"./my-upg-100-list/my-upg-100-list.js\" integrity=\"sha384-/96bD/kJ7nIFNvPIef48hwqqJiaOeQYUJNTgDTR0WwtXU0kyYPLl1iFKx+KJcl6g\" crossorigin=\"anonymous\"></script>\n<my-upg-100-list-map profile-config='{\"profile\":\"poster-wall\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></my-upg-100-list-map>"
           }
         },
         {
@@ -359,7 +359,7 @@
           "scriptUrl": "./my-upg-100-list/my-upg-100-list.js",
           "embed": {
             "iframe": "<iframe src=\"./my-upg-100-list/upg-100-list/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./my-upg-100-list/my-upg-100-list.js\" integrity=\"sha384-mbEjNg2czbPNcbsd8yqtppwFymur3/+1roDf54PmZCO11f6ekERchOH+F7J10+Px\" crossorigin=\"anonymous\"></script>\n<my-upg-100-list-map profile-config='{\"profile\":\"upg-100-list\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></my-upg-100-list-map>"
+            "script": "<script src=\"./my-upg-100-list/my-upg-100-list.js\" integrity=\"sha384-/96bD/kJ7nIFNvPIef48hwqqJiaOeQYUJNTgDTR0WwtXU0kyYPLl1iFKx+KJcl6g\" crossorigin=\"anonymous\"></script>\n<my-upg-100-list-map profile-config='{\"profile\":\"upg-100-list\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></my-upg-100-list-map>"
           }
         },
         {
@@ -371,7 +371,7 @@
           "scriptUrl": "./my-upg-100-list/my-upg-100-list.js",
           "embed": {
             "iframe": "<iframe src=\"./my-upg-100-list/upg-100-mfe/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./my-upg-100-list/my-upg-100-list.js\" integrity=\"sha384-mbEjNg2czbPNcbsd8yqtppwFymur3/+1roDf54PmZCO11f6ekERchOH+F7J10+Px\" crossorigin=\"anonymous\"></script>\n<my-upg-100-list-map profile-config='{\"profile\":\"upg-100-mfe\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></my-upg-100-list-map>"
+            "script": "<script src=\"./my-upg-100-list/my-upg-100-list.js\" integrity=\"sha384-/96bD/kJ7nIFNvPIef48hwqqJiaOeQYUJNTgDTR0WwtXU0kyYPLl1iFKx+KJcl6g\" crossorigin=\"anonymous\"></script>\n<my-upg-100-list-map profile-config='{\"profile\":\"upg-100-mfe\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></my-upg-100-list-map>"
           }
         }
       ]
