@@ -11,6 +11,10 @@
 // server/api/maps/token.get.ts) passes a pk.* through or mints a 1-hour tk.*
 // from a secret key — the single source of truth built for embeds like this.
 // We fetch it once and hand it to the shell via its native ?tk= rung.
+// FULL PAGE: no site chrome — the default layout's header/footer overlapped
+// the map. layout:false renders this page bare; the SPA shell IS the chrome.
+definePageMeta({ layout: false })
+
 const frameSrc = ref('')
 onMounted(async () => {
   let tk = ''
