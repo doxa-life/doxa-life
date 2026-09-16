@@ -54,7 +54,11 @@ const isSimple = props.bundle === 'simple-map'
 @media (max-width: 768px) {
   .doxa-map-slot {
     min-height: 0;
-    aspect-ratio: 1 / 2;
+    /* Was 1 / 2 — twice as tall as wide, ~780px on a 390px phone ("too tall on mobile",
+       2026-09-16). 2 / 3 keeps room for the legend sheet and the toolbar; the cap keeps the
+       map inside one screen so the page below it stays reachable. */
+    aspect-ratio: 9 / 16;
+    max-height: 85svh;
   }
 }
 
