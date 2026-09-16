@@ -71,30 +71,17 @@
 .map-toolbar {
   position: absolute;
   top: 6px;
-  /* Sit the control column near the edge with a small symmetric padding (3px) —
-     same value works whether the toolbar is swapped to the left or right side, and
-     it lines up with the search bar's 3px side inset. coder 2026-06-24. */
   right: 3px;
   display: flex;
   flex-direction: column;
   gap: var(--map-toolbar-gap, 8px);
   z-index: 10;
 }
-/* Slim every toolbar control to a fixed 32px (coder 2026-06-24: "buttons can be
-   smaller"): smaller but still tappable, and uniform so they all align. The icons
-   inside stay their own fixed px sizes (they don't scale with the button), so they
-   remain legible — "icons fixed in their sizing". Caps the responsive
-   --map-btn-size (40/36/32). FullscreenButton.vue is not edited; it slims here too. */
 .map-toolbar .mcb,
 .map-toolbar .hbg-btn { width: 32px; height: 32px; }
-.map-toolbar .hbg-ctrl { margin: 10px 0 0 0; }  /* drop the 6px left offset so it lines up with the rest */
+.map-toolbar .hbg-ctrl { margin: 10px 0 0 0; }
 @media (max-width: 767px) {
-  /* Mobile (with geocoder): drop the toolbar well below the search bar so
-     it doesn't sit flush against the search pill. Search = top:10,
-     height ~36, bottom:46. top:80 leaves a comfortable ~34px gap. */
   .map-toolbar { top: 72px; gap: 6px; }
-  /* Mobile (no geocoder): collapse the reserved gap — controls sit flush
-     to the top of the map area with the same 6px inset used on desktop. */
   .map-toolbar.map-toolbar--no-geocoder { top: 6px; gap: 6px; }
 }
 `,"map-toolbar"),(l,o)=>(A(),G("div",{class:Oe(["map-toolbar",{"map-toolbar--no-geocoder":!e.hasGeocoder}])},[ut(l.$slots,"default")],2))}},Kg=["title","disabled"],ts={__name:"MapControlButton",props:{isDark:{type:Boolean,default:!1},title:{type:String,default:""},active:{type:Boolean,default:!1},disabled:{type:Boolean,default:!1}},emits:["click"],setup(e){return $l(`
@@ -104,33 +91,24 @@
   border:none;
   border-radius:50%;
   cursor:pointer;
-  /* Don't let a drag that starts near a button select its glyph (the old
-     "drag selects the emoji to copy" bug while grabbing the scroll edge). */
   user-select:none;-webkit-user-select:none;
   display:flex;align-items:center;justify-content:center;
-  /* Tight shadow only — the old 0 2px 8px spread bled to the map's clipped right
-     edge (overflow:hidden) and read as a "shadow wall" + made buttons look
-     over-padded. (coder 2026-06-24) */
   box-shadow:0 1px 3px rgba(0,0,0,0.18);
   transition:background-color 0.2s,box-shadow 0.2s,transform 0.1s;
   color:#333;
   flex-shrink:0;
   outline:none;
-  /* No blue/grey selection box on click/tap (webkit tap highlight). */
   -webkit-tap-highlight-color:transparent;
 }
 .mcb:hover:not(:disabled){background:#f0f0f0;box-shadow:0 2px 8px rgba(0,0,0,0.18),0 4px 16px rgba(0,0,0,0.12);}
 .mcb:active:not(:disabled){transform:scale(0.93);}
 .mcb:disabled{opacity:0.4;cursor:not-allowed;}
 .mcb.active{background:#e8f0fe;color:#1a73e8;}
-/* dark */
 .mcb.dark{background:#3b463d;color:#F3F3F1;border:1px solid rgba(255,255,255,0.14);box-shadow:0 1px 4px rgba(0,0,0,0.4);}
 .mcb.dark:hover:not(:disabled){background:#4e594f;box-shadow:0 2px 8px rgba(0,0,0,0.5);}
 .mcb.dark.active{background:#4e594f;color:#92b195;}
 @media(max-width:767px){.mcb{width:36px;height:36px;}}
 `,"map-control-button"),(l,o)=>(A(),G("button",{class:Oe(["mcb",{dark:e.isDark,active:e.active}]),title:e.title,disabled:e.disabled,onClick:o[0]||(o[0]=s=>l.$emit("click"))},[ut(l.$slots,"default")],10,Kg))}},Gg={__name:"ZoomInButton",props:{map:{type:Object,default:null},isDark:{type:Boolean,default:!1}},setup(e){const{t:l}=so(),o=e;function s(){var n;(n=o.map)==null||n.zoomIn()}return(n,a)=>(A(),Ye(ts,{"is-dark":e.isDark,title:Nl(l)("buttons.zoomIn"),onClick:s},{default:io(()=>[...a[0]||(a[0]=[y("span",{style:{"font-size":"20px","line-height":"1","font-weight":"600"}},"+",-1)])]),_:1},8,["is-dark","title"]))}},zg={__name:"ZoomOutButton",props:{map:{type:Object,default:null},isDark:{type:Boolean,default:!1}},setup(e){const{t:l}=so(),o=e;function s(){var n;(n=o.map)==null||n.zoomOut()}return(n,a)=>(A(),Ye(ts,{"is-dark":e.isDark,title:Nl(l)("buttons.zoomOut"),onClick:s},{default:io(()=>[...a[0]||(a[0]=[y("span",{style:{"font-size":"22px","line-height":"1","font-weight":"600"}},"−",-1)])]),_:1},8,["is-dark","title"]))}},Vg={__name:"LocationButton",props:{map:{type:Object,default:null},isDark:{type:Boolean,default:!1},center:{type:Array,default:()=>[20,10]},zoom:{type:Number,default:1.8},userZoom:{type:Number,default:10}},setup(e){const{t:l}=so(),o=e;function s(){var a;(a=o.map)==null||a.flyTo({center:o.center,zoom:o.zoom,duration:1200})}function n(){if(o.map){if(typeof navigator>"u"||!navigator.geolocation){s();return}navigator.geolocation.getCurrentPosition(a=>{const{longitude:t,latitude:i}=a.coords;Number.isFinite(t)&&Number.isFinite(i)?o.map.flyTo({center:[t,i],zoom:o.userZoom,duration:1500}):s()},()=>s(),{enableHighAccuracy:!1,timeout:5e3,maximumAge:6e4})}}return(a,t)=>(A(),Ye(ts,{"is-dark":e.isDark,title:Nl(l)("buttons.resetView"),onClick:n},{default:io(()=>[...t[0]||(t[0]=[y("svg",{xmlns:"http://www.w3.org/2000/svg",width:"18",height:"18",viewBox:"0 0 24 24",fill:"currentColor"},[y("path",{d:"M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"})],-1)])]),_:1},8,["is-dark","title"]))}},Hg={key:0,xmlns:"http://www.w3.org/2000/svg",width:"20",height:"20",viewBox:"0 0 29 29",fill:"currentColor"},Wg={key:1,xmlns:"http://www.w3.org/2000/svg",width:"20",height:"20",viewBox:"0 0 29 29",fill:"currentColor"},qg={__name:"FullscreenButton",props:{mapContainer:{type:Object,default:null},isDark:{type:Boolean,default:!1}},emits:["change"],setup(e,{emit:l}){const{t:o}=so(),s=e,n=l,a=ne(!1);let t=null,i=null,r=null,c=null,u=null,f=null,w=null,v=null,x=null,N=null,P=null,L=0,K=0,d=null,g=null;function k(){if(typeof document>"u")return!1;const Y=typeof navigator<"u"&&navigator.userAgent||"";return/iPad|iPhone|iPod/.test(Y)||Y.includes("Mac")&&typeof document<"u"&&"ontouchend"in document?!1:!!(document.fullscreenEnabled||document.webkitFullscreenEnabled)}function j(){var Y,T,I;return((I=(T=(Y=s.mapContainer)==null?void 0:Y.getRootNode)==null?void 0:T.call(Y))==null?void 0:I.host)??null}function O(){var T,I;const Y=(I=(T=s.mapContainer)==null?void 0:T.getRootNode)==null?void 0:I.call(T);return document.fullscreenElement||document.webkitFullscreenElement||(Y&&Y instanceof ShadowRoot?Y.fullscreenElement:null)||null}function B(Y){const T=Y.requestFullscreen||Y.webkitRequestFullscreen;if(!T)return Promise.reject(new Error("Fullscreen API unavailable"));const I=T.call(Y);return I&&typeof I.then=="function"?I:Promise.resolve()}function $(){const Y=document.exitFullscreen||document.webkitExitFullscreen;if(!Y)return Promise.reject(new Error("Fullscreen API unavailable"));const T=Y.call(document);return T&&typeof T.then=="function"?T:Promise.resolve()}function le(){const Y=j();if(!Y)return!1;if(r=Y,i=Y.style.cssText,Y.style.position="fixed",Y.style.top="0",Y.style.left="0",Y.style.right="0",Y.style.bottom="0",Y.style.width="100vw",Y.style.height="100vh",Y.style.height="100dvh",Y.style.zIndex="2147483647",Y.style.margin="0",Y.style.borderRadius="0",Y.style.touchAction="pan-x pan-y pinch-zoom",typeof document<"u"){L=window.scrollY||window.pageYOffset||0,K=window.scrollX||window.pageXOffset||0;const T=document.body,I=document.documentElement;c=T?T.style.overflow:null,u=I?I.style.overflow:null,f=T?T.style.position:null,w=T?T.style.top:null,v=T?T.style.left:null,x=T?T.style.width:null,N=T?T.style.touchAction:null,P=I?I.style.touchAction:null,I&&(I.style.overflow="hidden",I.style.touchAction="none"),T&&(T.style.overflow="hidden",T.style.position="fixed",T.style.top=`-${L}px`,T.style.left=`-${K}px`,T.style.width="100%",T.style.touchAction="none"),d=Q=>{if(!r)return;const te=Q.target;te&&(te===r||r.contains&&r.contains(te))||Q.cancelable&&Q.preventDefault()},g=Q=>{if(!r)return;const te=Q.target;te&&(te===r||r.contains&&r.contains(te))||Q.cancelable&&Q.preventDefault()},document.addEventListener("touchmove",d,{passive:!1,capture:!0}),document.addEventListener("wheel",g,{passive:!1,capture:!0})}return!0}function ue(){if(r){if(r.style.cssText=i||"",r=null,i=null,typeof document<"u"){const Y=document.body,T=document.documentElement;Y&&(Y.style.overflow=c??"",Y.style.position=f??"",Y.style.top=w??"",Y.style.left=v??"",Y.style.width=x??"",Y.style.touchAction=N??""),T&&(T.style.overflow=u??"",T.style.touchAction=P??""),d&&(document.removeEventListener("touchmove",d,{capture:!0}),d=null),g&&(document.removeEventListener("wheel",g,{capture:!0}),g=null),typeof window<"u"&&(L||K)&&window.scrollTo(K,L)}c=null,u=null,f=null,w=null,v=null,x=null,N=null,P=null,L=0,K=0}}function Z(){typeof window>"u"||window.requestAnimationFrame(()=>{window.dispatchEvent(new Event("resize"))})}function ee(){if(!k()){a.value?(ue(),a.value=!1,n("change",!1)):le()&&(a.value=!0,n("change",!0)),Z();return}if(O())$().then(()=>{a.value=!1,n("change",!1)}).catch(()=>{});else{const T=j()??document.documentElement;B(T).then(()=>{a.value=!0,n("change",!0)}).catch(()=>{B(document.documentElement).then(()=>{a.value=!0,n("change",!0)}).catch(()=>{})})}}function de(){a.value=!!O(),n("change",a.value)}return Rl(()=>{var T,I;document.addEventListener("fullscreenchange",de),document.addEventListener("webkitfullscreenchange",de);const Y=(I=(T=s.mapContainer)==null?void 0:T.getRootNode)==null?void 0:I.call(T);Y instanceof ShadowRoot&&(t=Y,Y.addEventListener("fullscreenchange",de),Y.addEventListener("webkitfullscreenchange",de))}),uo(()=>{document.removeEventListener("fullscreenchange",de),document.removeEventListener("webkitfullscreenchange",de),t&&(t.removeEventListener("fullscreenchange",de),t.removeEventListener("webkitfullscreenchange",de),t=null),r&&ue()}),(Y,T)=>(A(),Ye(ts,{"is-dark":e.isDark,active:a.value,title:Nl(o)("buttons.toggleFullscreen"),onClick:ee},{default:io(()=>[a.value?(A(),G("svg",Wg,[...T[1]||(T[1]=[y("path",{d:"M18.5 16c-1.75 0-2.5.75-2.5 2.5V24h1l1.5-3 5.5 4 1-1-4-5.5 3-1.5v-1h-5.5zM13 18.5c0-1.75-.75-2.5-2.5-2.5H5v1l3 1.5L4 24l1 1 5.5-4 1.5 3h1v-5.5zm3-8c0 1.75.75 2.5 2.5 2.5H24v-1l-3-1.5L25 5l-1-1-5.5 4L17 5h-1v5.5zM10.5 13c1.75 0 2.5-.75 2.5-2.5V5h-1l-1.5 3L5 4 4 5l4 5.5L5 12v1h5.5z"},null,-1)])])):(A(),G("svg",Hg,[...T[0]||(T[0]=[y("path",{d:"M24 16v5.5c0 1.75-.75 2.5-2.5 2.5H16v-1l3-1.5-4-5.5 1-1 5.5 4 1.5-3h1zM6 16l1.5 3 5.5-4 1 1-4 5.5 3 1.5v1H7.5C5.75 24 5 23.25 5 21.5V16h1zm7-11v1l-3 1.5 4 5.5-1 1-5.5-4L6 13H5V7.5C5 5.75 5.75 5 7.5 5H13zm11 2.5c0-1.75-.75-2.5-2.5-2.5H16v1l3 1.5-4 5.5 1 1 5.5-4 1.5 3h1V7.5z"},null,-1)])]))]),_:1},8,["is-dark","active","title"]))}},Yg=Qs&&Qs.tagName.toUpperCase()==="SCRIPT"&&Qs.src||new URL("gospel-resources.js",document.baseURI).href,_n=e=>String(e||"").trim().replace(/\/+$/,"");function Jg(){try{const l=String(Yg||"").split(/[?#]/)[0].match(/^(.*)\/([^/]+)\/([^/]+)\.js$/);return!l||l[2]!==l[3]?null:l[1]||null}catch{return null}}function Xg(e){const l=e==null?void 0:e.embedBaseUrl;if(typeof l=="string"&&l.trim())return _n(l);if(typeof window<"u"){const o=window.MAP_EMBED_BASE_URL;if(typeof o=="string"&&o.trim())return _n(o)}return _n(Jg()||"")}function Zg({shareUrl:e,embedPath:l,profileConfig:o}={}){const s=o||null,n=typeof window<"u",a=e||(s==null?void 0:s.shareUrl);if(typeof a=="string"&&a.trim())return a.trim();const t=String(l||(s==null?void 0:s.shareEmbedPath)||"").trim();if(t){if(/^https?:\/\//i.test(t))return t;if(t.startsWith("/"))return n?window.location.origin+t:t;const i=Xg(s),r=t.replace(/^\.\//,"");if(i)return i+"/"+r;if(typeof document<"u")try{return new URL(r,document.baseURI).href}catch{}return r}return n?window.location.origin+window.location.pathname:""}const Qg={style:{position:"relative"}},ed={class:"share-tabs"},ld={key:0,class:"share-body"},od={class:"share-url-box"},sd={class:"share-url-text"},ad={key:0,width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2","stroke-linecap":"round","stroke-linejoin":"round"},nd={key:1,width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5","stroke-linecap":"round","stroke-linejoin":"round"},td={key:1,class:"share-body"},id={class:"share-size-pills"},rd=["onClick"],ud={class:"share-code-box"},cd={key:0,width:"15",height:"15",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2","stroke-linecap":"round","stroke-linejoin":"round"},_d={key:1,width:"15",height:"15",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2.5","stroke-linecap":"round","stroke-linejoin":"round"},pd={__name:"ShareButton",props:{isDark:{type:Boolean,default:!1},embedPath:{type:String,default:""}},setup(e){$l(`
-/* ---- popover shell ---- */
-/* ---- popover shell (imitates SemanticTreeLegend .stl-inner) ---- */
 .share-pop{
   position:absolute;
   top:0;
@@ -159,9 +137,6 @@
   box-shadow:0 6px 24px rgba(0,0,0,0.16);
   color:#1f2328;
 }
-
-/* ---- header / close ---- */
-/* ---- header (imitates .stl-titlebar: 32px min-height, slim) ---- */
 .share-header{
   display:flex;
   align-items:center;
@@ -191,8 +166,6 @@
 .share-close:hover{color:#c9d1d9;background:rgba(59,70,61,0.18);border-color:#73A17F;}
 .share-pop.light .share-close{background:rgba(208,215,222,0.4);border-color:#d0d7de;color:#57606a;}
 .share-pop.light .share-close:hover{color:#3b463d;background:rgba(59,70,61,0.12);border-color:#3b463d;}
-
-/* ---- tabs ---- */
 .share-tabs{
   display:flex;
   gap:0;
@@ -222,13 +195,9 @@
 .share-pop.light .share-tab.active{
   border-bottom-color:#1a73e8;
 }
-
-/* ---- tab body ---- */
 .share-body{
   padding:12px 16px 14px 16px;
 }
-
-/* ---- Share Link tab ---- */
 .share-url-box{
   display:flex;
   align-items:center;
@@ -254,8 +223,6 @@
   user-select:all;
 }
 .share-pop.light .share-url-text{color:#555;}
-
-/* ---- primary CTA button ---- */
 .share-primary-btn{
   display:flex;
   align-items:center;
@@ -288,8 +255,6 @@
 .share-pop.light .share-primary-btn.copied{
   background:#2ea44f;
 }
-
-/* ---- social row ---- */
 .share-social-row{
   display:flex;
   align-items:center;
@@ -330,15 +295,12 @@
   background:rgba(0,0,0,0.07);
   border-color:rgba(0,0,0,0.16);
 }
-
-/* ---- Embed tab ---- */
 .share-embed-desc{
   font-size:13.5px;
   line-height:1.55;
   opacity:0.72;
   margin-bottom:16px;
 }
-
 .share-size-pills{
   display:flex;
   gap:8px;
@@ -375,7 +337,6 @@
   border-color:rgba(26,115,232,0.40);
   color:#1a73e8;
 }
-
 .share-code-box{
   background:rgba(0,0,0,0.28);
   border:1px solid rgba(255,255,255,0.06);
@@ -397,8 +358,6 @@
   border:1px solid rgba(0,0,0,0.08);
   color:#444;
 }
-
-/* ---- copy code button (secondary style) ---- */
 .share-secondary-btn{
   display:flex;
   align-items:center;
@@ -440,14 +399,6 @@
   border-color:rgba(46,164,79,0.30);
   color:#2ea44f;
 }
-
-/* ---- responsive: align with MapToolbar's layout convention ----
-   The research-map profile uses @media(max-width:767px) and positions the
-   search bar at top:10, left:10, right:10. The geocoder pill renders ~60px
-   tall on mobile, so its bottom edge is ~70px. MapToolbar sits at top:80
-   (10px gap below search). We mirror MapToolbar exactly so the popover's
-   top edge aligns with the top of the  button.
-   right:52 = MapToolbar right(10) + button-width(36) + 6px breathing room. */
 @media(max-width:767px){
   .share-pop{
     position:fixed;

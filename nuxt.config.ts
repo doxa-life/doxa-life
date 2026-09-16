@@ -244,8 +244,8 @@ export default defineNuxtConfig({
     //     from the per-token writes bucket. `pages.view` is the only
     //     read scope today.
     //   mcpRateLimits: per-token writes bucket is raised from the
-    //     layer default (20/min) to 60/min — a "publish 9 locales of
-    //     5 pages" Claude flow lands at 45 calls.
+    //     layer default (20/min) to 60/min — a bulk publish of
+    //     9 locales × 5 pages needs ~45 write calls.
     mcpReadScopes: ['pages.view'],
     mcpRateLimits: {
       writesPerToken: { limit: 60, windowMs: 60_000 }

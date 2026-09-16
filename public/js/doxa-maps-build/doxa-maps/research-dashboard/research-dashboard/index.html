@@ -14,7 +14,7 @@
   <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
   <style>
     /* BARE full-page map — no chrome. The custom element IS the page, so the
-       browser URL shares the map itself (design note: "Share shares THE MAP"). */
+       browser URL shares the map itself. */
     html, body { height: 100%; margin: 0; background: #0a0e15; }
     #slot, research-dashboard-map { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
     #status { position: fixed; inset: 0; z-index: 2; display: grid; place-items: center;
@@ -29,7 +29,7 @@
 
   <script>window.MAP_APP_API_URL = "https://pray.doxa.life";</script>
   <!-- Bundle IIFE — registers the <research-dashboard-map> custom element. -->
-  <script src="../research-dashboard.js" integrity="sha384-zt/p5jPpNqDg6lcSBIEt0HccyWTMZE6JtY5tH7QdX7johN+8nf7xAHpoXPq1Ls0O" crossorigin="anonymous"></script>
+  <script src="../research-dashboard.js" integrity="sha384-KM1+8afDjk+fAFTzbxqv66v2xJtrgihGGkjQd7AFoWr87sctxGvAPpEG0aTsgKiY" crossorigin="anonymous"></script>
 
   <script>
     // Mapbox token resolution — the A3 ladder, in precedence order:

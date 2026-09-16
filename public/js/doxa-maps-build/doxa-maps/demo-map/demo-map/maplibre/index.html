@@ -12,7 +12,7 @@
   <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5/dist/maplibre-gl.js"></script>
   <style>
     /* BARE full-page map — no chrome. The custom element IS the page, so the
-       browser URL shares the map itself (design note: "Share shares THE MAP"). */
+       browser URL shares the map itself. */
     html, body { height: 100%; margin: 0; background: #0a0e15; }
     #slot, demo-map { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
     #status { position: fixed; inset: 0; z-index: 2; display: grid; place-items: center;
@@ -27,7 +27,7 @@
 
   <script>window.MAP_APP_API_URL = "https://pray.doxa.life";</script>
   <!-- Bundle IIFE — registers the <demo-map> custom element. -->
-  <script src="../../demo-map.js" integrity="sha384-LHGkKIEgv00d9oLnEZtLJJZ24oCTXrgoMItI12/wIOgUxlsefkyIb1bIPQKPkZiV" crossorigin="anonymous"></script>
+  <script src="../../demo-map.js" integrity="sha384-iwx1BbMrXkW8BmQMSfzl4MX4nyH6CDoOFivDM4DsIVr7832ELldLnRqrpaLV3BOY" crossorigin="anonymous"></script>
 
   <script>
     // Mapbox token resolution — the A3 ladder, in precedence order:
