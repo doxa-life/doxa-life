@@ -38,7 +38,18 @@ const isSimple = props.bundle === 'simple-map'
   min-height: 780px;
   aspect-ratio: 16 / 9;
   overflow: hidden;
+  /* Rounded clip that cannot race the compositor. `overflow: hidden` + `border-radius`
+     alone is applied to a COMPOSITED child (the WebGL canvas, an iframe) only once
+     Chrome has built a mask layer for it — so on a real GPU the map showed square
+     corners until it loaded, then rounded ones (reported on /research, 2026-09-16).
+     clip-path is applied at paint time regardless of compositing. The radius follows
+     the host page's utility class on this element (rounded-md / rounded-xlg). */
+  --slot-radius: 0px;
+  clip-path: inset(0 round var(--slot-radius));
+  isolation: isolate;
 }
+.doxa-map-slot.rounded-md  { --slot-radius: var(--border-radius-lg); }
+.doxa-map-slot.rounded-xlg { --slot-radius: var(--border-radius-xlg); }
 
 @media (max-width: 768px) {
   .doxa-map-slot {
