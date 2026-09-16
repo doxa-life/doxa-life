@@ -154,6 +154,11 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    // LEGACY MAP PATHS HEAL THEMSELVES: the drop-in moved to /js/doxa-maps-build/
+    // (one output folder under the js path). Any old /js/doxa-maps/... link —
+    // bookmarks, muscle memory, older embeds — 301s to the current location.
+    '/js/doxa-maps/**': { redirect: { to: '/js/doxa-maps-build/doxa-maps/**', statusCode: 301 } },
+
     // Content-hashed build assets never change under the same URL — cache forever.
     '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
     // Fonts/images use stable filenames, so avoid `immutable`: a 7-day cache
