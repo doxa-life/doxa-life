@@ -160,7 +160,10 @@
 
     // ── Load the bundle (registers the custom element) ───────────────────
     const s = document.createElement('script');
-    s.src = isResearch ? '/js/doxa-research-map.js' : '/js/doxa-simple-map.js';
+    // Bundles live in the doxa-maps-build drop-in (one output folder under /js).
+    s.src = isResearch
+      ? '/js/doxa-maps-build/doxa-maps/doxa-research-map/doxa-research-map.js'
+      : '/js/doxa-maps-build/doxa-maps/doxa-simple-map/doxa-simple-map.js';
     s.onerror = () => showError('<strong>Could not load the map bundle</strong> <code>' + s.src + '</code>.');
     document.head.appendChild(s);
   })();
