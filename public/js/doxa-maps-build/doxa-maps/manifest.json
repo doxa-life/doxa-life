@@ -56,7 +56,7 @@
       "bundle": "country-posters",
       "scriptUrl": "./country-posters/country-posters.js",
       "output": "doxa-maps/country-posters/country-posters.js",
-      "integrity": "sha384-FBtv267lu0P9eg9CMAttrXz1NOkbktgrwvUDjBJvRIEkpqxHCy1UD7ceJeIfAvjX",
+      "integrity": "sha384-n56xDdBrLifTiXMlqyiUMXXqLPhsdUlMPp7fPiD+DboNhQOiyKgZemKONDO2HxhC",
       "elements": [
         "country-posters-map"
       ],
@@ -70,7 +70,7 @@
           "scriptUrl": "./country-posters/country-posters.js",
           "embed": {
             "iframe": "<iframe src=\"./country-posters/countries-map/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./country-posters/country-posters.js\" integrity=\"sha384-FBtv267lu0P9eg9CMAttrXz1NOkbktgrwvUDjBJvRIEkpqxHCy1UD7ceJeIfAvjX\" crossorigin=\"anonymous\"></script>\n<country-posters-map profile-config='{\"profile\":\"countries-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></country-posters-map>"
+            "script": "<script src=\"./country-posters/country-posters.js\" integrity=\"sha384-n56xDdBrLifTiXMlqyiUMXXqLPhsdUlMPp7fPiD+DboNhQOiyKgZemKONDO2HxhC\" crossorigin=\"anonymous\"></script>\n<country-posters-map profile-config='{\"profile\":\"countries-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></country-posters-map>"
           }
         },
         {
@@ -82,7 +82,7 @@
           "scriptUrl": "./country-posters/country-posters.js",
           "embed": {
             "iframe": "<iframe src=\"./country-posters/country-poster-wall/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./country-posters/country-posters.js\" integrity=\"sha384-FBtv267lu0P9eg9CMAttrXz1NOkbktgrwvUDjBJvRIEkpqxHCy1UD7ceJeIfAvjX\" crossorigin=\"anonymous\"></script>\n<country-posters-map profile-config='{\"profile\":\"country-poster-wall\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></country-posters-map>"
+            "script": "<script src=\"./country-posters/country-posters.js\" integrity=\"sha384-n56xDdBrLifTiXMlqyiUMXXqLPhsdUlMPp7fPiD+DboNhQOiyKgZemKONDO2HxhC\" crossorigin=\"anonymous\"></script>\n<country-posters-map profile-config='{\"profile\":\"country-poster-wall\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></country-posters-map>"
           }
         }
       ]
@@ -91,7 +91,7 @@
       "bundle": "demo-map",
       "scriptUrl": "./demo-map/demo-map.js",
       "output": "doxa-maps/demo-map/demo-map.js",
-      "integrity": "sha384-B+SyViDxVGRi34FHMkYac/xvZ43ATdtjC581+MYPyim2Z8wk+6uAWj7DNt6GA+C2",
+      "integrity": "sha384-4+J4YYmXNDMdsv+sGd/8Q60hY2akzgpH968K1bHHClUxkXctNKRYlctvKlJbtK2b",
       "elements": [
         "demo-map"
       ],
@@ -105,7 +105,7 @@
           "scriptUrl": "./demo-map/demo-map.js",
           "embed": {
             "iframe": "<iframe src=\"./demo-map/demo-map/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./demo-map/demo-map.js\" integrity=\"sha384-B+SyViDxVGRi34FHMkYac/xvZ43ATdtjC581+MYPyim2Z8wk+6uAWj7DNt6GA+C2\" crossorigin=\"anonymous\"></script>\n<demo-map profile-config='{\"profile\":\"demo-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></demo-map>"
+            "script": "<script src=\"./demo-map/demo-map.js\" integrity=\"sha384-4+J4YYmXNDMdsv+sGd/8Q60hY2akzgpH968K1bHHClUxkXctNKRYlctvKlJbtK2b\" crossorigin=\"anonymous\"></script>\n<demo-map profile-config='{\"profile\":\"demo-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></demo-map>"
           },
           "instances": [
             {
@@ -132,7 +132,7 @@
       "bundle": "doxa-research-map",
       "scriptUrl": "./doxa-research-map/doxa-research-map.js",
       "output": "doxa-maps/doxa-research-map/doxa-research-map.js",
-      "integrity": "sha384-ucQyb81oBIScE6DAnHkfssGlIPACxSPP/BoC6mtdkuRn/XNSgyGDssUDTKtodUCL",
+      "integrity": "sha384-xUWb0a+reCVVmrFNLyDgblnoYvA/RCpEGD5kS5mjCm61bL0Zv463I89TMDuCBh2u",
       "elements": [
         "doxa-research-map"
       ],
@@ -146,7 +146,7 @@
           "scriptUrl": "./doxa-research-map/doxa-research-map.js",
           "embed": {
             "iframe": "<iframe src=\"./doxa-research-map/research-map/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./doxa-research-map/doxa-research-map.js\" integrity=\"sha384-ucQyb81oBIScE6DAnHkfssGlIPACxSPP/BoC6mtdkuRn/XNSgyGDssUDTKtodUCL\" crossorigin=\"anonymous\"></script>\n<doxa-research-map profile-config='{\"profile\":\"research-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></doxa-research-map>"
+            "script": "<script src=\"./doxa-research-map/doxa-research-map.js\" integrity=\"sha384-xUWb0a+reCVVmrFNLyDgblnoYvA/RCpEGD5kS5mjCm61bL0Zv463I89TMDuCBh2u\" crossorigin=\"anonymous\"></script>\n<doxa-research-map profile-config='{\"profile\":\"research-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></doxa-research-map>"
           }
         }
       ]
@@ -155,7 +155,7 @@
       "bundle": "doxa-simple-map",
       "scriptUrl": "./doxa-simple-map/doxa-simple-map.js",
       "output": "doxa-maps/doxa-simple-map/doxa-simple-map.js",
-      "integrity": "sha384-bhqFr7F7wpWDfWVigz0L7MH4tqQObm/W3xhcuzx82x9C64JFGpHDO8QgCRojX56a",
+      "integrity": "sha384-MOCXLAI5Kvp+9NrDyR+YWkolkd8QOnBELgqHCKGYvnZtPIiI/yaoT7qxKPackT07",
       "elements": [
         "doxa-map",
         "doxa-simple-map"
@@ -170,7 +170,7 @@
           "scriptUrl": "./doxa-simple-map/doxa-simple-map.js",
           "embed": {
             "iframe": "<iframe src=\"./doxa-simple-map/doxa-simple-map/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./doxa-simple-map/doxa-simple-map.js\" integrity=\"sha384-bhqFr7F7wpWDfWVigz0L7MH4tqQObm/W3xhcuzx82x9C64JFGpHDO8QgCRojX56a\" crossorigin=\"anonymous\"></script>\n<doxa-map profile-config='{\"profile\":\"doxa-simple-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></doxa-map>"
+            "script": "<script src=\"./doxa-simple-map/doxa-simple-map.js\" integrity=\"sha384-MOCXLAI5Kvp+9NrDyR+YWkolkd8QOnBELgqHCKGYvnZtPIiI/yaoT7qxKPackT07\" crossorigin=\"anonymous\"></script>\n<doxa-map profile-config='{\"profile\":\"doxa-simple-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></doxa-map>"
           },
           "instances": [
             {
@@ -309,7 +309,7 @@
       "bundle": "my-upg-100-list",
       "scriptUrl": "./my-upg-100-list/my-upg-100-list.js",
       "output": "doxa-maps/my-upg-100-list/my-upg-100-list.js",
-      "integrity": "sha384-EmL+y2EzMjdr+l2gPQNQ0WVmiSatcqpr50yMftD6vTaYYnkHyZL90vN2OIb4XXfi",
+      "integrity": "sha384-RW4eL0ddwRv7cC3GbCaImAGGDlgmymYlPF6EPjmum6kp2aUST/12N0UaJQUXnu6G",
       "elements": [
         "my-upg-100-list-map"
       ],
@@ -323,7 +323,7 @@
           "scriptUrl": "./my-upg-100-list/my-upg-100-list.js",
           "embed": {
             "iframe": "<iframe src=\"./my-upg-100-list/poster-wall/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./my-upg-100-list/my-upg-100-list.js\" integrity=\"sha384-EmL+y2EzMjdr+l2gPQNQ0WVmiSatcqpr50yMftD6vTaYYnkHyZL90vN2OIb4XXfi\" crossorigin=\"anonymous\"></script>\n<my-upg-100-list-map profile-config='{\"profile\":\"poster-wall\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></my-upg-100-list-map>"
+            "script": "<script src=\"./my-upg-100-list/my-upg-100-list.js\" integrity=\"sha384-RW4eL0ddwRv7cC3GbCaImAGGDlgmymYlPF6EPjmum6kp2aUST/12N0UaJQUXnu6G\" crossorigin=\"anonymous\"></script>\n<my-upg-100-list-map profile-config='{\"profile\":\"poster-wall\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></my-upg-100-list-map>"
           }
         },
         {
@@ -335,7 +335,7 @@
           "scriptUrl": "./my-upg-100-list/my-upg-100-list.js",
           "embed": {
             "iframe": "<iframe src=\"./my-upg-100-list/upg-100-list/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./my-upg-100-list/my-upg-100-list.js\" integrity=\"sha384-EmL+y2EzMjdr+l2gPQNQ0WVmiSatcqpr50yMftD6vTaYYnkHyZL90vN2OIb4XXfi\" crossorigin=\"anonymous\"></script>\n<my-upg-100-list-map profile-config='{\"profile\":\"upg-100-list\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></my-upg-100-list-map>"
+            "script": "<script src=\"./my-upg-100-list/my-upg-100-list.js\" integrity=\"sha384-RW4eL0ddwRv7cC3GbCaImAGGDlgmymYlPF6EPjmum6kp2aUST/12N0UaJQUXnu6G\" crossorigin=\"anonymous\"></script>\n<my-upg-100-list-map profile-config='{\"profile\":\"upg-100-list\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></my-upg-100-list-map>"
           }
         }
       ]
@@ -344,7 +344,7 @@
       "bundle": "research-dashboard",
       "scriptUrl": "./research-dashboard/research-dashboard.js",
       "output": "doxa-maps/research-dashboard/research-dashboard.js",
-      "integrity": "sha384-lZ7gBho2rDVPcokskvREISv+36u3aHZnZZ/cX9sy180aP+qyCxdgmnd8VacYOfqq",
+      "integrity": "sha384-81wtuh3Qw0Cck8jLbIjwmHxy2epkFqZuzYoD/kDbP8L4VlRYXvs87VOjTueFF8dn",
       "elements": [
         "research-dashboard-map"
       ],
@@ -358,7 +358,7 @@
           "scriptUrl": "./research-dashboard/research-dashboard.js",
           "embed": {
             "iframe": "<iframe src=\"./research-dashboard/research-dashboard/index.html\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./research-dashboard/research-dashboard.js\" integrity=\"sha384-lZ7gBho2rDVPcokskvREISv+36u3aHZnZZ/cX9sy180aP+qyCxdgmnd8VacYOfqq\" crossorigin=\"anonymous\"></script>\n<research-dashboard-map profile-config='{\"profile\":\"research-dashboard\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></research-dashboard-map>"
+            "script": "<script src=\"./research-dashboard/research-dashboard.js\" integrity=\"sha384-81wtuh3Qw0Cck8jLbIjwmHxy2epkFqZuzYoD/kDbP8L4VlRYXvs87VOjTueFF8dn\" crossorigin=\"anonymous\"></script>\n<research-dashboard-map profile-config='{\"profile\":\"research-dashboard\",\"tk\":\"YOUR_MAPBOX_TOKEN\"}'></research-dashboard-map>"
           },
           "bundle": "research-dashboard"
         }

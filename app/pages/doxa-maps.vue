@@ -18,7 +18,14 @@ onMounted(async () => {
     const r = await $fetch<{ token?: string }>('/api/maps/token')
     tk = r?.token || ''
   } catch { /* endpoint down → shell falls back to its own ladder */ }
-  frameSrc.value = '/js/doxa-maps-build/index.html' + (tk ? `?tk=${encodeURIComponent(tk)}` : '')
+  // Forward this page's own ?utm_source into the framed SPA so clicks inside
+  // it attribute to whoever linked here (the question-mark tracking mechanism).
+  const utm = (() => { try { return new URLSearchParams(window.location.search).get('utm_source') || '' } catch { return '' } })()
+  const q = new URLSearchParams()
+  if (tk) q.set('tk', tk)
+  if (utm) q.set('utm_source', utm)
+  const qs = q.toString()
+  frameSrc.value = '/js/doxa-maps-build/index.html' + (qs ? `?${qs}` : '')
 })
 useHead({
   title: 'All DOXA Maps',
