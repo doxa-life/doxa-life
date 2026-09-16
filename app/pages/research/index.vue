@@ -50,9 +50,6 @@ useTextHighlight()
       :profile-config="researchProfileConfig"
       class="rounded-xlg"
     />
-    <!-- Invitation to the full map collection sits under the map's bottom-right corner,
-         where the eye lands after exploring it (moved from the header, 2026-09-16). -->
-    <NuxtLink class="research-map-link" to="/doxa-maps">{{ t("See all our research maps, there's more!") }} &rarr;</NuxtLink>
 
     <UupgsList
       :language-code="locale"
