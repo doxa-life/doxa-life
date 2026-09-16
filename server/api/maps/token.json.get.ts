@@ -7,7 +7,7 @@
  * artifact (which would be overwritten on the next drop-in refresh), we expose
  * the same handler under the `.json` path so the leaf maps
  * (engagement / prayer / adoption / …) resolve the token unchanged.
- *
- * See eco-dx/deployment-cycle/backlog.json → DXM-002.
+ * Newer drop-ins try the canonical `/api/maps/token` first and fall back here,
+ * so this alias mainly serves pages built before that change.
  */
 export { default } from './token.get'
