@@ -7,13 +7,18 @@
 // as the build in this repo. Pointed to from the research page
 // ("See all DOXA maps →").
 //
-// TOKEN: one spot, no new endpoints. The shell's own ladder accepts ?tk= (rung
-// 2), so we pass the SAME public.mapboxToken every map page on this site
-// already uses (NUXT_PUBLIC_MAPBOX_TOKEN).
-const config = useRuntimeConfig()
-const frameSrc = computed(() => {
-  const tk = (config.public as { mapboxToken?: string }).mapboxToken || ''
-  return '/js/doxa-maps-build/index.html' + (tk ? `?tk=${encodeURIComponent(tk)}` : '')
+// TOKEN: the site's EXISTING endpoint, nothing new. /api/maps/token (see
+// server/api/maps/token.get.ts) passes a pk.* through or mints a 1-hour tk.*
+// from a secret key — the single source of truth built for embeds like this.
+// We fetch it once and hand it to the shell via its native ?tk= rung.
+const frameSrc = ref('')
+onMounted(async () => {
+  let tk = ''
+  try {
+    const r = await $fetch<{ token?: string }>('/api/maps/token')
+    tk = r?.token || ''
+  } catch { /* endpoint down → shell falls back to its own ladder */ }
+  frameSrc.value = '/js/doxa-maps-build/index.html' + (tk ? `?tk=${encodeURIComponent(tk)}` : '')
 })
 useHead({
   title: 'All DOXA Maps',
@@ -24,6 +29,7 @@ useHead({
 <template>
   <div class="maps-room">
     <iframe
+      v-if="frameSrc"
       :src="frameSrc"
       title="The DOXA maps app"
       class="maps-room-frame"
