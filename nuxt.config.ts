@@ -165,6 +165,9 @@ export default defineNuxtConfig({
     // bookmarks, muscle memory, older embeds — 301s to the current location.
     '/js/doxa-maps/**': { redirect: { to: `${MAPS_BASE}/doxa-maps/**`, statusCode: 301 } },
     '/js/doxa-maps-build/**': { redirect: { to: `${MAPS_BASE}/**`, statusCode: 301 } },
+    // The maps folder is a directory: without the trailing slash a browser resolves the page's
+    // relative refs against the parent and every bundle 404s. Send it to the canonical form.
+    [MAPS_BASE]: { redirect: { to: `${MAPS_BASE}/`, statusCode: 301 } },
 
     // THE DROP-IN STAYS FRAMEABLE: every partner-site embed is an iframe of one of these leaf
     // pages, so they must be embeddable from ANY origin. Nitro does not read the bundler's
