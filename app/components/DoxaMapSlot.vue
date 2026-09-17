@@ -57,6 +57,32 @@ const isSimple = props.bundle === 'simple-map'
   will-change: transform;
   transform: translateZ(0);
 }
+
+/* THE CORNERS ARE PAINTED, NOT ONLY CLIPPED.
+   A map canvas and an iframe are composited layers: on a real GPU they are not reliably
+   clipped by an ancestor's radius, which is why the corners went square the moment a map
+   finished loading (Firefox, reported 2026-09-17). Clipping the canvas itself breaks
+   Mapbox's own transforms, so the slot instead paints the four corner wedges in the page
+   colour ON TOP of whatever it holds. Ordinary painting — no compositor can escape it, and
+   it works the same for a canvas, an iframe or an image. Per-corner radii so a card can be
+   square along one edge (the research card on phones). */
+.doxa-map-slot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  --corner-tl: var(--slot-radius, 0px);
+  --corner-tr: var(--slot-radius, 0px);
+  --corner-br: var(--slot-radius, 0px);
+  --corner-bl: var(--slot-radius, 0px);
+  --corner-bg: var(--slot-corner-bg, var(--color-surface-default, #F3F3F1));
+  background:
+    radial-gradient(circle at 100% 100%, #0000 calc(var(--corner-tl) - 0.5px), var(--corner-bg) var(--corner-tl)) left    top    / var(--corner-tl) var(--corner-tl) no-repeat,
+    radial-gradient(circle at 0    100%, #0000 calc(var(--corner-tr) - 0.5px), var(--corner-bg) var(--corner-tr)) right   top    / var(--corner-tr) var(--corner-tr) no-repeat,
+    radial-gradient(circle at 0    0,    #0000 calc(var(--corner-br) - 0.5px), var(--corner-bg) var(--corner-br)) right   bottom / var(--corner-br) var(--corner-br) no-repeat,
+    radial-gradient(circle at 100% 0,    #0000 calc(var(--corner-bl) - 0.5px), var(--corner-bg) var(--corner-bl)) left    bottom / var(--corner-bl) var(--corner-bl) no-repeat;
+}
 /* One corner size for every map card, and the element's own radius is pinned to the same
    token so it can never disagree with the clip (the page's utility class sets its own). */
 .doxa-map-slot.rounded-md  { --slot-radius: var(--border-radius-lg); border-radius: var(--slot-radius); }
@@ -71,6 +97,7 @@ const isSimple = props.bundle === 'simple-map'
     clip-path: inset(0 round 0 0 var(--slot-radius) var(--slot-radius));
     --map-radius-corners: 0 0 var(--slot-radius) var(--slot-radius);
   }
+  .doxa-map-slot.rounded-xlg::after { --corner-tl: 0px; --corner-tr: 0px; }
   .doxa-map-slot {
     min-height: 0;
     /* Phone height: twice as tall as wide (~734px on a 390px phone) — 80px more map than the
