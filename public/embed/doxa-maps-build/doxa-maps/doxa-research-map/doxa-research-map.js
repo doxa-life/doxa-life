@@ -1311,16 +1311,21 @@
   .rm-dark .rm-tab-bar { background:#2a332a; }
   .rm-tab {
     background:none;border:none;padding:0;height:100%;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
     font-family:inherit;
-    font-size:14px;font-weight:500;
+    font-size:14px;font-weight:600;
     color:#5f6368;
     cursor:pointer;
-    border-bottom:2px solid transparent;
     white-space:nowrap;
-    transition:color .12s,border-color .12s,background .12s;
+    transition:color .12s;
+  }
+  .rm-tab::after {
+    content:'';display:block;align-self:stretch;height:8px;border-radius:2px;
+    background:transparent;transition:background .12s;
   }
   .rm-tab:hover { color:#202124; }
-  .rm-tab.active { color:#1a73e8;border-bottom-color:#1a73e8;font-weight:600; }
+  .rm-tab.active { color:#3b463d;font-weight:700; }
+  .rm-tab.active::after { background:#73A17F; }
   .rm-tab-sep {
     flex: 0 0 1px;
     align-self: center;
@@ -1329,6 +1334,7 @@
     background: rgba(0, 0, 0, 0.18);
     pointer-events: none;
   }
+  .rm-dark .rm-tab.active { color:#92b195; }
   .rm-dark .rm-tab { color:rgba(243,243,241,0.85); }
   .rm-dark .rm-tab:hover { color:#F3F3F1; }
   .rm-dark .rm-tab.active { color:#cbc5b9;border-bottom-color:#cbc5b9; }
@@ -1340,7 +1346,9 @@
   .rm-root, .rm-map-area, .rm-map-canvas,
   .rm-map-canvas .mapboxgl-canvas-container, .rm-map-canvas .mapboxgl-canvas,
   .rm-map-canvas .maplibregl-canvas-container, .rm-map-canvas .maplibregl-canvas { border-radius: var(--map-radius-corners, var(--map-radius, 0px)); }
-  .rm-map-area, .rm-map-canvas { clip-path: inset(0 round var(--map-radius-corners, var(--map-radius, 0px))); }
+  .rm-map-area, .rm-map-canvas,
+  .rm-map-canvas .mapboxgl-canvas-container, .rm-map-canvas .maplibregl-canvas-container,
+  .rm-map-canvas canvas { clip-path: inset(0 round var(--map-radius-corners, var(--map-radius, 0px))); }
   .rm-map-canvas { position:absolute;inset:0; }
   .rm-loading { position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0f1216;color:#7c8cf8;font:13px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;z-index:5; }
   .rm-error { position:absolute;top:50%;left:12px;right:12px;z-index:7;transform:translateY(-50%);text-align:center;font:13px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#fecaca;background:rgba(15,18,22,.95);border:1px solid rgba(254,202,202,.28);border-radius:10px;padding:12px 14px;box-shadow:0 2px 10px rgba(0,0,0,.4); }
