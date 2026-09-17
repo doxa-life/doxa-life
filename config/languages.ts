@@ -24,7 +24,7 @@ export const LANGUAGES: Language[] = [
   { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸', bibleId: 'NVI' }, //RV1960
   { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷', bibleId: 'FRLSG', bibleLabel: 'LSG' }, //maybe BDS
   { code: 'pt', name: 'Portuguese', nativeName: 'Português', flag: '🇵🇹', bibleId: 'NAA', translationName: 'Brazilian Portuguese' },
-  { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪', bibleId: 'S00', bibleLabel: 'SCH2000', hideFromSwitcher: true },
+  { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪', bibleId: 'S00', bibleLabel: 'SCH2000' },
   { code: 'it', name: 'Italian', nativeName: 'Italiano', flag: '🇮🇹', bibleId: 'NR06', enabled: false },
   { code: 'zh', name: 'Chinese', nativeName: '中文', flag: '🇨🇳', bibleId: 'CUNPS', translationName: 'Simplified Chinese', enabled: false, latinHeadings: false },
   { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦', dir: 'rtl', bibleId: 'SVD', translationName: 'Modern Standard Arabic', latinHeadings: false }, // NAV (New Arabic Version) would be better but not on Bolls
