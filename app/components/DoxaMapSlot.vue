@@ -103,14 +103,6 @@ const isSimple = props.bundle === 'simple-map'
 .doxa-map-slot.rounded-xlg { --slot-radius: var(--border-radius-lg); border-radius: var(--slot-radius); }
 
 @media (max-width: 768px) {
-  /* Phones: the research card runs to the top of the viewport area, so its top corners are
-     square and only the bottom is rounded. */
-  .doxa-map-slot.rounded-xlg {
-    border-radius: 0 0 var(--slot-radius) var(--slot-radius);
-    clip-path: inset(0 round 0 0 var(--slot-radius) var(--slot-radius));
-    --map-radius-corners: 0 0 var(--slot-radius) var(--slot-radius);
-  }
-  .doxa-map-slot.rounded-xlg::after { --corner-tl: 0px; --corner-tr: 0px; }
   .doxa-map-slot {
     min-height: 0;
     /* Phone height: twice as tall as wide (~734px on a 390px phone) — 80px more map than the

@@ -156,7 +156,7 @@
       "bundle": "doxa-research-map",
       "scriptUrl": "./doxa-research-map/doxa-research-map.js",
       "output": "doxa-maps/doxa-research-map/doxa-research-map.js",
-      "integrity": "sha384-1G77jhbHAY8bD1fqSt/c69xq767ngobYQzKb2BwsdzgjngdPzNxzKNdtZsUOzJK2",
+      "integrity": "sha384-g7GG9zmr04YFhYGllNda1EVy3Ruklq8hyFZjjCjoAVe9kU8tgckuvlllf2egL+qT",
       "elements": [
         "doxa-research-map"
       ],
@@ -170,7 +170,7 @@
           "scriptUrl": "./doxa-research-map/doxa-research-map.js",
           "embed": {
             "iframe": "<iframe src=\"./doxa-research-map/research-map/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./doxa-research-map/doxa-research-map.js\" integrity=\"sha384-1G77jhbHAY8bD1fqSt/c69xq767ngobYQzKb2BwsdzgjngdPzNxzKNdtZsUOzJK2\" crossorigin=\"anonymous\"></script>\n<doxa-research-map profile-config='{\"profile\":\"research-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></doxa-research-map>"
+            "script": "<script src=\"./doxa-research-map/doxa-research-map.js\" integrity=\"sha384-g7GG9zmr04YFhYGllNda1EVy3Ruklq8hyFZjjCjoAVe9kU8tgckuvlllf2egL+qT\" crossorigin=\"anonymous\"></script>\n<doxa-research-map profile-config='{\"profile\":\"research-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></doxa-research-map>"
           }
         }
       ]

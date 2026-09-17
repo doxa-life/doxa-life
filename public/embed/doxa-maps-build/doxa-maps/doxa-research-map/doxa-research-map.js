@@ -1303,7 +1303,7 @@
     padding-inline-start:36px;
     padding-inline-end:16px;
     scroll-padding-inline:16px;
-    gap:52px;
+    gap:44px;
     z-index:10;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;
     font-family:'Poppins',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
   }
