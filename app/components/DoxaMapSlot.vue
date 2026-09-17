@@ -72,6 +72,13 @@ const isSimple = props.bundle === 'simple-map'
   inset: 0;
   pointer-events: none;
   z-index: 4;
+  /* The wedges get their own compositing layer. The map canvas is a GPU layer, and a GPU layer
+     can paint over a non-layered sibling whatever the stacking order says — which is exactly
+     why the corners reappeared the moment the map finished loading. Two layers, so the z-order
+     between them is honoured. */
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
   --corner-tl: var(--slot-radius, 0px);
   --corner-tr: var(--slot-radius, 0px);
   --corner-br: var(--slot-radius, 0px);
