@@ -156,7 +156,7 @@
       "bundle": "doxa-research-map",
       "scriptUrl": "./doxa-research-map/doxa-research-map.js",
       "output": "doxa-maps/doxa-research-map/doxa-research-map.js",
-      "integrity": "sha384-jnq6fRKUf7gfrqtiXdleQsRvNCXXWAXTbFV05WAypl7ShT0A27k5bCkCBlSuTEdQ",
+      "integrity": "sha384-oNP1C8M6nsh3GOt3ZUZw/1995p9TT41L/EopaW2d2OKOwqzfv1Ha3qt56nODx2kB",
       "elements": [
         "doxa-research-map"
       ],
@@ -170,7 +170,7 @@
           "scriptUrl": "./doxa-research-map/doxa-research-map.js",
           "embed": {
             "iframe": "<iframe src=\"./doxa-research-map/research-map/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./doxa-research-map/doxa-research-map.js\" integrity=\"sha384-jnq6fRKUf7gfrqtiXdleQsRvNCXXWAXTbFV05WAypl7ShT0A27k5bCkCBlSuTEdQ\" crossorigin=\"anonymous\"></script>\n<doxa-research-map profile-config='{\"profile\":\"research-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></doxa-research-map>"
+            "script": "<script src=\"./doxa-research-map/doxa-research-map.js\" integrity=\"sha384-oNP1C8M6nsh3GOt3ZUZw/1995p9TT41L/EopaW2d2OKOwqzfv1Ha3qt56nODx2kB\" crossorigin=\"anonymous\"></script>\n<doxa-research-map profile-config='{\"profile\":\"research-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></doxa-research-map>"
           }
         }
       ]

@@ -1314,13 +1314,13 @@
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
     font-family:inherit;
     font-size:14px;font-weight:600;
-    color:#6d766e;
+    color:#9aa19b;
     cursor:pointer;
     white-space:nowrap;
     transition:color .12s;
   }
   .rm-tab::after {
-    content:'';display:block;align-self:stretch;height:3px;border-radius:2px;
+    content:'';display:block;align-self:stretch;height:4px;border-radius:2px;
     background:transparent;transition:background .12s;
   }
   .rm-tab:hover { color:#3b463d; }
@@ -1335,7 +1335,7 @@
     pointer-events: none;
   }
   .rm-dark .rm-tab.active { color:#92b195; }
-  .rm-dark .rm-tab { color:rgba(243,243,241,0.85); }
+  .rm-dark .rm-tab { color:rgba(243,243,241,0.55); }
   .rm-dark .rm-tab:hover { color:#F3F3F1; }
   .rm-dark .rm-tab.active { color:#cbc5b9;border-bottom-color:#cbc5b9; }
   @media(max-width:767px){

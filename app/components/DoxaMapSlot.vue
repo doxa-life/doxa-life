@@ -71,7 +71,7 @@ const isSimple = props.bundle === 'simple-map'
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 3;
+  z-index: 4;
   --corner-tl: var(--slot-radius, 0px);
   --corner-tr: var(--slot-radius, 0px);
   --corner-br: var(--slot-radius, 0px);
@@ -113,6 +113,11 @@ const isSimple = props.bundle === 'simple-map'
   display: block;
   position: absolute;
   inset: 0;
+  /* The map keeps its stacking to itself. A custom element is not a stacking context on its
+     own, so the legend (1000) and the search bar (1200) inside it would otherwise compete with
+     the slot's own layers and paint over the corner wedges below. */
+  isolation: isolate;
+  z-index: 0;
   width: 100%;
   height: 100%;
   /* Inherit any border-radius the host page gave the slot (e.g. .rounded-md /
