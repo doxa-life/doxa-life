@@ -644,7 +644,6 @@ const showMore = computed(() => hasMore())
                 </p>
               </template>
             </div>
-            <p v-if="uupg.location_description" class="uupg__content">{{ uupg.location_description }}</p>
             <a class="uupg__more-button button compact" :href="`${researchUrl}${uupg.slug}`">{{ t.full_profile }}</a>
           </div>
         </template>

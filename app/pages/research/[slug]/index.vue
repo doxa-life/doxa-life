@@ -211,7 +211,7 @@ const mapSrc = computed(() => {
             <p class="font-weight-medium font-size-lg">
               {{ uupg.country_code?.label }} ({{ uupg.rop1?.label }})
             </p>
-            <p>{{ uupg.imb_people_description ?? uupg.location_description }}</p>
+            <p>{{ uupg.imb_people_description }}</p>
 
             <a
               v-if="locale === 'en'"

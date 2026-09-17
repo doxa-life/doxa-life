@@ -24,7 +24,6 @@ export interface Uupg {
   country_label?: any
   rop1: ValueLabel
   rop1_label?: any
-  location_description: string
   has_photo: boolean
   image_url: string
   picture_credit: any

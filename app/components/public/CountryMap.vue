@@ -86,7 +86,7 @@ function mapColors() {
   }
 }
 
-const PIN_FIELDS = 'name,slug,country_code,rop1,religion,population,location_description,image_url,has_photo,latitude,longitude,people_committed'
+const PIN_FIELDS = 'name,slug,country_code,rop1,religion,population,imb_people_description,image_url,has_photo,latitude,longitude,people_committed'
 
 async function loadPins() {
   const url = `${prayBaseUrl}/api/people-groups/list?fields=${PIN_FIELDS}&lang=${props.languageCode}`
@@ -111,7 +111,7 @@ async function loadPins() {
         rop1: p.rop1?.label ?? '',
         religion: p.religion?.label ?? '',
         population: p.population ?? 0,
-        description: p.location_description ?? '',
+        description: p.imb_people_description ?? '',
         imageUrl: (p.has_photo && p.image_url) ? p.image_url : ''
       }
     }))
@@ -131,7 +131,7 @@ function formatPopulation(pop: number): string {
 // Build the pin popup's inner HTML from a feature's properties. Mirrors the
 // research map's detail panel: photo, name, country · people-group, the
 // population/religion stats and intercessor count (out of the full-coverage
-// goal, as on the people-group cards), a short description, and Pray / Full
+// goal, as on the people-group cards), the people group description, and Pray / Full
 // Profile links.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function popupHtml(p: any): string {
