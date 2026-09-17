@@ -81,8 +81,10 @@
 .map-toolbar .hbg-btn { width: 32px; height: 32px; }
 .map-toolbar .hbg-ctrl { margin: 10px 0 0 0; }
 @media (max-width: 767px) {
-  .map-toolbar { top: 72px; gap: 6px; }
-  .map-toolbar.map-toolbar--no-geocoder { top: 6px; gap: 6px; }
+  .map-toolbar { top: calc(8px + 35px + 12px); right: 8px; gap: 8px; }
+  .map-toolbar.map-toolbar--no-geocoder { top: 8px; }
+  .map-toolbar .mcb,
+  .map-toolbar .hbg-btn { width: 36px; height: 36px; }
 }
 `,"map-toolbar"),(l,o)=>(M(),G("div",{class:Oe(["map-toolbar",{"map-toolbar--no-geocoder":!e.hasGeocoder}])},[ut(l.$slots,"default")],2))}},Kg=["title","disabled"],ts={__name:"MapControlButton",props:{isDark:{type:Boolean,default:!1},title:{type:String,default:""},active:{type:Boolean,default:!1},disabled:{type:Boolean,default:!1}},emits:["click"],setup(e){return $l(`
 .mcb{
