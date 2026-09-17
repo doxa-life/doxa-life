@@ -1,7 +1,7 @@
 {
   "title": {
     "prayer": "Progreso de oración",
-    "engagement": "Progreso de implicación",
+    "engagement": "Progreso del compromiso",
     "adoption": "Progreso de adopción",
     "languageFamilies": "Familias lingüísticas",
     "doxaRegions": "Regiones Doxa",
@@ -10,7 +10,7 @@
   },
   "header": {
     "collapsed": "Leyenda",
-    "peopleGroupFallback": "Grupo de personas"
+    "peopleGroupFallback": "Grupo étnico"
   },
   "prayer": {
     "needsPrayer": "Nadie orando",
@@ -18,15 +18,15 @@
     "fullPrayerCoverage": "100+ personas orando"
   },
   "engagement": {
-    "needsEngagement": "Necesita implicación",
-    "hasEngagement": "Tiene implicación"
+    "needsEngagement": "No comprometido",
+    "hasEngagement": "Comprometido"
   },
   "adoption": {
-    "needsAdoption": "Necesita adopción",
-    "hasAdoption": "Tiene adopción"
+    "needsAdoption": "No adoptado",
+    "hasAdoption": "Adoptado"
   },
   "columns": {
-    "upgs": "UUPGs",
+    "upgs": "GENANC",
     "population": "Población"
   },
   "footer": {
