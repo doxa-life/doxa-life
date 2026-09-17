@@ -9,8 +9,6 @@
  *       to mint a 1-hour temporary token (`tk.*`) with read-only scopes,
  *       caches it server-side, returns the TK
  *
- * Pattern ported from `dt-geo-steward/geo-steward.php :: get_temp_key()`
- *
  * Why a server endpoint instead of `runtimeConfig.public.mapboxToken`?
  *   1. Static HTML pages in /public/ can't read runtimeConfig — they need
  *      to fetch the token over HTTP at page load.
@@ -39,6 +37,8 @@ interface TokenResponse {
   token: string
   type: 'pk' | 'tk'
   expires_in?: number
+  /** Where the maps drop-in is served from, so static embed pages need no hardcoded path. */
+  mapsBase?: string
 }
 
 interface MapboxTokenApiResponse {
