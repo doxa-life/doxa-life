@@ -1346,9 +1346,7 @@
   .rm-root, .rm-map-area, .rm-map-canvas,
   .rm-map-canvas .mapboxgl-canvas-container, .rm-map-canvas .mapboxgl-canvas,
   .rm-map-canvas .maplibregl-canvas-container, .rm-map-canvas .maplibregl-canvas { border-radius: var(--map-radius-corners, var(--map-radius, 0px)); }
-  .rm-map-area, .rm-map-canvas,
-  .rm-map-canvas .mapboxgl-canvas-container, .rm-map-canvas .maplibregl-canvas-container,
-  .rm-map-canvas canvas { clip-path: inset(0 round var(--map-radius-corners, var(--map-radius, 0px))); }
+  .rm-map-area { clip-path: inset(0 round var(--map-radius-corners, var(--map-radius, 0px))); }
   .rm-map-canvas { position:absolute;inset:0; }
   .rm-loading { position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0f1216;color:#7c8cf8;font:13px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;z-index:5; }
   .rm-error { position:absolute;top:50%;left:12px;right:12px;z-index:7;transform:translateY(-50%);text-align:center;font:13px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#fecaca;background:rgba(15,18,22,.95);border:1px solid rgba(254,202,202,.28);border-radius:10px;padding:12px 14px;box-shadow:0 2px 10px rgba(0,0,0,.4); }
