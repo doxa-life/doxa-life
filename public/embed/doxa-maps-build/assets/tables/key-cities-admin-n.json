@@ -3,7 +3,7 @@
   "title": "Key Cities under Admin-N",
   "grain": "one row per NAMED location cluster, with its sub-country admin unit",
   "derivation": "key_tier is a band over PIN DENSITY computed from this corpus: key-high >= 4 groups (top decile), key >= 3 (top quartile), else candidate.",
-  "HARD_LIMIT": "VERIFICATION IS SINGLE-SOURCE. Every name comes from Nominatim/OSM and NOTHING here is cross-referenced against a second gazetteer. verification_tier says exactly what was established. A \"verified key-cities list\" in the full sense needs a second independent source — NOT yet done.",
+  "verification_limit": "Place names are single-source: Nominatim/OSM, not cross-checked against a second gazetteer. verification_tier says exactly what was established.",
   "admin_n_note": "admin_n is the sub-country unit OSM reports (276 of 277 named places have one, 81 distinct values). What that level is CALLED varies by country — geoBoundaries boundaryCanonical gives the native term (State/Union Territory, Province, Wilayat, Region...). Not mislabelled \"province\" for everyone.",
   "rendering": "No city polygons are shipped; every row renders as a STAR pin, visually distinct from people-group pins.",
   "source": "Nominatim/OpenStreetMap (ODbL 1.0) for names; people-group counts from the DX spine."

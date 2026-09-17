@@ -9,7 +9,7 @@
    "generated": "2026-08-01",
    "definition": "A BRIDGE CANDIDATE is a language that is the primary language of MORE THAN ONE distinct DX people group in that country — measured from the corpus, not asserted from a list.",
    "honest_limit": "This is NOT the same as a national trade language. It finds languages widely used AMONG THE UNENGAGED GROUPS TRACKED HERE, and will MISS a lingua franca that no unengaged group claims as primary (e.g. Hindi in India). Named bridge_candidates, not trade_languages, for that reason.",
-   "why_not_a_list": "restcountries v3.1 is DEPRECATED (returns an error body); Ethnologue is paywalled; Glottolog has no lingua-franca field. Hand-typing 175 national languages from memory is exactly where a confident error would enter."
+   "why_not_a_list": "No open machine-readable list of national trade languages was available; bridge candidates are derived from this corpus."
   }
  },
  "columns": [

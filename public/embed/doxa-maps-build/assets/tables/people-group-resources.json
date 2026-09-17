@@ -20,30 +20,30 @@
     "note": "public API, no key required — carries iso3 per language, so the join is exact"
    }
   ],
-  "unchecked": [
+  "not_included": [
    {
     "id": "grn",
     "name": "Global Recordings Network",
     "covers": "audio (37,697 recordings)",
-    "blocked": "API key required (see BLOCKER-grn-api-key.md)"
+    "status": "not included: requires an API key"
    },
    {
     "id": "api_bible",
     "name": "API.Bible (bible.com ecosystem)",
     "covers": "scripture",
-    "blocked": "HTTP 401 — key required"
+    "status": "not included: requires an API key"
    },
    {
     "id": "dbl",
     "name": "Digital Bible Library",
     "covers": "scripture",
-    "blocked": "not yet evaluated"
+    "status": "not included: not evaluated"
    },
    {
     "id": "progress_bible",
     "name": "progress.bible",
     "covers": "translation status",
-    "blocked": "HTTP 403 to programmatic access"
+    "status": "not included: no programmatic access"
    }
   ],
   "absence_meaning": "FALSE means NOT FOUND in the pools checked — never proof that no resource exists.",
