@@ -37,6 +37,12 @@ const isSimple = props.bundle === 'simple-map'
   --map-radius: var(--slot-radius, 0px);
   /* Corners the MAP ITSELF must round (the canvas is not clipped by an ancestor radius). */
   --map-radius-corners: var(--slot-radius, 0px);
+  /* THE SLOT IS A LAYOUT, NOT A MASK. The map sits INSIDE the frame, inset by enough that its
+     own square corner can never reach the rounded edge — the corner bite of a radius r is
+     r·(1−1/√2) ≈ 0.3r. The slot paints its own opaque rounded surface behind and around the
+     map, so whatever the map does with its compositing layer, the corners stay the page's. */
+  --slot-inset: calc(var(--slot-radius, 0px) * 0.32);
+  background: var(--slot-corner-bg, var(--color-surface-default, #F3F3F1));
   display: block;
   position: relative;
   width: 100%;
@@ -119,14 +125,14 @@ const isSimple = props.bundle === 'simple-map'
 .doxa-map-slot :deep(doxa-research-map) {
   display: block;
   position: absolute;
-  inset: 0;
+  inset: var(--slot-inset, 0px);
   /* The map keeps its stacking to itself. A custom element is not a stacking context on its
      own, so the legend (1000) and the search bar (1200) inside it would otherwise compete with
      the slot's own layers and paint over the corner wedges below. */
   isolation: isolate;
   z-index: 0;
-  width: 100%;
-  height: 100%;
+  width: auto;
+  height: auto;
   /* Inherit any border-radius the host page gave the slot (e.g. .rounded-md /
      .rounded-xlg on the research page). Without this, the bare custom element
      paints a rectangular background during the brief window between page
