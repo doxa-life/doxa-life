@@ -1303,7 +1303,7 @@
     padding-inline-start:36px;
     padding-inline-end:16px;
     scroll-padding-inline:16px;
-    gap:var(--spacing-3xl,28px);
+    gap:52px;
     z-index:10;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;
     font-family:'Poppins',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
   }
@@ -1311,19 +1311,19 @@
   .rm-dark .rm-tab-bar { background:#2a332a; }
   .rm-tab {
     background:none;border:none;padding:0;height:100%;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
     font-family:inherit;
     font-size:14px;font-weight:600;
-    color:#5f6368;
+    color:#6d766e;
     cursor:pointer;
     white-space:nowrap;
     transition:color .12s;
   }
   .rm-tab::after {
-    content:'';display:block;align-self:stretch;height:8px;border-radius:2px;
+    content:'';display:block;align-self:stretch;height:3px;border-radius:2px;
     background:transparent;transition:background .12s;
   }
-  .rm-tab:hover { color:#202124; }
+  .rm-tab:hover { color:#3b463d; }
   .rm-tab.active { color:#3b463d;font-weight:700; }
   .rm-tab.active::after { background:#73A17F; }
   .rm-tab-sep {
