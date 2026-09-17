@@ -352,7 +352,7 @@ export const GLOSSARIES: Record<string, ReadonlyArray<readonly [string, string]>
     ["bodily resurrection", "résurrection corporelle"],
     ["pray", "prier"],
     ["engage", "engager"],
-    ["World Assemblies of God Fellowship", "Association mondiale des Assemblées de Dieu"],
+    ["World Assemblies of God Fellowship", "Fraternité Mondiale des Assemblées de Dieu"],
     ["choose a people group", "choisir un peuple"],
     ["sign up", "s'inscrire"]
   ],

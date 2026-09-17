@@ -155,11 +155,11 @@ export const fr: TermsContent = {
       rationale: '« offrande » porte le registre sacrificiel de l’adoration ; « cadeau » sonne transactionnel.'
     },
     {
-      term: 'Association mondiale des Assemblées de Dieu (WAGF)',
+      term: 'Fraternité Mondiale des Assemblées de Dieu (WAGF)',
       english: 'World Assemblies of God Fellowship (WAGF)',
-      alternatives: 'conserver le nom anglais · « Fraternité mondiale des Assemblées de Dieu »',
+      alternatives: 'conserver le nom anglais · « Association mondiale des Assemblées de Dieu »',
       rationale:
-        'c’est le nom français établi de la communion mondiale des Assemblées de Dieu. L’acronyme WAGF reste inchangé sur tout le site.'
+        '« fraternité » rend « fellowship » : la WAGF est une communion d’Églises, pas une association. C’est aussi le nom que portait la version française du site. L’acronyme WAGF reste inchangé sur tout le site.'
     },
     {
       term: 'Agences missionnaires',
