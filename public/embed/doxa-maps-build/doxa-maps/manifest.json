@@ -33,7 +33,7 @@
       "bundle": "cities-internet",
       "scriptUrl": "./cities-internet/cities-internet.js",
       "output": "doxa-maps/cities-internet/cities-internet.js",
-      "integrity": "sha384-l+6lodalROq02d4VK29Fb6jfNCXjdqTAlg2cJDC7lP8vVnjfwUop2vqqUJyGvy4i",
+      "integrity": "sha384-bU0D/4tejTwf/qOy/1txctaphkZHyTz+6FTW0FW0J60yMLnyGAJD2Y3L4Uz7E9Ti",
       "elements": [
         "cities-internet-map"
       ],
@@ -47,7 +47,7 @@
           "scriptUrl": "./cities-internet/cities-internet.js",
           "embed": {
             "iframe": "<iframe src=\"./cities-internet/connectivity-list/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./cities-internet/cities-internet.js\" integrity=\"sha384-l+6lodalROq02d4VK29Fb6jfNCXjdqTAlg2cJDC7lP8vVnjfwUop2vqqUJyGvy4i\" crossorigin=\"anonymous\"></script>\n<cities-internet-map profile-config='{\"profile\":\"connectivity-list\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></cities-internet-map>"
+            "script": "<script src=\"./cities-internet/cities-internet.js\" integrity=\"sha384-bU0D/4tejTwf/qOy/1txctaphkZHyTz+6FTW0FW0J60yMLnyGAJD2Y3L4Uz7E9Ti\" crossorigin=\"anonymous\"></script>\n<cities-internet-map profile-config='{\"profile\":\"connectivity-list\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></cities-internet-map>"
           }
         },
         {
@@ -59,7 +59,7 @@
           "scriptUrl": "./cities-internet/cities-internet.js",
           "embed": {
             "iframe": "<iframe src=\"./cities-internet/connectivity-map/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./cities-internet/cities-internet.js\" integrity=\"sha384-l+6lodalROq02d4VK29Fb6jfNCXjdqTAlg2cJDC7lP8vVnjfwUop2vqqUJyGvy4i\" crossorigin=\"anonymous\"></script>\n<cities-internet-map profile-config='{\"profile\":\"connectivity-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></cities-internet-map>"
+            "script": "<script src=\"./cities-internet/cities-internet.js\" integrity=\"sha384-bU0D/4tejTwf/qOy/1txctaphkZHyTz+6FTW0FW0J60yMLnyGAJD2Y3L4Uz7E9Ti\" crossorigin=\"anonymous\"></script>\n<cities-internet-map profile-config='{\"profile\":\"connectivity-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></cities-internet-map>"
           }
         },
         {
@@ -71,7 +71,7 @@
           "scriptUrl": "./cities-internet/cities-internet.js",
           "embed": {
             "iframe": "<iframe src=\"./cities-internet/data-tables/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./cities-internet/cities-internet.js\" integrity=\"sha384-l+6lodalROq02d4VK29Fb6jfNCXjdqTAlg2cJDC7lP8vVnjfwUop2vqqUJyGvy4i\" crossorigin=\"anonymous\"></script>\n<cities-internet-map profile-config='{\"profile\":\"data-tables\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></cities-internet-map>"
+            "script": "<script src=\"./cities-internet/cities-internet.js\" integrity=\"sha384-bU0D/4tejTwf/qOy/1txctaphkZHyTz+6FTW0FW0J60yMLnyGAJD2Y3L4Uz7E9Ti\" crossorigin=\"anonymous\"></script>\n<cities-internet-map profile-config='{\"profile\":\"data-tables\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></cities-internet-map>"
           }
         }
       ]
@@ -80,7 +80,7 @@
       "bundle": "country-posters",
       "scriptUrl": "./country-posters/country-posters.js",
       "output": "doxa-maps/country-posters/country-posters.js",
-      "integrity": "sha384-Vdkr17okYlO/8YQzSQ5WcZDp4sFdMQIBuiGIPVW/vTdt4Vm66ZAP6a8iMru+KCJO",
+      "integrity": "sha384-jSt8aSa2GLnsUosLHvUquwsuaN0Hr8ZbuaTm3u/4qP/V6HuJ6icXwywWoNfNe3ES",
       "elements": [
         "country-posters-map"
       ],
@@ -94,7 +94,7 @@
           "scriptUrl": "./country-posters/country-posters.js",
           "embed": {
             "iframe": "<iframe src=\"./country-posters/countries-map/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./country-posters/country-posters.js\" integrity=\"sha384-Vdkr17okYlO/8YQzSQ5WcZDp4sFdMQIBuiGIPVW/vTdt4Vm66ZAP6a8iMru+KCJO\" crossorigin=\"anonymous\"></script>\n<country-posters-map profile-config='{\"profile\":\"countries-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></country-posters-map>"
+            "script": "<script src=\"./country-posters/country-posters.js\" integrity=\"sha384-jSt8aSa2GLnsUosLHvUquwsuaN0Hr8ZbuaTm3u/4qP/V6HuJ6icXwywWoNfNe3ES\" crossorigin=\"anonymous\"></script>\n<country-posters-map profile-config='{\"profile\":\"countries-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></country-posters-map>"
           }
         },
         {
@@ -106,7 +106,7 @@
           "scriptUrl": "./country-posters/country-posters.js",
           "embed": {
             "iframe": "<iframe src=\"./country-posters/country-poster-wall/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./country-posters/country-posters.js\" integrity=\"sha384-Vdkr17okYlO/8YQzSQ5WcZDp4sFdMQIBuiGIPVW/vTdt4Vm66ZAP6a8iMru+KCJO\" crossorigin=\"anonymous\"></script>\n<country-posters-map profile-config='{\"profile\":\"country-poster-wall\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></country-posters-map>"
+            "script": "<script src=\"./country-posters/country-posters.js\" integrity=\"sha384-jSt8aSa2GLnsUosLHvUquwsuaN0Hr8ZbuaTm3u/4qP/V6HuJ6icXwywWoNfNe3ES\" crossorigin=\"anonymous\"></script>\n<country-posters-map profile-config='{\"profile\":\"country-poster-wall\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></country-posters-map>"
           }
         }
       ]
@@ -115,7 +115,7 @@
       "bundle": "demo-map",
       "scriptUrl": "./demo-map/demo-map.js",
       "output": "doxa-maps/demo-map/demo-map.js",
-      "integrity": "sha384-V318qF0ag0Nca5SgUEjJbeJtJ/+P+UJAh8KElxWkM4OKSE1abHJ9EA/5oavrzzCk",
+      "integrity": "sha384-dZQ3ah4coOTZwq19GERJiOkZMzZUWxop1mCBbHq+0pZrqBLMCuFVVrLA7HouXbkz",
       "elements": [
         "demo-map"
       ],
@@ -129,7 +129,7 @@
           "scriptUrl": "./demo-map/demo-map.js",
           "embed": {
             "iframe": "<iframe src=\"./demo-map/demo-map/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./demo-map/demo-map.js\" integrity=\"sha384-V318qF0ag0Nca5SgUEjJbeJtJ/+P+UJAh8KElxWkM4OKSE1abHJ9EA/5oavrzzCk\" crossorigin=\"anonymous\"></script>\n<demo-map profile-config='{\"profile\":\"demo-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></demo-map>"
+            "script": "<script src=\"./demo-map/demo-map.js\" integrity=\"sha384-dZQ3ah4coOTZwq19GERJiOkZMzZUWxop1mCBbHq+0pZrqBLMCuFVVrLA7HouXbkz\" crossorigin=\"anonymous\"></script>\n<demo-map profile-config='{\"profile\":\"demo-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></demo-map>"
           },
           "instances": [
             {
@@ -156,7 +156,7 @@
       "bundle": "doxa-research-map",
       "scriptUrl": "./doxa-research-map/doxa-research-map.js",
       "output": "doxa-maps/doxa-research-map/doxa-research-map.js",
-      "integrity": "sha384-cCTCOaVw6fFyUJALzX65o84kBdPIgcEs54zN76YSnxK0fLEgxJMujRac4Mn0c68m",
+      "integrity": "sha384-wIlvQ4u/UIsCOX21m+3lX2zY4Ef5EYMzZryE0HclyUTYCotcU33ah655ar5yGEqf",
       "elements": [
         "doxa-research-map"
       ],
@@ -170,7 +170,7 @@
           "scriptUrl": "./doxa-research-map/doxa-research-map.js",
           "embed": {
             "iframe": "<iframe src=\"./doxa-research-map/research-map/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./doxa-research-map/doxa-research-map.js\" integrity=\"sha384-cCTCOaVw6fFyUJALzX65o84kBdPIgcEs54zN76YSnxK0fLEgxJMujRac4Mn0c68m\" crossorigin=\"anonymous\"></script>\n<doxa-research-map profile-config='{\"profile\":\"research-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></doxa-research-map>"
+            "script": "<script src=\"./doxa-research-map/doxa-research-map.js\" integrity=\"sha384-wIlvQ4u/UIsCOX21m+3lX2zY4Ef5EYMzZryE0HclyUTYCotcU33ah655ar5yGEqf\" crossorigin=\"anonymous\"></script>\n<doxa-research-map profile-config='{\"profile\":\"research-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></doxa-research-map>"
           }
         }
       ]
@@ -179,7 +179,7 @@
       "bundle": "doxa-simple-map",
       "scriptUrl": "./doxa-simple-map/doxa-simple-map.js",
       "output": "doxa-maps/doxa-simple-map/doxa-simple-map.js",
-      "integrity": "sha384-+KwVCLoJ5vU5ij9zrPcdmMxCaG+/kTybOPwnWzVDaanKB1DE/60Lxg+f85/rmwCj",
+      "integrity": "sha384-xh55fK4mJqS55Q0ZJKdJvfhH9QUVzuAuML8DD11VS7a7+2LRef9P/MKWrhLvPdvq",
       "elements": [
         "doxa-map",
         "doxa-simple-map"
@@ -194,7 +194,7 @@
           "scriptUrl": "./doxa-simple-map/doxa-simple-map.js",
           "embed": {
             "iframe": "<iframe src=\"./doxa-simple-map/doxa-simple-map/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./doxa-simple-map/doxa-simple-map.js\" integrity=\"sha384-+KwVCLoJ5vU5ij9zrPcdmMxCaG+/kTybOPwnWzVDaanKB1DE/60Lxg+f85/rmwCj\" crossorigin=\"anonymous\"></script>\n<doxa-map profile-config='{\"profile\":\"doxa-simple-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></doxa-map>"
+            "script": "<script src=\"./doxa-simple-map/doxa-simple-map.js\" integrity=\"sha384-xh55fK4mJqS55Q0ZJKdJvfhH9QUVzuAuML8DD11VS7a7+2LRef9P/MKWrhLvPdvq\" crossorigin=\"anonymous\"></script>\n<doxa-map profile-config='{\"profile\":\"doxa-simple-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></doxa-map>"
           },
           "instances": [
             {
@@ -274,7 +274,7 @@
       "bundle": "gospel-resources",
       "scriptUrl": "./gospel-resources/gospel-resources.js",
       "output": "doxa-maps/gospel-resources/gospel-resources.js",
-      "integrity": "sha384-xOjYixJyf5PTq4rXXDk+tzKh6FxRfeLwSEgrI8/9C6WHBnIrlkERGi1c2pK6ULMq",
+      "integrity": "sha384-npQ5DYWOVL14xBxjQNsrtYhhwxv83VIsC8NZfrZGxXbGrRHrQ+qDVM8AZFfRbWnJ",
       "elements": [
         "gospel-resources-map"
       ],
@@ -288,7 +288,7 @@
           "scriptUrl": "./gospel-resources/gospel-resources.js",
           "embed": {
             "iframe": "<iframe src=\"./gospel-resources/charts/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./gospel-resources/gospel-resources.js\" integrity=\"sha384-xOjYixJyf5PTq4rXXDk+tzKh6FxRfeLwSEgrI8/9C6WHBnIrlkERGi1c2pK6ULMq\" crossorigin=\"anonymous\"></script>\n<gospel-resources-map profile-config='{\"profile\":\"charts\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></gospel-resources-map>"
+            "script": "<script src=\"./gospel-resources/gospel-resources.js\" integrity=\"sha384-npQ5DYWOVL14xBxjQNsrtYhhwxv83VIsC8NZfrZGxXbGrRHrQ+qDVM8AZFfRbWnJ\" crossorigin=\"anonymous\"></script>\n<gospel-resources-map profile-config='{\"profile\":\"charts\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></gospel-resources-map>"
           }
         },
         {
@@ -300,7 +300,7 @@
           "scriptUrl": "./gospel-resources/gospel-resources.js",
           "embed": {
             "iframe": "<iframe src=\"./gospel-resources/data-tables/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./gospel-resources/gospel-resources.js\" integrity=\"sha384-xOjYixJyf5PTq4rXXDk+tzKh6FxRfeLwSEgrI8/9C6WHBnIrlkERGi1c2pK6ULMq\" crossorigin=\"anonymous\"></script>\n<gospel-resources-map profile-config='{\"profile\":\"data-tables\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></gospel-resources-map>"
+            "script": "<script src=\"./gospel-resources/gospel-resources.js\" integrity=\"sha384-npQ5DYWOVL14xBxjQNsrtYhhwxv83VIsC8NZfrZGxXbGrRHrQ+qDVM8AZFfRbWnJ\" crossorigin=\"anonymous\"></script>\n<gospel-resources-map profile-config='{\"profile\":\"data-tables\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></gospel-resources-map>"
           }
         },
         {
@@ -312,7 +312,7 @@
           "scriptUrl": "./gospel-resources/gospel-resources.js",
           "embed": {
             "iframe": "<iframe src=\"./gospel-resources/resources-list/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./gospel-resources/gospel-resources.js\" integrity=\"sha384-xOjYixJyf5PTq4rXXDk+tzKh6FxRfeLwSEgrI8/9C6WHBnIrlkERGi1c2pK6ULMq\" crossorigin=\"anonymous\"></script>\n<gospel-resources-map profile-config='{\"profile\":\"resources-list\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></gospel-resources-map>"
+            "script": "<script src=\"./gospel-resources/gospel-resources.js\" integrity=\"sha384-npQ5DYWOVL14xBxjQNsrtYhhwxv83VIsC8NZfrZGxXbGrRHrQ+qDVM8AZFfRbWnJ\" crossorigin=\"anonymous\"></script>\n<gospel-resources-map profile-config='{\"profile\":\"resources-list\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></gospel-resources-map>"
           }
         },
         {
@@ -324,7 +324,7 @@
           "scriptUrl": "./gospel-resources/gospel-resources.js",
           "embed": {
             "iframe": "<iframe src=\"./gospel-resources/resources-map/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./gospel-resources/gospel-resources.js\" integrity=\"sha384-xOjYixJyf5PTq4rXXDk+tzKh6FxRfeLwSEgrI8/9C6WHBnIrlkERGi1c2pK6ULMq\" crossorigin=\"anonymous\"></script>\n<gospel-resources-map profile-config='{\"profile\":\"resources-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></gospel-resources-map>"
+            "script": "<script src=\"./gospel-resources/gospel-resources.js\" integrity=\"sha384-npQ5DYWOVL14xBxjQNsrtYhhwxv83VIsC8NZfrZGxXbGrRHrQ+qDVM8AZFfRbWnJ\" crossorigin=\"anonymous\"></script>\n<gospel-resources-map profile-config='{\"profile\":\"resources-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></gospel-resources-map>"
           }
         }
       ]

@@ -129,7 +129,7 @@
   position:absolute;
   top:0;
   right:48px;
-  width:380px;
+  width:min(340px, calc(100vw - 80px));
   background:#161b22;
   border:1px solid #30363d;
   border-radius:12px;
@@ -419,10 +419,10 @@
   .share-pop{
     position:fixed;
     top:64px;
-    left:10px;
-    right:10px;
+    left:auto;
+    right:12px;
     z-index:3000;
-    width:auto;
+    width:min(340px, calc(100vw - 24px));
     max-width:none;
     max-height:calc(100vh - 96px);
     overflow-y:auto;
