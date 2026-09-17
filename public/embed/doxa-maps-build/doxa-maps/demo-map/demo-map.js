@@ -240,8 +240,8 @@
 .share-wrap:hover::before{opacity:0.95;}
 @keyframes share-ring-turn{to{transform:rotate(360deg);}}
 @media(prefers-reduced-motion:reduce){.share-wrap::before{animation:none;}}
-.share-steps{margin:8px 12px 4px;padding:0 0 0 14px;list-style:'- ';font:12px/1.5 system-ui,sans-serif;color:#c9d1d9;}
-.share-steps li{margin:0;padding-left:2px;}
+.share-steps{margin:10px 14px 6px;padding:0 0 0 15px;list-style:'- ';font:14px/1.55 system-ui,sans-serif;color:#c9d1d9;}
+.share-steps li{margin:0 0 3px;padding-left:3px;}
 .share-steps li:last-child{font-weight:600;color:#92b195;}
 .share-pop.light .share-steps{color:#3b463d;}
 .share-pop.light .share-steps li:last-child{color:#3b463d;}
