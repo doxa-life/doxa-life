@@ -35,6 +35,8 @@ const isSimple = props.bundle === 'simple-map'
   /* The maps read this token inside their shadow DOM to round the canvas itself: a WebGL
      layer is not reliably clipped by an ancestor's radius, so it must carry its own. */
   --map-radius: var(--slot-radius, 0px);
+  /* Corners the MAP ITSELF must round (the canvas is not clipped by an ancestor radius). */
+  --map-radius-corners: var(--slot-radius, 0px);
   display: block;
   position: relative;
   width: 100%;
@@ -55,10 +57,20 @@ const isSimple = props.bundle === 'simple-map'
   will-change: transform;
   transform: translateZ(0);
 }
-.doxa-map-slot.rounded-md  { --slot-radius: var(--border-radius-lg); }
-.doxa-map-slot.rounded-xlg { --slot-radius: var(--border-radius-xlg); }
+/* One corner size for every map card, and the element's own radius is pinned to the same
+   token so it can never disagree with the clip (the page's utility class sets its own). */
+.doxa-map-slot.rounded-md  { --slot-radius: var(--border-radius-lg); border-radius: var(--slot-radius); }
+/* Every map card uses the same corner size, so they read as one family. */
+.doxa-map-slot.rounded-xlg { --slot-radius: var(--border-radius-lg); border-radius: var(--slot-radius); }
 
 @media (max-width: 768px) {
+  /* Phones: the research card runs to the top of the viewport area, so its top corners are
+     square and only the bottom is rounded. */
+  .doxa-map-slot.rounded-xlg {
+    border-radius: 0 0 var(--slot-radius) var(--slot-radius);
+    clip-path: inset(0 round 0 0 var(--slot-radius) var(--slot-radius));
+    --map-radius-corners: 0 0 var(--slot-radius) var(--slot-radius);
+  }
   .doxa-map-slot {
     min-height: 0;
     /* Phone height: twice as tall as wide (~734px on a 390px phone) — 80px more map than the
