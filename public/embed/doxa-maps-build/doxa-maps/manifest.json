@@ -80,7 +80,7 @@
       "bundle": "country-posters",
       "scriptUrl": "./country-posters/country-posters.js",
       "output": "doxa-maps/country-posters/country-posters.js",
-      "integrity": "sha384-lNoImv3ZxQESpN5pMYo1w/GmzmqWxOy8ivo6Md63R3NG45CdwBGuAZqvUZ6Pcew8",
+      "integrity": "sha384-VrsFxALbV+RX0xIHiaJkMRaukYH5Y3DAUl8+afkgC41Tlno16kpNsf0r1nw2X3QK",
       "elements": [
         "country-posters-map"
       ],
@@ -94,7 +94,7 @@
           "scriptUrl": "./country-posters/country-posters.js",
           "embed": {
             "iframe": "<iframe src=\"./country-posters/countries-map/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./country-posters/country-posters.js\" integrity=\"sha384-lNoImv3ZxQESpN5pMYo1w/GmzmqWxOy8ivo6Md63R3NG45CdwBGuAZqvUZ6Pcew8\" crossorigin=\"anonymous\"></script>\n<country-posters-map profile-config='{\"profile\":\"countries-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></country-posters-map>"
+            "script": "<script src=\"./country-posters/country-posters.js\" integrity=\"sha384-VrsFxALbV+RX0xIHiaJkMRaukYH5Y3DAUl8+afkgC41Tlno16kpNsf0r1nw2X3QK\" crossorigin=\"anonymous\"></script>\n<country-posters-map profile-config='{\"profile\":\"countries-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></country-posters-map>"
           }
         },
         {
@@ -106,7 +106,7 @@
           "scriptUrl": "./country-posters/country-posters.js",
           "embed": {
             "iframe": "<iframe src=\"./country-posters/country-poster-wall/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./country-posters/country-posters.js\" integrity=\"sha384-lNoImv3ZxQESpN5pMYo1w/GmzmqWxOy8ivo6Md63R3NG45CdwBGuAZqvUZ6Pcew8\" crossorigin=\"anonymous\"></script>\n<country-posters-map profile-config='{\"profile\":\"country-poster-wall\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></country-posters-map>"
+            "script": "<script src=\"./country-posters/country-posters.js\" integrity=\"sha384-VrsFxALbV+RX0xIHiaJkMRaukYH5Y3DAUl8+afkgC41Tlno16kpNsf0r1nw2X3QK\" crossorigin=\"anonymous\"></script>\n<country-posters-map profile-config='{\"profile\":\"country-poster-wall\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></country-posters-map>"
           }
         }
       ]
@@ -156,7 +156,7 @@
       "bundle": "doxa-research-map",
       "scriptUrl": "./doxa-research-map/doxa-research-map.js",
       "output": "doxa-maps/doxa-research-map/doxa-research-map.js",
-      "integrity": "sha384-oOcQONLfdO+33w2QO4oT3+GpLGt1iBVlDBiC/zsZPR5XPrZ9HKQADmoVbmVMd6uF",
+      "integrity": "sha384-2IWpClfDzdqqh2XrdsfS3DtE9eogg9RxCbt683tABf0dOxW0IcMCDw+PchVIvz3e",
       "elements": [
         "doxa-research-map"
       ],
@@ -170,7 +170,7 @@
           "scriptUrl": "./doxa-research-map/doxa-research-map.js",
           "embed": {
             "iframe": "<iframe src=\"./doxa-research-map/research-map/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./doxa-research-map/doxa-research-map.js\" integrity=\"sha384-oOcQONLfdO+33w2QO4oT3+GpLGt1iBVlDBiC/zsZPR5XPrZ9HKQADmoVbmVMd6uF\" crossorigin=\"anonymous\"></script>\n<doxa-research-map profile-config='{\"profile\":\"research-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></doxa-research-map>"
+            "script": "<script src=\"./doxa-research-map/doxa-research-map.js\" integrity=\"sha384-2IWpClfDzdqqh2XrdsfS3DtE9eogg9RxCbt683tABf0dOxW0IcMCDw+PchVIvz3e\" crossorigin=\"anonymous\"></script>\n<doxa-research-map profile-config='{\"profile\":\"research-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></doxa-research-map>"
           }
         }
       ]
@@ -179,7 +179,7 @@
       "bundle": "doxa-simple-map",
       "scriptUrl": "./doxa-simple-map/doxa-simple-map.js",
       "output": "doxa-maps/doxa-simple-map/doxa-simple-map.js",
-      "integrity": "sha384-pTYkO4VjUoC17jJRhg+9b5ZGaVUm1d1rWOczhcMgDk/2luDdJ0xSKvBqKQDR0p47",
+      "integrity": "sha384-X/kZzqMfydmULWYD4HrjPWGtw3Be2Yg5nUR1LMrhPbUV+KD6bBFBk0Q2+hIBTgu+",
       "elements": [
         "doxa-map",
         "doxa-simple-map"
@@ -194,7 +194,7 @@
           "scriptUrl": "./doxa-simple-map/doxa-simple-map.js",
           "embed": {
             "iframe": "<iframe src=\"./doxa-simple-map/doxa-simple-map/index.html?utm_source=YOUR_SOURCE\" width=\"100%\" height=\"600\" style=\"border:none;border-radius:12px;\" allowfullscreen></iframe>",
-            "script": "<script src=\"./doxa-simple-map/doxa-simple-map.js\" integrity=\"sha384-pTYkO4VjUoC17jJRhg+9b5ZGaVUm1d1rWOczhcMgDk/2luDdJ0xSKvBqKQDR0p47\" crossorigin=\"anonymous\"></script>\n<doxa-map profile-config='{\"profile\":\"doxa-simple-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></doxa-map>"
+            "script": "<script src=\"./doxa-simple-map/doxa-simple-map.js\" integrity=\"sha384-X/kZzqMfydmULWYD4HrjPWGtw3Be2Yg5nUR1LMrhPbUV+KD6bBFBk0Q2+hIBTgu+\" crossorigin=\"anonymous\"></script>\n<doxa-map profile-config='{\"profile\":\"doxa-simple-map\",\"tk\":\"YOUR_MAPBOX_TOKEN\",\"utmSource\":\"YOUR_SOURCE\"}'></doxa-map>"
           },
           "instances": [
             {
