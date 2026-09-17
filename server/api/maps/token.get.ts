@@ -17,8 +17,8 @@
  *   2. Lets us hold an SK in `.env` and never ship it (or any value
  *      derived from it) to the client; the TK we send back auto-expires
  *      in 1 hour and can be revoked by rotating the SK.
- *   3. Centralizes token logic for any embed (research page, PPLR data
- *      maps page, future MFEs) — single source of truth.
+ *   3. Centralizes token logic for every embed (the research page, the maps page and
+ *      any future map) — one source of truth.
  *
  * Security notes:
  *   - Returns a token to ANY caller. That's fine because:
