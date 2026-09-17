@@ -9,6 +9,7 @@ import { en } from './en'
 import { fr } from './fr'
 import { de } from './de'
 import { es } from './es'
+import { pt } from './pt'
 
 export interface TermEntry {
   /** Canonical term in this edition's language. */
@@ -43,7 +44,7 @@ export interface TermsContent {
   entries: TermEntry[]
 }
 
-const editions: Record<string, TermsContent> = { en, fr, de, es }
+const editions: Record<string, TermsContent> = { en, fr, de, es, pt }
 
 export function getTermsContent(locale: string): TermsContent {
   return editions[locale] ?? en
