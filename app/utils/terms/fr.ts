@@ -168,12 +168,13 @@ export const fr: TermsContent = {
       rationale: 'terme usuel des structures missionnaires francophones ; « agence d’envoi » est un calque.'
     },
     {
-      term: 'Couverture de prière 24h/24',
-      english: '24-hour prayer coverage',
+      term: 'Prière quotidienne (pour un peuple)',
+      english: 'daily prayer (for a people group)',
       definition:
-        'au moins 144 intercesseurs priant chacun 10 minutes par jour pour un même peuple — soit 24 heures de prière quotidienne.',
-      alternatives: 'couverture de prière de 24 heures',
-      rationale: '« 24h/24 » est la forme idiomatique française pour une couverture continue.'
+        'l’engagement de prier chaque jour pour un peuple non engagé précis, à l’aide du guide de prière quotidien. L’objectif : 100 intercesseurs quotidiens ou plus pour chaque peuple.',
+      alternatives: 'prière régulière · couverture de prière 24h/24 (ancien objectif : 144 intercesseurs × 10 minutes)',
+      rationale:
+        '« quotidienne » est voulu — un engagement de chaque jour, non une prière occasionnelle. L’ancien cadre des 144 intercesseurs couvrant 24 heures a été remplacé par l’objectif de 100 intercesseurs quotidiens ou plus.'
     },
     {
       term: 'Toute tribu, toute langue, tout peuple et toute nation',

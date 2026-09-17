@@ -109,9 +109,9 @@ export const en: TermsContent = {
         'Organizations that recruit, train, support, and send missionaries. DOXA works with sending agencies (129 WAGF-affiliated as of 2026) but does not replace them.'
     },
     {
-      term: '24-hour prayer coverage',
+      term: 'Daily prayer (for a people group)',
       definition:
-        'At least 144 intercessors each praying 10 minutes a day for one people group — together, 24 hours of daily prayer.'
+        'Committing to pray for a specific unengaged people group every day, using the daily prayer guide. The goal is 100+ daily intercessors for each people group. "Daily" is intentional — an every-day commitment, not regular or occasional prayer; it replaces the earlier framing of 144 intercessors covering 24 hours.'
     },
     {
       term: 'Every tribe, tongue, people, and nation',
