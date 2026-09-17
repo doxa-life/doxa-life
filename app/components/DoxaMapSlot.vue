@@ -32,6 +32,9 @@ const isSimple = props.bundle === 'simple-map'
 
 <style scoped>
 .doxa-map-slot {
+  /* The maps read this token inside their shadow DOM to round the canvas itself: a WebGL
+     layer is not reliably clipped by an ancestor's radius, so it must carry its own. */
+  --map-radius: var(--slot-radius, 0px);
   display: block;
   position: relative;
   width: 100%;
