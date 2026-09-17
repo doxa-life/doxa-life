@@ -76,6 +76,9 @@ export default defineEventHandler(async (event): Promise<TokenResponse> => {
     'Cache-Control': 'no-store',
   })
   const config = useRuntimeConfig(event)
+  // Where the maps drop-in is served from (MAPS_BASE in nuxt.config.ts). Returned with the
+  // token so static pages such as /embed/map can find the bundles without a hardcoded path.
+  const mapsBase = (config.public as { mapsBase?: string }).mapsBase || '/embed/doxa-maps-build'
   // Prefer the server-only key if present; fall back to the public token
   // so existing setups (just NUXT_PUBLIC_MAPBOX_TOKEN) keep working.
   const key = (config as { mapboxKey?: string }).mapboxKey
@@ -88,7 +91,7 @@ export default defineEventHandler(async (event): Promise<TokenResponse> => {
 
   // Public token → return as-is
   if (key.startsWith('pk.')) {
-    return { token: key, type: 'pk' }
+    return { token: key, type: 'pk', mapsBase }
   }
 
   // Anything else must be a secret key
@@ -103,6 +106,7 @@ export default defineEventHandler(async (event): Promise<TokenResponse> => {
       token: cachedTk.token,
       type: 'tk',
       expires_in: Math.floor((cachedTk.expiresAt - now) / 1000),
+      mapsBase,
     }
   }
 
@@ -136,7 +140,7 @@ export default defineEventHandler(async (event): Promise<TokenResponse> => {
   }
 
   cachedTk = { token: response.token, expiresAt: now + TK_LIFETIME_MS }
-  return { token: response.token, type: 'tk', expires_in: Math.floor(TK_LIFETIME_MS / 1000) }
+  return { token: response.token, type: 'tk', expires_in: Math.floor(TK_LIFETIME_MS / 1000), mapsBase }
 })
 
 /**

@@ -5,6 +5,12 @@ import { generateI18nLocales, ENABLED_LANGUAGE_CODES } from './config/languages'
 
 const LAYERS_DIR = '.layers'
 
+// THE ONE PLACE the maps drop-in path lives. The bundler's output folder is synced to
+// public/<MAPS_BASE>; the map slots, the full-page maps view, the static embed page
+// (via /api/maps/token) and the route rules below all read it from here. To move the
+// folder again: change this line, re-run the bundler's deploy, done.
+const MAPS_BASE = '/embed/doxa-maps-build'
+
 // Strip layer-level tsconfig.json files. Layers extracted from full Nuxt
 // projects often ship a tsconfig.json that references ./.nuxt/tsconfig.*.json
 // (only generated when the layer is opened as its own project). When the layer
@@ -157,14 +163,14 @@ export default defineNuxtConfig({
     // LEGACY MAP PATHS HEAL THEMSELVES: the drop-in lives at /embed/doxa-maps-build/ (earlier: /js/doxa-maps/, then /js/doxa-maps-build/)
     // (one output folder under the js path). Any old /js/doxa-maps/... link —
     // bookmarks, muscle memory, older embeds — 301s to the current location.
-    '/js/doxa-maps/**': { redirect: { to: '/embed/doxa-maps-build/doxa-maps/**', statusCode: 301 } },
-    '/js/doxa-maps-build/**': { redirect: { to: '/embed/doxa-maps-build/**', statusCode: 301 } },
+    '/js/doxa-maps/**': { redirect: { to: `${MAPS_BASE}/doxa-maps/**`, statusCode: 301 } },
+    '/js/doxa-maps-build/**': { redirect: { to: `${MAPS_BASE}/**`, statusCode: 301 } },
 
     // THE DROP-IN STAYS FRAMEABLE: every partner-site embed is an iframe of one of these leaf
     // pages, so they must be embeddable from ANY origin. Nitro does not read the bundler's
     // public/_headers frame policy — this rule is the site-side contract. Without it, a future
     // global X-Frame-Options / frame-ancestors header would blank every embedded map at once.
-    '/embed/doxa-maps-build/doxa-maps/**': { headers: { 'content-security-policy': 'frame-ancestors *' } },
+    [`${MAPS_BASE}/doxa-maps/**`]: { headers: { 'content-security-policy': 'frame-ancestors *' } },
 
     // Content-hashed build assets never change under the same URL — cache forever.
     '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
@@ -289,6 +295,8 @@ export default defineNuxtConfig({
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || '',
       prayBaseUrl: process.env.NUXT_PUBLIC_PRAY_BASE_URL || 'https://pray.doxa.life',
       mapboxToken: process.env.NUXT_PUBLIC_MAPBOX_TOKEN || '',
+      // Where the maps drop-in is served from (see MAPS_BASE at the top of this file).
+      mapsBase: MAPS_BASE,
       feedbackApiBase: process.env.NUXT_PUBLIC_FEEDBACK_API_BASE || 'https://support.gospelambition.org',
       feedbackProjectId: process.env.NUXT_PUBLIC_FEEDBACK_PROJECT_ID || '',
       statinatorUrl: process.env.NUXT_PUBLIC_STATINATOR_URL || 'https://statinator.doxa.life',

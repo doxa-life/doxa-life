@@ -133,10 +133,15 @@
 
     // ── Mapbox token ─────────────────────────────────────────────────────
     let token;
+    // Where the maps drop-in is served from: the token endpoint reports it (MAPS_BASE in
+    // nuxt.config.ts), so this static page never hardcodes the folder.
+    let mapsBase = '/embed/doxa-maps-build';
     try {
       const res = await fetch('/api/maps/token');
       if (!res.ok) throw new Error('Token endpoint returned ' + res.status);
-      token = (await res.json()).token;
+      const tokenJson = await res.json();
+      token = tokenJson.token;
+      if (tokenJson.mapsBase) mapsBase = tokenJson.mapsBase;
       if (!token) throw new Error('Token endpoint returned an empty token');
       // The map bundles only accept public keys.
       if (!token.startsWith('pk.')) throw new Error('Expected a pk. token, got ' + token.slice(0, 3) + '…');
@@ -160,10 +165,10 @@
 
     // ── Load the bundle (registers the custom element) ───────────────────
     const s = document.createElement('script');
-    // Bundles live in the doxa-maps-build drop-in (one output folder under /js).
-    s.src = isResearch
-      ? '/embed/doxa-maps-build/doxa-maps/doxa-research-map/doxa-research-map.js'
-      : '/embed/doxa-maps-build/doxa-maps/doxa-simple-map/doxa-simple-map.js';
+    // Bundles live in the maps drop-in (one output folder; its location comes from the token endpoint).
+    s.src = mapsBase + (isResearch
+      ? '/doxa-maps/doxa-research-map/doxa-research-map.js'
+      : '/doxa-maps/doxa-simple-map/doxa-simple-map.js');
     s.onerror = () => showError('<strong>Could not load the map bundle</strong> <code>' + s.src + '</code>.');
     document.head.appendChild(s);
   })();

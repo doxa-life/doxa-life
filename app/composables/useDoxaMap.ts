@@ -9,14 +9,13 @@
 const MAPBOX_JS = 'https://api.mapbox.com/mapbox-gl-js/v3.24.0/mapbox-gl.js'
 const MAPBOX_GEOCODER_JS = 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js'
 
-// Map of bundle keys → CDN drop-in URLs. The built maps live under
-// public/embed/doxa-maps-build/ (the doxa-maps bundler's output folder, dropped in here),
-// served at /embed/doxa-maps-build/doxa-maps/<bundle>/<bundle>.js. Each IIFE bundle
-// registers its own custom element (doxa-map / doxa-research-map), so only one
-// bundle should load per page.
+// Map of bundle keys → paths inside the maps drop-in. The drop-in's location is
+// runtimeConfig.public.mapsBase (MAPS_BASE in nuxt.config.ts), so the folder can move
+// without touching this file. Each IIFE bundle registers its own custom element
+// (doxa-map / doxa-research-map), so only one bundle should load per page.
 const BUNDLES = {
-  'simple-map':   '/embed/doxa-maps-build/doxa-maps/doxa-simple-map/doxa-simple-map.js',
-  'research-map': '/embed/doxa-maps-build/doxa-maps/doxa-research-map/doxa-research-map.js'
+  'simple-map':   'doxa-maps/doxa-simple-map/doxa-simple-map.js',
+  'research-map': 'doxa-maps/doxa-research-map/doxa-research-map.js'
 } as const
 type BundleKey = keyof typeof BUNDLES
 
@@ -65,7 +64,7 @@ export function useDoxaMap(bundle: BundleKey = 'simple-map') {
     ]
   })
 
-  const MAP_APP_JS = BUNDLES[bundle]
+  const MAP_APP_JS = `${(config.public as { mapsBase?: string }).mapsBase || '/embed/doxa-maps-build'}/${BUNDLES[bundle]}`
 
   onMounted(async () => {
     try {

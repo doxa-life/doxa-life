@@ -16,6 +16,8 @@
 definePageMeta({ layout: false })
 
 const frameSrc = ref('')
+// The drop-in's location comes from MAPS_BASE in nuxt.config.ts.
+const mapsBase = (useRuntimeConfig().public as { mapsBase?: string }).mapsBase || '/embed/doxa-maps-build'
 onMounted(async () => {
   let tk = ''
   try {
@@ -29,7 +31,7 @@ onMounted(async () => {
   if (tk) q.set('tk', tk)
   if (utm) q.set('utm_source', utm)
   const qs = q.toString()
-  frameSrc.value = '/embed/doxa-maps-build/index.html' + (qs ? `?${qs}` : '')
+  frameSrc.value = `${mapsBase}/index.html` + (qs ? `?${qs}` : '')
 })
 useHead({
   title: 'All DOXA Maps',
