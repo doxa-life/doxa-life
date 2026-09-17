@@ -2,7 +2,7 @@
 // doxa.life/doxa-maps — the DOXA maps SPA (every map, one app).
 //
 // Frames the bundler's single-page app (the app-wrapper shell) from the
-// drop-in at public/js/doxa-maps-build/ — every map, table and dashboard the
+// drop-in at public/embed/doxa-maps-build/ — every map, table and dashboard the
 // bundler ships, composed into one lazy-loaded app, always exactly as current
 // as the build in this repo. Pointed to from the research page
 // ("See all DOXA maps →").
@@ -29,7 +29,7 @@ onMounted(async () => {
   if (tk) q.set('tk', tk)
   if (utm) q.set('utm_source', utm)
   const qs = q.toString()
-  frameSrc.value = '/js/doxa-maps-build/index.html' + (qs ? `?${qs}` : '')
+  frameSrc.value = '/embed/doxa-maps-build/index.html' + (qs ? `?${qs}` : '')
 })
 useHead({
   title: 'All DOXA Maps',

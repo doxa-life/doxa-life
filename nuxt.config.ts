@@ -154,16 +154,17 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    // LEGACY MAP PATHS HEAL THEMSELVES: the drop-in moved to /js/doxa-maps-build/
+    // LEGACY MAP PATHS HEAL THEMSELVES: the drop-in lives at /embed/doxa-maps-build/ (earlier: /js/doxa-maps/, then /js/doxa-maps-build/)
     // (one output folder under the js path). Any old /js/doxa-maps/... link —
     // bookmarks, muscle memory, older embeds — 301s to the current location.
-    '/js/doxa-maps/**': { redirect: { to: '/js/doxa-maps-build/doxa-maps/**', statusCode: 301 } },
+    '/js/doxa-maps/**': { redirect: { to: '/embed/doxa-maps-build/doxa-maps/**', statusCode: 301 } },
+    '/js/doxa-maps-build/**': { redirect: { to: '/embed/doxa-maps-build/**', statusCode: 301 } },
 
     // THE DROP-IN STAYS FRAMEABLE: every partner-site embed is an iframe of one of these leaf
     // pages, so they must be embeddable from ANY origin. Nitro does not read the bundler's
     // public/_headers frame policy — this rule is the site-side contract. Without it, a future
     // global X-Frame-Options / frame-ancestors header would blank every embedded map at once.
-    '/js/doxa-maps-build/doxa-maps/**': { headers: { 'content-security-policy': 'frame-ancestors *' } },
+    '/embed/doxa-maps-build/doxa-maps/**': { headers: { 'content-security-policy': 'frame-ancestors *' } },
 
     // Content-hashed build assets never change under the same URL — cache forever.
     '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
