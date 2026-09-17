@@ -1,0 +1,1728 @@
+{
+ "meta": {
+  "title": "Gospel resource link verification",
+  "generated": "2026-08-02T07:34:41.253Z",
+  "states": {
+   "verified": "the link resolves to the language the row claims (see method)",
+   "broken": "the target does not exist, or holds nothing to open",
+   "mismatch": "the link resolves, but to a DIFFERENT language than the row joined on",
+   "unknown": "could not be checked — never read as either working or broken"
+  },
+  "summary": {
+   "scripture": {
+    "checked": 120,
+    "verified": 120
+   },
+   "film": {
+    "checked": 306,
+    "verified": 306
+   }
+  }
+ },
+ "links": {
+  "http://eBible.org/tel2010/": {
+   "state": "verified",
+   "detail": "HTTP 200, 4512 bytes"
+  },
+  "http://ebible.org/mey/": {
+   "state": "verified",
+   "detail": "HTTP 200, 1802 bytes"
+  },
+  "http://ebible.org/ben2006/": {
+   "state": "verified",
+   "detail": "HTTP 200, 4818 bytes"
+  },
+  "http://ebible.org/hin2010/": {
+   "state": "verified",
+   "detail": "HTTP 200, 4574 bytes"
+  },
+  "http://ebible.org/azb/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5285 bytes"
+  },
+  "http://ebible.org/mal/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5023 bytes"
+  },
+  "http://ebible.org/mar/": {
+   "state": "verified",
+   "detail": "HTTP 200, 4927 bytes"
+  },
+  "http://ebible.org/kan2010/": {
+   "state": "verified",
+   "detail": "HTTP 200, 4528 bytes"
+  },
+  "http://ebible.org/dyu/": {
+   "state": "verified",
+   "detail": "HTTP 200, 4647 bytes"
+  },
+  "http://ebible.org/tam2008/": {
+   "state": "verified",
+   "detail": "HTTP 200, 4476 bytes"
+  },
+  "http://ebible.org/guj2009/": {
+   "state": "verified",
+   "detail": "HTTP 200, 4509 bytes"
+  },
+  "http://ebible.org/hne/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5215 bytes"
+  },
+  "http://ebible.org/ory/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5121 bytes"
+  },
+  "http://ebible.org/swh1850/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3062 bytes"
+  },
+  "http://ebible.org/asmfb/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5005 bytes"
+  },
+  "http://eBible.org/npi2010/": {
+   "state": "verified",
+   "detail": "HTTP 200, 4576 bytes"
+  },
+  "http://ebible.org/urd/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5031 bytes"
+  },
+  "http://ebible.org/yao/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3068 bytes"
+  },
+  "http://ebible.org/mwe/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3099 bytes"
+  },
+  "http://ebible.org/ziw/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3071 bytes"
+  },
+  "http://ebible.org/mgh/": {
+   "state": "verified",
+   "detail": "HTTP 200, 1772 bytes"
+  },
+  "http://ebible.org/kdh/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2713 bytes"
+  },
+  "http://ebible.org/cmn2006/": {
+   "state": "verified",
+   "detail": "HTTP 200, 4355 bytes"
+  },
+  "http://ebible.org/kby/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2607 bytes"
+  },
+  "http://eBible.org/engamp/": {
+   "state": "verified",
+   "detail": "HTTP 200, 4690 bytes"
+  },
+  "http://ebible.org/wol2010/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2952 bytes"
+  },
+  "http://ebible.org/qxnNT/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3016 bytes"
+  },
+  "http://ebible.org/mni/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3077 bytes"
+  },
+  "http://ebible.org/ndg/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2994 bytes"
+  },
+  "http://ebible.org/xsm/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2501 bytes"
+  },
+  "http://ebible.org/pll/": {
+   "state": "verified",
+   "detail": "HTTP 200, 1510 bytes"
+  },
+  "http://ebible.org/mge/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2554 bytes"
+  },
+  "http://ebible.org/pesopcb/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5201 bytes"
+  },
+  "http://ebible.org/mdybse/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3145 bytes"
+  },
+  "http://ebible.org/bod/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2624 bytes"
+  },
+  "http://ebible.org/fuf/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3128 bytes"
+  },
+  "http://ebible.org/msc/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2606 bytes"
+  },
+  "http://ebible.org/spabes/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5054 bytes"
+  },
+  "http://ebible.org/ewe/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5196 bytes"
+  },
+  "http://ebible.org/yom/": {
+   "state": "verified",
+   "detail": "HTTP 200, 4464 bytes"
+  },
+  "http://ebible.org/pan/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5046 bytes"
+  },
+  "http://ebible.org/alw/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2831 bytes"
+  },
+  "http://ebible.org/nya/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5206 bytes"
+  },
+  "http://ebible.org/div/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3087 bytes"
+  },
+  "http://ebible.org/mai/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2542 bytes"
+  },
+  "http://ebible.org/sml/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2976 bytes"
+  },
+  "http://ebible.org/turobt/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2973 bytes"
+  },
+  "http://ebible.org/pga/": {
+   "state": "verified",
+   "detail": "HTTP 200, 1725 bytes"
+  },
+  "http://ebible.org/sle/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2838 bytes"
+  },
+  "http://ebible.org/blt/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2792 bytes"
+  },
+  "http://ebible.org/bsp/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2396 bytes"
+  },
+  "http://ebible.org/nod/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2562 bytes"
+  },
+  "http://ebible.org/porblt/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3143 bytes"
+  },
+  "http://ebible.org/moz/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2535 bytes"
+  },
+  "http://ebible.org/hlb/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3181 bytes"
+  },
+  "http://ebible.org/bhu/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3120 bytes"
+  },
+  "http://ebible.org/suzBl/": {
+   "state": "verified",
+   "detail": "HTTP 200, 4980 bytes"
+  },
+  "http://ebible.org/sbs/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2951 bytes"
+  },
+  "http://ebible.org/vgr/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2976 bytes"
+  },
+  "http://ebible.org/hausa/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5278 bytes"
+  },
+  "http://ebible.org/bcc/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2993 bytes"
+  },
+  "http://ebible.org/vie1934/": {
+   "state": "verified",
+   "detail": "HTTP 200, 4873 bytes"
+  },
+  "http://ebible.org/soy/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3086 bytes"
+  },
+  "http://ebible.org/srp1865/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5369 bytes"
+  },
+  "http://ebible.org/bgc/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3062 bytes"
+  },
+  "http://ebible.org/russyn/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5736 bytes"
+  },
+  "http://ebible.org/brb/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2343 bytes"
+  },
+  "http://ebible.org/thv/": {
+   "state": "verified",
+   "detail": "HTTP 200, 1347 bytes"
+  },
+  "http://ebible.org/rmyArli/": {
+   "state": "verified",
+   "detail": "HTTP 200, 1830 bytes"
+  },
+  "http://ebible.org/pac/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2552 bytes"
+  },
+  "http://ebible.org/bqj/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2712 bytes"
+  },
+  "http://ebible.org/gbl/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3191 bytes"
+  },
+  "http://ebible.org/fra_fob/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5162 bytes"
+  },
+  "http://ebible.org/heb/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5660 bytes"
+  },
+  "http://ebible.org/jpn1965/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3170 bytes"
+  },
+  "http://ebible.org/gax/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5588 bytes"
+  },
+  "http://ebible.org/kbo/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2736 bytes"
+  },
+  "http://ebible.org/cpuNT/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3350 bytes"
+  },
+  "http://ebible.org/did/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2602 bytes"
+  },
+  "http://ebible.org/lbj/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2932 bytes"
+  },
+  "http://ebible.org/amh/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3168 bytes"
+  },
+  "http://ebible.org/cbiNTpo/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3275 bytes"
+  },
+  "http://ebible.org/tuoNT/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3551 bytes"
+  },
+  "http://ebible.org/prq/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3770 bytes"
+  },
+  "http://ebible.org/sus/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5304 bytes"
+  },
+  "http://ebible.org/daaNT/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3172 bytes"
+  },
+  "http://ebible.org/tgk/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2527 bytes"
+  },
+  "http://ebible.org/des/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2535 bytes"
+  },
+  "http://ebible.org/ydd/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3309 bytes"
+  },
+  "http://ebible.org/knf/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3103 bytes"
+  },
+  "http://ebible.org/nld/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5051 bytes"
+  },
+  "http://ebible.org/gaz/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5316 bytes"
+  },
+  "http://ebible.org/bor/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2621 bytes"
+  },
+  "http://ebible.org/pirNT/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3035 bytes"
+  },
+  "http://ebible.org/amrNT/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3024 bytes"
+  },
+  "http://ebible.org/qvzNT/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2990 bytes"
+  },
+  "http://ebible.org/xsr/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2550 bytes"
+  },
+  "http://ebible.org/cdz/": {
+   "state": "verified",
+   "detail": "HTTP 200, 1945 bytes"
+  },
+  "http://ebible.org/cui/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3206 bytes"
+  },
+  "http://ebible.org/zlmKSZI/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3016 bytes"
+  },
+  "http://ebible.org/kpjNT/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3116 bytes"
+  },
+  "http://ebible.org/arq/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3432 bytes"
+  },
+  "http://ebible.org/ind/": {
+   "state": "verified",
+   "detail": "HTTP 200, 4224 bytes"
+  },
+  "http://ebible.org/yadNT/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2973 bytes"
+  },
+  "http://ebible.org/bru/": {
+   "state": "verified",
+   "detail": "HTTP 200, 4696 bytes"
+  },
+  "http://ebible.org/mcdNT/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2956 bytes"
+  },
+  "http://ebible.org/fin/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3462 bytes"
+  },
+  "http://ebible.org/tue/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2968 bytes"
+  },
+  "http://ebible.org/bgg/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2886 bytes"
+  },
+  "http://ebible.org/sri/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2977 bytes"
+  },
+  "http://ebible.org/yaaNT/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2997 bytes"
+  },
+  "http://ebible.org/cubNT/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3168 bytes"
+  },
+  "http://ebible.org/bmrNT/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3157 bytes"
+  },
+  "http://ebible.org/cbcNT/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3151 bytes"
+  },
+  "http://ebible.org/myy/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2921 bytes"
+  },
+  "http://ebible.org/pahNT/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2964 bytes"
+  },
+  "http://ebible.org/snnNT/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3058 bytes"
+  },
+  "http://ebible.org/shpNTpo/": {
+   "state": "verified",
+   "detail": "HTTP 200, 3311 bytes"
+  },
+  "http://ebible.org/baoNT/": {
+   "state": "verified",
+   "detail": "HTTP 200, 2920 bytes"
+  },
+  "http://ebible.org/arbnav/": {
+   "state": "verified",
+   "detail": "HTTP 200, 5417 bytes"
+  },
+  "https://www.jesusfilm.org/watch/?languageId=13562": {
+   "state": "verified",
+   "detail": "Arclight languageId 13562 = apd (Arabic, Sudanese Spoken), 25 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=15161": {
+   "state": "verified",
+   "detail": "Arclight languageId 15161 = ayn (Arabic, Sanaani), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=53347": {
+   "state": "verified",
+   "detail": "Arclight languageId 53347 = apc (Arabic, Palestinian), 24 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5848": {
+   "state": "verified",
+   "detail": "Arclight languageId 5848 = tel (Telugu), 31 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=140928": {
+   "state": "verified",
+   "detail": "Arclight languageId 140928 = hae (Oromo, Eastern), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=184627": {
+   "state": "verified",
+   "detail": "Arclight languageId 184627 = acq (Arabic, Ta'Izzi Yemeni), 4 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=353": {
+   "state": "verified",
+   "detail": "Arclight languageId 353 = bgn (Balochi, Western), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=7839": {
+   "state": "verified",
+   "detail": "Arclight languageId 7839 = mey (Arabic, Hassaniya), 20 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=176243": {
+   "state": "verified",
+   "detail": "Arclight languageId 176243 = ben (Bangla), 39 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=184848": {
+   "state": "verified",
+   "detail": "Arclight languageId 184848 = ayl (Arabic, Libyan), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6464": {
+   "state": "verified",
+   "detail": "Arclight languageId 6464 = hin (Hindi), 55 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=355": {
+   "state": "verified",
+   "detail": "Arclight languageId 355 = azb (Azerbaijani, Iran), 22 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5700": {
+   "state": "verified",
+   "detail": "Arclight languageId 5700 = bgp (Balochi, Eastern), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=19985": {
+   "state": "verified",
+   "detail": "Arclight languageId 19985 = mal (Malayalam), 9 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6174": {
+   "state": "verified",
+   "detail": "Arclight languageId 6174 = mar (Marathi), 12 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6318": {
+   "state": "verified",
+   "detail": "Arclight languageId 6318 = kan (Kannada), 9 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=2104": {
+   "state": "verified",
+   "detail": "Arclight languageId 2104 = dyu (Jula), 23 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=184591": {
+   "state": "verified",
+   "detail": "Arclight languageId 184591 = ars (Arabic, Najdi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20627": {
+   "state": "verified",
+   "detail": "Arclight languageId 20627 = hsn (Xiang), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3732": {
+   "state": "verified",
+   "detail": "Arclight languageId 3732 = iii (Nosu, Shengzha), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5871": {
+   "state": "verified",
+   "detail": "Arclight languageId 5871 = tam (Tamil), 35 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6600": {
+   "state": "verified",
+   "detail": "Arclight languageId 6600 = guj (Gujarati), 8 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=4752": {
+   "state": "verified",
+   "detail": "Arclight languageId 4752 = nus (Nuer), 20 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6463": {
+   "state": "verified",
+   "detail": "Arclight languageId 6463 = hne (Chhattisgarhi), 5 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=184528": {
+   "state": "verified",
+   "detail": "Arclight languageId 184528 = ory (Odiya), 6 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3787": {
+   "state": "verified",
+   "detail": "Arclight languageId 3787 = doc (Dong, Northern), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=23179": {
+   "state": "verified",
+   "detail": "Arclight languageId 23179 = swh (Swahili, Kenya), 6 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=185219": {
+   "state": "verified",
+   "detail": "Arclight languageId 185219 = asm (Assamese Muslim), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=184907": {
+   "state": "verified",
+   "detail": "Arclight languageId 184907 = npi (Bajureli), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=407": {
+   "state": "verified",
+   "detail": "Arclight languageId 407 = urd (Urdu), 41 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=13376": {
+   "state": "verified",
+   "detail": "Arclight languageId 13376 = ymm (Maay), 4 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=389": {
+   "state": "verified",
+   "detail": "Arclight languageId 389 = snd (Sindhi), 24 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=7773": {
+   "state": "verified",
+   "detail": "Arclight languageId 7773 = yao (Yao), 5 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=15882": {
+   "state": "verified",
+   "detail": "Arclight languageId 15882 = ava (Avar), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=23019": {
+   "state": "verified",
+   "detail": "Arclight languageId 23019 = lic (Li, Bendi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=14124": {
+   "state": "verified",
+   "detail": "Arclight languageId 14124 = mwe (Mwera), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=4575": {
+   "state": "verified",
+   "detail": "Arclight languageId 4575 = tig (Tigre), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=14060": {
+   "state": "verified",
+   "detail": "Arclight languageId 14060 = ziw (Zigula), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5829": {
+   "state": "verified",
+   "detail": "Arclight languageId 5829 = tcy (Tulu), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=144134": {
+   "state": "verified",
+   "detail": "Arclight languageId 144134 = psc (Persian Sign Language), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=7186": {
+   "state": "verified",
+   "detail": "Arclight languageId 7186 = kuj (Kuria), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20521": {
+   "state": "verified",
+   "detail": "Arclight languageId 20521 = adh (Dhopadhola), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=164216": {
+   "state": "verified",
+   "detail": "Arclight languageId 164216 = knn (Mangalorean Konkani), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5918": {
+   "state": "verified",
+   "detail": "Arclight languageId 5918 = scl (Shina), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=427": {
+   "state": "verified",
+   "detail": "Arclight languageId 427 = rmt (Nawary), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=1335": {
+   "state": "verified",
+   "detail": "Arclight languageId 1335 = kdh (Tem), 4 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20789": {
+   "state": "verified",
+   "detail": "Arclight languageId 20789 = khb (Tai Lue), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=139181": {
+   "state": "verified",
+   "detail": "Arclight languageId 139181 = afb (Arabic Gulf), 5 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=14182": {
+   "state": "verified",
+   "detail": "Arclight languageId 14182 = jit (Jita), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=53333": {
+   "state": "verified",
+   "detail": "Arclight languageId 53333 = kmr (Kurdi, Behdini), 24 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=512": {
+   "state": "verified",
+   "detail": "Arclight languageId 512 = tzm (Tamazight, Central Atlas), 26 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=144740": {
+   "state": "verified",
+   "detail": "Arclight languageId 144740 = rob (Luwu, Tae'), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=18489": {
+   "state": "verified",
+   "detail": "Arclight languageId 18489 = mhr (Mari, Low), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6209": {
+   "state": "verified",
+   "detail": "Arclight languageId 6209 = rwr (Marwari), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=26497": {
+   "state": "verified",
+   "detail": "Arclight languageId 26497 = pil (Yom), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=8418": {
+   "state": "verified",
+   "detail": "Arclight languageId 8418 = ary (Arabic, Moroccan Spoken), 27 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=53352": {
+   "state": "verified",
+   "detail": "Arclight languageId 53352 = cmn (Chinese, Guiliu), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=1944": {
+   "state": "verified",
+   "detail": "Arclight languageId 1944 = rsl (Russian Sign Language), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=24416": {
+   "state": "verified",
+   "detail": "Arclight languageId 24416 = swv (Shekhawati), 4 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=42106": {
+   "state": "verified",
+   "detail": "Arclight languageId 42106 = kby (Manga), 4 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20859": {
+   "state": "verified",
+   "detail": "Arclight languageId 20859 = nyn (Runyankole), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=10558": {
+   "state": "verified",
+   "detail": "Arclight languageId 10558 = khw (Khowar), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6298": {
+   "state": "verified",
+   "detail": "Arclight languageId 6298 = kas (Kashmiri), 5 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=1454": {
+   "state": "verified",
+   "detail": "Arclight languageId 1454 = her (Herero), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=529": {
+   "state": "verified",
+   "detail": "Arclight languageId 529 = eng (English), 185 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=7138": {
+   "state": "verified",
+   "detail": "Arclight languageId 7138 = jos (Jordanian Sign Language), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=4724": {
+   "state": "verified",
+   "detail": "Arclight languageId 4724 = xan (Xamtanga), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=2173": {
+   "state": "verified",
+   "detail": "Arclight languageId 2173 = kdt (Kuy), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=21661": {
+   "state": "verified",
+   "detail": "Arclight languageId 21661 = kfr (Kachchhi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=7897": {
+   "state": "verified",
+   "detail": "Arclight languageId 7897 = wol (Wolof), 23 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=4468": {
+   "state": "verified",
+   "detail": "Arclight languageId 4468 = aar (Afar), 4 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6171": {
+   "state": "verified",
+   "detail": "Arclight languageId 6171 = mup (Malvi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=139885": {
+   "state": "verified",
+   "detail": "Arclight languageId 139885 = boz (Bozo, Tigemaxo), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5697": {
+   "state": "verified",
+   "detail": "Arclight languageId 5697 = bgw (Bhatri), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20814": {
+   "state": "verified",
+   "detail": "Arclight languageId 20814 = mtr (Mewari), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=12449": {
+   "state": "verified",
+   "detail": "Arclight languageId 12449 = qxn (Quechua, Ancash, Conchucos, Northern), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=146379": {
+   "state": "verified",
+   "detail": "Arclight languageId 146379 = btz (Batak-Kluet), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5667": {
+   "state": "verified",
+   "detail": "Arclight languageId 5667 = bho (Bhojpuri), 6 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=143789": {
+   "state": "verified",
+   "detail": "Arclight languageId 143789 = mni (Meitei), 6 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=26416": {
+   "state": "verified",
+   "detail": "Arclight languageId 26416 = nbw (Ngbandi-Ngiri), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20902": {
+   "state": "verified",
+   "detail": "Arclight languageId 20902 = sck (Sadani), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=163660": {
+   "state": "verified",
+   "detail": "Arclight languageId 163660 = kdn (Chikunda), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=140982": {
+   "state": "verified",
+   "detail": "Arclight languageId 140982 = hmm (Miao, Central Mashan), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20984": {
+   "state": "verified",
+   "detail": "Arclight languageId 20984 = toi (Tonga, Zambezi), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=22910": {
+   "state": "verified",
+   "detail": "Arclight languageId 22910 = xsm (Kasem, Ghana), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=1444": {
+   "state": "verified",
+   "detail": "Arclight languageId 1444 = afr (Afrikaans), 27 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20269": {
+   "state": "verified",
+   "detail": "Arclight languageId 20269 = thk (Tharaka), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=140166": {
+   "state": "verified",
+   "detail": "Arclight languageId 140166 = bze (Bozo, Jenaama), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3832": {
+   "state": "verified",
+   "detail": "Arclight languageId 3832 = xal (Kalmyk-Oirat), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=17518": {
+   "state": "verified",
+   "detail": "Arclight languageId 17518 = kjk (Konjo, Highland), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=184531": {
+   "state": "verified",
+   "detail": "Arclight languageId 184531 = avl (Arabic, Bedouin), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=184917": {
+   "state": "verified",
+   "detail": "Arclight languageId 184917 = bej (Beja, Bidhaawyeet), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=99804": {
+   "state": "verified",
+   "detail": "Arclight languageId 99804 = zqe (Zhuang, Qiubei), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20651": {
+   "state": "verified",
+   "detail": "Arclight languageId 20651 = dgo (Dogri), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=184592": {
+   "state": "verified",
+   "detail": "Arclight languageId 184592 = acw (Arabic, Hijazi), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=26152": {
+   "state": "verified",
+   "detail": "Arclight languageId 26152 = mge (Mango), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3910": {
+   "state": "verified",
+   "detail": "Arclight languageId 3910 = tdd (Tai Nua), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=139250": {
+   "state": "verified",
+   "detail": "Arclight languageId 139250 = abl (Lampung Nyo), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20293": {
+   "state": "verified",
+   "detail": "Arclight languageId 20293 = tsc (Tswa), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=53299": {
+   "state": "verified",
+   "detail": "Arclight languageId 53299 = kir (Kyrgyz), 36 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6788": {
+   "state": "verified",
+   "detail": "Arclight languageId 6788 = pes (Farsi, Western), 65 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20531": {
+   "state": "verified",
+   "detail": "Arclight languageId 20531 = shu (Arabic, Chadian Spoken), 20 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20587": {
+   "state": "verified",
+   "detail": "Arclight languageId 20587 = bns (Bundel Khandi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=184521": {
+   "state": "verified",
+   "detail": "Arclight languageId 184521 = ssy (Saho-Eritrea), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3712": {
+   "state": "verified",
+   "detail": "Arclight languageId 3712 = ahk (Akha), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=98458": {
+   "state": "verified",
+   "detail": "Arclight languageId 98458 = gwc (Gawri), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=4768": {
+   "state": "verified",
+   "detail": "Arclight languageId 4768 = mdy (Male), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=14165": {
+   "state": "verified",
+   "detail": "Arclight languageId 14165 = kcz (Konongo), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=1124": {
+   "state": "verified",
+   "detail": "Arclight languageId 1124 = tly (Talysh), 6 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=547": {
+   "state": "verified",
+   "detail": "Arclight languageId 547 = kwn (Kwangali), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=53327": {
+   "state": "verified",
+   "detail": "Arclight languageId 53327 = naq (Khoekhoegowab), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=1336": {
+   "state": "verified",
+   "detail": "Arclight languageId 1336 = kbp (Kabiye), 4 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5485": {
+   "state": "verified",
+   "detail": "Arclight languageId 5485 = knk (Kuranko), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=21795": {
+   "state": "verified",
+   "detail": "Arclight languageId 21795 = bod (Lhasa, Tibetan), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=17373": {
+   "state": "verified",
+   "detail": "Arclight languageId 17373 = blf (Buol), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5459": {
+   "state": "verified",
+   "detail": "Arclight languageId 5459 = fuf (Fuuta Jalon), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=143877": {
+   "state": "verified",
+   "detail": "Arclight languageId 143877 = moy (Shekkacho), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=23330": {
+   "state": "verified",
+   "detail": "Arclight languageId 23330 = anp (Angika), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=21046": {
+   "state": "verified",
+   "detail": "Arclight languageId 21046 = spa (Spanish, Castilian), 34 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=141173": {
+   "state": "verified",
+   "detail": "Arclight languageId 141173 = jio (Jiamao), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=17785": {
+   "state": "verified",
+   "detail": "Arclight languageId 17785 = pse (Ogan), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=7786": {
+   "state": "verified",
+   "detail": "Arclight languageId 7786 = tum (Tumbuka), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=2075": {
+   "state": "verified",
+   "detail": "Arclight languageId 2075 = bam (Bambara), 24 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=99303": {
+   "state": "verified",
+   "detail": "Arclight languageId 99303 = liq (Maro), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6029": {
+   "state": "verified",
+   "detail": "Arclight languageId 6029 = noe (Nimadi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=14278": {
+   "state": "verified",
+   "detail": "Arclight languageId 14278 = bem (Bemba), 25 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6532": {
+   "state": "verified",
+   "detail": "Arclight languageId 6532 = gbm (Garhwali), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=98459": {
+   "state": "verified",
+   "detail": "Arclight languageId 98459 = gwd (Ale, Gawwada), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=8684": {
+   "state": "verified",
+   "detail": "Arclight languageId 8684 = shn (Shan), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5331": {
+   "state": "verified",
+   "detail": "Arclight languageId 5331 = ewe (Ewe), 4 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=4739": {
+   "state": "verified",
+   "detail": "Arclight languageId 4739 = suq (Suri, Tirmaga-Chai), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=22195": {
+   "state": "verified",
+   "detail": "Arclight languageId 22195 = yom (Kiyombe), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=19171": {
+   "state": "verified",
+   "detail": "Arclight languageId 19171 = ase (American Sign Language), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=142869": {
+   "state": "verified",
+   "detail": "Arclight languageId 142869 = ysn (Sani), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=17035": {
+   "state": "verified",
+   "detail": "Arclight languageId 17035 = szn (Sula), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=21061": {
+   "state": "verified",
+   "detail": "Arclight languageId 21061 = acm (Arabic, Iraqi Baghdadi), 20 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=46771": {
+   "state": "verified",
+   "detail": "Arclight languageId 46771 = pan (Punjabi), 11 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=114921": {
+   "state": "verified",
+   "detail": "Arclight languageId 114921 = blm (Jur Beli), 4 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=4793": {
+   "state": "verified",
+   "detail": "Arclight languageId 4793 = alw (Alaba), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20857": {
+   "state": "verified",
+   "detail": "Arclight languageId 20857 = nya (Chichewa), 26 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=97941": {
+   "state": "verified",
+   "detail": "Arclight languageId 97941 = dsh (Daasanach), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=4593": {
+   "state": "verified",
+   "detail": "Arclight languageId 4593 = byn (Blin), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=141597": {
+   "state": "verified",
+   "detail": "Arclight languageId 141597 = krn (Sapo), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=17813": {
+   "state": "verified",
+   "detail": "Arclight languageId 17813 = btx (Batak Karo), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=102103": {
+   "state": "verified",
+   "detail": "Arclight languageId 102103 = neb (Toura), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=53287": {
+   "state": "verified",
+   "detail": "Arclight languageId 53287 = div (Dhivehi), 30 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6199": {
+   "state": "verified",
+   "detail": "Arclight languageId 6199 = mai (Maithili), 3 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=7248": {
+   "state": "verified",
+   "detail": "Arclight languageId 7248 = pkb (Pokomo, Lower), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6631": {
+   "state": "verified",
+   "detail": "Arclight languageId 6631 = bjj (Kanauji), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=12588": {
+   "state": "verified",
+   "detail": "Arclight languageId 12588 = sml (Sama, Central), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=141292": {
+   "state": "verified",
+   "detail": "Arclight languageId 141292 = kcf (Ikaan), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=171395": {
+   "state": "verified",
+   "detail": "Arclight languageId 171395 = rwm (Kwamba), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=142694": {
+   "state": "verified",
+   "detail": "Arclight languageId 142694 = wbj (Alagwa), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=1942": {
+   "state": "verified",
+   "detail": "Arclight languageId 1942 = tur (Turkish), 55 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=371": {
+   "state": "verified",
+   "detail": "Arclight languageId 371 = kaz (Kazakh), 40 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=140246": {
+   "state": "verified",
+   "detail": "Arclight languageId 140246 = cqd (Miao, Chuanqiandian Cluster), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=143881": {
+   "state": "verified",
+   "detail": "Arclight languageId 143881 = mpe (Majang), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=142418": {
+   "state": "verified",
+   "detail": "Arclight languageId 142418 = she (Sheko), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=139538": {
+   "state": "verified",
+   "detail": "Arclight languageId 139538 = bdi (Burun), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3299": {
+   "state": "verified",
+   "detail": "Arclight languageId 3299 = dzg (Daza), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=140001": {
+   "state": "verified",
+   "detail": "Arclight languageId 140001 = bvi (Belanda Viri), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=38242": {
+   "state": "verified",
+   "detail": "Arclight languageId 38242 = pga (Arabic, Juba), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=13805": {
+   "state": "verified",
+   "detail": "Arclight languageId 13805 = toq (Toposa), 4 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20581": {
+   "state": "verified",
+   "detail": "Arclight languageId 20581 = bos (Bosnian), 20 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3717": {
+   "state": "verified",
+   "detail": "Arclight languageId 3717 = bwx (Yao, Bunu (Dongnu)), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=142647": {
+   "state": "verified",
+   "detail": "Arclight languageId 142647 = sle (Sikkiligar), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=140404": {
+   "state": "verified",
+   "detail": "Arclight languageId 140404 = dox (Mosiye), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=7516": {
+   "state": "verified",
+   "detail": "Arclight languageId 7516 = blt (Tai Dam), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3817": {
+   "state": "verified",
+   "detail": "Arclight languageId 3817 = kjg (Khmu), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=23089": {
+   "state": "verified",
+   "detail": "Arclight languageId 23089 = adx (Amdo, Tibetan), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=531": {
+   "state": "verified",
+   "detail": "Arclight languageId 531 = cat (Catalan-Valencian-Balear), 7 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=139169": {
+   "state": "verified",
+   "detail": "Arclight languageId 139169 = hac (Kurdi, Hawrami), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=7139": {
+   "state": "verified",
+   "detail": "Arclight languageId 7139 = che (Chechen), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=21118": {
+   "state": "verified",
+   "detail": "Arclight languageId 21118 = nod (Thai, Northern), 7 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=584": {
+   "state": "verified",
+   "detail": "Arclight languageId 584 = por (Portuguese, Brazil), 80 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5766": {
+   "state": "verified",
+   "detail": "Arclight languageId 5766 = wbr (Wagdi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=17424": {
+   "state": "verified",
+   "detail": "Arclight languageId 17424 = txm (Tomini), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=53400": {
+   "state": "verified",
+   "detail": "Arclight languageId 53400 = prs (Dari), 24 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=185254": {
+   "state": "verified",
+   "detail": "Arclight languageId 185254 = une (Uneme, South), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=19739": {
+   "state": "verified",
+   "detail": "Arclight languageId 19739 = hlb (Halbi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20644": {
+   "state": "verified",
+   "detail": "Arclight languageId 20644 = dar (Dargin), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=24068": {
+   "state": "verified",
+   "detail": "Arclight languageId 24068 = suz (Sunuwar), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=53095": {
+   "state": "verified",
+   "detail": "Arclight languageId 53095 = mwn (Namwanga), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=1341": {
+   "state": "verified",
+   "detail": "Arclight languageId 1341 = hau (Hausa), 33 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=141334": {
+   "state": "verified",
+   "detail": "Arclight languageId 141334 = kib (Koalib), 4 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6679": {
+   "state": "verified",
+   "detail": "Arclight languageId 6679 = bcc (Balochi, Southern), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=176424": {
+   "state": "verified",
+   "detail": "Arclight languageId 176424 = tsb (Tsamakko), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3887": {
+   "state": "verified",
+   "detail": "Arclight languageId 3887 = vie (Vietnamese), 57 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=22293": {
+   "state": "verified",
+   "detail": "Arclight languageId 22293 = mvf (Inner Mongolian), 3 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=24343": {
+   "state": "verified",
+   "detail": "Arclight languageId 24343 = dhd (Dhundari), 4 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5611": {
+   "state": "verified",
+   "detail": "Arclight languageId 5611 = bra (Braj Bhasha), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=7564": {
+   "state": "verified",
+   "detail": "Arclight languageId 7564 = vai (Vai), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20696": {
+   "state": "verified",
+   "detail": "Arclight languageId 20696 = hoj (Hadothi), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5541": {
+   "state": "verified",
+   "detail": "Arclight languageId 5541 = srp (Serbian), 27 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5709": {
+   "state": "verified",
+   "detail": "Arclight languageId 5709 = bgc (Haryanvi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=143668": {
+   "state": "verified",
+   "detail": "Arclight languageId 143668 = pgg (Pangwali), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3934": {
+   "state": "verified",
+   "detail": "Arclight languageId 3934 = rus (Russian), 83 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5625": {
+   "state": "verified",
+   "detail": "Arclight languageId 5625 = xnr (Kangri), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=2614": {
+   "state": "verified",
+   "detail": "Arclight languageId 2614 = knc (Kanuri, Yerwa), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=1924": {
+   "state": "verified",
+   "detail": "Arclight languageId 1924 = iba (Iban), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=1313": {
+   "state": "verified",
+   "detail": "Arclight languageId 1313 = wwa (Waama), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=22334": {
+   "state": "verified",
+   "detail": "Arclight languageId 22334 = rmy (Romani, Caldarasi), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5038": {
+   "state": "verified",
+   "detail": "Arclight languageId 5038 = msw (Mansoanka), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=143207": {
+   "state": "verified",
+   "detail": "Arclight languageId 143207 = ssn (Waata), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=7577": {
+   "state": "verified",
+   "detail": "Arclight languageId 7577 = men (Mende), 21 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=142491": {
+   "state": "verified",
+   "detail": "Arclight languageId 142491 = yea (Ravula), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=43229": {
+   "state": "verified",
+   "detail": "Arclight languageId 43229 = gju (Gojri), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=21637": {
+   "state": "verified",
+   "detail": "Arclight languageId 21637 = btd (Pak Pak Dairi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=185002": {
+   "state": "verified",
+   "detail": "Arclight languageId 185002 = ort (Kutia), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=139909": {
+   "state": "verified",
+   "detail": "Arclight languageId 139909 = bqj (Bandial), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=144101": {
+   "state": "verified",
+   "detail": "Arclight languageId 144101 = nnj (Nyangatom), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=144427": {
+   "state": "verified",
+   "detail": "Arclight languageId 144427 = mxj (Miju-Mishmi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=140555": {
+   "state": "verified",
+   "detail": "Arclight languageId 140555 = fwe (Fwe), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6533": {
+   "state": "verified",
+   "detail": "Arclight languageId 6533 = gbl (Gamit), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5050": {
+   "state": "verified",
+   "detail": "Arclight languageId 5050 = fuc (Fulacunda), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=140948": {
+   "state": "verified",
+   "detail": "Arclight languageId 140948 = hea (Miao, Northern Qiandong), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=53424": {
+   "state": "verified",
+   "detail": "Arclight languageId 53424 = fra (French, African), 9 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6930": {
+   "state": "verified",
+   "detail": "Arclight languageId 6930 = heb (Hebrew), 30 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=7411": {
+   "state": "verified",
+   "detail": "Arclight languageId 7411 = lao (Lao), 28 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=22094": {
+   "state": "verified",
+   "detail": "Arclight languageId 22094 = swi (Shui), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=570": {
+   "state": "verified",
+   "detail": "Arclight languageId 570 = mhw (Mbukushu), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=7083": {
+   "state": "verified",
+   "detail": "Arclight languageId 7083 = jpn (Japanese), 46 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=4700": {
+   "state": "verified",
+   "detail": "Arclight languageId 4700 = gax (Oromo, Borana-Arsi-Guji), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=144716": {
+   "state": "verified",
+   "detail": "Arclight languageId 144716 = mhu (Digaro-Mishmi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=23525": {
+   "state": "verified",
+   "detail": "Arclight languageId 23525 = zne (Zande, South Sudan), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3888": {
+   "state": "verified",
+   "detail": "Arclight languageId 3888 = uzn (Uzbek, Northern), 39 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=98838": {
+   "state": "verified",
+   "detail": "Arclight languageId 98838 = kbo (Keliko), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=185333": {
+   "state": "verified",
+   "detail": "Arclight languageId 185333 = zyg (Zhuang, Dejing), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=23941": {
+   "state": "verified",
+   "detail": "Arclight languageId 23941 = cpu (Asheninca Pichis), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=144211": {
+   "state": "verified",
+   "detail": "Arclight languageId 144211 = mbd (Manobo, Dibabawon), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=139862": {
+   "state": "verified",
+   "detail": "Arclight languageId 139862 = bxw (Bankagooma), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=139498": {
+   "state": "verified",
+   "detail": "Arclight languageId 139498 = arv (Arbore), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=23047": {
+   "state": "verified",
+   "detail": "Arclight languageId 23047 = tsj (Sharchogpa), 21 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6271": {
+   "state": "verified",
+   "detail": "Arclight languageId 6271 = lbj (Ladakhi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=53418": {
+   "state": "verified",
+   "detail": "Arclight languageId 53418 = fvr (Fur), 6 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20654": {
+   "state": "verified",
+   "detail": "Arclight languageId 20654 = dtp (Dusun), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=99152": {
+   "state": "verified",
+   "detail": "Arclight languageId 99152 = krs (Gbaya-Kresh, South Sudan), 4 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=141333": {
+   "state": "verified",
+   "detail": "Arclight languageId 141333 = kia (Kim), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=141528": {
+   "state": "verified",
+   "detail": "Arclight languageId 141528 = kwv (Kaba Naa, Sara), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=4791": {
+   "state": "verified",
+   "detail": "Arclight languageId 4791 = amh (Amharic), 39 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=4501": {
+   "state": "verified",
+   "detail": "Arclight languageId 4501 = cbi (Chachi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=10461": {
+   "state": "verified",
+   "detail": "Arclight languageId 10461 = wne (Waneci), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=99460": {
+   "state": "verified",
+   "detail": "Arclight languageId 99460 = loh (Laarim), 4 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=13901": {
+   "state": "verified",
+   "detail": "Arclight languageId 13901 = mgd (Moru), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=125402": {
+   "state": "verified",
+   "detail": "Arclight languageId 125402 = usi (Ushoi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=100282": {
+   "state": "verified",
+   "detail": "Arclight languageId 100282 = ybh (Yakha), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3892": {
+   "state": "verified",
+   "detail": "Arclight languageId 3892 = tyv (Tuvin), 6 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=179655": {
+   "state": "verified",
+   "detail": "Arclight languageId 179655 = tyy (Tiyaa), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3803": {
+   "state": "verified",
+   "detail": "Arclight languageId 3803 = kmc (Dong, Southern), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=24173": {
+   "state": "verified",
+   "detail": "Arclight languageId 24173 = adi (Adi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3960": {
+   "state": "verified",
+   "detail": "Arclight languageId 3960 = pcc (Bouyei), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=2745": {
+   "state": "verified",
+   "detail": "Arclight languageId 2745 = gya (Gbaya, Northwest), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3936": {
+   "state": "verified",
+   "detail": "Arclight languageId 3936 = rbb (Palaung, Rumai), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=140205": {
+   "state": "verified",
+   "detail": "Arclight languageId 140205 = dhi (Dhimal), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20601": {
+   "state": "verified",
+   "detail": "Arclight languageId 20601 = yue (Cantonese), 35 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5470": {
+   "state": "verified",
+   "detail": "Arclight languageId 5470 = sus (Susu), 20 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=24309": {
+   "state": "verified",
+   "detail": "Arclight languageId 24309 = tgk (Tajik), 39 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=19594": {
+   "state": "verified",
+   "detail": "Arclight languageId 19594 = brx (Bodo), 4 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5652": {
+   "state": "verified",
+   "detail": "Arclight languageId 5652 = cdh (Chambeali), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=18321": {
+   "state": "verified",
+   "detail": "Arclight languageId 18321 = bxr (Buriat, Russia), 6 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=142979": {
+   "state": "verified",
+   "detail": "Arclight languageId 142979 = yup (Yukpa), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6363": {
+   "state": "verified",
+   "detail": "Arclight languageId 6363 = kfs (Bilaspuri), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=53326": {
+   "state": "verified",
+   "detail": "Arclight languageId 53326 = ddn (Dendi (Djougou)), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=10526": {
+   "state": "verified",
+   "detail": "Arclight languageId 10526 = mvy (Kohistani, Indus), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6648": {
+   "state": "verified",
+   "detail": "Arclight languageId 6648 = bfy (Bagheli), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5130": {
+   "state": "verified",
+   "detail": "Arclight languageId 5130 = ydd (Yiddish), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=99582": {
+   "state": "verified",
+   "detail": "Arclight languageId 99582 = zgn (Zhuang, Guibian), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6535": {
+   "state": "verified",
+   "detail": "Arclight languageId 6535 = gbk (Gaddi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5042": {
+   "state": "verified",
+   "detail": "Arclight languageId 5042 = knf (Mankanya), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20967": {
+   "state": "verified",
+   "detail": "Arclight languageId 20967 = tts (Isan), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=21578": {
+   "state": "verified",
+   "detail": "Arclight languageId 21578 = nld (Flemish), 6 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=184506": {
+   "state": "verified",
+   "detail": "Arclight languageId 184506 = hni (Hani, Haya), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5699": {
+   "state": "verified",
+   "detail": "Arclight languageId 5699 = bgq (Bagri), 4 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=22098": {
+   "state": "verified",
+   "detail": "Arclight languageId 22098 = ium (Yao (Iu Mien)), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=4695": {
+   "state": "verified",
+   "detail": "Arclight languageId 4695 = gaz (Oromo, West-Central), 6 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6186": {
+   "state": "verified",
+   "detail": "Arclight languageId 6186 = mag (Magahi), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=140932": {
+   "state": "verified",
+   "detail": "Arclight languageId 140932 = hal (Halang), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=141536": {
+   "state": "verified",
+   "detail": "Arclight languageId 141536 = kxh (Karo), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=1873": {
+   "state": "verified",
+   "detail": "Arclight languageId 1873 = bor (Bororo), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=23403": {
+   "state": "verified",
+   "detail": "Arclight languageId 23403 = tdb (Panchpargania), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=139071": {
+   "state": "verified",
+   "detail": "Arclight languageId 139071 = kui (Kikuro), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3974": {
+   "state": "verified",
+   "detail": "Arclight languageId 3974 = nxq (Naxi), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=174473": {
+   "state": "verified",
+   "detail": "Arclight languageId 174473 = qvz (Quichua, Pastaza), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3929": {
+   "state": "verified",
+   "detail": "Arclight languageId 3929 = xsr (Sherpa), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=20208": {
+   "state": "verified",
+   "detail": "Arclight languageId 20208 = sgh (Shughni), 6 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=3786": {
+   "state": "verified",
+   "detail": "Arclight languageId 3786 = dta (Daur), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=1927": {
+   "state": "verified",
+   "detail": "Arclight languageId 1927 = zlm (Malay), 38 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=1796": {
+   "state": "verified",
+   "detail": "Arclight languageId 1796 = oym (Wayampi, Oiapoque), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=525": {
+   "state": "verified",
+   "detail": "Arclight languageId 525 = arq (Arabic, Algerian Spoken), 24 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=184566": {
+   "state": "verified",
+   "detail": "Arclight languageId 184566 = ind (Indonesian (Isa)), 17 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=5040": {
+   "state": "verified",
+   "detail": "Arclight languageId 5040 = mnk (Mandinka), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=7371": {
+   "state": "verified",
+   "detail": "Arclight languageId 7371 = bru (Bru, Eastern), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=10570": {
+   "state": "verified",
+   "detail": "Arclight languageId 10570 = bsk (Burushaski), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=4820": {
+   "state": "verified",
+   "detail": "Arclight languageId 4820 = fin (Finnish), 22 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=143321": {
+   "state": "verified",
+   "detail": "Arclight languageId 143321 = tue (Tuyuca), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=6353": {
+   "state": "verified",
+   "detail": "Arclight languageId 6353 = kfy (Kumauni), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=142312": {
+   "state": "verified",
+   "detail": "Arclight languageId 142312 = yaa (Jaminawa), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=1592": {
+   "state": "verified",
+   "detail": "Arclight languageId 1592 = cub (Cubeo), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=100773": {
+   "state": "verified",
+   "detail": "Arclight languageId 100773 = wau (Waura), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=99766": {
+   "state": "verified",
+   "detail": "Arclight languageId 99766 = wmd (Mamainde), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=141382": {
+   "state": "verified",
+   "detail": "Arclight languageId 141382 = kpc (Curripaco), 2 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=9194": {
+   "state": "verified",
+   "detail": "Arclight languageId 9194 = nzs (New Zealand Sign Language), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=24014": {
+   "state": "verified",
+   "detail": "Arclight languageId 24014 = fub (Fulfulde-Adamawa), 4 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=12392": {
+   "state": "verified",
+   "detail": "Arclight languageId 12392 = shp (Shipibo-Conibo), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=140087": {
+   "state": "verified",
+   "detail": "Arclight languageId 140087 = ceg (Chamacoco), 1 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  },
+  "https://www.jesusfilm.org/watch/?languageId=53441": {
+   "state": "verified",
+   "detail": "Arclight languageId 53441 = arb (Arabic, Modern Standard (Egyptian)), 9 film(s). jesusfilm.org itself is client-rendered and cannot be fetch-verified."
+  }
+ }
+}

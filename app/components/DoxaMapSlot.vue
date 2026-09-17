@@ -32,18 +32,84 @@ const isSimple = props.bundle === 'simple-map'
 
 <style scoped>
 .doxa-map-slot {
+  /* The maps read this token inside their shadow DOM to round the canvas itself: a WebGL
+     layer is not reliably clipped by an ancestor's radius, so it must carry its own. */
+  --map-radius: var(--slot-radius, 0px);
+  /* Corners the MAP ITSELF must round (the canvas is not clipped by an ancestor radius). */
+  --map-radius-corners: var(--slot-radius, 0px);
+  /* THE SLOT IS A LAYOUT, NOT A MASK. The map sits INSIDE the frame, inset by enough that its
+     own square corner can never reach the rounded edge — the corner bite of a radius r is
+     r·(1−1/√2) ≈ 0.3r. The slot paints its own opaque rounded surface behind and around the
+     map, so whatever the map does with its compositing layer, the corners stay the page's. */
+  --slot-inset: calc(var(--slot-radius, 0px) * 0.32);
+  background: var(--slot-corner-bg, var(--color-surface-default, #F3F3F1));
   display: block;
   position: relative;
   width: 100%;
   min-height: 780px;
   aspect-ratio: 16 / 9;
   overflow: hidden;
+  /* Rounded clip that cannot race the compositor. `overflow: hidden` + `border-radius`
+     alone is applied to a COMPOSITED child (the WebGL canvas, an iframe) only once
+     Chrome has built a mask layer for it — so on a real GPU the map showed square
+     corners until it loaded, then rounded ones (reported on /research, 2026-09-16).
+     clip-path is applied at paint time regardless of compositing. The radius follows
+     the host page's utility class on this element (rounded-md / rounded-xlg). */
+  --slot-radius: 0px;
+  clip-path: inset(0 round var(--slot-radius));
+  isolation: isolate;
+  /* Own compositor layer from the first frame: the rounded clip is then applied on the
+     compositor side before the WebGL canvas ever arrives (Chrome, real GPU). */
+  will-change: transform;
+  transform: translateZ(0);
 }
+
+/* THE CORNERS ARE PAINTED, NOT ONLY CLIPPED.
+   A map canvas and an iframe are composited layers: on a real GPU they are not reliably
+   clipped by an ancestor's radius, which is why the corners went square the moment a map
+   finished loading (Firefox, reported 2026-09-17). Clipping the canvas itself breaks
+   Mapbox's own transforms, so the slot instead paints the four corner wedges in the page
+   colour ON TOP of whatever it holds. Ordinary painting — no compositor can escape it, and
+   it works the same for a canvas, an iframe or an image. Per-corner radii so a card can be
+   square along one edge (the research card on phones). */
+.doxa-map-slot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  /* The wedges get their own compositing layer. The map canvas is a GPU layer, and a GPU layer
+     can paint over a non-layered sibling whatever the stacking order says — which is exactly
+     why the corners reappeared the moment the map finished loading. Two layers, so the z-order
+     between them is honoured. */
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  --corner-tl: var(--slot-radius, 0px);
+  --corner-tr: var(--slot-radius, 0px);
+  --corner-br: var(--slot-radius, 0px);
+  --corner-bl: var(--slot-radius, 0px);
+  --corner-bg: var(--slot-corner-bg, var(--color-surface-default, #F3F3F1));
+  background:
+    radial-gradient(circle at 100% 100%, #0000 calc(var(--corner-tl) - 0.5px), var(--corner-bg) var(--corner-tl)) left    top    / var(--corner-tl) var(--corner-tl) no-repeat,
+    radial-gradient(circle at 0    100%, #0000 calc(var(--corner-tr) - 0.5px), var(--corner-bg) var(--corner-tr)) right   top    / var(--corner-tr) var(--corner-tr) no-repeat,
+    radial-gradient(circle at 0    0,    #0000 calc(var(--corner-br) - 0.5px), var(--corner-bg) var(--corner-br)) right   bottom / var(--corner-br) var(--corner-br) no-repeat,
+    radial-gradient(circle at 100% 0,    #0000 calc(var(--corner-bl) - 0.5px), var(--corner-bg) var(--corner-bl)) left    bottom / var(--corner-bl) var(--corner-bl) no-repeat;
+}
+/* One corner size for every map card, and the element's own radius is pinned to the same
+   token so it can never disagree with the clip (the page's utility class sets its own). */
+.doxa-map-slot.rounded-md  { --slot-radius: var(--border-radius-lg); border-radius: var(--slot-radius); }
+/* Every map card uses the same corner size, so they read as one family. */
+.doxa-map-slot.rounded-xlg { --slot-radius: var(--border-radius-lg); border-radius: var(--slot-radius); }
 
 @media (max-width: 768px) {
   .doxa-map-slot {
     min-height: 0;
+    /* Phone height: twice as tall as wide (~734px on a 390px phone) — 80px more map than the
+       9/16 it replaced, with room for the search band, the toolbar and the legend sheet. The
+       cap keeps the map inside one screen so the page below it stays reachable. */
     aspect-ratio: 1 / 2;
+    max-height: 90svh;
   }
 }
 
@@ -51,9 +117,14 @@ const isSimple = props.bundle === 'simple-map'
 .doxa-map-slot :deep(doxa-research-map) {
   display: block;
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  inset: var(--slot-inset, 0px);
+  /* The map keeps its stacking to itself. A custom element is not a stacking context on its
+     own, so the legend (1000) and the search bar (1200) inside it would otherwise compete with
+     the slot's own layers and paint over the corner wedges below. */
+  isolation: isolate;
+  z-index: 0;
+  width: auto;
+  height: auto;
   /* Inherit any border-radius the host page gave the slot (e.g. .rounded-md /
      .rounded-xlg on the research page). Without this, the bare custom element
      paints a rectangular background during the brief window between page

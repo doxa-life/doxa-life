@@ -9,16 +9,14 @@
  *       to mint a 1-hour temporary token (`tk.*`) with read-only scopes,
  *       caches it server-side, returns the TK
  *
- * Pattern ported from `dt-geo-steward/geo-steward.php :: get_temp_key()`
- *
  * Why a server endpoint instead of `runtimeConfig.public.mapboxToken`?
  *   1. Static HTML pages in /public/ can't read runtimeConfig — they need
  *      to fetch the token over HTTP at page load.
  *   2. Lets us hold an SK in `.env` and never ship it (or any value
  *      derived from it) to the client; the TK we send back auto-expires
  *      in 1 hour and can be revoked by rotating the SK.
- *   3. Centralizes token logic for any embed (research page, PPLR data
- *      maps page, future MFEs) — single source of truth.
+ *   3. Centralizes token logic for every embed (the research page, the maps page and
+ *      any future map) — one source of truth.
  *
  * Security notes:
  *   - Returns a token to ANY caller. That's fine because:
@@ -39,6 +37,8 @@ interface TokenResponse {
   token: string
   type: 'pk' | 'tk'
   expires_in?: number
+  /** Where the maps drop-in is served from, so static embed pages need no hardcoded path. */
+  mapsBase?: string
 }
 
 interface MapboxTokenApiResponse {
@@ -66,7 +66,19 @@ const CLIENT_SCOPES = [
 ]
 
 export default defineEventHandler(async (event): Promise<TokenResponse> => {
+  // CORS: the built map pages fetch this from wherever the doxa-maps tree is hosted
+  // (a CDN, a partner site, localhost) — a foreign origin without this header is
+  // blocked by the browser and the map never gets a token. Safe to open: pk tokens
+  // are public by design and tk tokens are minted read-only (see notes above).
+  setResponseHeaders(event, {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Cache-Control': 'no-store',
+  })
   const config = useRuntimeConfig(event)
+  // Where the maps drop-in is served from (MAPS_BASE in nuxt.config.ts). Returned with the
+  // token so static pages such as /embed/map can find the bundles without a hardcoded path.
+  const mapsBase = (config.public as { mapsBase?: string }).mapsBase || '/embed/doxa-maps-build'
   // Prefer the server-only key if present; fall back to the public token
   // so existing setups (just NUXT_PUBLIC_MAPBOX_TOKEN) keep working.
   const key = (config as { mapboxKey?: string }).mapboxKey
@@ -79,7 +91,7 @@ export default defineEventHandler(async (event): Promise<TokenResponse> => {
 
   // Public token → return as-is
   if (key.startsWith('pk.')) {
-    return { token: key, type: 'pk' }
+    return { token: key, type: 'pk', mapsBase }
   }
 
   // Anything else must be a secret key
@@ -94,6 +106,7 @@ export default defineEventHandler(async (event): Promise<TokenResponse> => {
       token: cachedTk.token,
       type: 'tk',
       expires_in: Math.floor((cachedTk.expiresAt - now) / 1000),
+      mapsBase,
     }
   }
 
@@ -127,7 +140,7 @@ export default defineEventHandler(async (event): Promise<TokenResponse> => {
   }
 
   cachedTk = { token: response.token, expiresAt: now + TK_LIFETIME_MS }
-  return { token: response.token, type: 'tk', expires_in: Math.floor(TK_LIFETIME_MS / 1000) }
+  return { token: response.token, type: 'tk', expires_in: Math.floor(TK_LIFETIME_MS / 1000), mapsBase }
 })
 
 /**

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>connectivity-map · cities-internet</title>
+  <link rel="icon" href="data:,">
+  <!-- Mapbox peer loaded ONCE here; the map custom element mounts in this page and
+       uses window.mapboxgl directly (same realm → no cross-realm container errors). -->
+  <link rel="preconnect" href="https://api.mapbox.com" crossorigin />
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.24.0/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.24.0/mapbox-gl.js"></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+  <style>
+    /* BARE full-page map — no chrome. The custom element IS the page, so the
+       browser URL shares the map itself. */
+    html, body { height: 100%; margin: 0; background: #0a0e15; }
+    #slot, cities-internet-map { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+    #status { position: fixed; inset: 0; z-index: 2; display: grid; place-items: center;
+      padding: 24px; text-align: center; color: #9aa7b8;
+      font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    #status.err { color: #f87171; }
+  </style>
+</head>
+<body>
+  <div id="slot"></div>
+  <div id="status">loading token…</div>
+
+  <script>window.MAP_APP_API_URL = "https://pray.doxa.life";</script>
+  <!-- Bundle IIFE — registers the <cities-internet-map> custom element. -->
+  <script src="../cities-internet.js" integrity="sha384-PAqYfQxuqlTa0wMwATfLtaJIeDnBhlHqijIMW4ILMtpy4VOXubmV19L8iiu3LI/u" crossorigin="anonymous"></script>
+
+  <script>
+    // Mapbox token resolution — the A3 ladder, in precedence order:
+    //   1. prop            — a token hardcoded into this page's profile-config (config.tk)
+    //   2. ?tk= URL param  — token carried in the shared link
+    //   3. baked token     — opt-in literal token inlined at build time (build-config.token)
+    //   A token from rungs 1-3 is used DIRECTLY (no network). Otherwise a token
+    //   *endpoint* is resolved and fetched:
+    //   4. window.MAP_TOKEN_URL override  5. configured TOKEN_SRC URL  6. same-origin /api/maps/token
+    // TOKEN_SRC is treated as DATA, never eval'd: the literal "window.MAP_TOKEN_URL"
+    // means "read that global"; anything else is used as a URL — so both a global
+    // name and a plain URL are safe (no SyntaxError footgun).
+    (function () {
+      var slot = document.getElementById('slot');
+      var status = document.getElementById('status');
+      var BASE_CONFIG = {"profile":"connectivity-map","dataSource":"pray-tools","instanceId":"cities-internet-connectivity-map","assetsBase":"../../../assets"};
+      // MapLibre pages need NO token: the ladder below is skipped entirely.
+      var TOKEN_FREE = false;
+      var TOKEN_SRC = "https://doxa.life/api/maps/token";
+      var BAKED_TOKEN = "";
+      var DEFAULT_TOKEN_URL = '/api/maps/token';
+
+      function fail(msg) { if (status) { status.className = 'err'; status.textContent = '⚠ ' + msg; } }
+      // No token anywhere on the ladder → ask ONCE, store locally, remount. No dead ends.
+      function askToken() {
+        if (!status) return;
+        status.className = 'err';
+        status.innerHTML = 'map needs a Mapbox token — ' +
+          '<input id="tkIn" type="password" placeholder="paste pk.… (stays in this browser)" ' +
+          'style="font:12px ui-monospace,monospace;padding:6px 8px;border-radius:6px;border:1px solid #223047;background:#0e1623;color:#eef2f7;width:min(320px,70vw)"> ' +
+          '<button id="tkGo" style="font:700 11px ui-monospace,monospace;padding:7px 12px;border-radius:999px;border:0;cursor:pointer;background:linear-gradient(90deg,#46d4ff,#b9a6f5);color:#0a0e15">use it</button>';
+        var go = document.getElementById('tkGo');
+        if (go) go.addEventListener('click', function () {
+          var v = (document.getElementById('tkIn').value || '').trim();
+          if (!v) return;
+          try { localStorage.setItem('MAPS_STAGING_TK', v); } catch (e) {}
+          mount(v);
+        });
+      }
+      function done() { if (status && status.parentNode) { status.parentNode.removeChild(status); } }
+
+      function mount(token) {
+        if (!token && !TOKEN_FREE) { return askToken(); }
+        try {
+          var cfg = token ? Object.assign({}, BASE_CONFIG, { tk: token }) : BASE_CONFIG;
+          var el = document.createElement("cities-internet-map");
+          el.setAttribute('profile-config', JSON.stringify(cfg));
+          slot.innerHTML = '';
+          slot.appendChild(el);
+          done();
+        } catch (e) { fail(e && e.message ? e.message : String(e)); }
+      }
+
+      function qp(name) {
+        try { return new URLSearchParams(location.search).get(name) || ''; }
+        catch (e) { return ''; }
+      }
+
+      function extractToken(data) {
+        if (typeof data === 'string') return data.trim();
+        if (data && typeof data === 'object') return data.token || data.tk || data.accessToken || '';
+        return '';
+      }
+
+      // Rungs 1-3b: an actual token → mount directly, no fetch.
+      // 2b = localStorage: the paste-once store shared with the staging pages
+      // (MAPS_STAGING_TK) — paste a token ONCE anywhere in the tree, every page uses it.
+      var stored = '';
+      try { stored = localStorage.getItem('MAPS_STAGING_TK') || ''; } catch (e) {}
+      var urlTk = qp('tk');
+      if (urlTk) { try { localStorage.setItem('MAPS_STAGING_TK', urlTk); } catch (e) {} }
+      var directToken = (BASE_CONFIG && BASE_CONFIG.tk) || urlTk || stored || BAKED_TOKEN;
+      if (TOKEN_FREE) { return mount(''); }
+      if (directToken) { return mount(directToken); }
+
+      // Rungs 4-6: resolve the token ENDPOINT candidates and try them IN ORDER — the first
+      // one that answers with a token wins. Order: window.MAP_TOKEN_URL override → the
+      // configured TOKEN_SRC (an ABSOLUTE url, so a tree hosted on a CDN away from the API
+      // still finds it) → same-origin /api/maps/token (dev, or the site hosting both).
+      // A single hard-coded pick used to kill the page when its one url 404'd or was
+      // blocked by CORS; a shared link must work wherever the tree is hosted.
+      var candidates = [];
+      function addCandidate(u) { if (u && candidates.indexOf(u) === -1) candidates.push(u); }
+      addCandidate(window.MAP_TOKEN_URL);
+      addCandidate(TOKEN_SRC && TOKEN_SRC !== 'window.MAP_TOKEN_URL' ? TOKEN_SRC : '');
+      addCandidate(DEFAULT_TOKEN_URL);
+
+      function fetchToken(i, errors) {
+        if (i >= candidates.length) {
+          // Every endpoint failed: say which, and still offer the paste-once box (no dead ends).
+          askToken();
+          if (status) {
+            var d = document.createElement('div');
+            d.textContent = '⚠ Token fetch failed from ' + candidates.join(', ') + ' — set window.MAP_TOKEN_URL or pass ?tk=. (' + errors.join(' | ') + ')';
+            status.insertBefore(d, status.firstChild);
+          }
+          return;
+        }
+        var url = candidates[i];
+        return fetch(url)
+          .then(function (r) {
+            if (!r.ok) throw new Error(url + ' → HTTP ' + r.status);
+            var ct = r.headers.get('content-type') || '';
+            return ct.indexOf('json') !== -1 ? r.json() : r.text();
+          })
+          .then(function (data) {
+            var tk = extractToken(data);
+            if (!tk) throw new Error(url + ' → no token in response');
+            mount(tk);
+          })
+          .catch(function (e) {
+            errors.push(e && e.message ? e.message : String(e));
+            return fetchToken(i + 1, errors);
+          });
+      }
+      fetchToken(0, []);
+    })();
+  </script>
+</body>
+</html>

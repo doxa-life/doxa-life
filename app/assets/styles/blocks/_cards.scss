@@ -56,10 +56,19 @@
     position: relative;
     overflow: hidden;
     border-radius: var(--border-radius-lg);
+    // An <iframe> is composited in its own layer: `overflow: hidden` + `border-radius` on the
+    // parent does not clip it in Chrome until the layer tree settles after the frame paints,
+    // so the map showed square corners until it loaded and rounded ones after. clip-path is
+    // applied at paint time regardless of compositing, and the iframe carries the radius too.
+    clip-path: inset(0 round var(--border-radius-lg));
+    isolation: isolate;
 
     iframe {
+        display: block;
         width: 100%;
         height: 20rem;
+        border: 0;
+        border-radius: inherit;
     }
 
     .overlay {

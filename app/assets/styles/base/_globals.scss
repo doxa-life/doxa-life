@@ -147,6 +147,21 @@ a {
       color: var(--color-brand-secondary-light);
     }
   }
+
+  // The "→ more maps" invitation that sits under a map's bottom-right corner
+  // (home, pray, adopt, research). One rule, body-sized text, brand colour.
+  &.research-map-link {
+    display: block;
+    margin-top: 0.75rem;
+    text-align: right;
+    color: var(--color-brand-primary, #3b463d);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+
+    &:hover {
+      color: var(--color-brand-primary-darker, #1f2328);
+    }
+  }
 }
 
 
