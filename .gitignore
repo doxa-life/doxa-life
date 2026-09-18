@@ -49,5 +49,5 @@ embeddables/micro-frontends/_template/
 
 package-lock.json
 plans
-.claude
+.claude/settings.local.json
 .vscode

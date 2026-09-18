@@ -8,7 +8,7 @@
  */
 
 import { getLanguage } from '~~/config/languages'
-import { GLOSSARIES } from '~~/config/glossaries'
+import { getGlossary, renderGlossaryPrompt, type Glossary } from './glossary'
 import { getSetting } from './site-settings'
 
 const DEFAULT_TRANSLATION_MODEL = 'anthropic/claude-opus-5'
@@ -41,19 +41,16 @@ function promptLanguageName(code: string): string {
   return lang?.translationName || lang?.name || code
 }
 
-/** Whether a curated terminology glossary is injected for this language. */
-export function hasGlossary(code: string): boolean {
-  return Boolean(GLOSSARIES[code]?.length)
-}
-
-function buildSystemPrompt(targetLanguage: string, sourceLanguage: string, fragmentCount: number): string {
+function buildSystemPrompt(
+  targetLanguage: string,
+  sourceLanguage: string,
+  fragmentCount: number,
+  glossary: Glossary
+): string {
   const source = promptLanguageName(sourceLanguage)
   const target = promptLanguageName(targetLanguage)
 
-  const glossary = GLOSSARIES[targetLanguage]
-  const glossaryBlock = glossary?.length
-    ? `\nGlossary — always use these translations, inflected correctly for the surrounding grammar:\n${glossary.map(([s, t]) => `${s} → ${t}`).join('\n')}\n`
-    : ''
+  const glossaryBlock = renderGlossaryPrompt(glossary, target)
 
   return `You are a professional translator for DOXA, a Christian mission organization mobilizing prayer for unreached people groups. Translate marketing and informational website copy from ${source} into ${target}.
 
@@ -140,11 +137,12 @@ export async function openrouterTranslateTexts(
   }
 
   const model = await getTranslationModel(targetLanguage)
+  const glossary = await getGlossary(targetLanguage)
 
   const body = JSON.stringify({
     model,
     messages: [
-      { role: 'system', content: buildSystemPrompt(targetLanguage, sourceLanguage, texts.length) },
+      { role: 'system', content: buildSystemPrompt(targetLanguage, sourceLanguage, texts.length, glossary) },
       { role: 'user', content: JSON.stringify({ fragments: texts }) }
     ],
     response_format: { type: 'json_object' },

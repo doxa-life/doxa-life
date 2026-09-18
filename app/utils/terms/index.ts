@@ -2,8 +2,10 @@
 // documenting that language's terminology decisions — the chosen term,
 // alternatives considered, what Joshua Project and PeopleGroups.org use,
 // and the rationale. Locales without an edition fall back to English.
-// New language editions are added as part of the language-stabilization
-// process (see translation/LANGUAGE-STABILIZATION.md in the doxa monorepo).
+// A new edition is written when a language is added or its terminology
+// changes; the `add-language` and `sync-language` skills in .claude/skills
+// cover it. Terminology itself comes from the DOXA glossary, published at
+// https://pray.doxa.life/api/glossary/{lang}.
 
 import { en } from './en'
 import { fr } from './fr'

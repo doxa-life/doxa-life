@@ -1,7 +1,7 @@
 // LLM text-translation tool. Generic primitive — Claude composes
 // with upsert_page_translation when applying translations to pages.
 //
-// The vendored glossary for each target locale is always injected into
+// The approved terminology for each target locale is always injected into
 // the translation prompt, keeping MCP-driven translations terminologically
 // consistent with admin auto-translates.
 
@@ -18,7 +18,7 @@ Inputs:
 - \`source_locale\`: defaults to "en"; must be one of the site's enabled locales.
 - \`target_locales\`: array of locale codes to translate into; each must be enabled and different from the source.
 
-Output: \`translations: [{locale, text, glossary_used}]\`. \`glossary_used\` is true when a per-locale terminology glossary was applied (consistent with admin auto-translate behavior). After this returns, embed each translated text into the corresponding locale's page via upsert_page_translation.
+Output: \`translations: [{locale, text, glossary_used}]\`. \`glossary_used\` is true when the locale's approved DOXA terminology was applied (consistent with admin auto-translate behavior); it is false for a locale whose glossary has not been started yet. After this returns, embed each translated text into the corresponding locale's page via upsert_page_translation.
 
 Limits: 100 KB per call. For longer content, split into sections and translate each separately.`
 

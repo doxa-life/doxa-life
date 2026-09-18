@@ -1,13 +1,14 @@
 // LLM text-translation service — the canonical primitive both the
 // MCP translate_text tool and the admin batch-translate flow share.
 //
-// The per-locale glossary vendored in config/glossaries.ts is injected
-// into every translation prompt, so the terminology stays consistent
-// with admin auto-translates and with the translation/ glossaries repo.
+// Every translation prompt carries the target locale's approved terminology,
+// read at runtime from the glossary published by pray.doxa.life, so the
+// wording here matches the prayer site and the mobile app.
 
 import type { H3Error } from 'h3'
 import { translateTexts, translateTiptapContent, isTranslationConfigured } from '../utils/translate'
-import { OpenRouterError, hasGlossary } from '../utils/openrouter'
+import { OpenRouterError } from '../utils/openrouter'
+import { hasGlossary } from '../utils/glossary'
 import { ENABLED_LANGUAGE_CODES } from '~~/config/languages'
 import { db } from '../utils/database'
 import {
@@ -84,7 +85,7 @@ export async function translateText(input: TranslateTextInput): Promise<Translat
       return {
         locale,
         text: out[0] ?? '',
-        glossary_used: hasGlossary(locale)
+        glossary_used: await hasGlossary(locale)
       }
     })
   )
