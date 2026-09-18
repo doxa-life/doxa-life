@@ -4,9 +4,8 @@
 // .stack, etc.) get flattened into plain paragraphs when parsed. This
 // extension keeps the wrappers intact so the ported SCSS can style them.
 //
-// Shared by the editor (app/components/admin/RichTextEditor.vue), the
-// server renderer (server/utils/renderTiptap.ts), and the scrape-time
-// HTML→JSON converter (scripts/lib/htmlToTiptap.ts).
+// Shared by the editor (app/components/admin/RichTextEditor.vue) and the
+// server renderer (server/utils/renderTiptap.ts).
 
 import { Node } from '@tiptap/core'
 
@@ -36,7 +35,7 @@ export const Div = Node.create({
     const attrs: Record<string, { default: string | null }> = {
       class: { default: null },
       // Only preserved when the div is a `.wp-block-spacer` whose whole
-      // purpose is an inline height; see scripts/lib/htmlToTiptap.ts.
+      // purpose is an inline height.
       style: { default: null }
     }
     for (const name of PRESERVED_DATA_ATTRS) attrs[name] = { default: null }

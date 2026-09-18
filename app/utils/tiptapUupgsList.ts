@@ -12,9 +12,8 @@
 // (preserving the host app's i18n / runtime-config context via `h()`
 // + `render()`).
 //
-// Keep this file shared between editor (app/components/admin/RichTextEditor.vue),
-// server renderer (server/utils/renderTiptap.ts), and scraper
-// (scripts/lib/htmlToTiptap.ts).
+// Keep this file shared between editor (app/components/admin/RichTextEditor.vue)
+// and server renderer (server/utils/renderTiptap.ts).
 
 import { Node } from '@tiptap/core'
 

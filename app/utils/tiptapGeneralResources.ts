@@ -8,9 +8,8 @@
 // place (preserving the host app's i18n / runtime-config context via
 // h() + render()).
 //
-// Shared between editor (app/components/admin/RichTextEditor.vue),
-// server renderer (server/utils/renderTiptap.ts), and migration
-// converter (scripts/lib/htmlToTiptap.ts) via tiptapExtensions.ts.
+// Shared between editor (app/components/admin/RichTextEditor.vue) and
+// server renderer (server/utils/renderTiptap.ts) via tiptapExtensions.ts.
 
 import { Node } from '@tiptap/core'
 
