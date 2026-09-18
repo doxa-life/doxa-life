@@ -215,6 +215,9 @@ export default defineCachedEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Page not found' })
   }
 
+  // The body carries whichever locale its translation resolved to; the
+  // surrounding navigation follows the requested locale instead, since
+  // each category name and sibling title falls back to English on its own.
   const renderedLocale = result?.resolvedLocale ?? fallbackLocale
   const requestedLocale = locale
   const bodyHtml = result ? renderTiptap(result.translation.body_json) : ''
@@ -236,8 +239,8 @@ export default defineCachedEventHandler(async (event) => {
   let navTree: NavCategoryNode | null = null
   if (navCategoryId) {
     const [categoryName, siblingRows] = await Promise.all([
-      getCategoryName(navCategoryId, renderedLocale, fallbackLocale),
-      getCategoryPageTranslations(navCategoryId, renderedLocale, fallbackLocale)
+      getCategoryName(navCategoryId, locale, fallbackLocale),
+      getCategoryPageTranslations(navCategoryId, locale, fallbackLocale)
     ])
     const navCategory = tree.byId.get(navCategoryId) ?? null
     categorySlug = navCategory?.slug ?? null
@@ -264,7 +267,7 @@ export default defineCachedEventHandler(async (event) => {
       if (!ancestor?.parent_id) break
       navRootId = ancestor.parent_id
     }
-    navTree = await buildNavTree(navRootId, renderedLocale, fallbackLocale, tree)
+    navTree = await buildNavTree(navRootId, locale, fallbackLocale, tree)
   }
 
   // Child categories below this one — surfaced so archive landing
@@ -281,13 +284,13 @@ export default defineCachedEventHandler(async (event) => {
       // Hide subcategories with no published pages anywhere in their
       // subtree — matches the menu so empty categories aren't surfaced
       // as dead-end cards.
-      const withPages = await categoryIdsWithPublishedPages(renderedLocale, fallbackLocale)
+      const withPages = await categoryIdsWithPublishedPages(locale, fallbackLocale)
       const nonEmpty = cats.filter(c =>
         descendantCategoryIds(tree, c.id).some(id => withPages.has(id))
       )
       if (nonEmpty.length > 0) {
         const basePath = categoryUrlPath(tree, resolvedCategory.id)
-        childCategories = await summarizeChildCategories(nonEmpty, renderedLocale, fallbackLocale, basePath)
+        childCategories = await summarizeChildCategories(nonEmpty, locale, fallbackLocale, basePath)
       }
     }
   }
