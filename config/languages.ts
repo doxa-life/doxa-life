@@ -25,12 +25,12 @@ export const LANGUAGES: Language[] = [
   { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷', bibleId: 'FRLSG', bibleLabel: 'LSG' }, // maybe BDS
   { code: 'pt', name: 'Portuguese', nativeName: 'Português', flag: '🇵🇹', bibleId: 'NAA', translationName: 'Brazilian Portuguese' },
   { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪', bibleId: 'S00', bibleLabel: 'SCH2000' },
-  { code: 'it', name: 'Italian', nativeName: 'Italiano', flag: '🇮🇹', bibleId: 'NR06', enabled: false },
-  { code: 'zh', name: 'Chinese', nativeName: '中文', flag: '🇨🇳', bibleId: 'CUNPS', translationName: 'Simplified Chinese', enabled: false, latinHeadings: false },
+  { code: 'it', name: 'Italian', nativeName: 'Italiano', flag: '🇮🇹', bibleId: 'NR06' },
+  { code: 'zh', name: 'Chinese', nativeName: '中文', flag: '🇨🇳', bibleId: 'CUNPS', translationName: 'Simplified Chinese', latinHeadings: false },
   { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦', dir: 'rtl', bibleId: 'SVD', translationName: 'Modern Standard Arabic', latinHeadings: false }, // NAV (New Arabic Version) would be better but not on Bolls
   { code: 'ru', name: 'Russian', nativeName: 'Русский', flag: '🇷🇺', bibleId: 'SYNOD', latinHeadings: false }, // NRT (New Russian Translation) is a modern alternative
   { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳', bibleId: 'HIOV', bibleLabel: 'OV', hideFromSwitcher: true, latinHeadings: false },
-  { code: 'ro', name: 'Romanian', nativeName: 'Română', flag: '🇷🇴', bibleId: 'NTR', enabled: false }
+  { code: 'ro', name: 'Romanian', nativeName: 'Română', flag: '🇷🇴', bibleId: 'NTR' }
 ]
 
 // All language codes
