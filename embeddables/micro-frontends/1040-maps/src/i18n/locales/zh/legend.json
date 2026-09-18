@@ -1,16 +1,17 @@
 {
   "title": {
     "prayer": "祷告进度",
-    "engagement": "参与进度",
+    "engagement": "接触进度",
     "adoption": "认领进度",
     "languageFamilies": "语系",
     "doxaRegions": "Doxa 区域",
-    "affinityBlocs": "亲缘板块",
+    "affinityBlocs": "亲缘集团",
     "gospelResources": "福音资源"
   },
   "header": {
+    "default": "图例",
     "collapsed": "图例",
-    "peopleGroupFallback": "民族群体"
+    "peopleGroupFallback": "族群"
   },
   "prayer": {
     "needsPrayer": "无人祷告",
@@ -18,8 +19,8 @@
     "fullPrayerCoverage": "100+ 人祷告"
   },
   "engagement": {
-    "needsEngagement": "需要参与",
-    "hasEngagement": "已有参与"
+    "needsEngagement": "未接触",
+    "hasEngagement": "已接触"
   },
   "adoption": {
     "needsAdoption": "需要认领",

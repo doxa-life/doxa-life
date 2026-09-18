@@ -1,7 +1,7 @@
 {
-  "placeholder": "民族、地点、语言、宗教",
+  "placeholder": "族群、地点、语言、宗教",
   "labels": {
-    "people": "民族：",
+    "people": "族群：",
     "place": "地点：",
     "language": "语言：",
     "religion": "宗教："
