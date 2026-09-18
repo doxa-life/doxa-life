@@ -29,7 +29,7 @@ export const LANGUAGES: Language[] = [
   { code: 'zh', name: 'Chinese', nativeName: '简体中文', flag: '🇨🇳', bibleId: 'CUNPS', translationName: 'Simplified Chinese', latinHeadings: false },
   { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦', dir: 'rtl', bibleId: 'SVD', translationName: 'Modern Standard Arabic', latinHeadings: false }, // NAV (New Arabic Version) would be better but not on Bolls
   { code: 'ru', name: 'Russian', nativeName: 'Русский', flag: '🇷🇺', bibleId: 'SYNOD', latinHeadings: false }, // NRT (New Russian Translation) is a modern alternative
-  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳', bibleId: 'HIOV', bibleLabel: 'OV', hideFromSwitcher: true, latinHeadings: false },
+  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳', bibleId: 'HIOV', bibleLabel: 'OV', latinHeadings: false },
   { code: 'ro', name: 'Romanian', nativeName: 'Română', flag: '🇷🇴', bibleId: 'NTR' }
 ]
 
