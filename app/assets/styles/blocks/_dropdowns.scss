@@ -52,3 +52,16 @@
       padding: 0.25rem 0;
     }
 }
+
+/* Language dropdown in the desktop nav: the shared .main-navigation .sub-menu
+   padding is sized for wide content menus and leaves the short language rows
+   floating in whitespace, so tighten it to list proportions. */
+.main-navigation {
+    .pll-parent-menu-item > .sub-menu {
+        padding: var(--spacing-2xs) 0;
+    }
+
+    .pll-parent-menu-item > .sub-menu > li > a {
+        padding: var(--spacing-2xs) var(--spacing-xs);
+    }
+}
