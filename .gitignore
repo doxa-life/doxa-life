@@ -51,3 +51,6 @@ package-lock.json
 plans
 .claude/settings.local.json
 .vscode
+
+# Local DB dump artifact (scripts/sync-local-db.sh)
+live.dump
