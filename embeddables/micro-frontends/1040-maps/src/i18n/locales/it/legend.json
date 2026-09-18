@@ -1,7 +1,7 @@
 {
   "title": {
     "prayer": "Avanzamento della preghiera",
-    "engagement": "Avanzamento dell'impegno",
+    "engagement": "Avanzamento del coinvolgimento",
     "adoption": "Avanzamento dell'adozione",
     "languageFamilies": "Famiglie linguistiche",
     "doxaRegions": "Regioni Doxa",
@@ -10,7 +10,7 @@
   },
   "header": {
     "collapsed": "Legenda",
-    "peopleGroupFallback": "Gruppo di persone"
+    "peopleGroupFallback": "Gruppo etnico"
   },
   "prayer": {
     "needsPrayer": "Nessuno prega",
@@ -18,15 +18,15 @@
     "fullPrayerCoverage": "100+ persone in preghiera"
   },
   "engagement": {
-    "needsEngagement": "Necessita impegno",
-    "hasEngagement": "Ha impegno"
+    "needsEngagement": "Non coinvolto",
+    "hasEngagement": "Coinvolto"
   },
   "adoption": {
     "needsAdoption": "Necessita adozione",
     "hasAdoption": "Ha adozione"
   },
   "columns": {
-    "upgs": "UUPGs",
+    "upgs": "UUPG",
     "population": "Popolazione"
   },
   "footer": {

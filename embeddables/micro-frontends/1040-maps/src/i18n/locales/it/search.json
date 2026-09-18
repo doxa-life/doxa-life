@@ -1,7 +1,7 @@
 {
-  "placeholder": "Popolo, luogo, lingua, religione",
+  "placeholder": "Gruppo etnico, luogo, lingua, religione",
   "labels": {
-    "people": "Popolo:",
+    "people": "Gruppo etnico:",
     "place": "Luogo:",
     "language": "Lingua:",
     "religion": "Religione:"
