@@ -1,16 +1,17 @@
 {
   "title": {
     "prayer": "Progresul rugăciunii",
-    "engagement": "Progresul implicării",
-    "adoption": "Progresul adopției",
+    "engagement": "Progresul angajării misionare",
+    "adoption": "Progresul adoptării",
     "languageFamilies": "Familii de limbi",
     "doxaRegions": "Regiuni Doxa",
     "affinityBlocs": "Blocuri de afinitate",
     "gospelResources": "Resurse ale Evangheliei"
   },
   "header": {
+    "default": "Legendă",
     "collapsed": "Legendă",
-    "peopleGroupFallback": "Grup de popoare"
+    "peopleGroupFallback": "Grup etnolingvistic"
   },
   "prayer": {
     "needsPrayer": "Nimeni nu se roagă",
@@ -18,15 +19,15 @@
     "fullPrayerCoverage": "100+ persoane se roagă"
   },
   "engagement": {
-    "needsEngagement": "Necesită implicare",
-    "hasEngagement": "Are implicare"
+    "needsEngagement": "Neangajat misionar",
+    "hasEngagement": "Angajat misionar"
   },
   "adoption": {
-    "needsAdoption": "Necesită adopție",
-    "hasAdoption": "Are adopție"
+    "needsAdoption": "Necesită adoptare",
+    "hasAdoption": "Adoptat"
   },
   "columns": {
-    "upgs": "UUPGs",
+    "upgs": "UUPG-uri",
     "population": "Populație"
   },
   "footer": {

@@ -30,7 +30,7 @@ export const LANGUAGES: Language[] = [
   { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦', dir: 'rtl', bibleId: 'SVD', translationName: 'Modern Standard Arabic', latinHeadings: false }, // NAV (New Arabic Version) would be better but not on Bolls
   { code: 'ru', name: 'Russian', nativeName: 'Русский', flag: '🇷🇺', bibleId: 'SYNOD', latinHeadings: false }, // NRT (New Russian Translation) is a modern alternative
   { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳', bibleId: 'HIOV', bibleLabel: 'OV', hideFromSwitcher: true, latinHeadings: false },
-  { code: 'ro', name: 'Romanian', nativeName: 'Română', flag: '🇷🇴', bibleId: 'NTR', enabled: false }
+  { code: 'ro', name: 'Romanian', nativeName: 'Română', flag: '🇷🇴', bibleId: 'NTR' }
 ]
 
 // All language codes

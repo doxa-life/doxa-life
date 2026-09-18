@@ -1,8 +1,8 @@
 {
   "title": {
     "prayer": "Прогресс молитвы",
-    "engagement": "Прогресс вовлечённости",
-    "adoption": "Прогресс усыновления",
+    "engagement": "Прогресс вовлечения",
+    "adoption": "Прогресс принятия",
     "languageFamilies": "Языковые семьи",
     "doxaRegions": "Регионы Doxa",
     "affinityBlocs": "Блоки родства",
@@ -10,7 +10,7 @@
   },
   "header": {
     "collapsed": "Условные обозначения",
-    "peopleGroupFallback": "Народная группа"
+    "peopleGroupFallback": "Народ"
   },
   "prayer": {
     "needsPrayer": "Никто не молится",
@@ -18,12 +18,12 @@
     "fullPrayerCoverage": "100+ человек молятся"
   },
   "engagement": {
-    "needsEngagement": "Нуждается в вовлечённости",
-    "hasEngagement": "Есть вовлечённость"
+    "needsEngagement": "Невовлечённый",
+    "hasEngagement": "Вовлечённый"
   },
   "adoption": {
-    "needsAdoption": "Нуждается в усыновлении",
-    "hasAdoption": "Есть усыновление"
+    "needsAdoption": "Нуждается в принятии",
+    "hasAdoption": "Принят"
   },
   "columns": {
     "upgs": "UUPGs",
