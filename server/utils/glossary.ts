@@ -45,7 +45,14 @@ const cache = new Map<string, CacheEntry>()
 
 interface PublishedGlossary {
   notes?: string
-  terms?: Array<{ term?: string, translation?: string }>
+  terms?: Array<{
+    term?: string
+    translation?: string
+    /** The English acronym, for a term known by one. */
+    acronym?: string | null
+    /** The acronym this language uses — its own, or the English one. */
+    acronym_translation?: string | null
+  }>
 }
 
 /**
@@ -65,9 +72,16 @@ export async function getGlossary(code: string): Promise<Glossary> {
       retry: 1
     })
 
+    // A term with an acronym yields the acronym as its own pair too, so a bare
+    // "UUPG" in the source maps to this language's acronym rather than being
+    // left to the model. The wording itself never carries the acronym.
     const pairs = (data?.terms || [])
       .filter(entry => entry?.term && entry?.translation)
-      .map(entry => ({ term: String(entry.term), value: String(entry.translation) }))
+      .flatMap((entry) => {
+        const pair = { term: String(entry.term), value: String(entry.translation) }
+        if (!entry.acronym) return [pair]
+        return [pair, { term: String(entry.acronym), value: String(entry.acronym_translation || entry.acronym) }]
+      })
 
     const glossary: Glossary = { pairs, notes: String(data?.notes || '') }
     cache.set(code, { glossary, expires: Date.now() + CACHE_MS })

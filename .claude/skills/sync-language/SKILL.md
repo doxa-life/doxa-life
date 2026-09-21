@@ -24,6 +24,13 @@ are used.
 A `draft` term is still authoritative — it is wording nobody has ruled on yet,
 not wording to ignore.
 
+An acronym is a field of its own. The wording never carries it, so a term
+published as `Unreached people group (UPG) → grupo étnico não alcançado (PNA)`
+gives the phrase `grupo étnico não alcançado` and, separately, the acronym
+`PNA`. A bare acronym in a string — `Find a UUPG`, the map legend's `UUPGs` —
+takes this language's acronym, which is the English one unless a reviewer chose
+another.
+
 ## 2. Establish what here was written by a human
 
 This matters more on this site than anywhere else. Several languages' copy was
