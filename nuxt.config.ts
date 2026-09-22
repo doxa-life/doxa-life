@@ -277,8 +277,6 @@ export default defineNuxtConfig({
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || '',
       prayBaseUrl: process.env.NUXT_PUBLIC_PRAY_BASE_URL || 'https://pray.doxa.life',
       mapboxToken: process.env.NUXT_PUBLIC_MAPBOX_TOKEN || '',
-      feedbackApiBase: process.env.NUXT_PUBLIC_FEEDBACK_API_BASE || 'https://support.gospelambition.org',
-      feedbackProjectId: process.env.NUXT_PUBLIC_FEEDBACK_PROJECT_ID || '',
       statinatorUrl: process.env.NUXT_PUBLIC_STATINATOR_URL || 'https://statinator.doxa.life',
       statinatorProjectId: process.env.NUXT_PUBLIC_STATINATOR_PROJECT_ID || 'doxa',
       statinatorEnabled: process.env.NUXT_PUBLIC_STATINATOR_ENABLED === 'true',
@@ -299,7 +297,7 @@ export default defineNuxtConfig({
 
   vue: {
     compilerOptions: {
-      isCustomElement: (tag: string) => ['doxa-map', 'doxa-research-map', 'feedback-web-component'].includes(tag)
+      isCustomElement: (tag: string) => ['doxa-map', 'doxa-research-map'].includes(tag)
     }
   },
 
@@ -313,7 +311,7 @@ export default defineNuxtConfig({
     vue: {
       template: {
         compilerOptions: {
-          isCustomElement: (tag: string) => ['doxa-map', 'doxa-research-map', 'feedback-web-component'].includes(tag)
+          isCustomElement: (tag: string) => ['doxa-map', 'doxa-research-map'].includes(tag)
         }
       }
     }

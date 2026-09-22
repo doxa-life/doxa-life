@@ -4,7 +4,6 @@
 // window.mapboxgl / window.MapboxGeocoder BEFORE map-app.iife.js runs
 // customElements.define('doxa-map', …) — otherwise the custom-element upgrade's
 // connectedCallback calls `new mapboxgl.Map(…)` before the global exists.
-// The <feedback-widget> bundle is loaded globally via nuxt.config.ts.
 
 const MAPBOX_JS = 'https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js'
 const MAPBOX_GEOCODER_JS = 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js'

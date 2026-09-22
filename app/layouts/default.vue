@@ -8,11 +8,11 @@ const { locale, locales } = useI18n()
 const { public: pub } = useRuntimeConfig()
 
 // Warm DNS+TCP+TLS for the cross-origin services these pages hit: the prayer
-// data API (people-group components) and the idle-loaded analytics + feedback
-// widget scripts. Deriving from runtime config keeps these correct per env.
+// data API (people-group components) and the idle-loaded analytics script.
+// Deriving from runtime config keeps these correct per env.
 const preconnectOrigins = computed(() => {
   const origins = new Set<string>()
-  for (const url of [pub.prayBaseUrl, pub.statinatorUrl, pub.feedbackApiBase]) {
+  for (const url of [pub.prayBaseUrl, pub.statinatorUrl]) {
     if (!url) continue
     try {
       origins.add(new URL(String(url)).origin)
