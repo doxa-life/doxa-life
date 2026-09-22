@@ -4,7 +4,7 @@ export const ro: TermsContent = {
   title: 'Terminologie',
   intro: [
     'Această pagină documentează deciziile terminologice românești ale parteneriatului DOXA. Pentru fiecare termen: definiția, alternativele luate în calcul și motivul alegerii.',
-    'Sursele noastre: glosarul DOXA, confirmat de un recenzent român în septembrie 2026, vocabularul misionar evanghelic românesc și traducerile românești ale Bibliei pentru fiecare expresie de origine biblică. Recenzentul a indicat Biblia Cornilescu 1924 (VDC) ca ediție a comunității sale, în timp ce site-ul citează deocamdată Noua Traducere Românească; acolo unde cele două diferă, sunt arătate amândouă. Joshua Project și PeopleGroups.org (IMB) publică doar în engleză, așa că această ediție nu le citează.'
+    'Sursele noastre: glosarul DOXA, completat de un recenzent român în septembrie 2026 — niciunul dintre cei 39 de termeni nu este încă confirmat, iar cinci sunt marcați pentru discuție —, vocabularul misionar evanghelic românesc și traducerile românești ale Bibliei pentru fiecare expresie de origine biblică. Recenzentul a indicat Biblia Cornilescu 1924 (VDC) ca ediție a comunității sale, în timp ce site-ul citează deocamdată Noua Traducere Românească (NTR); acolo unde cele două diferă, sunt arătate amândouă. Joshua Project și PeopleGroups.org (IMB) publică doar în engleză, așa că această ediție nu le citează.'
   ],
   seeDefinitionsBefore: 'Definițiile complete se află pe pagina',
   definitionsLinkLabel: 'Definiții',
@@ -25,7 +25,7 @@ export const ro: TermsContent = {
         'un grup de oameni care se percep pe ei înșiși ca având o afinitate comună, întemeiată pe limbă, cultură, religie și viziune despre lume — cel mai mare grup în interiorul căruia Evanghelia se poate răspândi fără bariere de înțelegere sau de acceptare. Este unitatea de măsură a tot ceea ce numără DOXA.',
       alternatives: 'grup etnic · popor · etnie · trib',
       rationale:
-        'recenzentul a aprobat forma completă în locul lui „grup etnic”, care era wordingul folosit până acum pe suprafețele românești ale DOXA. „Grup etnic” lasă pe dinafară limba, deși limba este criteriul care desparte două grupuri vecine de aceeași etnie; „popor” rămâne firesc în text curent, dar ca etichetă se confundă cu națiunea; „trib” aduce cu sine conotații primitive. În română, termenul tehnic și cel de zi cu zi sunt același, așa că „grup etnolingvistic” traduce și „ethnolinguistic group”.'
+        'recenzentul a aprobat forma completă în locul lui „grup etnic”, care era termenul folosit până acum pe suprafețele românești ale DOXA. „Grup etnic” lasă pe dinafară limba, deși limba este criteriul care desparte două grupuri vecine de aceeași etnie; „popor” rămâne firesc în text curent, dar ca etichetă se confundă cu națiunea; „trib” aduce cu sine conotații primitive. În română, termenul tehnic și cel de zi cu zi sunt același, așa că „grup etnolingvistic” traduce și „ethnolinguistic group”.'
     },
     {
       term: 'Grup etnolingvistic neatins cu Evanghelia (UPG)',
@@ -40,7 +40,7 @@ export const ro: TermsContent = {
       term: 'Neangajat misionar',
       english: 'unengaged people group',
       definition:
-        'un grup etnolingvistic în mijlocul căruia nu se cunoaște niciun efort îndreptat spre întemeierea unor biserici care se susțin singure: lipsesc cele patru niveluri ale unei angajări misionare eficiente — lucrare apostolică prin prezență activă, lucrare în cultura locală și în limba maternă, angajament pe termen lung și semănarea Evangheliei cu ținta unei mișcări de plantare de biserici. Este un termen tehnic al IMB: spune că nimeni nu lucrează în mijlocul lor, nu că oamenii ar fi nepăsători.',
+        'un grup etnolingvistic în mijlocul căruia nu se cunoaște niciun efort îndreptat spre întemeierea unor biserici care se susțin singure: lipsesc cele patru niveluri ale unei angajări misionare eficiente — lucrare apostolică de pionierat prin prezență activă, lucrare în cultura locală și în limba maternă, angajament pe termen lung și semănarea Evangheliei cu ținta unei mișcări de plantare de biserici. Este un termen tehnic al IMB: spune că nimeni nu lucrează în mijlocul lor, nu că oamenii ar fi nepăsători.',
       alternatives: 'fără angajare misionară activă · neangajat · neevanghelizat',
       rationale:
         'recenzentul a înlocuit formularea propusă, „fără angajare misionară activă”, cu adjectivul „neangajat misionar”, care se leagă direct de substantiv și formează o familie completă: angajare misionară, angajat misionar, neangajat misionar, puțin angajat misionar. Calificativul „misionar” este obligatoriu: „neangajat” singur înseamnă în română fără loc de muncă.'
@@ -68,10 +68,10 @@ export const ro: TermsContent = {
       term: 'Grup etnolingvistic de frontieră',
       english: 'frontier people group',
       definition:
-        'aproximativ 1 ucenic sau mai puțin la 1.000 (≤ 0,1%), fără o mișcare confirmată și susținută de oameni care se întorc la Isus — cei mai neatinși dintre cei neatinși. Termenul vine de la Joshua Project.',
+        'aproximativ 1 ucenic sau mai puțin la 1.000 (≤ 0,1%), fără o mișcare confirmată și susținută de oameni care se întorc în mod colectiv la Isus — cei mai neatinși dintre cei neatinși. Termenul vine de la Joshua Project.',
       alternatives: 'popor de frontieră · grup de pionierat',
       rationale:
-        'aprobat ca atare. „De frontieră” păstrează sensul misiologic de margine a înaintării, fără conotația militară.'
+        'aprobat ca atare. „De frontieră” păstrează sensul misiologic de margine a înaintării, fără conotația militară. Pentru „movement to Jesus” glosarul dă „oameni care se întorc în mod colectiv la Isus” și îl marchează pentru discuție tocmai aici: definiția se sprijină pe negație — „fără o mișcare confirmată și susținută” —, iar o expresie despre oameni nu poate fi negată în felul acesta, așa că substantivul „mișcare” rămâne în text.'
     },
     {
       term: 'Angajare misionară',
@@ -107,7 +107,7 @@ export const ro: TermsContent = {
         'lucrători dintr-o altă cultură care slujesc în mijlocul unui grup etnolingvistic. Calificativul este intenționat: ei nu vin din interiorul grupului.',
       alternatives: 'lucrători interculturali · misionari străini',
       rationale:
-        'recenzentul a schimbat „interculturali” în „transculturali”: „inter-” înseamnă între culturi, „trans-” înseamnă trecând prin ele, ceea ce descrie exact ce face lucrătorul. „Misionari străini” mută accentul pe cetățenie, nu pe cultură.'
+        'recenzentul a schimbat „interculturali” în „transculturali”: „inter-” înseamnă între culturi, „trans-” înseamnă trecând dincolo de ele, ceea ce descrie exact ce face lucrătorul. „Misionari străini” mută accentul pe cetățenie, nu pe cultură.'
     },
     {
       term: 'Domnul secerișului',
@@ -156,7 +156,7 @@ export const ro: TermsContent = {
       term: 'Darul nostru pentru Isus',
       english: 'our gift to Jesus',
       definition:
-        'felul în care este așezat întregul efort: o lucrare misionară activă în fiecare popor până în 2033, ca dar de închinare al Bisericii — jertfă, nu tranzacție.',
+        'felul în care este așezat întregul efort: o lucrare misionară activă în fiecare grup etnolingvistic până în 2033, ca dar de închinare al Bisericii — jertfă, nu tranzacție.',
       rationale: 'aprobat ca atare.'
     },
     {

@@ -1,7 +1,7 @@
 {
-  "placeholder": "Popor, loc, limbă, religie",
+  "placeholder": "Grup etnolingvistic, loc, limbă, religie",
   "labels": {
-    "people": "Popor:",
+    "people": "Grup etnolingvistic:",
     "place": "Loc:",
     "language": "Limbă:",
     "religion": "Religie:"

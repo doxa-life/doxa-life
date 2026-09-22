@@ -9,11 +9,12 @@
     "gospelResources": "Risorse del Vangelo"
   },
   "header": {
+    "default": "Legenda",
     "collapsed": "Legenda",
     "peopleGroupFallback": "Gruppo etnico"
   },
   "prayer": {
-    "needsPrayer": "Nessuno prega",
+    "needsPrayer": "Nessuno in preghiera",
     "hasPrayer": "1+ persone in preghiera",
     "fullPrayerCoverage": "100+ persone in preghiera"
   },
@@ -22,8 +23,8 @@
     "hasEngagement": "Coinvolto"
   },
   "adoption": {
-    "needsAdoption": "Necessita adozione",
-    "hasAdoption": "Ha adozione"
+    "needsAdoption": "Da adottare",
+    "hasAdoption": "Adottato"
   },
   "columns": {
     "upgs": "UUPG",

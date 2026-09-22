@@ -6,13 +6,13 @@
   "zoomOut": "Reduzir",
   "switchToLightMode": "Mudar para modo claro",
   "switchToDarkMode": "Mudar para modo escuro",
-  "resetView": "Repor vista",
-  "toggleFullscreen": "Alternar ecrã inteiro",
+  "resetView": "Redefinir visualização",
+  "toggleFullscreen": "Alternar tela cheia",
   "aboutThisMap": "Sobre este mapa",
   "closeMenu": "Fechar menu",
   "reloadMap": "Recarregar mapa",
   "showClusters": "Mostrar clusters",
-  "clusterSettings": "Definições de clusters",
+  "clusterSettings": "Configurações de clusters",
   "startAutoFly": "Iniciar voo automático",
   "stopFlight": "Parar voo",
   "speedLabel": "Velocidade:",
@@ -21,5 +21,5 @@
     "normal": "Normal",
     "fast": "Rápida"
   },
-  "shareEmbed": "Partilhar e incorporar"
+  "shareEmbed": "Compartilhar e incorporar"
 }

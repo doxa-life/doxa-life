@@ -1,16 +1,17 @@
 {
   "title": {
-    "prayer": "تقدم الصلاة",
-    "engagement": "تقدم الانخراط",
-    "adoption": "تقدم التبني",
+    "prayer": "تقدُّم الصلاة",
+    "engagement": "تقدُّم الانخراط",
+    "adoption": "تقدُّم التبنّي",
     "languageFamilies": "العائلات اللغوية",
     "doxaRegions": "مناطق Doxa",
     "affinityBlocs": "كتل القرابة",
     "gospelResources": "موارد الإنجيل"
   },
   "header": {
+    "default": "وسيلة الإيضاح",
     "collapsed": "وسيلة الإيضاح",
-    "peopleGroupFallback": "مجموعة الشعب"
+    "peopleGroupFallback": "مجموعة شعبية"
   },
   "prayer": {
     "needsPrayer": "لا أحد يصلّي",
@@ -18,15 +19,15 @@
     "fullPrayerCoverage": "أكثر من 100 شخص يصلّون"
   },
   "engagement": {
-    "needsEngagement": "يحتاج إلى انخراط",
-    "hasEngagement": "لديه انخراط"
+    "needsEngagement": "غير مَخْدُومَة",
+    "hasEngagement": "مُخْدُومَة"
   },
   "adoption": {
-    "needsAdoption": "يحتاج إلى تبني",
-    "hasAdoption": "لديه تبني"
+    "needsAdoption": "تحتاج إلى تبنٍّ",
+    "hasAdoption": "لديها تبنٍّ"
   },
   "columns": {
-    "upgs": "UUPGs",
+    "upgs": "UUPG",
     "population": "السكان"
   },
   "footer": {

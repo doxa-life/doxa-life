@@ -36,7 +36,7 @@ export const en: TermsContent = {
     {
       term: 'Unengaged, unreached people group (UUPG)',
       definition:
-        'The combined category — unreached and unengaged. The 2,085 peoples DOXA mobilizes prayer for. UUPG is the established international acronym, kept as-is across all language editions.'
+        'The combined category — unreached and unengaged. The 2,085 peoples DOXA mobilizes prayer for. UUPG is the established international acronym; most language editions keep it, while some carry a reviewer-chosen local acronym (Spanish GENANC, Portuguese PNANE, German VUVG).'
     },
     {
       term: 'Under-engaged',
@@ -101,7 +101,7 @@ export const en: TermsContent = {
     {
       term: 'World Assemblies of God Fellowship (WAGF)',
       definition:
-        "The global fellowship that founded and stewards DOXA. Language editions use the fellowship's established national name where one exists; the WAGF acronym stays unchanged everywhere."
+        "The global fellowship that founded and stewards DOXA. Language editions use the fellowship's established national name where one exists; the WAGF acronym is kept unless a reviewer has chosen a local one (Spanish FMAD)."
     },
     {
       term: 'Sending agencies',

@@ -497,6 +497,7 @@ const showMore = computed(() => hasMore())
             :options="filterOptions.wagf_region || []"
             :value="activeFilters.wagf_region?.value ?? ''"
             :placeholder="t.type_to_search || 'Type to search...'"
+            :no-options-text="t.no_options || 'No options found'"
             @filter-change="onFilterChange"
             @filter-clear="onFilterClear"
           />
@@ -506,6 +507,7 @@ const showMore = computed(() => hasMore())
             :options="filterOptions.wagf_block || []"
             :value="activeFilters.wagf_block?.value ?? ''"
             :placeholder="t.type_to_search || 'Type to search...'"
+            :no-options-text="t.no_options || 'No options found'"
             @filter-change="onFilterChange"
             @filter-clear="onFilterClear"
           />
@@ -516,6 +518,7 @@ const showMore = computed(() => hasMore())
             :options="filterOptions.country_code || []"
             :value="activeFilters.country_code?.value ?? ''"
             :placeholder="t.type_to_search || 'Type to search...'"
+            :no-options-text="t.no_options || 'No options found'"
             @filter-change="onFilterChange"
             @filter-clear="onFilterClear"
           />
@@ -525,6 +528,7 @@ const showMore = computed(() => hasMore())
             :options="filterOptions.rop1 || []"
             :value="activeFilters.rop1?.value ?? ''"
             :placeholder="t.type_to_search || 'Type to search...'"
+            :no-options-text="t.no_options || 'No options found'"
             @filter-change="onFilterChange"
             @filter-clear="onFilterClear"
           />
@@ -534,6 +538,7 @@ const showMore = computed(() => hasMore())
             :options="filterOptions.religion || []"
             :value="activeFilters.religion?.value ?? ''"
             :placeholder="t.type_to_search || 'Type to search...'"
+            :no-options-text="t.no_options || 'No options found'"
             @filter-change="onFilterChange"
             @filter-clear="onFilterClear"
           />

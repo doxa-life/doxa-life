@@ -82,7 +82,7 @@ export const fr: TermsContent = {
       term: 'Engagement · s’engager auprès d’un peuple',
       english: 'engagement · to engage',
       definition:
-        'une activité soutenue, en résidence, transculturelle, orientée vers un mouvement d’implantation d’églises (voir « Qu’est-ce que l’engagement ? » sur la page Vision).',
+        'une activité soutenue, sur le terrain, transculturelle, orientée vers un mouvement d’implantation d’églises (voir « Qu’est-ce que l’engagement ? » sur la page Vision).',
       alternatives: 'implication · contact · cibler',
       rationale:
         'terme de précision — un rendu vague comme « implication » vide le sens. Au verbe, nous préférons « s’engager auprès d’un peuple » : « engager un peuple » évoquerait une embauche.'
@@ -135,11 +135,13 @@ export const fr: TermsContent = {
         'la notion missiologique — la langue dans laquelle une personne pense et ressent le plus profondément — distincte de la langue officielle ou véhiculaire, ce que « langue maternelle » ne dit pas.'
     },
     {
-      term: 'Sujets de prière',
+      term: 'Points de prière quotidiens',
       english: 'prayer points',
-      alternatives: 'points de prière',
+      definition:
+        'les demandes de prière quotidiennes propres à un peuple que DOXA envoie aux intercesseurs : centrées sur les Écritures et reliées au terrain, distinctes d’un contenu de dévotion générale.',
+      alternatives: 'sujets de prière · motifs de prière',
       rationale:
-        '« sujets de prière » est l’expression naturelle des églises francophones ; « points de prière » est un calque de l’anglais.'
+        'le glossaire DOXA fixe « points de prière quotidiens », en parallèle du « guide de prière quotidien » : le site et les e-mails emploient la même formule. « Sujets de prière » reste l’expression la plus naturelle des églises francophones et demeure l’alternative à retenir si une relecture francophone tranche en sa faveur.'
     },
     {
       term: 'Adopter un peuple',

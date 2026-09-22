@@ -9,6 +9,7 @@
     "gospelResources": "Ressources de l'Évangile"
   },
   "header": {
+    "default": "Légende",
     "collapsed": "Légende",
     "peopleGroupFallback": "Peuple"
   },
@@ -18,12 +19,12 @@
     "fullPrayerCoverage": "100+ personnes en prière"
   },
   "engagement": {
-    "needsEngagement": "Besoin d'engagement",
-    "hasEngagement": "Engagement en cours"
+    "needsEngagement": "Non engagé",
+    "hasEngagement": "Engagé"
   },
   "adoption": {
     "needsAdoption": "Besoin d'adoption",
-    "hasAdoption": "Adoption en cours"
+    "hasAdoption": "Adopté"
   },
   "columns": {
     "upgs": "UUPG",

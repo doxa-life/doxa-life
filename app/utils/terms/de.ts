@@ -4,7 +4,7 @@ export const de: TermsContent = {
   title: 'Terminologie',
   intro: [
     'Diese Seite dokumentiert die deutschen Begriffsentscheidungen der DOXA-Partnerschaft. Zu jedem Begriff: die Definition, die erwogenen Alternativen, was Joshua Project und PeopleGroups.org (IMB) verwenden, und der Grund für unsere Wahl.',
-    'Unsere Quellen: das von einem deutschsprachigen Prüfer durchgesehene DOXA-Glossar, der Sprachgebrauch deutschsprachiger Missionswerke und Gebetsnetzwerke (etwa Unerreichte-Volksgruppen.de) sowie Luther 2017 und Schlachter 2000 für jede Wendung biblischen Ursprungs.'
+    'Unsere Quellen: das von einem deutschsprachigen Prüfer durchgesehene DOXA-Glossar, der Sprachgebrauch deutschsprachiger Missionswerke und Gebetsnetzwerke (etwa Unerreichte-Volksgruppen.de) sowie Schlachter 2000 als Referenzübersetzung – zum Abgleich auch Luther 2017 – für jede Wendung biblischen Ursprungs.'
   ],
   seeDefinitionsBefore: 'Die vollständigen Definitionen stehen auf der Seite',
   definitionsLinkLabel: 'Begriffsbestimmungen',
@@ -40,7 +40,7 @@ export const de: TermsContent = {
       term: 'Unberührte Volksgruppe',
       english: 'unengaged people group',
       definition:
-        'keine bekannten Bemühungen, sich selbst tragende Gemeinden zu gründen – die vier Ebenen wirksamer missionarischer Arbeit vor Ort fehlen (apostolischer Einsatz vor Ort; Arbeit in Kultur und Herzenssprache; langfristige Verbindlichkeit; Evangelisation mit dem Ziel einer Gemeindegründungsbewegung). Ein Fachbegriff aus dem Umfeld der IMB: Er sagt, dass niemand unter ihnen arbeitet – nicht, dass die Menschen gleichgültig wären.',
+        'keine bekannten Bemühungen, sich selbst tragende Gemeinden zu gründen – die vier Ebenen wirksamer missionarischer Arbeit vor Ort fehlen (apostolischer Einsatz in der Pionierphase vor Ort; Arbeit in Kultur und Herzenssprache; langfristige Verbindlichkeit; Evangelisation mit dem Ziel einer Gemeindegründungsbewegung). Ein Fachbegriff aus dem Umfeld der IMB: Er sagt, dass niemand unter ihnen arbeitet – nicht, dass die Menschen gleichgültig wären.',
       alternatives: 'nicht-engagierte Volksgruppe · völlig unerreichte Volksgruppe · Volksgruppe ohne missionarische Arbeit vor Ort',
       rationale:
         'die abschließende Entscheidung unseres Prüfers: „Im Deutschen sprechen wir von unberührten Landstrichen.“ „Unberührt“ sagt, dass noch niemand begonnen hat, ohne Gleichgültigkeit zu unterstellen. „Nicht-engagiert“ klingt nach persönlichem Desinteresse; „völlig unerreicht“ bleibt der kombinierten Kategorie VUVG vorbehalten.'
@@ -112,14 +112,14 @@ export const de: TermsContent = {
       term: 'Herr der Ernte',
       english: 'Lord of the harvest',
       rationale:
-        'Matthäus 9,38 (Luther 2017): „Darum bittet den Herrn der Ernte, dass er Arbeiter aussende in seine Ernte.“ Schlachter 2000 lautet bis auf die Wortstellung gleich. Unsere biblischen Wendungen folgen diesen beiden Übersetzungen.'
+        'Matthäus 9,38 (Schlachter 2000, unsere Referenzübersetzung): „Darum bittet den Herrn der Ernte, dass er Arbeiter in seine Ernte aussende!“ Luther 2017 lautet bis auf die Wortstellung gleich. Glossar und Referenzübersetzung stimmen hier überein.'
     },
     {
       term: 'Gebet bahnt den Weg',
       english: 'prayer prepares the way',
       alternatives: 'Gebet bereitet den Weg · Gebet bereitet den Boden',
       rationale:
-        'Anklang an Jesaja 40,3 (Luther 2017): „Bereitet dem HERRN den Weg, macht in der Steppe eine ebene Bahn unserm Gott!“ „Bahnen“ sagt, dass ein Weg entsteht, wo noch keiner war – genau das tut Fürbitte, lange bevor Mitarbeiter eintreffen. „Den Boden bereiten“ bleibt richtig, wo der englische Text „prepares the soil“ sagt.'
+        'Anklang an Jesaja 40,3. Hier gehen Glossar und Referenzübersetzung auseinander: Schlachter 2000 liest „In der Wüste bereitet den Weg des Herrn, ebnet in der Steppe eine Straße unserem Gott!“ – also „bereiten“, während „Bahn“ nur bei Luther 2017 steht („macht in der Steppe eine ebene Bahn unserm Gott“). Das Glossar bleibt bei „bahnen“, weil es sagt, dass ein Weg entsteht, wo noch keiner war – genau das tut Fürbitte, lange bevor Mitarbeiter eintreffen. Wo die Wendung als Bibelzitat gesetzt wird, gilt der Schlachter-Wortlaut. „Den Boden bereiten“ bleibt richtig, wo der englische Text „prepares the soil“ sagt.'
     },
     {
       term: 'Herzenssprache',
@@ -175,7 +175,7 @@ export const de: TermsContent = {
       term: 'Jeder Stamm, jede Zunge, jedes Volk und jede Nation',
       english: 'every tribe, tongue, people, and nation',
       rationale:
-        'Offenbarung 5,9 und 7,9 – das Bild, das die ganze Arbeit motiviert. Luther 2017 und Schlachter 2000 übersetzen „aus allen Stämmen und Sprachen und Völkern und Nationen“; die Glossarform behält „Zunge“ als wörtliche Wiedergabe des biblischen Begriffs bei. Jedes der vier Wörter benennt eine eigene Dimension menschlicher Vielfalt.'
+        'Offenbarung 5,9 und 7,9 – das Bild, das die ganze Arbeit motiviert. Auch hier gehen Glossar und Referenzübersetzung auseinander: Schlachter 2000 liest „aus allen Stämmen und Sprachen und Völkern und Nationen“ (5,9) und „aus allen Nationen und Stämmen und Völkern und Sprachen“ (7,9), Luther 2017 ebenso mit „Sprachen“. Die Glossarform behält „Zunge“ als wörtliche Wiedergabe des biblischen Begriffs bei, weil jedes der vier Wörter eine eigene Dimension menschlicher Vielfalt benennt und „Sprache“ sich sonst mit der Herzenssprache überschneidet. Wo der Satz als Bibelzitat gesetzt wird, gilt der Schlachter-Wortlaut.'
     }
   ]
 }

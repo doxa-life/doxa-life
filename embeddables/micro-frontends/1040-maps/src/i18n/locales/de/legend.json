@@ -9,6 +9,7 @@
     "gospelResources": "Evangeliumsressourcen"
   },
   "header": {
+    "default": "Legende",
     "collapsed": "Legende",
     "peopleGroupFallback": "Volksgruppe"
   },

@@ -40,7 +40,7 @@ export const it: TermsContent = {
       term: 'Non coinvolto',
       english: 'unengaged people group',
       definition:
-        'un gruppo etnico presso il quale non risulta alcuno sforzo mirato a fondare chiese capaci di sostenersi: mancano i quattro livelli del coinvolgimento efficace (sforzo apostolico residente; lavoro nella cultura locale e nella lingua del cuore; impegno a lungo termine; semina del Vangelo orientata a un movimento di fondazione di chiese). È un termine tecnico dell’IMB: dice che nessuno lavora tra loro, non che quel popolo sia indifferente.',
+        'un gruppo etnico presso il quale non risulta alcuno sforzo mirato a fondare chiese capaci di sostenersi: mancano i quattro livelli del coinvolgimento efficace (sforzo apostolico pionieristico residente; lavoro nella cultura locale e nella lingua del cuore; impegno a lungo termine; semina del Vangelo orientata a un movimento di fondazione di chiese). È un termine tecnico dell’IMB: dice che nessuno lavora tra loro, non che quel popolo sia indifferente.',
       alternatives: 'non impegnato · non toccato · senza presenza missionaria · non evangelizzato',
       rationale:
         '«coinvolgimento» e «coinvolto» formano in italiano una famiglia completa e coerente con tutti i termini derivati — coinvolgere, coinvolto, non coinvolto, poco coinvolto, coinvolgimento fruttuoso — cosa che «impegno» non fa, perché in italiano descrive già la dedizione personale di chi prega. «Non evangelizzato» descrive un’altra cosa: l’assenza di annuncio, non l’assenza di operai residenti.'

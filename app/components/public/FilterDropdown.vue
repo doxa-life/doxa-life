@@ -11,9 +11,11 @@ const props = withDefaults(defineProps<{
   options: FilterOption[]
   value?: string
   placeholder?: string
+  noOptionsText?: string
 }>(), {
   value: '',
-  placeholder: 'Type to search...'
+  placeholder: 'Type to search...',
+  noOptionsText: 'No options found'
 })
 
 const emit = defineEmits<{
@@ -154,7 +156,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
       >Clear selection</button>
       <div class="filter-dropdown__options">
         <template v-if="filteredOptions.length === 0">
-          <div class="filter-dropdown__no-options">No options found</div>
+          <div class="filter-dropdown__no-options">{{ noOptionsText }}</div>
         </template>
         <template v-else>
           <div

@@ -2,13 +2,14 @@
   "title": {
     "prayer": "Прогресс молитвы",
     "engagement": "Прогресс вовлечения",
-    "adoption": "Прогресс принятия",
+    "adoption": "Прогресс принятия ответственности",
     "languageFamilies": "Языковые семьи",
     "doxaRegions": "Регионы Doxa",
     "affinityBlocs": "Блоки родства",
     "gospelResources": "Евангельские ресурсы"
   },
   "header": {
+    "default": "Условные обозначения",
     "collapsed": "Условные обозначения",
     "peopleGroupFallback": "Народ"
   },
@@ -19,14 +20,14 @@
   },
   "engagement": {
     "needsEngagement": "Невовлечённый",
-    "hasEngagement": "Вовлечённый"
+    "hasEngagement": "Вовлечён"
   },
   "adoption": {
-    "needsAdoption": "Нуждается в принятии",
-    "hasAdoption": "Принят"
+    "needsAdoption": "Ответственность не взята",
+    "hasAdoption": "Ответственность взята"
   },
   "columns": {
-    "upgs": "UUPGs",
+    "upgs": "UUPG",
     "population": "Население"
   },
   "footer": {

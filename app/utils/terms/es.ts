@@ -28,13 +28,13 @@ export const es: TermsContent = {
         'preguntado si «grupo de personas» debía mantenerse, nuestro revisor respondió «grupo étnico»: recoge con más precisión el concepto etnolingüístico, mientras que «grupo de personas» suena a estadística y «pueblo» a nación. Es también la base de las siglas en español (GENANC). «Tribu» se evita por sus connotaciones primitivas.'
     },
     {
-      term: 'Grupo étnico no alcanzado',
+      term: 'Grupo étnico no alcanzado (UPG)',
       english: 'unreached people group (UPG)',
       definition:
         'aproximadamente 2 discípulos o menos de cada 100 personas (≤ 2 %), sin la capacidad de establecer iglesias autóctonas sin obreros transculturales. Joshua Project añade un criterio de ≤ 5 % de cristianos; DOXA sigue la definición de la IMB.',
-      alternatives: 'pueblo étnico no alcanzado (PNA) · UPG (sigla inglesa)',
+      alternatives: 'pueblo étnico no alcanzado (PNA) · pueblo no alcanzado',
       rationale:
-        'el glosario revisado no fija una sigla en español para este término, así que se escribe completo. «PNA» se construyó sobre «pueblo» y se abandonó con él. Para la movilización general basta el término «grupos étnicos no alcanzados»; las categorías más finas de abajo se dirigen a los responsables estratégicos.'
+        'el glosario revisado no fija una sigla propia en español para este término, así que se conserva la inglesa, UPG, y en texto corrido se escribe completo. «PNA» se construyó sobre «pueblo» y se abandonó con él. Para la movilización general basta el término «grupos étnicos no alcanzados»; las categorías más finas de abajo se dirigen a los responsables estratégicos.'
     },
     {
       term: 'Grupo étnico no comprometido',
@@ -80,7 +80,7 @@ export const es: TermsContent = {
         'actividad sostenida, residente y transcultural para compartir a Cristo y hacer discípulos, orientada a iglesias autosustentables y realizada de maneras culturalmente apropiadas y localmente relevantes (véase «¿Qué es el compromiso?» en la página de Visión).',
       alternatives: 'involucramiento · participación · implicación · contacto',
       rationale:
-        'se le pidió al revisor que considerara «compromiso» con cuidado, porque puede confundir el ministerio residente con una actitud. Lo confirmó por la misma razón que «comprometido»: implica responsabilidad y compromiso, mientras que «involucramiento» solo significa tomar parte en un proyecto. El verbo es «comprometer» («Comprometer a todos los grupos étnicos no comprometidos para 2033»); «involucrar» y «participación», de borradores anteriores, quedan sustituidos. En las etiquetas de interfaz: «Estado de compromiso», «Criterios de compromiso».'
+        'se le pidió al revisor que considerara «compromiso» con cuidado, porque puede confundir el ministerio residente con una actitud. Lo confirmó por la misma razón que «comprometido»: implica responsabilidad y compromiso, mientras que «involucramiento» solo significa tomar parte en un proyecto. El verbo es «comprometer» («Comprometer a todos los grupos étnicos no comprometidos para 2033»); «involucrar» y «participación», de borradores anteriores, quedan sustituidos. En las etiquetas de interfaz: «Estado del compromiso», «Criterios de compromiso».'
     },
     {
       term: 'Movimiento de plantación de iglesias (MPI)',
@@ -132,7 +132,7 @@ export const es: TermsContent = {
       english: 'prayer points',
       alternatives: 'puntos de oración · pedidos de oración · peticiones de oración · indicaciones de oración',
       rationale:
-        '«motivos de oración» es la expresión natural de las iglesias hispanas; «puntos de oración» es un calco. El glosario revisado fija «motivos diarios de oración»; el conjunto diario se llama «guía diaria de oración». En el sitio web, el revisor escribió «pedidos de oración» en dos frases, que se conservan.'
+        '«motivos de oración» es la expresión natural de las iglesias hispanas; «puntos de oración» es un calco. El glosario revisado fija «motivos diarios de oración», que el sitio ya usa en lugar de los «pedidos de oración» que el revisor había escrito en el formulario. El conjunto diario se llama «guía diaria de oración»; el encabezado del sitio conserva el orden «Tu guía de oración diaria».'
     },
     {
       term: 'Adoptar (un grupo étnico)',

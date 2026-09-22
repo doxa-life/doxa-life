@@ -9,6 +9,7 @@
     "gospelResources": "Recursos do Evangelho"
   },
   "header": {
+    "default": "Legenda",
     "collapsed": "Legenda",
     "peopleGroupFallback": "Grupo étnico"
   },

@@ -9,6 +9,7 @@
     "gospelResources": "सुसमाचार संसाधन"
   },
   "header": {
+    "default": "लेजेंड",
     "collapsed": "लेजेंड",
     "peopleGroupFallback": "जनसमूह"
   },
@@ -18,15 +19,15 @@
     "fullPrayerCoverage": "100+ लोग प्रार्थना कर रहे हैं"
   },
   "engagement": {
-    "needsEngagement": "संलग्नता चाहिए",
-    "hasEngagement": "संलग्नता है"
+    "needsEngagement": "अनसंपर्कित",
+    "hasEngagement": "संपर्कित"
   },
   "adoption": {
-    "needsAdoption": "गोद लेना चाहिए",
+    "needsAdoption": "गोद लेने की ज़रूरत",
     "hasAdoption": "गोद लिया गया"
   },
   "columns": {
-    "upgs": "UUPGs",
+    "upgs": "UUPG",
     "population": "जनसंख्या"
   },
   "footer": {
