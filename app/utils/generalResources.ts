@@ -4,6 +4,8 @@
 // `DOCUMENT_RESOURCES_NO_IMAGE` depending on the `useDocuments` flag,
 // and always renders `GENERAL_RESOURCES_WITH_IMAGE` above it.
 
+import { hasVideoTranslation } from '~/utils/videoUrls'
+
 const S3_URL = 'https://s3.doxa.life/'
 
 export interface ResourceWithImage {
@@ -42,9 +44,6 @@ const DOCUMENT_LANGS: Record<string, string[]> = {
   'initial-proposal':       ['en', 'es', 'fr']
 }
 
-// Per-language Vimeo URLs for the promo video — same ids as videoUrls.ts.
-const VIDEO_LANGS = ['en', 'es', 'fr']
-
 function s3LangCode(docId: string, lang: string): string {
   const langs = DOCUMENT_LANGS[docId] ?? ['en']
   return langs.includes(lang) ? lang : 'en'
@@ -53,10 +52,6 @@ function s3LangCode(docId: string, lang: string): string {
 function hasDocumentTranslation(docId: string, lang: string): boolean {
   const langs = DOCUMENT_LANGS[docId] ?? ['en']
   return langs.includes(lang)
-}
-
-function hasVideoTranslation(lang: string): boolean {
-  return VIDEO_LANGS.includes(lang)
 }
 
 export function resourcesWithImage(videoUrl: (lang: string) => string): ResourceWithImage[] {

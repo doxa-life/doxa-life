@@ -1,14 +1,8 @@
 {
-<<<<<<< Updated upstream
+  "Compliment": "إطراء",
   "Daily Prayer Coverage": "تغطية الصلاة اليومية",
   "%count% people groups in %countries% countries": "%count% مجموعة شعبية في %countries% دولة",
   "%region% has %count% people groups across %countries% countries. Each pin is coloured by how many people are praying for that people group.": "تضم %region% %count% مجموعة شعبية في %countries% دولة. يشير لون كل نقطة إلى عدد الأشخاص الذين يصلّون من أجل تلك المجموعة الشعبية.",
-=======
-  "Compliment": "إطراء",
-  "Daily Prayer Coverage": "تغطية صلاة يومية",
-  "%count% people groups in %countries% countries": "%count% مجموعة بشرية في %countries% دولة",
-  "%region% has %count% people groups across %countries% countries. Each pin is coloured by how many people are praying for that people group.": "تضم %region% %count% مجموعة بشرية في %countries% دولة. يشير لون كل نقطة إلى عدد الأشخاص الذين يصلّون من أجل تلك المجموعة البشرية.",
->>>>>>> Stashed changes
   "All Regions": "جميع المناطق",
   "By Region": "حسب المنطقة",
   "Countries": "الدول",
@@ -19,11 +13,7 @@
   "I'd like to receive email updates from the DOXA partnership.": "أرغب في تلقي تحديثات عبر البريد الإلكتروني من شراكة DOXA.",
   "Other": "أخرى",
   "Outside this region": "خارج هذه المنطقة",
-<<<<<<< Updated upstream
   "People Groups": "مجموعات شعبية",
-  "people groups engaged": "مجموعات شعبية مُخْدُومَة",
-=======
-  "People Groups": "مجموعات بشرية",
   "Please choose what your message is about.": "يُرجى اختيار موضوع رسالتك.",
   "Please enter a message.": "يُرجى إدخال رسالة.",
   "Please enter a valid email address.": "يُرجى إدخال عنوان بريد إلكتروني صالح.",
@@ -36,8 +26,7 @@
   "We'd love to hear from you — tell us what you love, share a suggestion, or report a problem.": "يسعدنا أن نسمع منك: أخبرنا بما يعجبك، أو شارك اقتراحًا، أو أبلغ عن مشكلة.",
   "What is your message about?": "عمّ تدور رسالتك؟",
   "Your name (optional)": "اسمك (اختياري)",
-  "people groups engaged": "مجموعات بشرية مُنخرِطة",
->>>>>>> Stashed changes
+  "people groups engaged": "مجموعات شعبية مُخْدُومَة",
   "Regions": "المناطق",
   "See %region% dashboard": "عرض لوحة معلومات %region%",
   "There are %count% people groups in %country%. Check the map for the people groups on the border of this country as well.": "توجد %count% مجموعة شعبية في %country%. تحقق من الخريطة لمعرفة المجموعات الشعبية الواقعة على حدود هذه الدولة أيضًا.",

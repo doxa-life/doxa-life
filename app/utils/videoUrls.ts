@@ -11,3 +11,10 @@ const VIDEO_URLS: Record<string, string> = {
 export function getVideoUrl(langCode: string): string {
   return VIDEO_URLS[langCode] ?? VIDEO_URLS.en!
 }
+
+// The languages the video actually exists in, derived from VIDEO_URLS so that
+// adding a translation is one edit rather than two. Callers use this for the
+// "In English" hint, since getVideoUrl falls back silently.
+export function hasVideoTranslation(langCode: string): boolean {
+  return Object.hasOwn(VIDEO_URLS, langCode)
+}

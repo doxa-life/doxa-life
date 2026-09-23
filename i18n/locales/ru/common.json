@@ -1,14 +1,8 @@
 {
-<<<<<<< Updated upstream
+  "Compliment": "Благодарность",
   "Daily Prayer Coverage": "Ежедневный молитвенный охват",
   "%count% people groups in %countries% countries": "%count% народов в %countries% странах",
   "%region% has %count% people groups across %countries% countries. Each pin is coloured by how many people are praying for that people group.": "В регионе %region% — %count% народов в %countries% странах. Цвет каждой точки показывает, сколько человек молится за этот народ.",
-=======
-  "Compliment": "Благодарность",
-  "Daily Prayer Coverage": "Ежедневная молитвенная поддержка",
-  "%count% people groups in %countries% countries": "%count% групп людей в %countries% странах",
-  "%region% has %count% people groups across %countries% countries. Each pin is coloured by how many people are praying for that people group.": "В регионе %region% — %count% групп людей в %countries% странах. Цвет каждой точки показывает, сколько человек молится за эту группу людей.",
->>>>>>> Stashed changes
   "All Regions": "Все регионы",
   "By Region": "По регионам",
   "Countries": "Страны",
@@ -19,11 +13,7 @@
   "I'd like to receive email updates from the DOXA partnership.": "Я хочу получать новости партнёрства DOXA по электронной почте.",
   "Other": "Другое",
   "Outside this region": "За пределами этого региона",
-<<<<<<< Updated upstream
   "People Groups": "Народы",
-  "people groups engaged": "вовлечённые народы",
-=======
-  "People Groups": "Группы людей",
   "Please choose what your message is about.": "Выберите, о чём ваше сообщение.",
   "Please enter a message.": "Введите сообщение.",
   "Please enter a valid email address.": "Введите действительный адрес электронной почты.",
@@ -36,8 +26,7 @@
   "We'd love to hear from you — tell us what you love, share a suggestion, or report a problem.": "Мы будем рады услышать вас: расскажите, что вам нравится, поделитесь предложением или сообщите о проблеме.",
   "What is your message about?": "О чём ваше сообщение?",
   "Your name (optional)": "Ваше имя (необязательно)",
-  "people groups engaged": "вовлечённые группы людей",
->>>>>>> Stashed changes
+  "people groups engaged": "вовлечённые народы",
   "Regions": "Регионы",
   "See %region% dashboard": "Открыть панель: %region%",
   "There are %count% people groups in %country%. Check the map for the people groups on the border of this country as well.": "Страна %country% насчитывает %count% народов. Проверьте также на карте народы, расположенные вдоль границ этой страны.",
