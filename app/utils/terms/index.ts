@@ -1,4 +1,4 @@
-// Terminology page content (/terms). Each locale has its own edition
+// Terminology page content (/about/definitions). Each locale has its own edition
 // documenting that language's terminology decisions — the chosen term,
 // alternatives considered, what Joshua Project and PeopleGroups.org use,
 // and the rationale. Locales without an edition fall back to English.
@@ -17,6 +17,7 @@ import { zh } from './zh'
 import { ru } from './ru'
 import { hi } from './hi'
 import { ro } from './ro'
+import { ar } from './ar'
 
 export interface TermEntry {
   /** Canonical term in this edition's language. */
@@ -36,10 +37,6 @@ export interface TermEntry {
 export interface TermsContent {
   title: string
   intro: string[]
-  /** "Full definitions live on the" / link label / " page." */
-  seeDefinitionsBefore: string
-  definitionsLinkLabel: string
-  seeDefinitionsAfter: string
   labels: {
     english: string
     definition: string
@@ -51,7 +48,7 @@ export interface TermsContent {
   entries: TermEntry[]
 }
 
-const editions: Record<string, TermsContent> = { en, fr, de, es, pt, it, zh, ru, hi, ro }
+const editions: Record<string, TermsContent> = { en, fr, de, es, pt, it, zh, ru, hi, ro, ar }
 
 export function getTermsContent(locale: string): TermsContent {
   return editions[locale] ?? en

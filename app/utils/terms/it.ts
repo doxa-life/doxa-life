@@ -1,14 +1,11 @@
 import type { TermsContent } from './index'
 
 export const it: TermsContent = {
-  title: 'Terminologia',
+  title: 'Definizioni',
   intro: [
     'Questa pagina documenta le scelte terminologiche italiane della partnership DOXA. Per ogni termine: la definizione, le alternative considerate e il motivo della scelta.',
     'Le nostre fonti: il glossario DOXA, l’uso già consolidato sull’app di preghiera e nei contenuti di preghiera quotidiani in italiano, il vocabolario missionario evangelico italiano e la Nuova Riveduta 2006 per ogni espressione di origine biblica. Joshua Project e PeopleGroups.org (IMB) non pubblicano dati in italiano, quindi questa edizione non li cita.'
   ],
-  seeDefinitionsBefore: 'Le definizioni complete si trovano nella pagina',
-  definitionsLinkLabel: 'Definizioni',
-  seeDefinitionsAfter: '.',
   labels: {
     english: 'Inglese:',
     definition: 'Definizione:',

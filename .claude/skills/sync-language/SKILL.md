@@ -1,6 +1,6 @@
 ---
 name: sync-language
-description: Bring the marketing site's existing text for one language into line with the current DOXA glossary — site strings, the map widget locales and their bundles, the /terms edition, and the published CMS pages. Use after a reviewer confirms or changes terminology. Invoke with /sync-language <code>.
+description: Bring the marketing site's existing text for one language into line with the current DOXA glossary — site strings, the map widget locales and their bundles, the /about/definitions terminology edition, and the published CMS pages. Use after a reviewer confirms or changes terminology. Invoke with /sync-language <code>.
 user-invocable: true
 ---
 
@@ -72,7 +72,7 @@ vocabularies on one page.
    can differ from the current source. Anchor on a nearby unique literal,
    because several locales' blocks sit within a few kilobytes of each other.
 
-## 5. The `/terms` edition
+## 5. The terminology edition (`/about/definitions`)
 
 `app/utils/terms/{code}.ts`, registered in `app/utils/terms/index.ts`. It
 documents this language's terminology decisions: the chosen term, the

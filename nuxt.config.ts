@@ -53,6 +53,14 @@ const regionRouteRules = Object.fromEntries(
   ])
 )
 
+// The terminology page lives at /about/definitions; /terms stays as an alias.
+const termsRouteRules = Object.fromEntries(
+  MARKETING_LOCALE_PREFIXES.map(prefix => [
+    `${prefix}/terms`,
+    { redirect: { to: `${prefix}/about/definitions`, statusCode: 301 } }
+  ])
+)
+
 export default defineNuxtConfig({
   // Embeddables (micro-frontends + web-components) have their own Vite builds —
   // Nuxt must not watch or scan their source trees.
@@ -163,6 +171,7 @@ export default defineNuxtConfig({
     ...marketingRouteRules,
     // Region + country pages — same cache policy; routes enumerated at build time.
     ...regionRouteRules,
+    ...termsRouteRules,
     '/login': { ssr: false, prerender: false },
     '/register': { ssr: false, prerender: false },
     '/reset-password': { ssr: false, prerender: false },

@@ -1,14 +1,11 @@
 import type { TermsContent } from './index'
 
 export const es: TermsContent = {
-  title: 'Terminología',
+  title: 'Definiciones',
   intro: [
     'Esta página documenta las decisiones terminológicas en español de la asociación DOXA. Para cada término: la definición, las alternativas consideradas, lo que usan Joshua Project y PeopleGroups.org (IMB) y la razón de nuestra elección.',
     'Nuestras fuentes: el glosario de DOXA revisado por un traductor hispanohablante, sus comentarios sobre el sitio web y, para toda expresión de origen bíblico, la Nueva Versión Internacional (NVI) y la Reina-Valera 1960 (RVR1960).'
   ],
-  seeDefinitionsBefore: 'Las definiciones completas están en la página',
-  definitionsLinkLabel: 'Definiciones',
-  seeDefinitionsAfter: '.',
   labels: {
     english: 'Inglés:',
     definition: 'Definición:',

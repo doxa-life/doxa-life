@@ -1,14 +1,11 @@
 import type { TermsContent } from './index'
 
 export const pt: TermsContent = {
-  title: 'Terminologia',
+  title: 'Definições',
   intro: [
     'Esta página documenta as decisões terminológicas da parceria DOXA em português. Para cada termo: a definição, as alternativas consideradas, o que o Joshua Project e o PeopleGroups.org (IMB) usam, e o motivo da nossa escolha.',
     'Nossas fontes: o glossário DOXA revisado por tradutores de língua portuguesa, o uso já estabelecido em doxa.life/pt e no aplicativo, o vocabulário das missões brasileiras e as traduções de Almeida para as expressões de origem bíblica.'
   ],
-  seeDefinitionsBefore: 'As definições completas estão na página',
-  definitionsLinkLabel: 'Definições',
-  seeDefinitionsAfter: '.',
   labels: {
     english: 'Inglês:',
     definition: 'Definição:',

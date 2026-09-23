@@ -1,14 +1,11 @@
 import type { TermsContent } from './index'
 
 export const en: TermsContent = {
-  title: 'Terminology',
+  title: 'Definitions',
   intro: [
     'This page documents the terminology DOXA uses and why. Precise terms matter: our statistics, goals, and prayer tools all depend on definitions that must survive translation.',
     "Each language edition of this page documents that language's terminology decisions — the term we chose, the alternatives we considered, what Joshua Project and PeopleGroups.org (IMB) use, and the reasoning."
   ],
-  seeDefinitionsBefore: 'Full definitions live on the',
-  definitionsLinkLabel: 'Definitions',
-  seeDefinitionsAfter: ' page.',
   labels: {
     english: 'English:',
     definition: 'Definition:',

@@ -1,14 +1,11 @@
 import type { TermsContent } from './index'
 
 export const ro: TermsContent = {
-  title: 'Terminologie',
+  title: 'Definiții',
   intro: [
     'Această pagină documentează deciziile terminologice românești ale parteneriatului DOXA. Pentru fiecare termen: definiția, alternativele luate în calcul și motivul alegerii.',
     'Sursele noastre: glosarul DOXA, completat de un recenzent român în septembrie 2026 — niciunul dintre cei 39 de termeni nu este încă confirmat, iar cinci sunt marcați pentru discuție —, vocabularul misionar evanghelic românesc și traducerile românești ale Bibliei pentru fiecare expresie de origine biblică. Recenzentul a indicat Biblia Cornilescu 1924 (VDC) ca ediție a comunității sale, în timp ce site-ul citează deocamdată Noua Traducere Românească (NTR); acolo unde cele două diferă, sunt arătate amândouă. Joshua Project și PeopleGroups.org (IMB) publică doar în engleză, așa că această ediție nu le citează.'
   ],
-  seeDefinitionsBefore: 'Definițiile complete se află pe pagina',
-  definitionsLinkLabel: 'Definiții',
-  seeDefinitionsAfter: '.',
   labels: {
     english: 'În engleză:',
     definition: 'Definiție:',

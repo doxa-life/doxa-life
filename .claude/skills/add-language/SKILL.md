@@ -1,6 +1,6 @@
 ---
 name: add-language
-description: Bring a new language onto the marketing site — the config/languages.ts entry from its glossary record, the site strings, the map widget locales and bundles, the /terms edition, and the CMS pages. Use after the language has a glossary with reviewed terms. Invoke with /add-language <code>.
+description: Bring a new language onto the marketing site — the config/languages.ts entry from its glossary record, the site strings, the map widget locales and bundles, the /about/definitions terminology edition, and the CMS pages. Use after the language has a glossary with reviewed terms. Invoke with /add-language <code>.
 user-invocable: true
 ---
 
@@ -69,7 +69,7 @@ file is not obviously broken. Check the count, not the appearance.
    per-language strings for the languages it supports, add this one by patching
    its literals in place; otherwise leave it and say so.
 
-## 5. The `/terms` edition
+## 5. The terminology edition (`/about/definitions`)
 
 Create `app/utils/terms/{code}.ts` from `en.ts` and register it in
 `app/utils/terms/index.ts`. A locale with no edition falls back to English.
@@ -81,7 +81,7 @@ PeopleGroups.org use, and a rationale that cites this language's reference Bible
 wherever the choice is Scripture-driven. An entry that needed no real decision
 in this language still appears, with its definition and a one-line rationale.
 
-Two rendering rules already encoded in `app/pages/terms.vue` that a new edition
+Two rendering rules already encoded in `app/pages/about/definitions.vue` that a new edition
 must not break: entries stay flat children of `.page-body`, because the site's
 typography uses direct-child selectors and a global rule gives every `<section>`
 landing-page padding; and a space at the edge of a `<template>` fragment has to
@@ -109,7 +109,7 @@ Pages live in this site's database. Create the translations through the
 
 Set `enabled: true` once the site strings and the map locales are done. Then run
 `npx nuxi typecheck`, start the dev server, and read the home page, a people
-group page, the adopt flow and `/{code}/terms` end to end. For a right-to-left
+group page, the adopt flow and `/{code}/about/definitions` end to end. For a right-to-left
 language, confirm the layout mirrors.
 
 The typecheck baseline is 122 pre-existing errors in the external layers and

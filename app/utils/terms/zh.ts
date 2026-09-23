@@ -1,15 +1,12 @@
 import type { TermsContent } from './index'
 
 export const zh: TermsContent = {
-  title: '术语',
+  title: '定义',
   intro: [
     '本页记录 DOXA 伙伴关系的中文术语选择。每个术语都列出定义、曾考虑过的其他译法，以及选用的理由。',
     '我们的依据：DOXA 词汇表、祷告应用和中文每日祷告内容中已经在用的措辞、中文福音派与宣教学的既有词汇，以及和合本（简体，CUNPS）——凡出于圣经的表达都以它为准。Joshua Project 和 PeopleGroups.org（IMB）没有确认的中文版本，因此本版不引用它们。',
     '中文术语尚未经过母语审核者确认。以下选择反映各产品目前的实际用法，将来会由审核者复核并更新。'
   ],
-  seeDefinitionsBefore: '完整定义见',
-  definitionsLinkLabel: '定义',
-  seeDefinitionsAfter: '页面。',
   labels: {
     english: '英语：',
     definition: '定义：',

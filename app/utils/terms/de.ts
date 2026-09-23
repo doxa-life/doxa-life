@@ -1,14 +1,11 @@
 import type { TermsContent } from './index'
 
 export const de: TermsContent = {
-  title: 'Terminologie',
+  title: 'Begriffsbestimmungen',
   intro: [
     'Diese Seite dokumentiert die deutschen Begriffsentscheidungen der DOXA-Partnerschaft. Zu jedem Begriff: die Definition, die erwogenen Alternativen, was Joshua Project und PeopleGroups.org (IMB) verwenden, und der Grund für unsere Wahl.',
     'Unsere Quellen: das von einem deutschsprachigen Prüfer durchgesehene DOXA-Glossar, der Sprachgebrauch deutschsprachiger Missionswerke und Gebetsnetzwerke (etwa Unerreichte-Volksgruppen.de) sowie Schlachter 2000 als Referenzübersetzung – zum Abgleich auch Luther 2017 – für jede Wendung biblischen Ursprungs.'
   ],
-  seeDefinitionsBefore: 'Die vollständigen Definitionen stehen auf der Seite',
-  definitionsLinkLabel: 'Begriffsbestimmungen',
-  seeDefinitionsAfter: '.',
   labels: {
     english: 'Englisch:',
     definition: 'Definition:',

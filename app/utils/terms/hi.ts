@@ -1,14 +1,11 @@
 import type { TermsContent } from './index'
 
 export const hi: TermsContent = {
-  title: 'शब्दावली',
+  title: 'परिभाषाएँ',
   intro: [
     'यह पृष्ठ DOXA साझेदारी के हिंदी शब्दों का लेखा-जोखा है। हर शब्द के लिए: उसकी परिभाषा, जिन विकल्पों पर विचार हुआ, और वह शब्द क्यों चुना गया।',
     'हमारे स्रोत: DOXA शब्दावली, DOXA Access and Alignment प्लेबुक का हिंदी अनुवाद, गोद लेने के प्रमाणपत्र की छपी हुई हिंदी, हिंदी सुसमाचारी और मिशन-विज्ञान का प्रचलित शब्द-भंडार, और बाइबिलीय वाक्यांशों के लिए पवित्र बाइबिल का पुराना संस्करण (OV)। Joshua Project और PeopleGroups.org (IMB) हिंदी में कुछ प्रकाशित नहीं करते, इसलिए इस संस्करण में उनका उल्लेख नहीं है।'
   ],
-  seeDefinitionsBefore: 'पूरी परिभाषाएँ',
-  definitionsLinkLabel: 'परिभाषाएँ',
-  seeDefinitionsAfter: ' पृष्ठ पर हैं।',
   labels: {
     english: 'अंग्रेज़ी:',
     definition: 'परिभाषा:',

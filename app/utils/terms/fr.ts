@@ -1,14 +1,11 @@
 import type { TermsContent } from './index'
 
 export const fr: TermsContent = {
-  title: 'Terminologie',
+  title: 'Définitions',
   intro: [
     'Cette page documente les choix de terminologie française du partenariat DOXA. Pour chaque terme : sa définition, les autres options envisagées, ce qu’utilisent Joshua Project et PeopleGroups.org (IMB), et la raison de notre choix.',
     'Nos sources : les données officielles en français de PeopleGroups.org (IMB), les ressources françaises de Joshua Project, l’usage des ministères évangéliques francophones, et la Bible Louis Segond pour toute expression d’origine biblique.'
   ],
-  seeDefinitionsBefore: 'Les définitions complètes se trouvent sur la page',
-  definitionsLinkLabel: 'Définitions',
-  seeDefinitionsAfter: '.',
   labels: {
     english: 'Anglais :',
     definition: 'Définition :',
