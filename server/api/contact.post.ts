@@ -5,11 +5,22 @@
 
 import { defineEventHandler, readBody, createError } from 'h3'
 
+// Message categories the form offers. They map onto the campaigns-server
+// feedback types, which give the inbox conversation a `[Type]` subject prefix
+// and a filterable tag. The server re-validates, so this list only needs to
+// stay in sync with the labels rendered by app/pages/contact-us.vue.
+const MESSAGE_TYPES = ['compliment', 'suggestion', 'problem']
+
+// Origin marker the campaigns-server records on the conversation, so messages
+// from this site stay distinguishable from in-app feedback (which shares the
+// same pipeline). Must be an allowlisted value on the receiving end.
+const SOURCE = 'doxa_life'
+
 interface ContactBody {
   name?: string
   email?: string
-  country?: string
   message?: string
+  message_type?: string
   consent_doxa_general?: boolean
   language?: string
   cf_turnstile?: string
@@ -43,13 +54,18 @@ export default defineEventHandler(async (event) => {
   // 2. Sanitize inputs (matches PHP sanitize_text_field / sanitize_email)
   const name = sanitizeText(body.name)
   const email = sanitizeEmail(body.email)
-  const country = sanitizeText(body.country)
   const message = sanitizeText(body.message)
   const consent = Boolean(body.consent_doxa_general)
   const language = sanitizeText(body.language) || 'en'
+  const messageType = MESSAGE_TYPES.includes(sanitizeText(body.message_type))
+    ? sanitizeText(body.message_type)
+    : ''
 
   if (!email || !message) {
     throw createError({ statusCode: 400, statusMessage: 'Email and message are required' })
+  }
+  if (!messageType) {
+    throw createError({ statusCode: 400, statusMessage: 'Please choose what your message is about' })
   }
 
   // 3. Forward to campaigns-sever (mirrors contact-rest-api.php)
@@ -67,8 +83,9 @@ export default defineEventHandler(async (event) => {
       body: {
         name,
         email,
-        country,
         message,
+        feedback_type: messageType,
+        source: SOURCE,
         consent_doxa_general: consent,
         language
       },

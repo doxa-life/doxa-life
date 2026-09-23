@@ -2,7 +2,7 @@ textarea,
 select,
 input,
 .input {
-    border: 1px solid var(--input-border-color);
+    border: 1px solid gray;
     border-radius: 8px;
     background-color: var(--color-surface-white);
     width: 100%;
@@ -125,6 +125,43 @@ input[type=radio] {
     width: 1em;
     height: 1em;
     fill: var(--color-brand-secondary-light);
+}
+
+/* Required-field marker: the red asterisk that follows a label's text. */
+.required-marker {
+    color: var(--color-status-error);
+    margin-inline-start: 0.15em;
+}
+
+/* Per-field validation message, rendered directly under the field it belongs to. */
+.field-error {
+    color: var(--color-status-error);
+    font-size: var(--font-size-xs);
+}
+
+/* Quieter form chrome: field outlines drop to the weight of placeholder text so
+   the labels lead instead of the boxes. Opt in per form, not site-wide. */
+.form--quiet {
+    textarea,
+    select,
+    input,
+    .input {
+        border-color: var(--input-border-color-muted);
+    }
+}
+
+/* Opt-in row: a switch beside small print, rather than a checkbox beside a label. */
+.form-consent {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+
+    & .form-consent__label {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-muted);
+        max-width: 60ch;
+        cursor: pointer;
+    }
 }
 
 .contact-message {

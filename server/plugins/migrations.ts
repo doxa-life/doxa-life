@@ -4,6 +4,29 @@ import * as path from 'path'
 import { pathToFileURL } from 'url'
 import { getDb } from '../utils/database'
 
+// Migration files are TypeScript, and they are imported at runtime by absolute
+// path — the bundler never sees them, so the server's own runtime has to be able
+// to load .ts. Production runs under Bun, which can; `nuxt dev` runs Nitro under
+// Node, which only strips types from 22.18 (or behind --experimental-strip-types
+// before that) and otherwise throws ERR_UNKNOWN_FILE_EXTENSION. Shipping .js
+// migrations wouldn't fix it either — layers bring their own .ts ones. So: try the
+// native import, and fall back to jiti, which transpiles on the fly.
+let jitiImport: ((path: string) => Promise<unknown>) | undefined
+
+async function importMigration(fullPath: string): Promise<Migration> {
+  try {
+    return await import(/* @vite-ignore */ pathToFileURL(fullPath).href) as Migration
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException)?.code !== 'ERR_UNKNOWN_FILE_EXTENSION') throw err
+    if (!jitiImport) {
+      const { createJiti } = await import('jiti')
+      const jiti = createJiti(import.meta.url)
+      jitiImport = (path: string) => jiti.import(path)
+    }
+    return await jitiImport(fullPath) as Migration
+  }
+}
+
 // Reads migration files from multiple folders (consumer + each layer's migrations/).
 // Filenames are sorted globally for a stable order. Each layer prefixes its files
 // (e.g. `oauth_001_*`) to avoid collision with the consumer's numeric-prefixed names.
@@ -25,9 +48,7 @@ class MultiFolderMigrationProvider implements MigrationProvider {
         if (all[name]) {
           throw new Error(`Migration name collision: "${name}" appears in multiple layers. Rename one (use a layer prefix like \`oauth_001_*\`).`)
         }
-        const fullPath = path.join(folder, file)
-        const mod = await import(pathToFileURL(fullPath).href)
-        all[name] = mod
+        all[name] = await importMigration(path.join(folder, file))
       }
     }
     return all

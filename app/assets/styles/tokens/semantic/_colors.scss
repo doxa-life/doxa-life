@@ -75,6 +75,7 @@ $color-red-600: #bd1218;
   --color-text-on-brand-lightest: #{$color-beige-50};
   --color-text-on-secondary-light: #{$color-green-600};
   --color-text-on-white: #{$color-green-600};
+  --color-text-muted: #{$color-gray-500};
   --color-white: #{$color-white};
 
   // Status
@@ -87,5 +88,8 @@ $color-red-600: #bd1218;
 
   // forms
   --input-border-color: #{$color-gray-500};
+  // Quieter field outline, the same weight as placeholder text — for forms that
+  // should let their labels lead rather than their boxes (see `.form--quiet`).
+  --input-border-color-muted: #{$color-gray-400};
   --table-border-color: #{$color-gray-500};
 }

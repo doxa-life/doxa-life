@@ -1,51 +1,87 @@
 <script setup lang="ts">
-// Port of marketing-theme/page-contact.php.
-// Markup, classes, field names, labels, placeholders, and submit flow
-// mirror the source exactly. The Turnstile widget is rendered via the
-// @nuxtjs/turnstile module; the form submits to our server proxy at
-// /api/contact which verifies the token and forwards to pray.doxa.life.
+// Contact form. Shares its shape and copy with the campaigns-server feedback
+// form (app/pages/feedback.vue there) — a required message category, the same
+// field labels and placeholders, a consent switch and a full-width submit —
+// because both open the same kind of inbox conversation. The category is sent
+// on as the campaigns-server `feedback_type`, while `source: doxa_life` (added
+// by the server proxy) keeps these messages identifiable in the inbox.
+//
+// The form posts to our server proxy at /api/contact which verifies the
+// Turnstile token and forwards to pray.doxa.life. Turnstile runs in
+// interaction-only mode, so it stays invisible unless Cloudflare decides the
+// visitor actually needs to be challenged.
 
-import { COUNTRIES } from '~/utils/countries'
+import type { MessageType } from '~/types/contact'
 
 const { t, locale } = useI18n()
 
+const messageType = ref<MessageType | null>(null)
 const name = ref('')
 const email = ref('')
 const honeypot = ref('') // matches the `name="email"` trap in the PHP template
-const country = ref('')
 const message = ref('')
 const consent = ref(false)
 const turnstileToken = ref('')
 
 const submitting = ref(false)
-const submitDisabled = computed(() => submitting.value || !turnstileToken.value)
 
-const messageEl = ref<HTMLDivElement | null>(null)
+const typeError = ref('')
+const emailError = ref('')
+const messageError = ref('')
+
 const messageText = ref('')
 const messageClass = ref<'success' | 'error' | ''>('')
 const formRef = ref<HTMLFormElement | null>(null)
 const turnstileRef = ref<{ reset: () => void } | null>(null)
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 async function onSubmit(e: Event) {
   e.preventDefault()
   if (honeypot.value) return
-  if (formRef.value && !formRef.value.checkValidity()) {
-    formRef.value.reportValidity()
+
+  typeError.value = ''
+  emailError.value = ''
+  messageError.value = ''
+  messageText.value = ''
+  messageClass.value = ''
+
+  const trimmedEmail = email.value.trim()
+  const trimmedMessage = message.value.trim()
+  let valid = true
+  if (!messageType.value) {
+    typeError.value = t('Please choose what your message is about.')
+    valid = false
+  }
+  if (!EMAIL_REGEX.test(trimmedEmail)) {
+    emailError.value = t('Please enter a valid email address.')
+    valid = false
+  }
+  if (!trimmedMessage) {
+    messageError.value = t('Please enter a message.')
+    valid = false
+  }
+  if (!valid) return
+
+  // The widget is invisible and re-arms itself periodically, so a missing token
+  // means "not ready yet" rather than "failed" — say so instead of letting the
+  // proxy reject the submission with a generic error.
+  if (!turnstileToken.value) {
+    messageClass.value = 'error'
+    messageText.value = t('Verification is still loading. Please try again in a moment.')
     return
   }
 
   submitting.value = true
-  messageText.value = ''
-  messageClass.value = ''
 
   try {
-    const response = await $fetch<{ status: string; message?: string }>('/api/contact', {
+    const response = await $fetch<{ status: string, message?: string }>('/api/contact', {
       method: 'POST',
       body: {
         name: name.value,
-        email: email.value,
-        country: country.value,
-        message: message.value,
+        email: trimmedEmail,
+        message: trimmedMessage,
+        message_type: messageType.value,
         consent_doxa_general: consent.value,
         language: locale.value,
         cf_turnstile: turnstileToken.value
@@ -55,10 +91,10 @@ async function onSubmit(e: Event) {
     if (response?.status === 'success') {
       messageClass.value = 'success'
       messageText.value = t('Thank you for your message. We will get back to you soon!')
-      window.goStats?.track('contact_submit', { metadata: { language: locale.value, country: country.value || null } })
+      window.goStats?.track('contact_submit', { metadata: { language: locale.value, message_type: messageType.value } })
+      messageType.value = null
       name.value = ''
       email.value = ''
-      country.value = ''
       message.value = ''
       consent.value = false
       formRef.value?.reset()
@@ -78,16 +114,26 @@ async function onSubmit(e: Event) {
 </script>
 
 <template>
-  <div class="container page-content">
-    <h1 class="page-title">{{ t('Contact Us') }}</h1>
+  <div class="container page-content max-width-lg">
+    <h1 class="page-title">
+      {{ t('Contact Us') }}
+    </h1>
+    <p class="center contact-intro">
+      {{ t("We'd love to hear from you — tell us what you love, share a suggestion, or report a problem.") }}
+    </p>
 
     <form
       id="contact-form"
       ref="formRef"
-      class="stack stack--md max-width-lg center"
+      class="stack stack--md center form--quiet"
+      novalidate
       @submit="onSubmit"
     >
-      <input type="hidden" name="action" value="contact_us">
+      <input
+        type="hidden"
+        name="action"
+        value="contact_us"
+      >
       <input
         v-model="honeypot"
         type="email"
@@ -98,19 +144,45 @@ async function onSubmit(e: Event) {
       >
 
       <div class="">
+        <span
+          id="message-type-label"
+          class="field-label"
+        >
+          {{ t('What is your message about?') }}<span
+            class="required-marker"
+            aria-hidden="true"
+          >*</span>
+        </span>
+        <MessageTypeSelect
+          v-model="messageType"
+          label-id="message-type-label"
+        />
+        <p
+          v-if="typeError"
+          class="field-error"
+        >
+          {{ typeError }}
+        </p>
+      </div>
+
+      <div class="">
         <label for="name">{{ t('Name') }}</label>
         <input
           id="name"
           v-model="name"
           type="text"
           name="name"
-          required
-          :placeholder="t('Enter your name')"
+          :placeholder="t('Your name (optional)')"
         >
       </div>
 
       <div class="">
-        <label for="contact_email">{{ t('Email') }}</label>
+        <label for="contact_email">
+          {{ t('Email') }}<span
+            class="required-marker"
+            aria-hidden="true"
+          >*</span>
+        </label>
         <input
           id="contact_email"
           v-model="email"
@@ -119,60 +191,93 @@ async function onSubmit(e: Event) {
           required
           :placeholder="t('Enter your email')"
         >
+        <p
+          v-if="emailError"
+          class="field-error"
+        >
+          {{ emailError }}
+        </p>
       </div>
 
       <div class="">
-        <label for="country">{{ t('Your Country (optional)') }}</label>
-        <select id="country" v-model="country" name="country">
-          <option value="">{{ t('Select Country') }}</option>
-          <option v-for="c in COUNTRIES" :key="c.value" :value="c.value">{{ c.label }}</option>
-        </select>
-      </div>
-
-      <div class="">
-        <label for="message">{{ t('Message') }}</label>
+        <label for="message">
+          {{ t('Message') }}<span
+            class="required-marker"
+            aria-hidden="true"
+          >*</span>
+        </label>
         <textarea
           id="message"
           v-model="message"
           name="message"
           rows="5"
           required
-          :placeholder="t('Enter your message')"
+          :placeholder="t('Tell us more…')"
         />
+        <p
+          v-if="messageError"
+          class="field-error"
+        >
+          {{ messageError }}
+        </p>
       </div>
 
-      <div class="form-control color-primary-darker">
-        <input
-          id="consent-doxa-general"
+      <div class="form-consent">
+        <ToggleSwitch
           v-model="consent"
-          type="checkbox"
-          name="consent_doxa_general"
+          label-id="consent-doxa-general"
+        />
+        <span
+          id="consent-doxa-general"
+          class="form-consent__label"
+          @click="consent = !consent"
         >
-        <label for="consent-doxa-general">{{ t('I would like to receive email updates from the DOXA partnership.') }}</label>
+          {{ t("I'd like to receive email updates from the DOXA partnership.") }}
+        </span>
       </div>
 
       <NuxtTurnstile
         ref="turnstileRef"
         v-model="turnstileToken"
-        :options="{ theme: 'light' }"
+        :options="{ theme: 'light', appearance: 'interaction-only' }"
       />
 
       <div
         id="contact-message"
-        ref="messageEl"
         class="contact-message"
         :class="messageClass"
         :style="{ display: messageText ? 'block' : 'none' }"
-      >{{ messageText }}</div>
+      >
+        {{ messageText }}
+      </div>
 
       <button
         id="contact-submit"
         type="submit"
-        class="button"
-        :disabled="submitDisabled"
+        class="button width-100"
+        :disabled="submitting"
       >
-        {{ submitting ? t('Submitting...') : t('Submit') }}
+        {{ submitting ? t('Sending…') : t('Send message') }}
       </button>
     </form>
   </div>
 </template>
+
+<style scoped>
+.contact-intro {
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Matches the weight and spacing of the <label>s the other fields use, for the
+   one field whose control is a button group rather than a labelable input. */
+.field-label {
+  display: block;
+}
+
+/* `.button` centres nothing by default because it is sized to its content; as a
+   full-width submit it needs its own text centring. */
+#contact-submit {
+  text-align: center;
+}
+</style>
