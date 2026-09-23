@@ -14,9 +14,9 @@
     "peopleGroupFallback": "Grup etnolingvistic"
   },
   "prayer": {
-    "needsPrayer": "Nimeni nu se roagă",
-    "hasPrayer": "1+ persoane se roagă",
-    "fullPrayerCoverage": "100+ persoane se roagă"
+    "needsPrayer": "Nicio persoană angajată",
+    "hasPrayer": "Cel puțin o persoană angajată să se roage",
+    "fullPrayerCoverage": "Peste 100 angajați să se roage"
   },
   "engagement": {
     "needsEngagement": "Neangajat misionar",

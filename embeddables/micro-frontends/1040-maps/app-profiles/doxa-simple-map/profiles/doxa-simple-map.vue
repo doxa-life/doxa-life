@@ -857,7 +857,7 @@ function getStrokeColor() {
 /** Build the Mapbox filter expression for a given filter type + key */
 function buildMatchExpr(filterType, filterKey) {
   if (filterType === 'prayer') {
-    const pp = ['coalesce', ['to-number', ['get', 'peoplePraying'], 0], 0]
+    const pp = ['coalesce', ['to-number', ['get', 'peopleCommitted'], 0], 0]
     if (filterKey === 'noPrayer')   return ['<=', pp, 0]
     if (filterKey === 'hasPrayer')  return ['all', ['>', pp, 0], ['<', pp, FULL_PRAYER_THRESHOLD]]
     if (filterKey === 'fullPrayer') return ['>=', pp, FULL_PRAYER_THRESHOLD]

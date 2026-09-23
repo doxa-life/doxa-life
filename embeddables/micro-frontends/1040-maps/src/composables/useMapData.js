@@ -181,7 +181,7 @@ export function useMapData(options) {
                 description: pg.description,
                 imageUrl: pg.imageUrl,
                 doxaRegion: pg.doxaRegion || pg.wagfRegion || '',
-                peoplePraying: pg.peoplePraying ?? null,
+                peopleCommitted: pg.peopleCommitted ?? null,
                 _normalized: pg // Keep reference to normalized data
             })));
 

@@ -40,7 +40,6 @@
         "population",
         "has_photo",
         "image_url",
-        "people_praying",
         "people_committed",
         "adopted_by_churches",
         "engagement_status",
@@ -51,7 +50,7 @@
       ],
       "pollFields": [
         "slug",
-        "people_praying"
+        "people_committed"
       ],
       "pollInterval": 300000,
       "fallbackSourceId": null,
@@ -73,7 +72,6 @@
         "hasPhoto": "has_photo",
         "imageUrl": "image_url",
         "photoUrl": "image_url",
-        "peoplePraying": "people_praying",
         "peopleCommitted": "people_committed",
         "engagementStatus": "engagement_status",
         "adoptionStatus": "adopted_by_churches",
@@ -228,12 +226,8 @@
       "description": "Boolean \u2014 true if adopted_by_churches > 0",
       "required": false
     },
-    "peoplePraying": {
-      "description": "Number of people currently praying for this group \u2014 from pray-tools API",
-      "required": false
-    },
     "peopleCommitted": {
-      "description": "Raw count of committed workers for this group \u2014 source of engagementStatus",
+      "description": "Number of people committed to pray for this group \u2014 from pray-tools API",
       "required": false
     },
     "languageFamily": {

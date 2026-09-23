@@ -144,7 +144,7 @@ function popupHtml(p: any): string {
   const rows: string[] = []
   if (pop) rows.push(`<div><dt>${escapeHtml(t('Population'))}</dt><dd>${pop}</dd></div>`)
   if (p.religion) rows.push(`<div><dt>${escapeHtml(t('Religion'))}</dt><dd>${escapeHtml(p.religion)}</dd></div>`)
-  rows.push(`<div><dt>${escapeHtml(t('Intercessors'))}</dt><dd>${Number(p.committed) || 0}/${FULL_PRAYER_COVERAGE_COUNT}</dd></div>`)
+  rows.push(`<div><dt>${escapeHtml(t('Committed to Pray'))}</dt><dd>${Number(p.committed) || 0}/${FULL_PRAYER_COVERAGE_COUNT}</dd></div>`)
 
   return `<div class="cm-popup">
       ${p.imageUrl ? `<img class="cm-popup__img" src="${escapeHtml(p.imageUrl)}" alt="${name}" loading="lazy">` : ''}
@@ -265,9 +265,9 @@ onBeforeUnmount(() => { if (map) { map.remove(); map = null } })
   <div class="country-map">
     <div ref="container" class="country-map__canvas" />
     <div v-if="colorByPrayer" class="country-map__legend">
-      <span><i :style="{ background: colors.prayerFull }" />{{ t('100+ People Praying') }}</span>
-      <span><i :style="{ background: colors.prayerPartial }" />{{ t('1+ People Praying') }}</span>
-      <span><i :style="{ background: colors.prayerNone }" />{{ t('No One Praying') }}</span>
+      <span><i :style="{ background: colors.prayerFull }" />{{ t('100+ Committed to Pray') }}</span>
+      <span><i :style="{ background: colors.prayerPartial }" />{{ t('1+ Committed to Pray') }}</span>
+      <span><i :style="{ background: colors.prayerNone }" />{{ t('No One Committed') }}</span>
       <span><i :style="{ background: colors.outside }" />{{ t('Outside this region') }}</span>
     </div>
   </div>

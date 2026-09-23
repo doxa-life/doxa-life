@@ -724,7 +724,7 @@ function _buildFlatLegendMatchExpr(node, legendType) {
   if (!node || !legendType) return null
   const key = node.id
   if (legendType === 'prayer') {
-    const v = ['to-number', ['get', 'peoplePraying']]
+    const v = ['to-number', ['get', 'peopleCommitted']]
     if (key === 'noPrayer')   return ['==', v, 0]
     if (key === 'fullPrayer') return ['>=', v, FULL_PRAYER_THRESHOLD]
     if (key === 'hasPrayer')  return ['all', ['>', v, 0], ['<', v, FULL_PRAYER_THRESHOLD]]
@@ -1209,7 +1209,7 @@ function applyDimFilter(detail) {
   } else if (detail.kind === 'region') {
     kind = 'region'; property = 'doxaRegion'; expectedValue = detail.regionKey
   } else if (detail.kind === 'prayer') {
-    kind = 'prayer'; property = detail.property || 'peoplePraying'; expectedValue = detail.expectedValue
+    kind = 'prayer'; property = detail.property || 'peopleCommitted'; expectedValue = detail.expectedValue
   } else if (detail.kind === 'engagement') {
     kind = 'engagement'; property = detail.property || 'engagementStatus'; expectedValue = detail.expectedValue
   } else if (detail.kind === 'adoption') {
@@ -1616,7 +1616,7 @@ watch(() => mapStore.selectedDialect, (dialect) => {
 // row click. (Filter keys: prayer → noPrayer | hasPrayer | fullPrayer;
 // engagement → notEngaged | hasEngagement; adoption → notAdopted | hasAdoption.)
 watch(() => uiStore.prayerFilter, (key) => {
-  if (key) applyDimFilter({ kind: 'prayer', property: 'peoplePraying', expectedValue: key, coords: [] })
+  if (key) applyDimFilter({ kind: 'prayer', property: 'peopleCommitted', expectedValue: key, coords: [] })
   else applyDimFilter({ kind: null })
 })
 watch(() => uiStore.engagementFilter, (key) => {

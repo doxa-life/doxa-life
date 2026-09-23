@@ -1,39 +1,35 @@
 /**
  * Prayer Progress Color Strategy
  *
- * Three-tier coloring based on prayer coverage:
- *   RED    = No One Praying      (peoplePraying === 0 or null)
- *   ORANGE = 1+ People Praying   (0 < peoplePraying < FULL_PRAYER_THRESHOLD)
- *   GREEN  = 100+ People Praying (peoplePraying >= FULL_PRAYER_THRESHOLD)
- *
- * QA Session Round 2 A1: `people_praying` null = 0 = "not prayed for".
- * When someone prays, people_praying updates to a positive integer → orange.
- * When enough people pray (>= threshold) → green.
+ * Three-tier coloring based on how many people have committed to pray:
+ *   RED    = No One Committed      (peopleCommitted === 0 or null)
+ *   ORANGE = 1+ Committed to Pray  (0 < peopleCommitted < FULL_PRAYER_THRESHOLD)
+ *   GREEN  = 100+ Committed to Pray (peopleCommitted >= FULL_PRAYER_THRESHOLD)
  *
  * Sourced from doxa-research-mfe (research wins on drift).
  */
 
-export const PROPERTY_KEY = 'peoplePraying'
+export const PROPERTY_KEY = 'peopleCommitted'
 
 /**
- * Number of people praying required for "Full Prayer Coverage".
+ * Number of people committed to pray required for "Full Prayer Coverage".
  * Set to match the platform's prayer goal (100 people per people group).
  * Adjust this constant to change the green threshold.
  */
 export const FULL_PRAYER_THRESHOLD = 100
 
 export const PALETTE = {
-  noPrayer: '#e74c3c', // Red — No One Praying (default)
-  hasPrayer: '#f39c12', // Orange — 1+ People Praying (partial)
-  fullPrayer: '#22c55e' // Green — 100+ People Praying
+  noPrayer: '#e74c3c', // Red — No One Committed (default)
+  hasPrayer: '#f39c12', // Orange — 1+ Committed to Pray (partial)
+  fullPrayer: '#22c55e' // Green — 100+ Committed to Pray
 }
 
 export const PRAYER_COLORS = PALETTE
 
 export const LABELS = {
-  noPrayer: 'No One Praying',
-  hasPrayer: '1+ People Praying',
-  fullPrayer: '100+ People Praying'
+  noPrayer: 'No One Committed',
+  hasPrayer: '1+ Committed to Pray',
+  fullPrayer: '100+ Committed to Pray'
 }
 
 export const PRAYER_LABELS = LABELS
@@ -44,8 +40,8 @@ export const PRAYER_LABELS = LABELS
  * @returns {'noPrayer'|'hasPrayer'|'fullPrayer'}
  */
 export function getPrayerLevel(properties) {
-  const peoplePraying = properties.peoplePraying ?? properties._raw?.people_praying ?? null
-  const count = Number(peoplePraying) || 0
+  const peopleCommitted = properties.peopleCommitted ?? properties._raw?.people_committed ?? null
+  const count = Number(peopleCommitted) || 0
   if (count >= FULL_PRAYER_THRESHOLD) return 'fullPrayer'
   if (count > 0) return 'hasPrayer'
   return 'noPrayer'
@@ -66,8 +62,8 @@ export function getPrayerColor(properties) {
  * @returns {boolean}
  */
 export function checkHasPrayer(properties) {
-  const peoplePraying = properties.peoplePraying ?? properties._raw?.people_praying ?? null
-  return peoplePraying !== null && peoplePraying > 0
+  const peopleCommitted = properties.peopleCommitted ?? properties._raw?.people_committed ?? null
+  return peopleCommitted !== null && peopleCommitted > 0
 }
 
 /**
@@ -94,15 +90,15 @@ export function getColor(properties) {
  */
 export function applyColor({ colorSource = 'properties' } = {}) {
   const valueExpr = colorSource === 'feature-state'
-    ? ['feature-state', 'peoplePraying']
-    : ['get', 'peoplePraying']
+    ? ['feature-state', 'peopleCommitted']
+    : ['get', 'peopleCommitted']
 
   return [
     'case',
-    // peoplePraying >= FULL_PRAYER_THRESHOLD → Green (full prayer coverage)
+    // peopleCommitted >= FULL_PRAYER_THRESHOLD → Green (full prayer coverage)
     ['>=', valueExpr, FULL_PRAYER_THRESHOLD],
     PALETTE.fullPrayer,
-    // peoplePraying > 0 → Orange (has prayer, partial)
+    // peopleCommitted > 0 → Orange (has prayer, partial)
     ['>', valueExpr, 0],
     PALETTE.hasPrayer,
     // Default: null / 0 → Red (needs prayer)

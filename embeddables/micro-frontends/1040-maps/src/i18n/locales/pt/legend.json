@@ -14,9 +14,9 @@
     "peopleGroupFallback": "Grupo étnico"
   },
   "prayer": {
-    "needsPrayer": "Ninguém orando",
-    "hasPrayer": "1+ pessoas orando",
-    "fullPrayerCoverage": "100+ pessoas orando"
+    "needsPrayer": "Ninguém comprometido",
+    "hasPrayer": "1+ comprometidos a orar",
+    "fullPrayerCoverage": "100+ comprometidos a orar"
   },
   "engagement": {
     "needsEngagement": "Não engajado",

@@ -101,9 +101,9 @@ useTextHighlight()
                   />
                 </div>
                 <div class="prayer-coverage-legend">
-                  <span><i class="prayer-coverage-key prayer-coverage-key--full" />{{ t('100+ People Praying') }}: {{ fullPrayerCount }}</span>
-                  <span><i class="prayer-coverage-key prayer-coverage-key--partial" />{{ t('1+ People Praying') }}: {{ partialPrayerCount }}</span>
-                  <span><i class="prayer-coverage-key prayer-coverage-key--none" />{{ t('No One Praying') }}: {{ noPrayerCount }}</span>
+                  <span><i class="prayer-coverage-key prayer-coverage-key--full" />{{ t('100+ Committed to Pray') }}: {{ fullPrayerCount }}</span>
+                  <span><i class="prayer-coverage-key prayer-coverage-key--partial" />{{ t('1+ Committed to Pray') }}: {{ partialPrayerCount }}</span>
+                  <span><i class="prayer-coverage-key prayer-coverage-key--none" />{{ t('No One Committed') }}: {{ noPrayerCount }}</span>
                 </div>
               </div>
             </div>

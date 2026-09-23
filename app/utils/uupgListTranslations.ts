@@ -8,7 +8,7 @@ export function buildUupgListTranslations(t: (key: string) => string) {
   return {
     select: t('Select'),
     full_profile: t('Full Profile'),
-    prayer_coverage: t('Intercessors'),
+    prayer_coverage: t('Committed to Pray'),
     adopted: t('Adopted'),
     not_adopted: t('Not Adopted'),
     loading: t('Loading results...'),

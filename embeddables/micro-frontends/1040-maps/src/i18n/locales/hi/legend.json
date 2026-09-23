@@ -14,9 +14,9 @@
     "peopleGroupFallback": "जनसमूह"
   },
   "prayer": {
-    "needsPrayer": "कोई प्रार्थना नहीं कर रहा",
-    "hasPrayer": "1+ लोग प्रार्थना कर रहे हैं",
-    "fullPrayerCoverage": "100+ लोग प्रार्थना कर रहे हैं"
+    "needsPrayer": "कोई प्रतिबद्ध नहीं",
+    "hasPrayer": "1+ प्रार्थना के लिए प्रतिबद्ध",
+    "fullPrayerCoverage": "100+ प्रार्थना के लिए प्रतिबद्ध"
   },
   "engagement": {
     "needsEngagement": "अनसंपर्कित",
