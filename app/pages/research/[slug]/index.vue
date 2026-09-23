@@ -255,7 +255,7 @@ const mapSrc = computed(() => {
           <div class="stack stack--xl | card | text-center lh-0" data-variant="secondary">
             <h2>{{ t('Prayer Status') }}</h2>
             <p class="font-size-4xl font-weight-medium">{{ uupg.people_committed }}</p>
-            <p class="font-size-lg">{{ t('People committed to praying') }}</p>
+            <p class="font-size-lg">{{ t('People committed to pray') }}</p>
             <div class="stack stack--sm">
               <div class="progress-bar" data-size="md">
                 <div class="progress-bar__slider" :style="{ width: `${prayerCoveragePercent}%` }" />

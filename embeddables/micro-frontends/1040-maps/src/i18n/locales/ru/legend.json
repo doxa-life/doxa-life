@@ -14,9 +14,9 @@
     "peopleGroupFallback": "Народ"
   },
   "prayer": {
-    "needsPrayer": "Никто не молится",
-    "hasPrayer": "1+ человек молится",
-    "fullPrayerCoverage": "100+ человек молятся"
+    "needsPrayer": "Никто не обязался",
+    "hasPrayer": "1+ обязались молиться",
+    "fullPrayerCoverage": "100+ обязались молиться"
   },
   "engagement": {
     "needsEngagement": "Невовлечённый",

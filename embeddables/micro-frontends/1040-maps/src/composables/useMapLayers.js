@@ -98,8 +98,8 @@ export function useMapLayers(options = {}) {
         }
 
         // Build color expression from properties for all modes.
-        // peoplePraying is stored in GeoJSON feature properties as a number,
-        // so the Mapbox ['get', 'peoplePraying'] expression reads directly from properties.
+        // peopleCommitted is stored in GeoJSON feature properties as a number,
+        // so the Mapbox ['get', 'peopleCommitted'] expression reads directly from properties.
         const colorExpression = buildColorExpression(colorMode);
 
         // Create GeoJSON features
@@ -154,9 +154,9 @@ export function useMapLayers(options = {}) {
                 status: pg.status,
                 description: pg.description || '',
                 imageUrl: pg.imageUrl || '',
-                // peoplePraying: stored in feature properties for initial load path;
+                // peopleCommitted: stored in feature properties for initial load path;
                 // after polling starts, Mapbox feature-state overrides color via setFeatureState().
-                peoplePraying: Number(pg.peoplePraying ?? pg._normalized?.peoplePraying ?? 0),
+                peopleCommitted: Number(pg.peopleCommitted ?? pg._normalized?.peopleCommitted ?? 0),
                 // engagementStatus / adoptionStatus: stored as booleans so Mapbox expressions work
                 engagementStatus: pg.engagementStatus === true || pg.engagementStatus === 1 || false,
                 adoptionStatus:   pg.adoptionStatus   === true || pg.adoptionStatus   === 1 || false,
@@ -560,9 +560,9 @@ export function useMapLayers(options = {}) {
     function _glowColorExpr() {
         return [
             'case',
-            ['>=', ['get', 'peoplePraying'], FULL_PRAYER_THRESHOLD],
+            ['>=', ['get', 'peopleCommitted'], FULL_PRAYER_THRESHOLD],
             '#15803d',
-            ['>', ['get', 'peoplePraying'], 0],
+            ['>', ['get', 'peopleCommitted'], 0],
             '#d97706',
             'rgba(0,0,0,0)'
         ];
@@ -582,7 +582,7 @@ export function useMapLayers(options = {}) {
         const map = getMap();
         if (!map || !map.getSource('language-families')) return;
 
-        const prayerFilter = ['>', ['get', 'peoplePraying'], 0];
+        const prayerFilter = ['>', ['get', 'peopleCommitted'], 0];
         const color = _glowColorExpr();
 
         // True idempotency: if ALL 5 glow layers already exist, do nothing.
@@ -648,7 +648,7 @@ export function useMapLayers(options = {}) {
     function syncGlowFilter(extraFilter) {
         const map = getMap();
         if (!map) return;
-        const base = ['>', ['get', 'peoplePraying'], 0];
+        const base = ['>', ['get', 'peopleCommitted'], 0];
         const filter = extraFilter ? ['all', base, extraFilter] : base;
         for (const id of _GLOW_IDS) {
             if (map.getLayer(id)) {
@@ -682,8 +682,8 @@ export function useMapLayers(options = {}) {
             try {
                 map.setLayoutProperty('language-family-pins', 'circle-sort-key', [
                     'case',
-                    ['>=', ['get', 'peoplePraying'], FULL_PRAYER_THRESHOLD], 1,
-                    ['>', ['get', 'peoplePraying'], 0], 1,
+                    ['>=', ['get', 'peopleCommitted'], FULL_PRAYER_THRESHOLD], 1,
+                    ['>', ['get', 'peopleCommitted'], 0], 1,
                     3
                 ]);
             } catch (_) {}

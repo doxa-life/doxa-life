@@ -14,9 +14,9 @@
     "peopleGroupFallback": "族群"
   },
   "prayer": {
-    "needsPrayer": "无人祷告",
-    "hasPrayer": "1+ 人祷告",
-    "fullPrayerCoverage": "100+ 人祷告"
+    "needsPrayer": "无人承诺",
+    "hasPrayer": "1+ 人承诺祷告",
+    "fullPrayerCoverage": "100+ 人承诺祷告"
   },
   "engagement": {
     "needsEngagement": "未接触",

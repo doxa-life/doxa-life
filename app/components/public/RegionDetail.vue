@@ -90,7 +90,7 @@ const mapNote = computed(() =>
         <h2>{{ t('Prayer Coverage') }}</h2>
         <div>
           <p class="font-size-4xl font-weight-medium">{{ formatNumber(region.peopleCommitted) }}</p>
-          <p class="font-size-lg">{{ t('People committed to praying') }}</p>
+          <p class="font-size-lg">{{ t('People committed to pray') }}</p>
         </div>
         <div class="stack stack--xs">
           <div
@@ -103,9 +103,9 @@ const mapNote = computed(() =>
             <div class="prayer-coverage-segment prayer-coverage-segment--none" :style="{ width: `${percentOfRegion(noPrayerCount)}%` }" />
           </div>
           <div class="prayer-coverage-legend">
-            <span><i class="prayer-coverage-key prayer-coverage-key--full" />{{ t('100+ People Praying') }}: {{ formatNumber(region.withFullPrayer) }}</span>
-            <span><i class="prayer-coverage-key prayer-coverage-key--partial" />{{ t('1+ People Praying') }}: {{ formatNumber(partialPrayerCount) }}</span>
-            <span><i class="prayer-coverage-key prayer-coverage-key--none" />{{ t('No One Praying') }}: {{ formatNumber(noPrayerCount) }}</span>
+            <span><i class="prayer-coverage-key prayer-coverage-key--full" />{{ t('100+ Committed to Pray') }}: {{ formatNumber(region.withFullPrayer) }}</span>
+            <span><i class="prayer-coverage-key prayer-coverage-key--partial" />{{ t('1+ Committed to Pray') }}: {{ formatNumber(partialPrayerCount) }}</span>
+            <span><i class="prayer-coverage-key prayer-coverage-key--none" />{{ t('No One Committed') }}: {{ formatNumber(noPrayerCount) }}</span>
           </div>
         </div>
         <p class="region-goal">
@@ -150,7 +150,7 @@ const mapNote = computed(() =>
             <tr>
               <th>{{ t('Country') }}</th>
               <th>{{ t('People Groups') }}</th>
-              <th>{{ t('1+ People Praying') }}</th>
+              <th>{{ t('1+ Committed to Pray') }}</th>
               <th>{{ t('Adopted') }}</th>
               <th>{{ t('Engaged') }}</th>
             </tr>
