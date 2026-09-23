@@ -7,6 +7,7 @@
 import { hasVideoTranslation } from '~/utils/videoUrls'
 
 const S3_URL = 'https://s3.doxa.life/'
+const GOOGLE_DRIVE_URL = 'https://drive.google.com/drive/folders/1TSfjWdu7p0GZ22xXjlppcX_vrgmVyzBV?usp=drive_link'
 
 export interface ResourceWithImage {
   key: string
@@ -35,13 +36,13 @@ export interface ResourceNoImage {
 // `doxa_get_s3_lang_code()`. Keep in sync when new translated files
 // are uploaded to the S3 bucket.
 const DOCUMENT_LANGS: Record<string, string[]> = {
-  'doxa-playbook':          ['en', 'es'],
-  'doxa-playbook-slides':   ['en'],
-  'introduction-2025':      ['en'],
-  'vision-and-values':      ['en'],
-  'definitions':            ['en'],
-  'doxa-endowment-policy':  ['en'],
-  'initial-proposal':       ['en', 'es', 'fr']
+  'doxa-playbook': ['en', 'es'],
+  'doxa-playbook-slides': ['en'],
+  'introduction-2025': ['en'],
+  'vision-and-values': ['en'],
+  'definitions': ['en'],
+  'doxa-endowment-policy': ['en'],
+  'initial-proposal': ['en', 'es', 'fr']
 }
 
 function s3LangCode(docId: string, lang: string): string {
@@ -82,6 +83,15 @@ export function resourcesWithImage(videoUrl: (lang: string) => string): Resource
       downloadType: 'link',
       downloadLink: lang => videoUrl(lang),
       hasTranslation: lang => hasVideoTranslation(lang)
+    },
+    {
+      key: 'doxa_prayer_card_bundles',
+      title: 'DOXA Prayer Card Bundles per language',
+      imageUrl: '/assets/images/card.png',
+      style: 'width: 80%; padding-top: 10%; padding-bottom: 10%;',
+      downloadType: 'link',
+      downloadLink: () => GOOGLE_DRIVE_URL,
+      hasTranslation: () => true
     }
   ]
 }
