@@ -24,7 +24,7 @@ export interface PrayerStatistics {
 const FALLBACK_TOTAL = 2085
 
 // Fallback unengaged population (≈200M) shown only when the upstream API
-// hasn't responded yet or failed — avoids rendering "0 Million" in the
+// hasn't responded yet or failed — avoids rendering a zero population in the
 // bullseye on a cold cache. Replaced by the live SUM(population) as soon as
 // the stats load.
 const FALLBACK_UNENGAGED_POPULATION = 200_000_000
@@ -105,13 +105,8 @@ export function usePrayerStatistics() {
   )
 
   // Total population living in the unengaged people groups. Drives the
-  // bullseye's "{0} Million" figure, which shrinks as groups become engaged.
+  // bullseye's population figure, which shrinks as groups become engaged.
   const unengagedPopulation = computed(() => stats.value.unengaged_population || FALLBACK_UNENGAGED_POPULATION)
-  // Rounded to whole millions to match the "{0} Million" copy (e.g. 202).
-  // Latin digits forced like the other counters so it matches the page.
-  const unengagedPopulationMillionsFormatted = computed(() =>
-    Math.round(unengagedPopulation.value / 1_000_000).toLocaleString(`${locale.value}-u-nu-latn`)
-  )
 
   const prayerCoveragePercent = computed(
     () => Math.min(100, (stats.value.total_with_full_prayer / totalPeopleGroups.value) * 100)
@@ -129,7 +124,6 @@ export function usePrayerStatistics() {
     unengagedPeopleGroups,
     unengagedPeopleGroupsFormatted,
     unengagedPopulation,
-    unengagedPopulationMillionsFormatted,
     prayerCoveragePercent,
     adoptedPercent,
     reload,

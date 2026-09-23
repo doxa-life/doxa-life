@@ -19,7 +19,7 @@ function openVideo() {
   videoModalRef.value?.open()
 }
 
-const { unengagedPeopleGroupsFormatted, totalPeopleGroupsFormatted, unengagedPopulationMillionsFormatted, ensureLoaded, reload } = usePrayerStatistics()
+const { unengagedPeopleGroupsFormatted, totalPeopleGroupsFormatted, unengagedPopulation, ensureLoaded, reload } = usePrayerStatistics()
 await ensureLoaded()
 // This page is prerendered, so its payload carries build-time counts; refetch
 // on the client so the figures track the live API between deploys.
@@ -28,6 +28,13 @@ onMounted(() => reload())
 // Locale separators with Latin digits, matching usePrayerStatistics — for the
 // bullseye's static figures (e.g. 3.9 → "3,9" and 6602 → "6.602" in pt).
 const formatNumber = (n: number) => n.toLocaleString(`${locale.value}-u-nu-latn`)
+// Population magnitudes in the locale's own grouping (3.9 billion, 39亿, 20.2 करोड़).
+// Three significant digits so 201.6M stays 2.02亿 rather than collapsing to 2亿.
+const formatPopulation = (n: number) => new Intl.NumberFormat(`${locale.value}-u-nu-latn`, {
+  notation: 'compact',
+  compactDisplay: 'long',
+  maximumSignificantDigits: 3
+}).format(n)
 
 const mapboxToken = config.public.mapboxToken as string
 
@@ -160,7 +167,7 @@ useTextHighlight()
             <div class="info-card color-brand-dark justify-center">
               <div class="stack stack--lg | info-card__content">
                 <h3 class="color-brand-lighter">{{ t('Unreached') }}</h3>
-                <span>{{ t('{0} Billion', [formatNumber(3.9)]) }}</span>
+                <span>{{ formatPopulation(3_900_000_000) }}</span>
                 <span class="color-brand-lighter">{{ t('{0} People Groups', [formatNumber(6602)]) }}</span>
               </div>
             </div>
@@ -169,7 +176,7 @@ useTextHighlight()
             <div class="info-card color-secondary-very-light justify-center">
               <div class="stack stack--lg | info-card__content">
                 <h3>{{ t('Under-Engaged') }}</h3>
-                <span class="color-secondary-light">{{ t('{0} Billion', [formatNumber(3.3)]) }}</span>
+                <span class="color-secondary-light">{{ formatPopulation(3_300_000_000) }}</span>
                 <span>{{ t('{0} People Groups', [formatNumber(5119)]) }}</span>
               </div>
             </div>
@@ -178,7 +185,7 @@ useTextHighlight()
             <div class="info-card color-secondary-very-light justify-center">
               <div class="stack stack--lg | info-card__content">
                 <h3>{{ t('Frontier People') }}</h3>
-                <span class="color-secondary-light">{{ t('{0} Billion', [formatNumber(2)]) }}</span>
+                <span class="color-secondary-light">{{ formatPopulation(2_000_000_000) }}</span>
                 <span>{{ t('{0} People Groups', [formatNumber(4788)]) }}</span>
               </div>
             </div>
@@ -187,7 +194,7 @@ useTextHighlight()
             <div class="info-card surface-brand-dark justify-center">
               <div class="stack stack--lg | info-card__content">
                 <h3>{{ t('Unengaged') }}</h3>
-                <span>{{ t('{0} Million', [unengagedPopulationMillionsFormatted]) }}</span>
+                <span>{{ formatPopulation(unengagedPopulation) }}</span>
                 <span>{{ t('{0} People Groups', [unengagedPeopleGroupsFormatted]) }}</span>
               </div>
             </div>
