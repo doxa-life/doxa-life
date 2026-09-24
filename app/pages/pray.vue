@@ -301,49 +301,7 @@ useTextHighlight()
       </div>
     </section>
 
-    <section>
-      <div class="container">
-        <div class="switcher | align-center" data-width="xl">
-          <div class="stack | grow-2 align-center">
-            <div class="stack stack--2xl">
-              <p class="color-brand-lighter font-weight-medium uppercase">
-                {{ t('The DOXA Prayer App') }}
-              </p>
-              <h2 class="highlight stack-spacing-sm" data-highlight-index="3">{{ t('Take the unreached with you') }}</h2>
-              <ul class="stack stack--sm" data-list-color="primary">
-                <li>{{ t('Daily reminders at the time you choose') }}</li>
-                <li>{{ t('Today\'s prayer ready to open') }}</li>
-                <li>{{ t('See how many people are praying with you now') }}</li>
-              </ul>
-              <div class="stack" id="app-store-links"></div>
-              <p class="font-size-sm color-brand-light">
-                {{ t('Download and choose your people group in the app.') }}
-              </p>
-            </div>
-          </div>
-          <div>
-            <picture>
-              <source
-                srcset="/assets/images/pray-02-PrayerFUEL-Phone-graphic-2.avif"
-                type="image/avif"
-              >
-              <source
-                srcset="/assets/images/pray-02-PrayerFUEL-Phone-graphic-2.webp"
-                type="image/webp"
-              >
-              <img
-                class="center"
-                src="/assets/images/pray-02-PrayerFUEL-Phone-graphic-2.png"
-                :alt="t('Your daily prayer guide')"
-                width="500"
-                height="872"
-                loading="lazy"
-              >
-            </picture>
-          </div>
-        </div>
-      </div>
-    </section>
+    <MobileAppSection />
 
     <section>
       <div class="container stack stack--5xl">

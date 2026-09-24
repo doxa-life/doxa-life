@@ -289,7 +289,15 @@ export default defineNuxtConfig({
       statinatorUrl: process.env.NUXT_PUBLIC_STATINATOR_URL || 'https://statinator.doxa.life',
       statinatorProjectId: process.env.NUXT_PUBLIC_STATINATOR_PROJECT_ID || 'doxa',
       statinatorEnabled: process.env.NUXT_PUBLIC_STATINATOR_ENABLED === 'true',
-      statinatorCookieDomain: process.env.NUXT_PUBLIC_STATINATOR_COOKIE_DOMAIN || '.doxa.life'
+      statinatorCookieDomain: process.env.NUXT_PUBLIC_STATINATOR_COOKIE_DOMAIN || '.doxa.life',
+      // DOXA Prayer App store listings, used by the app promo section
+      // (components/public/MobileAppSection.vue). The Apple badge is hidden
+      // until mobileAppAppleId is set, so the link is never a dead end while
+      // the iOS app is still in review. Either MOBILE_APP_* (build time, the
+      // same names the campaigns server uses) or NUXT_PUBLIC_MOBILE_APP_*
+      // (runtime override, the standard Nuxt mapping for these keys) works.
+      mobileAppAppleId: process.env.MOBILE_APP_APPLE_ID || '',
+      mobileAppAndroidPackage: process.env.MOBILE_APP_ANDROID_PACKAGE || 'life.doxa.pray'
     }
   },
 

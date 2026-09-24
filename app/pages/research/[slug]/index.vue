@@ -150,181 +150,190 @@ const mapSrc = computed(() => {
 </script>
 
 <template>
-  <div v-if="notFound || uupgError" class="container page-content uupg-detail-page">
-    <div class="stack stack--lg">
-      <h1>{{ t('People Group Not Found') }}</h1>
-      <p>{{ t('The people group you are looking for could not be found. Please try again.') }}</p>
-      <NuxtLink :to="localePath('/research')" class="button font-size-lg">
-        <span class="sr-only">{{ t('Back') }}</span>
-        <svg class="icon | rotate-270" viewBox="0 0 489.67 289.877">
-          <path d="M439.017,211.678L263.258,35.919c-3.9-3.9-8.635-6.454-13.63-7.665-9.539-2.376-20.051.161-27.509,7.619L46.361,211.632c-11.311,11.311-11.311,29.65,0,40.961h0c11.311,11.311,29.65,11.311,40.961,0L242.667,97.248l155.39,155.39c11.311,11.311,29.65,11.311,40.961,0h0c11.311-11.311,11.311-29.65,0-40.961Z" />
-        </svg>
-        {{ t('Back') }}
-      </NuxtLink>
+  <div>
+    <div v-if="notFound || uupgError" class="container page-content uupg-detail-page">
+      <div class="stack stack--lg">
+        <h1>{{ t('People Group Not Found') }}</h1>
+        <p>{{ t('The people group you are looking for could not be found. Please try again.') }}</p>
+        <NuxtLink :to="localePath('/research')" class="button font-size-lg">
+          <span class="sr-only">{{ t('Back') }}</span>
+          <svg class="icon | rotate-270" viewBox="0 0 489.67 289.877">
+            <path d="M439.017,211.678L263.258,35.919c-3.9-3.9-8.635-6.454-13.63-7.665-9.539-2.376-20.051.161-27.509,7.619L46.361,211.632c-11.311,11.311-11.311,29.65,0,40.961h0c11.311,11.311,29.65,11.311,40.961,0L242.667,97.248l155.39,155.39c11.311,11.311,29.65,11.311,40.961,0h0c11.311-11.311,11.311-29.65,0-40.961Z" />
+          </svg>
+          {{ t('Back') }}
+        </NuxtLink>
+      </div>
     </div>
-  </div>
 
-  <div v-else-if="uupg" class="container page-content uupg-detail-page">
-    <div class="stack stack--lg">
-      <div class="stack stack--2xl">
-        <div class="card switcher" padding-small>
-          <div class="center | grow-none">
-            <div class="position-relative">
-              <img class="uupg__image" data-size="medium" :src="uupg.image_url" :alt="uupg.name || 'People Group Photo'">
+    <div v-else-if="uupg" class="container page-content uupg-detail-page">
+      <div class="stack stack--lg">
+        <div class="stack stack--2xl">
+          <div class="card switcher" padding-small>
+            <div class="center | grow-none">
+              <div class="position-relative">
+                <img class="uupg__image" data-size="medium" :src="uupg.image_url" :alt="uupg.name || 'People Group Photo'">
 
-              <template v-if="Array.isArray(uupg.picture_credit) && uupg.picture_credit.length">
-                <button
-                  id="info-button"
-                  class="info__button"
-                  type="button"
-                  aria-haspopup="dialog"
-                  :aria-expanded="infoOpen ? 'true' : 'false'"
-                  :data-state="infoOpen ? 'open' : 'closed'"
-                  aria-label="Photo credit"
-                  @click="infoOpen = !infoOpen"
-                >
-                  <span class="info__icon" aria-hidden="true" />
-                  <div class="info__content">
-                    <template v-for="(credit, i) in uupg.picture_credit" :key="i">
-                      <a
-                        v-if="credit.link"
-                        class="light-link"
-                        :href="credit.link"
-                        target="_blank"
-                      >{{ credit.text }}</a>
-                      <span v-else>{{ credit.text }}</span>
-                    </template>
-                  </div>
-                </button>
-              </template>
-            </div>
-            <div
-              class="engaged-stamp"
-              :data-engaged="isEngaged ? 'true' : 'false'"
-            >
-              <span v-if="isEngaged">{{ t('Engaged') }}</span>
-              <span v-else>{{ t('Not Engaged') }}</span>
-            </div>
-          </div>
-          <div class="stack stack--xs | uupg__header">
-            <h4 class="font-base font-weight-medium">{{ uupg.name }}</h4>
-            <p class="font-weight-medium font-size-lg">
-              {{ uupg.country_code?.label }} ({{ uupg.rop1?.label }})
-            </p>
-            <p>{{ uupg.imb_people_description }}</p>
-
-            <a
-              v-if="locale === 'en'"
-              :href="`/research/${slug}/resources/`"
-              class="button compact | resources-button"
-            >{{ t('View Resources') }}</a>
-          </div>
-        </div>
-
-        <div id="engagement-status" class="card stack stack--2xs" padding-small>
-          <h2 class="text-center">{{ t('Engagement Status') }}</h2>
-          <div class="cluster justify-center">
-            <div class="cluster justify-center align-start" data-width="md">
+                <template v-if="Array.isArray(uupg.picture_credit) && uupg.picture_credit.length">
+                  <button
+                    id="info-button"
+                    class="info__button"
+                    type="button"
+                    aria-haspopup="dialog"
+                    :aria-expanded="infoOpen ? 'true' : 'false'"
+                    :data-state="infoOpen ? 'open' : 'closed'"
+                    aria-label="Photo credit"
+                    @click="infoOpen = !infoOpen"
+                  >
+                    <span class="info__icon" aria-hidden="true" />
+                    <div class="info__content">
+                      <template v-for="(credit, i) in uupg.picture_credit" :key="i">
+                        <a
+                          v-if="credit.link"
+                          class="light-link"
+                          :href="credit.link"
+                          target="_blank"
+                        >{{ credit.text }}</a>
+                        <span v-else>{{ credit.text }}</span>
+                      </template>
+                    </div>
+                  </button>
+                </template>
+              </div>
               <div
-                v-for="(item, i) in statusItems"
-                :key="i"
-                class="status-item"
+                class="engaged-stamp"
+                :data-engaged="isEngaged ? 'true' : 'false'"
               >
+                <span v-if="isEngaged">{{ t('Engaged') }}</span>
+                <span v-else>{{ t('Not Engaged') }}</span>
+              </div>
+            </div>
+            <div class="stack stack--xs | uupg__header">
+              <h4 class="font-base font-weight-medium">{{ uupg.name }}</h4>
+              <p class="font-weight-medium font-size-lg">
+                {{ uupg.country_code?.label }} ({{ uupg.rop1?.label }})
+              </p>
+              <p>{{ uupg.imb_people_description }}</p>
+
+              <a
+                v-if="locale === 'en'"
+                :href="`/research/${slug}/resources/`"
+                class="button compact | resources-button"
+              >{{ t('View Resources') }}</a>
+            </div>
+          </div>
+
+          <div id="engagement-status" class="card stack stack--2xs" padding-small>
+            <h2 class="text-center">{{ t('Engagement Status') }}</h2>
+            <div class="cluster justify-center">
+              <div class="cluster justify-center align-start" data-width="md">
+                <div
+                  v-for="(item, i) in statusItems"
+                  :key="i"
+                  class="status-item"
+                >
+                  <img
+                    v-if="item.icon === 'done'"
+                    src="/assets/icons/Check-GreenCircle.png"
+                    :alt="t('Done')"
+                  >
+                  <img
+                    v-else-if="item.icon === 'partial'"
+                    src="/assets/icons/Check-YellowCircle.png"
+                    :alt="t('Has prayer coverage')"
+                  >
+                  <img
+                    v-else
+                    src="/assets/icons/RedX-Circle.png"
+                    :alt="t('Not Done')"
+                  >
+                  <p>{{ item.label }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="switcher" data-width="xl">
+            <div class="stack stack--xl | card | text-center lh-0" data-variant="secondary">
+              <h2>{{ t('Prayer Status') }}</h2>
+              <p class="font-size-4xl font-weight-medium">{{ uupg.people_committed }}</p>
+              <p class="font-size-lg">{{ t('People committed to praying') }}</p>
+              <div class="stack stack--sm">
+                <div class="progress-bar" data-size="md">
+                  <div class="progress-bar__slider" :style="{ width: `${prayerCoveragePercent}%` }" />
+                </div>
+                <p class="font-size-lg font-weight-medium">{{ t('Daily Prayer Coverage') }}</p>
+              </div>
+              <a
+                class="button fit-content mx-auto stack-spacing-4xl clamp-padding"
+                :href="prayUrl"
+              >{{ t('Sign up to pray') }}</a>
+            </div>
+            <div class="stack stack--xl | card | text-center lh-0" data-variant="primary">
+              <h2>{{ t('Adoption Status') }}</h2>
+              <p class="font-size-4xl font-weight-medium">{{ uupg.adopted_by_churches || 0 }}</p>
+              <p class="font-size-lg margin-bottom-md">{{ t('churches / individuals have adopted this people group') }}</p>
+              <ul v-if="uupg.adopted_by_names && uupg.adopted_by_names.length">
+                <li v-for="(name, i) in uupg.adopted_by_names" :key="i">{{ name }}</li>
+              </ul>
+
+              <NuxtLink
+                class="button fit-content mx-auto mt-auto clamp-padding"
+                :to="adoptUrl"
+              >{{ t('Adopt people group') }}</NuxtLink>
+            </div>
+          </div>
+
+          <div v-if="uupg.latitude && uupg.longitude" class="map-card">
+            <iframe class="map" :src="mapSrc" loading="lazy" />
+            <div class="overlay" />
+          </div>
+
+          <div class="switcher" data-width="xl">
+            <div class="card" data-variant="primary">
+              <div class="stack">
+                <h2 class="color-primary">{{ t('Overview') }}</h2>
+                <p><strong>{{ t('Country') }}:</strong> {{ uupg.country_code?.label }}</p>
+
+                <p v-if="uupg.imb_alternate_name">
+                  <strong>{{ t('Alternate Names') }}:</strong> {{ uupg.imb_alternate_name }}
+                </p>
+                <p><strong>{{ t('Population') }}:</strong> ~{{ uupg.population }}</p>
+                <p><strong>{{ t('Primary Language') }}:</strong> {{ uupg.primary_language?.label }}</p>
+                <p><strong>{{ t('Primary Religion') }}:</strong> {{ uupg.religion?.label }}</p>
+                <p><strong>{{ t('Religious Practices') }}:</strong> <br>{{ uupg.religion?.description }}</p>
+              </div>
+            </div>
+            <div class="stack | card" data-variant="primary">
+              <h2 class="color-primary">{{ t('Progress') }}</h2>
+              <p v-for="(item, i) in progressItems" :key="i" class="progress-item">
                 <img
-                  v-if="item.icon === 'done'"
+                  v-if="item.done"
                   src="/assets/icons/Check-GreenCircle.png"
                   :alt="t('Done')"
-                >
-                <img
-                  v-else-if="item.icon === 'partial'"
-                  src="/assets/icons/Check-YellowCircle.png"
-                  :alt="t('Has prayer coverage')"
                 >
                 <img
                   v-else
                   src="/assets/icons/RedX-Circle.png"
                   :alt="t('Not Done')"
                 >
-                <p>{{ item.label }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="switcher" data-width="xl">
-          <div class="stack stack--xl | card | text-center lh-0" data-variant="secondary">
-            <h2>{{ t('Prayer Status') }}</h2>
-            <p class="font-size-4xl font-weight-medium">{{ uupg.people_committed }}</p>
-            <p class="font-size-lg">{{ t('People committed to praying') }}</p>
-            <div class="stack stack--sm">
-              <div class="progress-bar" data-size="md">
-                <div class="progress-bar__slider" :style="{ width: `${prayerCoveragePercent}%` }" />
-              </div>
-              <p class="font-size-lg font-weight-medium">{{ t('Daily Prayer Coverage') }}</p>
-            </div>
-            <a
-              class="button fit-content mx-auto stack-spacing-4xl clamp-padding"
-              :href="prayUrl"
-            >{{ t('Sign up to pray') }}</a>
-          </div>
-          <div class="stack stack--xl | card | text-center lh-0" data-variant="primary">
-            <h2>{{ t('Adoption Status') }}</h2>
-            <p class="font-size-4xl font-weight-medium">{{ uupg.adopted_by_churches || 0 }}</p>
-            <p class="font-size-lg margin-bottom-md">{{ t('churches / individuals have adopted this people group') }}</p>
-            <ul v-if="uupg.adopted_by_names && uupg.adopted_by_names.length">
-              <li v-for="(name, i) in uupg.adopted_by_names" :key="i">{{ name }}</li>
-            </ul>
-
-            <NuxtLink
-              class="button fit-content mx-auto mt-auto clamp-padding"
-              :to="adoptUrl"
-            >{{ t('Adopt people group') }}</NuxtLink>
-          </div>
-        </div>
-
-        <div v-if="uupg.latitude && uupg.longitude" class="map-card">
-          <iframe class="map" :src="mapSrc" loading="lazy" />
-          <div class="overlay" />
-        </div>
-
-        <div class="switcher" data-width="xl">
-          <div class="card" data-variant="primary">
-            <div class="stack">
-              <h2 class="color-primary">{{ t('Overview') }}</h2>
-              <p><strong>{{ t('Country') }}:</strong> {{ uupg.country_code?.label }}</p>
-
-              <p v-if="uupg.imb_alternate_name">
-                <strong>{{ t('Alternate Names') }}:</strong> {{ uupg.imb_alternate_name }}
+                <strong>{{ item.label }}:</strong> {{ item.done ? t('Yes') : t('No') }}
               </p>
-              <p><strong>{{ t('Population') }}:</strong> ~{{ uupg.population }}</p>
-              <p><strong>{{ t('Primary Language') }}:</strong> {{ uupg.primary_language?.label }}</p>
-              <p><strong>{{ t('Primary Religion') }}:</strong> {{ uupg.religion?.label }}</p>
-              <p><strong>{{ t('Religious Practices') }}:</strong> <br>{{ uupg.religion?.description }}</p>
             </div>
           </div>
-          <div class="stack | card" data-variant="primary">
-            <h2 class="color-primary">{{ t('Progress') }}</h2>
-            <p v-for="(item, i) in progressItems" :key="i" class="progress-item">
-              <img
-                v-if="item.done"
-                src="/assets/icons/Check-GreenCircle.png"
-                :alt="t('Done')"
-              >
-              <img
-                v-else
-                src="/assets/icons/RedX-Circle.png"
-                :alt="t('Not Done')"
-              >
-              <strong>{{ item.label }}:</strong> {{ item.done ? t('Yes') : t('No') }}
-            </p>
-          </div>
-        </div>
 
-        <a
-          class="button mx-auto"
-          :href="updatesUrl"
-        >{{ t('Submit Updates') }}</a>
+          <a
+            class="button mx-auto"
+            :href="updatesUrl"
+          >{{ t('Submit Updates') }}</a>
+        </div>
       </div>
     </div>
+
+    <!-- Full-bleed, so it sits outside the page container above. -->
+    <MobileAppSection
+      v-if="!notFound && !uupgError"
+      :people-group-name="uupg?.name"
+      :people-group-slug="slug"
+    />
   </div>
 </template>
