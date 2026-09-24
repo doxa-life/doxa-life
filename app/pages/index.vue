@@ -137,18 +137,7 @@ useTextHighlight()
           :research-url="localePath('/research') + '/'"
           :language-code="locale"
         />
-        <div class="stack stack--2xl">
-          <h2 class="highlight" data-highlight-last>{{ t('A simple path to faithful obedience') }}</h2>
-          <div class="switcher | gap-md">
-            <div class="step-card">
-              <div class="step-card__content">
-                <h2 class="step-card__title">{{ t('Pray') }}</h2>
-                <p>{{ t('Receive daily prayer points and join believers worldwide in prayer for the unengaged peoples.') }}</p>
-              </div>
-              <NuxtLink :to="localePath('/pray')" class="button | compact">{{ t('Join') }}</NuxtLink>
-            </div>
-          </div>
-        </div>
+        <NuxtLink :to="localePath('/pray')" class="center | button | compact">{{ t('Join') }}</NuxtLink>
       </div>
     </section>
 
