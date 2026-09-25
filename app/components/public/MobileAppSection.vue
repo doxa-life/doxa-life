@@ -1,6 +1,8 @@
 <script setup lang="ts">
 // "Take the unreached with you" — the DOXA Prayer App promo section, used at
-// the bottom of /pray and of each research people group page.
+// the bottom of /pray and of each research people group page. The heading is one
+// message either way: the people group's name fills the placeholder, or the
+// collective noun does (see headingTerm below).
 //
 // Where a people group is in hand (the research detail page) both badges point
 // at the campaigns-server smart link, `{prayBaseUrl}/app/<slug>`: it opens an
@@ -35,11 +37,16 @@ const googlePlayUrl = computed(() => {
   return `https://play.google.com/store/apps/details?id=${androidPackage}&referrer=${referrer}`
 })
 
+// The heading accents whatever fills the placeholder — the people group's name,
+// or the collective noun when the section stands on its own. Both go through one
+// message so each language decides where the accented phrase sits; a fixed word
+// index would land on "unreached" in English and on "a" or "te" elsewhere.
+//
 // A locale that hasn't translated a string gets the English key back, and that
 // fallback is *not* interpolated (see i18n.config.ts) — so pass the placeholder
-// through as the argument and split on it here. Either way we end up with the
-// text either side of the people group's name, which lets the name carry the
-// accent colour the way "unreached" does in the generic heading.
+// through as the argument and split on it here.
+const headingTerm = computed(() => props.peopleGroupName || t('unreached'))
+
 const titleParts = computed(() => {
   const [before = '', after = ''] = t('Take the {0} with you', ['{0}']).split('{0}')
   return { before, after }
@@ -55,11 +62,8 @@ const titleParts = computed(() => {
             <p class="color-brand-lighter font-weight-medium uppercase">
               {{ t('The DOXA Prayer App') }}
             </p>
-            <h2 v-if="peopleGroupName" class="stack-spacing-sm">
-              {{ titleParts.before }}<span class="color-primary">{{ peopleGroupName }}</span>{{ titleParts.after }}
-            </h2>
-            <h2 v-else class="highlight stack-spacing-sm" data-highlight-index="3">
-              {{ t('Take the unreached with you') }}
+            <h2 class="stack-spacing-sm">
+              {{ titleParts.before }}<span class="color-primary">{{ headingTerm }}</span>{{ titleParts.after }}
             </h2>
             <ul class="stack stack--sm" data-list-color="primary">
               <li>{{ t('Daily reminders at the time you choose') }}</li>
