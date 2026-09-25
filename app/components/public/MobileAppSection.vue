@@ -47,7 +47,7 @@ const titleParts = computed(() => {
 </script>
 
 <template>
-  <section>
+  <section class="surface-white">
     <div class="container">
       <div class="switcher | align-center" data-width="xl">
         <div class="stack | grow-2 align-center">

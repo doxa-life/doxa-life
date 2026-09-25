@@ -74,6 +74,8 @@ const googlePlayBadge = computed(() => `/assets/images/badges/google-play-${badg
   height: 44px;
   width: auto;
   border-radius: 0;
+  margin-left: 11px;
+  margin-right: 11px;
 }
 
 .app-store-badges__google {
