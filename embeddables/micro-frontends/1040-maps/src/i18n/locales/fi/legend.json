@@ -1,0 +1,36 @@
+{
+  "title": {
+    "prayer": "Rukouksen edistyminen",
+    "engagement": "Kohtaamistyön edistyminen",
+    "adoption": "Vastuunoton edistyminen",
+    "languageFamilies": "Kieliperheet",
+    "doxaRegions": "Doxa-alueet",
+    "affinityBlocs": "Sukulaisuusryhmät",
+    "gospelResources": "Evankeliumimateriaalit"
+  },
+  "header": {
+    "default": "Selite",
+    "collapsed": "Selite",
+    "peopleGroupFallback": "Kansanryhmä"
+  },
+  "prayer": {
+    "needsPrayer": "Ei yhtään rukoilijaa",
+    "hasPrayer": "1 tai useampi rukoilija",
+    "fullPrayerCoverage": "Yli 100 rukoilijaa"
+  },
+  "engagement": {
+    "needsEngagement": "Kohtaamaton",
+    "hasEngagement": "Kohdattu"
+  },
+  "adoption": {
+    "needsAdoption": "Vastuunotto tarvitaan",
+    "hasAdoption": "Vastuulla"
+  },
+  "columns": {
+    "upgs": "UUPG:t",
+    "population": "Väestö"
+  },
+  "footer": {
+    "total": "Yhteensä"
+  }
+}

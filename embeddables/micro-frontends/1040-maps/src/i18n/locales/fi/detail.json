@@ -1,0 +1,12 @@
+{
+  "labels": {
+    "country": "Maa:",
+    "population": "Väestö:",
+    "language": "Kieli:",
+    "religion": "Uskonto:",
+    "languageFamily": "Kieliperhe:"
+  },
+  "messages": {
+    "noDescription": "Kuvausta ei ole saatavilla."
+  }
+}

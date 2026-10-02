@@ -8,6 +8,7 @@
 // https://pray.doxa.life/api/glossary/{lang}.
 
 import { en } from './en'
+import { fi } from './fi'
 import { fr } from './fr'
 import { de } from './de'
 import { es } from './es'
@@ -48,7 +49,7 @@ export interface TermsContent {
   entries: TermEntry[]
 }
 
-const editions: Record<string, TermsContent> = { en, fr, de, es, pt, it, zh, ru, hi, ro, ar }
+const editions: Record<string, TermsContent> = { en, fi, fr, de, es, pt, it, zh, ru, hi, ro, ar }
 
 export function getTermsContent(locale: string): TermsContent {
   return editions[locale] ?? en

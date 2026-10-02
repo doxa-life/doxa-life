@@ -46,7 +46,7 @@ for (const [path, subtree] of Object.entries(rawModules)) {
   messages[locale][area] = subtree
 }
 
-export const SUPPORTED_LOCALES = ['ar', 'de', 'en', 'es', 'fr', 'hi', 'it', 'pt', 'ro', 'ru', 'zh']
+export const SUPPORTED_LOCALES = ['ar', 'de', 'en', 'es', 'fi', 'fr', 'hi', 'it', 'pt', 'ro', 'ru', 'zh']
 
 export const RTL_LOCALES = new Set(['ar'])
 

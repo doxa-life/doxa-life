@@ -1,0 +1,9 @@
+{
+  "placeholder": "Kansa, paikka, kieli, uskonto",
+  "labels": {
+    "people": "Kansa:",
+    "place": "Paikka:",
+    "language": "Kieli:",
+    "religion": "Uskonto:"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "prayForThem": "Rukoile heidän puolestaan",
+  "adoptThem": "Ota vastuulle",
+  "moreInfo": "Lisätietoja",
+  "zoomIn": "Lähennä",
+  "zoomOut": "Loitonna",
+  "switchToLightMode": "Vaihda vaaleaan tilaan",
+  "switchToDarkMode": "Vaihda tummaan tilaan",
+  "resetView": "Palauta näkymä",
+  "toggleFullscreen": "Koko näyttö päälle/pois",
+  "aboutThisMap": "Tietoa tästä kartasta",
+  "closeMenu": "Sulje valikko",
+  "reloadMap": "Lataa kartta uudelleen",
+  "showClusters": "Näytä ryhmät",
+  "clusterSettings": "Ryhmäasetukset",
+  "startAutoFly": "Aloita automaattilento",
+  "stopFlight": "Pysäytä lento",
+  "speedLabel": "Nopeus:",
+  "speedOption": {
+    "slow": "Hidas",
+    "normal": "Normaali",
+    "fast": "Nopea"
+  },
+  "shareEmbed": "Jaa ja upota"
+}
