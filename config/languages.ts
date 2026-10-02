@@ -31,7 +31,7 @@ export const LANGUAGES: Language[] = [
   { code: 'ru', name: 'Russian', nativeName: 'Русский', flag: '🇷🇺', bibleId: 'SYNOD', latinHeadings: false }, // NRT (New Russian Translation) is a modern alternative
   { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳', bibleId: 'HIOV', bibleLabel: 'OV', latinHeadings: false },
   { code: 'ro', name: 'Romanian', nativeName: 'Română', flag: '🇷🇴', bibleId: 'NTR' },
-  { code: 'fi', name: 'Finnish', nativeName: 'suomi', flag: '🇫🇮', bibleId: 'FIK38', enabled: false }
+  { code: 'fi', name: 'Finnish', nativeName: 'suomi', flag: '🇫🇮', bibleId: 'FIK38' }
 ]
 
 // All language codes
