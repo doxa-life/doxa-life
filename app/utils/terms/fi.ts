@@ -24,7 +24,7 @@ export const fi: TermsContent = {
         'Sanaston luonnosversio käyttää termiä "kansanryhmä", joka on suomenkielisessä lähetystyön kielenkäytössä vakiintunut ja erottuu selvästi poliittisesta "valtiosta" tai "kansakunnasta". Valinta odottaa kielentarkistajan vahvistusta.'
     },
     {
-      term: 'Tavoittamaton kansanryhmä (UPG)',
+      term: 'Saavuttamaton kansanryhmä (UPG)',
       english: 'unreached people group (UPG)',
       definition:
         'Kansanryhmä, jossa on noin 2 opetuslasta tai vähemmän 100 henkeä kohden (≤ 2 %) ja jolla ei ole kykyä perustaa paikallislähtöisiä seurakuntia ilman kulttuurirajat ylittävää apua. Joshua Project lisää kriteerin ≤ 5 % itsensä kristityiksi ilmoittavia; DOXA seuraa IMB:n määritelmää.',
@@ -32,7 +32,7 @@ export const fi: TermsContent = {
         'Englannin lyhenne UPG säilytetään, koska se on vakiintunut kansainvälisissä rukoustyökaluissa. Suomenkielinen vaihtoehto ei ole vielä käytössä.'
     },
     {
-      term: 'Kohtaamaton',
+      term: 'Lähetystyön ulkopuolella oleva kansanryhmä',
       english: 'unengaged',
       definition:
         'Kansanryhmä, jonka keskuudessa ei tunneta pyrkimyksiä itsenäisesti kasvavien seurakuntien perustamiseksi — kaikki neljä tehokkaan kohtaamistyön tasoa puuttuvat (paikan päällä asuva pioneerityö; työskentely paikallisessa kulttuurissa ja sydämen kielessä; pitkäaikainen sitoumus; evankeliumin kylväminen tavoitteena seurakuntien istutusliike). Tekninen termi, joka tarkoittaa, ettei kukaan työskentele heidän keskuudessaan — ei sitä, että kansa itse olisi välinpitämätön.',
@@ -40,15 +40,15 @@ export const fi: TermsContent = {
         '"Kohtaamaton" on sanaston luonnosvalinta ja muodostaa johdonmukaisen sanaperheen ("kohtaamistyö", "kohdattu", "kohtaamaton", "alikohdattu"), mikä helpottaa termien käyttöä yhdessä.'
     },
     {
-      term: 'Kohtaamaton tavoittamaton kansanryhmä (UUPG)',
+      term: 'Lähetystyön ulkopuolella oleva saavuttamaton kansanryhmä (UUPG)',
       english: 'unengaged unreached people group (UUPG)',
       definition:
-        'Yhdistetty luokka — tavoittamaton ja kohtaamaton. Näitä on 2 085 kansanryhmää, joiden puolesta DOXA mobilisoi rukousta.',
+        'Yhdistetty luokka — saavuttamaton ja lähetystyön ulkopuolella oleva. Näitä on 2 085 kansanryhmää, joiden puolesta DOXA mobilisoi rukousta.',
       rationale:
         'Englannin lyhenne UUPG säilytetään, kuten useimmissa muissakin kieliversioissa, koska se on kansainvälinen vakiotermi eikä suomenkielistä vastinetta ole vielä sovittu.'
     },
     {
-      term: 'Alikohdattu',
+      term: 'Riittämättömästi saavutettu kansanryhmä',
       english: 'under-engaged people group',
       definition:
         'Kansanryhmä, jossa on noin 1 opetuslapsi tai vähemmän 100 henkeä kohden (≤ 1 %): työ on alkanut, mutta hedelmälliseen kohtaamistyöhön tarvitaan lisää seurakunnan istuttamiseen keskittyviä tiimejä.',
@@ -56,10 +56,10 @@ export const fi: TermsContent = {
         'Yhdyssana "alikohdattu" pysyy samassa sanaperheessä kuin "kohdattu" ja "kohtaamaton" ja välttää vaikutelman, että kansa itse olisi passiivinen.'
     },
     {
-      term: 'Äärirajojen kansanryhmä',
+      term: 'Täysin saavuttamaton kansanryhmä',
       english: 'frontier people group',
       definition:
-        'Kansanryhmä, jossa on noin 1 opetuslapsi tai vähemmän 1 000 henkeä kohden (≤ 0,1 %) eikä tunnettua, kestävää liikettä Jeesuksen puoleen — tavoittamattomista tavoittamattomin. Termi on peräisin Joshua Projectilta.',
+        'Kansanryhmä, jossa on noin 1 opetuslapsi tai vähemmän 1 000 henkeä kohden (≤ 0,1 %) eikä tunnettua, kestävää liikettä Jeesuksen puoleen — saavuttamattomista saavuttamattomin. Termi on peräisin Joshua Projectilta.',
       rationale:
         '"Äärirajojen" välittää lähetysteologisen merkityksen eturintamasta ilman sotilaallista sävyä.'
     },
@@ -99,7 +99,7 @@ export const fi: TermsContent = {
       term: 'Elonkorjuun Herra',
       english: 'Lord of the harvest',
       definition:
-        'Raamatullinen nimitys Jeesukselle (Matt. 9:38), jota käytetään rukouskehotuksessa, että hän lähettäisi työntekijöitä kohtaamattomien keskuuteen.',
+        'Raamatullinen nimitys Jeesukselle (Matt. 9:38), jota käytetään rukouskehotuksessa, että hän lähettäisi työntekijöitä lähetystyön ulkopuolella olevaien kansanryhmien keskuuteen.',
       rationale:
         'Ilmaisu seuraa vakiintunutta suomalaista raamatunkäännöstapaa; tarkka käännösversio (esim. FIK38) tarkistetaan kielentarkistuksen yhteydessä.'
     },
@@ -131,7 +131,7 @@ export const fi: TermsContent = {
       term: 'Ottaa kansanryhmä vastuulleen',
       english: 'adopt (a people group)',
       definition:
-        'Seurakuntalähtöinen, pitkäaikainen sitoumus rukoilla, antaa ja lähettää, jotta evankeliumin saavutettavuus alkaa toteutua tiettyä kohtaamatonta kansanryhmää varten — lähetystyöllistä vastuunottoa, ei perheoikeudellista adoptiota.',
+        'Seurakuntalähtöinen, pitkäaikainen sitoumus rukoilla, antaa ja lähettää, jotta evankeliumin saavutettavuus alkaa toteutua tiettyä lähetystyön ulkopuolella olevaa kansanryhmää varten — lähetystyöllistä vastuunottoa, ei perheoikeudellista adoptiota.',
       rationale:
         'Sanaston luonnosvastine on pitkä kuvaileva ilmaus perheoikeudellisen "adoptio"-sanan sekaannuksen välttämiseksi; lyhyempi, painikkeeseen sopiva muoto on vielä sanaston keskustelussa.'
     },
@@ -162,7 +162,7 @@ export const fi: TermsContent = {
       term: 'Päivittäinen rukous kansanryhmän puolesta',
       english: 'daily prayer (for a people group)',
       definition:
-        'Sitoumus rukoilla päivittäin tietyn kohtaamattoman kansanryhmän puolesta, käyttäen päivittäistä rukousopasta. Tavoitteena on yli 100 päivittäistä esirukoilijaa kutakin kansanryhmää kohden.',
+        'Sitoumus rukoilla päivittäin tietyn lähetystyön ulkopuolella olevan kansanryhmän puolesta, käyttäen päivittäistä rukousopasta. Tavoitteena on yli 100 päivittäistä esirukoilijaa kutakin kansanryhmää kohden.',
       rationale:
         '"Päivittäinen" on tarkoituksellinen sana, joka erottaa tämän säännöllisestä tai satunnaisesta rukouksesta.'
     },
