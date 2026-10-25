@@ -7,7 +7,7 @@
  * Everything else in the app is prop-free at the web component boundary.
  *
  * Usage:
- *   <doxa-map profile-config='{"profile":"example-map","tk":"pk.eyJ...","instanceId":"my-map"}'></doxa-map>
+ *   <doxa-map profile-config='{"profile":"example-map","tk":"MAPBOX_PUBLIC_TOKEN","instanceId":"my-map"}'></doxa-map>
  *
  * instanceId — optional. If omitted, a random ID is generated.
  * Used to isolate window events so multiple <doxa-map> embeds on the same page
@@ -108,7 +108,7 @@ provide('dataStore', dataStore)
     <!-- Error: no profile-config prop -->
     <div v-if="!config" class="profile-error">
       <p>⚠️ <strong>doxa-map</strong>: missing or invalid <code>profile-config</code> prop.</p>
-      <p>Example: <code>profile-config='{"profile":"example-map","tk":"pk.eyJ..."}'</code></p>
+      <p>Example: <code>profile-config='{"profile":"example-map","tk":"MAPBOX_PUBLIC_TOKEN"}'</code></p>
     </div>
 
     <!-- Error: profile name not found in registry -->

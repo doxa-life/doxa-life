@@ -51,11 +51,133 @@ useHead({
     : []
 })
 
-const homeMapConfig = JSON.stringify({
+// THE MAP comes from this site's own copy of the dx-maps output (public/dx-maps/) and is loaded here,
+// not through DoxaMapSlot, which loads the older bundle in public/js/. Mapbox with the site's token, as
+// before; the keyless MapLibre when there is none. Its styles and boundaries live in the same tree, and
+// the site's language is the map's.
+const homeMapConfig = computed(() => JSON.stringify({
   profile: 'doxa-simple-map',
   dataSource: 'pray-tools',
-  tk: mapboxToken,
-  tabs: [{ id: 'engagement', colorStrategy: 'engagement', legend: 'engagement', popup: 'engagement' }]
+  tabs: [{ id: 'engagement', colorStrategy: 'engagement', legend: 'engagement', popup: 'engagement' }],
+  provider: mapboxToken ? 'mapbox' : 'maplibre',
+  ...(mapboxToken ? { tk: mapboxToken } : {}),
+  assetsBase: '/dx-maps/assets',
+  locale: locale.value
+}))
+// THE MAP'S ELEMENT, <dxm-simple-map>: DX Maps' own name for it, so it never meets the older <doxa-map> elements
+// elsewhere on the site, in whatever order the pages are visited. Its bundle comes from this site's own copy of
+// the dx-maps output and is added once per visit. A load in progress is shared, and a failed load takes its tag
+// away again, so a later page tries afresh; the page then shows without the map.
+const MAP_TAG = 'dxm-simple-map'
+const MAP_SCRIPT = '/dx-maps/doxa-simple-map/doxa-simple-map.js'
+// FRESH, NOT STALE: a returning reader's browser may keep /dx-maps/ files for hours (no cache rule is sent for them), so
+// the script is asked for once with cache 'no-cache' before it is added (a 304 when unchanged; a changed file replaces the
+// stale copy), then added at its PLAIN address, so DX Maps' gallery still recognises it and never runs it twice.
+function revalidate(src: string): Promise<void> {
+  return fetch(src, { cache: 'no-cache', credentials: 'same-origin' })
+    .then((r) => { if (r.status === 200 && r.body) r.body.cancel() })
+    .catch(() => {})
+}
+function loadMapBundle(): Promise<void> {
+  if (customElements.get(MAP_TAG)) return Promise.resolve()
+  return revalidate(MAP_SCRIPT).then(() => addMapBundle())
+}
+function addMapBundle(): Promise<void> {
+  if (customElements.get(MAP_TAG)) return Promise.resolve()
+  const pending = document.querySelector<HTMLScriptElement>('script[data-dxl-map="' + MAP_TAG + '"]')
+  if (pending) {
+    return new Promise((resolve, reject) => {
+      pending.addEventListener('load', () => customElements.get(MAP_TAG) ? resolve() : reject(new Error('the map bundle did not register')), { once: true })
+      pending.addEventListener('error', () => reject(new Error('the map bundle failed to load')), { once: true })
+    })
+  }
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script')
+    const fail = (message: string) => {
+      script.remove()
+      reject(new Error(message))
+    }
+    script.src = MAP_SCRIPT
+    script.dataset.dxlMap = MAP_TAG
+    script.onload = () => customElements.get(MAP_TAG) ? resolve() : fail('the map bundle did not register')
+    script.onerror = () => fail('the map bundle failed to load')
+    document.head.appendChild(script)
+  })
+}
+// THE PHONE HEIGHT, LOCKED IN PX: 80% of the window's height when the page opens (never under 320px), so the map
+// box does not grow and shrink while the browser's address bar collapses and expands during a scroll, which also
+// broke a drag on the map. It is measured again only when the WIDTH changes (a rotation), never on a height-only
+// resize. Wider screens keep the stylesheet's height; 80svh there is the fallback until this runs.
+// A phone: a narrow screen, or a touch screen held sideways (the same test as the stylesheet's phone rules).
+const PHONE_QUERY = '(max-width: 768px), (pointer: coarse) and (max-height: 600px)'
+function lockPhoneHeight(slot: HTMLElement): () => void {
+  const PHONE = window.matchMedia(PHONE_QUERY)
+  let width = -1
+  const lock = () => {
+    if (window.innerWidth === width) return
+    width = window.innerWidth
+    slot.style.height = PHONE.matches ? `${Math.max(320, Math.round(window.innerHeight * 0.8))}px` : ''
+  }
+  lock()
+  window.addEventListener('resize', lock)
+  return () => window.removeEventListener('resize', lock)
+}
+let unlockHeight: (() => void) | null = null
+onMounted(() => { if (homeMapHost.value) unlockHeight = lockPhoneHeight(homeMapHost.value) })
+onBeforeUnmount(() => unlockHeight?.())
+// THE SCROLL BAND STEPS ASIDE FOR THE MAP'S PANELS. A panel the map's controls open (Share, and every other menu)
+// sits at the map's top, under the band, so its ✕ could not be tapped. DX Maps says when a panel opens (the composed
+// 'dxmaps:panel-open') and when it closes ('dxmaps:panel-close'). The band counts them (another panel can still be open
+// when one closes) and stays off while the count is above 0; for builds without the close event, it also comes back
+// after any tap once no panel is open in the map any more.
+const padOff = ref(false)
+let openPanels = 0
+function mapPanelOpen(): boolean {
+  const walk = (node: Element | ShadowRoot): boolean => {
+    for (const n of node.querySelectorAll('*')) {
+      if (n.classList.contains('mcm')) return true
+      if (n.shadowRoot && walk(n.shadowRoot)) return true
+    }
+    return false
+  }
+  return !!homeMap && walk(homeMap.shadowRoot || homeMap)
+}
+const onPanelOpen = () => { openPanels++; padOff.value = true }
+const onPanelClose = () => { openPanels = Math.max(0, openPanels - 1); padOff.value = openPanels > 0 }
+const onAnyTap = () => {
+  if (padOff.value) setTimeout(() => { if (!mapPanelOpen()) { openPanels = 0; padOff.value = false } }, 50)
+}
+onMounted(() => {
+  homeMapHost.value?.addEventListener('dxmaps:panel-open', onPanelOpen)
+  homeMapHost.value?.addEventListener('dxmaps:panel-close', onPanelClose)
+  document.addEventListener('click', onAnyTap, true)
+})
+onBeforeUnmount(() => {
+  homeMapHost.value?.removeEventListener('dxmaps:panel-open', onPanelOpen)
+  homeMapHost.value?.removeEventListener('dxmaps:panel-close', onPanelClose)
+  document.removeEventListener('click', onAnyTap, true)
+})
+// The prayer API the map reads is set before its script runs; the element is created once the bundle is in.
+const homeMapHost = ref<HTMLElement | null>(null)
+let homeMap: HTMLElement | null = null
+onMounted(async () => {
+  if (config.public.prayBaseUrl) window.MAP_APP_API_URL = config.public.prayBaseUrl as string
+  try {
+    await loadMapBundle()
+  } catch (err) {
+    console.error('[home map]', err)
+    return
+  }
+  if (!homeMapHost.value) return
+  homeMap = document.createElement(MAP_TAG)
+  homeMap.id = 'home-map'
+  homeMap.setAttribute('profile-config', homeMapConfig.value)
+  homeMapHost.value.prepend(homeMap)
+})
+watch(homeMapConfig, (value) => { homeMap?.setAttribute('profile-config', value) })
+onBeforeUnmount(() => {
+  homeMap?.remove()
+  homeMap = null
 })
 
 useTextHighlight()
@@ -114,7 +236,9 @@ useTextHighlight()
           data-highlight-color="primary"
         >{{ t('DOXA people groups around the world') }}</h1>
       </div>
-      <DoxaMapSlot map-id="home-map" :profile-config="homeMapConfig" class="rounded-xlg" />
+      <div ref="homeMapHost" class="doxa-map-slot rounded-xlg">
+        <div class="doxa-map-scroll-pad doxa-map-scroll-pad--top" :class="{ 'is-off': padOff }" />
+      </div>
       <NuxtLink
         :to="localePath('/research')"
         class="research-map-link"
@@ -336,5 +460,66 @@ useTextHighlight()
 }
 .research-map-link:hover {
   color: var(--color-brand-primary-darker, #1f2328);
+}
+
+/* The map's frame, as DoxaMapSlot draws it. */
+.doxa-map-slot {
+  display: block;
+  position: relative;
+  width: 100%;
+  min-height: 780px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+@media (max-width: 768px), (pointer: coarse) and (max-height: 600px) {
+  /* On a phone the map is 80% of the SMALL viewport height, a little shorter than the screen so the page
+     stays in view (svh does not jump when the browser's address bar collapses), never under 320px. */
+  .doxa-map-slot {
+    min-height: 320px;
+    aspect-ratio: auto;
+    height: 80svh;
+  }
+}
+/* The card's corners are concentric with the map's top control (a 32px round button 3px in: 3 + 16 = 19px), so the
+   rounded corner no longer cuts across it. */
+.doxa-map-slot.rounded-xlg {
+  border-radius: 19px;
+}
+.doxa-map-slot :deep(dxm-simple-map) {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  overflow: hidden;
+  contain: paint;
+}
+.doxa-map-scroll-pad {
+  display: none;
+}
+@media (max-width: 768px), (pointer: coarse) and (max-height: 600px) {
+  .doxa-map-scroll-pad {
+    display: block;
+    position: absolute;
+    /* stops short of the map's control column at the inline end (32px round buttons, 3px in), so the ＋ and
+       the other controls stay tappable; the rest of the band still lets a finger scroll the page */
+    inset-inline-start: 0;
+    inset-inline-end: 44px;
+    height: 48px;
+    z-index: 1500;
+    touch-action: pan-y;
+    pointer-events: auto;
+  }
+  .doxa-map-scroll-pad--top { top: 0; }
+  /* while a map panel is open, its ✕ and its contents get every tap */
+  .doxa-map-scroll-pad.is-off { display: none; }
+}
+.doxa-map-slot :deep(dxm-simple-map:fullscreen),
+.doxa-map-slot :deep(dxm-simple-map:-webkit-full-screen) {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
 }
 </style>

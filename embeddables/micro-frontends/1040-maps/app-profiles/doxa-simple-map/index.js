@@ -10,11 +10,11 @@
  *
  * Usage from a host page (legacy):
  *   <script src="/app/doxa-simple-map.iife.js"></script>
- *   <doxa-map profile-config='{"profile":"doxa-simple-map","tk":"pk.eyJ..."}'></doxa-map>
+ *   <doxa-map profile-config='{"profile":"doxa-simple-map","tk":"MAPBOX_PUBLIC_TOKEN"}'></doxa-map>
  *
  * Usage (new):
  *   <script src="/app/doxa-simple-map.iife.js"></script>
- *   <doxa-simple-map profile-config='{"profile":"doxa-simple-map","tk":"pk.eyJ..."}'></doxa-simple-map>
+ *   <doxa-simple-map profile-config='{"profile":"doxa-simple-map","tk":"MAPBOX_PUBLIC_TOKEN"}'></doxa-simple-map>
  *
  * The profile-config attribute is parsed by ProfileLoader (in @map).
  * `profile` must match a file in this bundle's profiles/ folder.

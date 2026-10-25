@@ -11,7 +11,7 @@
  * profile-config shape (minimal for research-map):
  *   {
  *     "profile":   "research-map",
- *     "tk":        "pk.eyJ...",
+ *     "tk":        "MAPBOX_PUBLIC_TOKEN",
  *     "dataSource": "pray-tools",
  *     "instanceId": "any-stable-id"
  *   }

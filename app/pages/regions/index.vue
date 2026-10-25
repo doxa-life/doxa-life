@@ -107,6 +107,8 @@ useTextHighlight()
               </svg>
             </NuxtLink>
           </p>
+          <!-- Country posters for this region, under the dashboard link (a PosterSlot: DX Maps' poster section). -->
+          <PosterSlot :scope="region.slug" />
         </div>
       </div>
     </div>
