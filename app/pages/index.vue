@@ -79,16 +79,16 @@ useTextHighlight()
         </svg>
         <picture>
           <source
-            srcset="/assets/images/home-01-hero.avif"
+            srcset="/assets/images/home-01-hero-v2.avif"
             type="image/avif"
           >
           <source
-            srcset="/assets/images/home-01-hero.webp"
+            srcset="/assets/images/home-01-hero-v2.webp"
             type="image/webp"
           >
           <img
             class="rounded-xlg"
-            src="/assets/images/home-01-hero.jpg"
+            src="/assets/images/home-01-hero-v2.jpg"
             :alt="t('Engage every people by 2033')"
             width="1200"
             height="723"
