@@ -36,7 +36,7 @@ export interface ResourceNoImage {
 // `doxa_get_s3_lang_code()`. Keep in sync when new translated files
 // are uploaded to the S3 bucket.
 const DOCUMENT_LANGS: Record<string, string[]> = {
-  'doxa-playbook': ['en', 'es', 'de', 'pt', 'ro', 'ru'],
+  'doxa-playbook': ['en', 'es', 'de', 'pt', 'ro', 'ru', 'hi'],
   'doxa-playbook-slides': ['en'],
   'introduction-2025': ['en'],
   'vision-and-values': ['en'],
