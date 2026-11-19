@@ -181,6 +181,13 @@ export default defineNuxtConfig({
     '/en/**': { redirect: '/**' }
   },
 
+  // Local dev without the marketing database: serve CMS content (/resources,
+  // /about, the Training page list, …) from the live site's public API so
+  // those pages can still be tested. Never applies to builds.
+  $development: process.env.DATABASE_URL
+    ? {}
+    : { routeRules: { '/api/pages/**': { proxy: 'https://doxa.life/api/pages/**' } } },
+
   nitro: {
     // DigitalOcean App Platform installs and runs with Bun (only bun.lock is
     // committed). The default node-server preset traces external deps with

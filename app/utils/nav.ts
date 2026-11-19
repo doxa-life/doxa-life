@@ -12,6 +12,8 @@ export interface NavItem {
 // Main header navigation (desktop). Minimal on purpose — the full list
 // lives in the hamburger menu; this matches the live site layout.
 export const PRIMARY_NAV: NavItem[] = [
+  { key: 'UUPGS', to: '/uupgs' },
+  { key: 'Training', to: '/training' },
   { key: 'Pray', to: '/pray' }
 ]
 
@@ -29,8 +31,9 @@ export const SECONDARY_NAV: NavItem[] = [
   { key: 'About', to: '/about' },
   { key: 'Research', to: '/research' },
   { key: 'Pray', to: '/pray' },
+  { key: 'UUPGS', to: '/uupgs' },
   { key: 'Adopt', to: '/adopt' },
-  { key: 'Resources', to: '/resources' },
+  { key: 'Training', to: '/training' },
   { key: 'Regions', to: '/regions' },
   { key: 'Give', href: 'https://giving.ag.org/donate/600001-6C2327?utm_source=direct_link' }
 ]

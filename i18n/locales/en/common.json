@@ -272,7 +272,7 @@
   "Unengaged people groups": "Unengaged people groups",
   "UUPG Detail": "UUPG Detail",
   "UUPG Photo": "UUPG Photo",
-  "UUPGS": "UUPGS",
+  "UUPGS": "UUPGs",
   "Under-Engaged": "Under-Engaged",
   "Unengaged": "Unengaged",
   "Unengaged people groups have no missionaries, no churches, and often no known believers. Adoption helps ensure they are finally seen, prayed for, and intentionally pursued with the gospel.": "Unengaged people groups have no missionaries, no churches, and often no known believers. Adoption helps ensure they are finally seen, prayed for, and intentionally pursued with the gospel.",
@@ -311,5 +311,9 @@
   "churches / individuals have adopted this people group": "churches / individuals have adopted this people group",
   "people groups adopted": "people groups adopted",
   "{0} People Groups": "{0} People Groups",
-  "{0} unengaged people groups": "{0} unengaged people groups"
+  "{0} unengaged people groups": "{0} unengaged people groups",
+  "Training": "Training",
+  "Unengaged, Unreached People Groups": "Unengaged, Unreached People Groups",
+  "These people groups have no one signed up to pray for them yet. The list is updated continuously and sorted by population, largest first. Each name links to its prayer page.": "These people groups have no one signed up to pray for them yet. The list is updated continuously and sorted by population, largest first. Each name links to its prayer page.",
+  "People groups with no one praying (PDF)": "People groups with no one praying (PDF)"
 }
