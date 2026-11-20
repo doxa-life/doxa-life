@@ -20,6 +20,7 @@ logs
 .DS_Store
 .fleet
 .idea
+*.dump
 
 # Plugin-local CLAUDE.md files are kept on disk for Claude context but not tracked
 public/plugins/**/CLAUDE.md
