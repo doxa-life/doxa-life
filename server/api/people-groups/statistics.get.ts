@@ -19,32 +19,24 @@ export interface PrayerStatisticsResponse {
   committed_duration: string
 }
 
-interface PeopleGroupListResponse {
-  posts?: Array<{ people_committed?: number | string | null }>
+// Upstream fields counted from sign-ups (active campaign_subscriptions):
+// the same definition as the "groups without prayer" PDF and the admin
+// dashboard. Upstream's plain `total_with_prayer` counts the older
+// `people_praying` column instead, which lags behind real sign-ups, so it is
+// never used here.
+interface UpstreamStatistics extends Partial<PrayerStatisticsResponse> {
+  total_with_prayer_committed?: number
+  total_with_100_committed?: number
 }
-
-const FULL_PRAYER_COVERAGE_COUNT = 100
 
 export default defineCachedEventHandler(
   async (): Promise<PrayerStatisticsResponse> => {
     const config = useRuntimeConfig()
     const prayBaseUrl = String(config.public.prayBaseUrl || '').replace(/\/$/, '')
-    const data = await $fetch<Partial<PrayerStatisticsResponse>>(`${prayBaseUrl}/api/people-groups/statistics`, { timeout: 10_000 })
+    const data = await $fetch<UpstreamStatistics>(`${prayBaseUrl}/api/people-groups/statistics`, { timeout: 10_000 })
 
-    let totalWithPrayer = Number(data.total_with_prayer || 0)
-    let totalWithFullPrayer = Number(data.total_with_full_prayer || 0)
-
-    try {
-      const list = await $fetch<PeopleGroupListResponse>(
-        `${prayBaseUrl}/api/people-groups/list?fields=people_committed`,
-        { timeout: 10_000 }
-      )
-      const committedCounts = (list.posts || []).map(post => Number(post.people_committed || 0))
-      totalWithPrayer = committedCounts.filter(count => count > 0).length
-      totalWithFullPrayer = committedCounts.filter(count => count >= FULL_PRAYER_COVERAGE_COUNT).length
-    } catch (error) {
-      console.warn('Unable to derive prayer coverage statistics from people-group list:', error)
-    }
+    const totalWithPrayer = Number(data.total_with_prayer_committed || 0)
+    const totalWithFullPrayer = Number(data.total_with_100_committed || 0)
 
     return {
       total: Number(data.total || 0),
@@ -59,7 +51,7 @@ export default defineCachedEventHandler(
     }
   },
   {
-    maxAge: 60 * 60,
+    maxAge: 60 * 10,
     swr: true,
     name: 'people-groups-statistics'
   }
