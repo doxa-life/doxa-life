@@ -51,7 +51,7 @@
       ],
       "pollFields": [
         "slug",
-        "people_praying"
+        "people_committed"
       ],
       "pollInterval": 300000,
       "fallbackSourceId": null,
@@ -73,7 +73,7 @@
         "hasPhoto": "has_photo",
         "imageUrl": "image_url",
         "photoUrl": "image_url",
-        "peoplePraying": "people_praying",
+        "peoplePraying": "people_committed",
         "peopleCommitted": "people_committed",
         "engagementStatus": "engagement_status",
         "adoptionStatus": "adopted_by_churches",
